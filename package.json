@@ -1,0 +1,23 @@
+{
+  "name": "mathgen",
+  "version": "1.0.0",
+  "description": "Öğretmenler ve veliler için ilkokul seviyesinde, farklı zorluklarda özelleştirilebilir ve yazdırılabilir matematik problemleri üreten bir web uygulaması.",
+  "scripts": {
+    "start": "echo \"Application is served directly from index.html. No build step is required.\" && exit 0"
+  },
+  "keywords": [
+    "math",
+    "education",
+    "worksheet",
+    "generator"
+  ],
+  "author": "MathGen Developer",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@google/genai": "^0.15.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

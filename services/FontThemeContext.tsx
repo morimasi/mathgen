@@ -1,0 +1,50 @@
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
+
+export type FontTheme = 'klasik' | 'modern' | 'disleksi1' | 'disleksi2' | 'eglenceli';
+
+export const fontThemes: Record<FontTheme, { name: string; className: string }> = {
+  klasik: { name: 'Klasik (Lora)', className: 'font-theme-klasik' },
+  modern: { name: 'Modern (Nunito Sans)', className: 'font-theme-modern' },
+  disleksi1: { name: 'Disleksi Dostu (Lexend)', className: 'font-theme-disleksi1' },
+  disleksi2: { name: 'Okunaklı (Atkinson)', className: 'font-theme-disleksi2' },
+  eglenceli: { name: 'El Yazısı (Caveat)', className: 'font-theme-eglenceli' },
+};
+
+interface FontThemeContextType {
+    fontTheme: FontTheme;
+    setFontTheme: (theme: FontTheme) => void;
+}
+
+const FontThemeContext = createContext<FontThemeContextType | undefined>(undefined);
+
+export const FontThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [fontTheme, setFontTheme] = useState<FontTheme>(() => {
+        const storedTheme = localStorage.getItem('fontTheme');
+        return (storedTheme && fontThemes[storedTheme as FontTheme]) ? (storedTheme as FontTheme) : 'disleksi1';
+    });
+
+    useEffect(() => {
+        Object.values(fontThemes).forEach(theme => {
+            document.body.classList.remove(theme.className);
+        });
+
+        document.body.classList.add(fontThemes[fontTheme].className);
+        localStorage.setItem('fontTheme', fontTheme);
+    }, [fontTheme]);
+
+    const value = useMemo(() => ({ fontTheme, setFontTheme }), [fontTheme]);
+
+    return (
+        <FontThemeContext.Provider value={value}>
+            {children}
+        </FontThemeContext.Provider>
+    );
+};
+
+export const useFontTheme = (): FontThemeContextType => {
+    const context = useContext(FontThemeContext);
+    if (!context) {
+        throw new Error('useFontTheme must be used within a FontThemeProvider');
+    }
+    return context;
+};
