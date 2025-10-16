@@ -59,7 +59,7 @@ const AnimatedLogo: React.FC<AnimatedLogoProps> = ({ onReset }) => {
             title="Uygulamayı Sıfırla"
             aria-label="Uygulamayı Sıfırla"
         >
-            <svg viewBox="0 0 150 150" className="absolute -top-8 -left-8 w-24 h-24 overflow-visible">
+            <svg viewBox="0 0 150 150" className="absolute -top-2 -left-2 w-12 h-12 overflow-visible">
                 <g className="daisy-sway" style={{ animationPlayState: isExploded ? 'paused' : 'running' }}>
                     
                     {/* Core parts that fade away */}
@@ -99,7 +99,7 @@ const AnimatedLogo: React.FC<AnimatedLogoProps> = ({ onReset }) => {
                     </g>
                 </g>
             </svg>
-            <div className="absolute -top-[1.6rem] left-[0.1rem] w-20 h-20">
+            <div className="absolute w-10 h-10" style={{ top: '-4.8px', left: '8.8px' }}>
                  <LadybugSVG className="crawling-bug w-6 h-6" />
             </div>
         </button>

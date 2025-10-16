@@ -69,7 +69,7 @@ html.dark body {
 }
 
 .crawling-bug {
-    offset-path: path("M 30,53 C 40,30 70,30 80,53 S 100,85 80,107 S 40,125 30,107 S 10,80 30,53 Z");
+    offset-path: path("M 15,26.5 C 20,15 35,15 40,26.5 S 50,42.5 40,53.5 S 20,62.5 15,53.5 S 5,40 15,26.5 Z");
     animation: crawl-path 12s infinite linear;
     offset-rotate: auto;
 }
