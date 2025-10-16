@@ -151,11 +151,11 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
     const isTableLayout = printSettings.layoutMode === 'table';
 
     return (
-        <div className="space-y-3">
-            <h2 className="text-base font-semibold">Dört İşlem Ayarları</h2>
+        <div className="space-y-2">
+            <h2 className="text-sm font-semibold">Dört İşlem Ayarları</h2>
             
-            <div className="grid grid-cols-1 gap-3">
-                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="grid grid-cols-1 gap-2">
+                <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                     <Checkbox
                         label="Gerçek Hayat Problemleri (AI)"
                         id="use-word-problems"
@@ -163,7 +163,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                         onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
                     />
                     {settings.useWordProblems && (
-                        <div className="mt-2 pl-6 space-y-2">
+                        <div className="mt-1.5 pl-6 space-y-1.5">
                             <Select
                                 label="Gereken İşlem Sayısı"
                                 id="arithmetic-op-count"
@@ -182,15 +182,15 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                                     value={settings.topic || ''}
                                     onChange={e => handleSettingChange('topic', e.target.value)}
                                     placeholder="Örn: Market, Park, Oyuncaklar"
-                                    className="pr-10"
+                                    className="pr-9"
                                 />
                                 <button
                                     type="button"
                                     onClick={handleRandomTopic}
-                                    className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                                    className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
                                     title="Rastgele Konu Öner"
                                 >
-                                    <ShuffleIcon className="w-5 h-5" />
+                                    <ShuffleIcon className="w-4 h-4" />
                                 </button>
                             </div>
                              <Checkbox
@@ -202,7 +202,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                         </div>
                     )}
                 </div>
-                 <div className="p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                 <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <Checkbox
                         label="Otomatik Sığdır"
                         id="auto-fit"
@@ -215,7 +215,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
             </div>
 
 
-            <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                 <Select
                     label="Sınıf Düzeyi"
                     id="arithmetic-grade-level"
@@ -339,7 +339,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                     disabled={isTableLayout}
                     title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
                 />
-                <div className="flex items-center pt-5">
+                <div className="flex items-center pt-3">
                     {isAddSub && (
                         <Checkbox
                             label="Üçüncü Sayı Ekle"
@@ -356,7 +356,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
-            <div className="flex flex-wrap gap-2 pt-3">
+            <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
                 <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
                     <ShuffleIcon className="w-4 h-4" />

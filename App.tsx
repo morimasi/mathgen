@@ -315,7 +315,7 @@ const AppContent: React.FC = () => {
                         className="print:hidden settings-panel"
                         onMouseEnter={() => setIsSettingsPanelCollapsed(false)}
                     >
-                         <div className="settings-panel-content bg-white dark:bg-stone-800/80 p-6 rounded-lg shadow-sm sticky top-[10.5rem]">
+                         <div className="settings-panel-content bg-white dark:bg-stone-800/80 p-4 rounded-lg shadow-sm sticky top-[10.5rem]">
                             <SettingsPanel 
                                 onGenerate={handleGenerate} 
                                 setIsLoading={setIsLoading} 
