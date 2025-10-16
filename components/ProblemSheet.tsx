@@ -127,7 +127,9 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
                             <header className="worksheet-header">
                                 <div className="worksheet-title" />
                                 <div className="worksheet-info">
-                                    <span className="whitespace-nowrap">Okul: ..........................&nbsp;&nbsp;&nbsp;&nbsp;İsim: ..........................&nbsp;&nbsp;&nbsp;&nbsp;Tarih: ..........................</span>
+                                    <span className="whitespace-nowrap">Okul: ..........................</span>
+                                    <span className="whitespace-nowrap">İsim: ..........................</span>
+                                    <span className="whitespace-nowrap">Tarih: ..........................</span>
                                 </div>
                             </header>
                         )}
