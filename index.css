@@ -583,18 +583,19 @@ html.dark .table-selector-grid {
     background-color: #e7e5e4; /* stone-200 */
     border: 1px solid #d4d4d8; /* stone-300 */
     border-radius: 2px;
-    transition: background-color 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
+    transform: scale(1);
 }
 html.dark .table-selector-cell {
     background-color: #57534e; /* stone-600 */
     border-color: #3f3f46; /* stone-700 */
 }
 
-.table-selector-cell.hovered {
-    background-color: #fdba74; /* orange-300 */
-}
 .table-selector-cell.selected {
     background-color: #f97316; /* orange-500 */
+    border-color: #c2410c; /* orange-700 */
+    transform: scale(1.1);
+    border-radius: 3px;
 }
 
 /* Tailwind Prose Overrides for HowToUse Modal */
@@ -626,6 +627,7 @@ body.theme-mint .bg-orange-100 { background-color: #d1fae5; }
 body.theme-mint .text-orange-800 { color: #065f46; }
 body.theme-mint .prose ul > li::before { background-color: #059669; }
 body.theme-mint .prose ol > li::before { color: #065f46; }
+body.theme-mint .table-selector-cell.selected { background-color: #10b981; border-color: #059669; }
 .dark body.theme-mint .dark\:bg-orange-900\/50 { background-color: rgba(6, 78, 59, 0.5); }
 .dark body.theme-mint .dark\:text-orange-300 { color: #6ee7b7; }
 .dark body.theme-mint .dark\:text-orange-400 { color: #34d399; }
@@ -641,6 +643,7 @@ body.theme-rose .bg-orange-100 { background-color: #fce7f3; }
 body.theme-rose .text-orange-800 { color: #9d174d; }
 body.theme-rose .prose ul > li::before { background-color: #db2777; }
 body.theme-rose .prose ol > li::before { color: #9d174d; }
+body.theme-rose .table-selector-cell.selected { background-color: #ec4899; border-color: #db2777; }
 .dark body.theme-rose .dark\:bg-orange-900\/50 { background-color: rgba(136, 19, 55, 0.5); }
 .dark body.theme-rose .dark\:text-orange-300 { color: #f9a8d4; }
 .dark body.theme-rose .dark\:text-orange-400 { color: #f472b6; }
@@ -656,6 +659,7 @@ body.theme-sky .bg-orange-100 { background-color: #e0f2fe; }
 body.theme-sky .text-orange-800 { color: #075985; }
 body.theme-sky .prose ul > li::before { background-color: #0284c7; }
 body.theme-sky .prose ol > li::before { color: #075985; }
+body.theme-sky .table-selector-cell.selected { background-color: #0ea5e9; border-color: #0284c7; }
 .dark body.theme-sky .dark\:bg-orange-900\/50 { background-color: rgba(12, 74, 110, 0.5); }
 .dark body.theme-sky .dark\:text-orange-300 { color: #7dd3fc; }
 .dark body.theme-sky .dark\:text-orange-400 { color: #38bdf8; }
