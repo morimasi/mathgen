@@ -5,7 +5,6 @@ import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { useToast } from '../services/ToastContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
@@ -31,7 +30,6 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
     setSettings
 }) => {
     const { settings: printSettings, setSettings: setPrintSettings } = usePrintSettings();
-    const { addToast } = useToast();
     const isInitialMount = useRef(true);
     
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
@@ -55,10 +53,9 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
             }
         } catch (error: any) {
             console.error(error);
-            addToast(error.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
     
     useEffect(() => {
         // This module is "live", so it should update whenever its settings or print settings change.

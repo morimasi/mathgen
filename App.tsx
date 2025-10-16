@@ -5,7 +5,6 @@ import { ThemeProvider } from './services/ThemeContext';
 import { FontThemeProvider } from './services/FontThemeContext';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext';
-import { ToastProvider, useToast } from './services/ToastContext';
 import Tabs from './components/Tabs';
 import SettingsPanel from './components/SettingsPanel';
 import ProblemSheet from './components/ProblemSheet';
@@ -13,7 +12,6 @@ import PrintSettingsPanel from './components/PrintSettingsPanel';
 import HowToUseModal from './components/HowToUseModal';
 import ContactModal from './components/ContactModal';
 import ThemeSwitcher from './components/ThemeSwitcher';
-import ToastContainer from './components/ToastContainer';
 import { TAB_GROUPS } from './constants';
 import { Problem, PrintSettings, VisualSupportSettings, ArithmeticOperation } from './types';
 import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon } from './components/icons/Icons';
@@ -140,7 +138,6 @@ const AppContent: React.FC = () => {
     });
 
     const { settings: printSettings } = usePrintSettings();
-    const { addToast } = useToast();
     const contentRef = useRef<HTMLDivElement>(null);
     const worksheetParentRef = useRef<HTMLDivElement>(null);
 
@@ -162,7 +159,7 @@ const AppContent: React.FC = () => {
         if (!contentElement || isPdfLoading) return;
     
         setIsPdfLoading(true);
-        addToast('Yazdırma için PDF oluşturuluyor...', 'info');
+        console.info('Yazdırma için PDF oluşturuluyor...');
         document.body.classList.add('pdf-export-mode');
         
         try {
@@ -175,11 +172,10 @@ const AppContent: React.FC = () => {
                 const pdfUrl = URL.createObjectURL(blob);
                 window.open(pdfUrl);
             } else {
-                 addToast('PDF oluşturulamadı.', 'error');
+                 console.error('PDF oluşturulamadı.');
             }
         } catch (error) {
             console.error("Error preparing PDF for printing:", error);
-            addToast('PDF yazdırılırken bir hata oluştu.', 'error');
         } finally {
             document.body.classList.remove('pdf-export-mode');
             setIsPdfLoading(false);
@@ -191,7 +187,7 @@ const AppContent: React.FC = () => {
         if (!contentElement || isPdfLoading) return;
 
         setIsPdfLoading(true);
-        addToast('PDF dosyası oluşturuluyor...', 'info');
+        console.info('PDF dosyası oluşturuluyor...');
         document.body.classList.add('pdf-export-mode');
         
         try {
@@ -209,14 +205,12 @@ const AppContent: React.FC = () => {
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                addToast('PDF başarıyla oluşturuldu ve indiriliyor.', 'success');
             } else {
-                 addToast('PDF dosyası oluşturulamadı.', 'error');
+                 console.error('PDF dosyası oluşturulamadı.');
             }
 
         } catch (error) {
             console.error("Error generating PDF for saving:", error);
-            addToast('PDF kaydedilirken bir hata oluştu.', 'error');
         } finally {
             document.body.classList.remove('pdf-export-mode');
             setIsPdfLoading(false);
@@ -371,7 +365,6 @@ const AppContent: React.FC = () => {
                 isVisible={isContactModalVisible}
                 onClose={() => setContactModalVisible(false)}
             />
-            <ToastContainer />
         </div>
     );
 };
@@ -383,9 +376,7 @@ const App: React.FC = () => {
         <FontThemeProvider>
             <PrintSettingsProvider>
                 <FlyingLadybugProvider>
-                    <ToastProvider>
-                        <AppContent />
-                    </ToastProvider>
+                    <AppContent />
                 </FlyingLadybugProvider>
             </PrintSettingsProvider>
         </FontThemeProvider>

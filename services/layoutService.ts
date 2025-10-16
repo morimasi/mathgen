@@ -1,4 +1,3 @@
-// FIX: Import React to resolve the 'React.RefObject' type which caused the "Cannot find namespace 'React'" error.
 import React from 'react';
 import { PrintSettings, Problem } from '../types';
 
@@ -54,7 +53,6 @@ export const calculateMaxProblems = (
     tempItem.style.position = 'absolute';
     tempItem.style.visibility = 'hidden';
 
-    // FIX: Correctly calculate the width of a single column
     const problemListWidth = problemList.clientWidth;
     const gapWidth = (printSettings.columns - 1) * remToPx(printSettings.columnGap);
     const columnWidth = (problemListWidth - gapWidth) / printSettings.columns;

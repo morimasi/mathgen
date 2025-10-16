@@ -8,7 +8,6 @@ import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { useToast } from '../services/ToastContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
@@ -22,7 +21,6 @@ interface ModuleProps {
 
 const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
-    const { addToast } = useToast();
     const [settings, setSettings] = useState<GeometrySettings>({
         gradeLevel: 1,
         type: GeometryProblemType.ShapeRecognition,
@@ -56,26 +54,23 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 const shapeNames: { [key: string]: string } = { 'square': 'Kare', 'rectangle': 'Dikdörtgen', 'triangle': 'Üçgen', 'circle': 'Daire' };
                 const title = `Gerçek Hayat Problemleri - ${shapeNames[settings.shape!]} ${typeNames[settings.type]}`;
                 onGenerate(problems, clearPrevious, title, 'geometry', settings.pageCount);
-                addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateGeometryProblem(settings));
                  
                 const firstResultWithError = results.find(r => (r as any).error);
                 if (firstResultWithError) {
-                    addToast((firstResultWithError as any).error, 'error');
+                    console.error((firstResultWithError as any).error);
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
                     onGenerate(problems, clearPrevious, title, 'geometry', isTableLayout ? 1 : settings.pageCount);
-                    addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }
         } catch (error: any) {
             console.error(error);
-            addToast(error.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'geometry') {

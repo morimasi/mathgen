@@ -8,7 +8,6 @@ import TextInput from '../components/form/TextInput';
 import Checkbox from '../components/form/Checkbox';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { useToast } from '../services/ToastContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TABS } from '../constants';
@@ -46,7 +45,6 @@ const moduleOptions = [
 
 const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
-    const { addToast } = useToast();
     const [settings, setSettings] = useState<WordProblemSettings>({
         topic: 'Dört İşlem',
         gradeLevel: '4',
@@ -82,13 +80,11 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
             const problems = await generateWordProblems(adjustedSettings);
             const title = `Yapay Zeka Destekli Problemler (${settings.customPrompt ? 'Özel' : settings.topic})`;
             onGenerate(problems, clearPrevious, title, 'word-problems', isTableLayout ? 1 : settings.pageCount);
-            addToast(`${problems.length} AI problemi başarıyla oluşturuldu!`, 'success');
         } catch (err: any) {
             console.error(err);
-            addToast(err.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'word-problems') {

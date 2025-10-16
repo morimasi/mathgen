@@ -1,4 +1,4 @@
-// FIX: Removed self-import of `Problem` which was causing a declaration conflict. Also removed an unused `React` import.
+
 // types.ts
 
 export interface Problem {

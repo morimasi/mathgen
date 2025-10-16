@@ -8,7 +8,6 @@ import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { useToast } from '../services/ToastContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
@@ -22,7 +21,6 @@ interface ModuleProps {
 
 const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
-    const { addToast } = useToast();
     const [settings, setSettings] = useState<DecimalsSettings>({
         gradeLevel: 4,
         type: DecimalsProblemType.FourOperations,
@@ -60,22 +58,19 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed': 'Karışık Dört İşlem' };
                 const title = `Gerçek Hayat Problemleri - Ondalık Sayılarda ${opNames[settings.operation!]}`;
                 onGenerate(problems, clearPrevious, title, 'decimals', settings.pageCount);
-                addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateDecimalProblem(settings));
                 if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
                     onGenerate(problems, clearPrevious, title, 'decimals', isTableLayout ? 1 : settings.pageCount);
-                    addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }
         } catch (error: any) {
             console.error(error);
-            addToast(error.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'decimals') {

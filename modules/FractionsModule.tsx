@@ -8,7 +8,6 @@ import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { useToast } from '../services/ToastContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
@@ -22,7 +21,6 @@ interface ModuleProps {
 
 const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
-    const { addToast } = useToast();
     const [settings, setSettings] = useState<FractionsSettings>({
         gradeLevel: 3,
         type: FractionsProblemType.FourOperations,
@@ -62,26 +60,23 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                 const diffNames: { [key: string]: string } = { 'easy': 'Kolay', 'medium': 'Orta', 'hard': 'Zor' };
                 const title = `Gerçek Hayat Problemleri - Kesirlerde ${opNames[settings.operation!]} (${diffNames[settings.difficulty!]})`;
                 onGenerate(problems, clearPrevious, title, 'fractions', settings.pageCount);
-                addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateFractionsProblem(settings));
                 
                 const firstResultWithError = results.find(r => (r as any).error);
                 if (firstResultWithError) {
-                    addToast((firstResultWithError as any).error, 'error');
+                    console.error((firstResultWithError as any).error);
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
                     onGenerate(problems, clearPrevious, title, 'fractions', isTableLayout ? 1 : settings.pageCount);
-                    addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }
         } catch (error: any) {
             console.error(error);
-            addToast(error.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'fractions') {

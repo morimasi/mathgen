@@ -4,7 +4,6 @@ import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { useToast } from '../services/ToastContext';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
@@ -22,7 +21,6 @@ interface ModuleProps {
 
 const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
-    const { addToast } = useToast();
     const [settings, setSettings] = useState<ArithmeticSettings>({
         gradeLevel: 2,
         operation: ArithmeticOperation.Addition,
@@ -64,27 +62,24 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed-add-sub': 'Toplama ve Çıkarma' };
                 const title = `Gerçek Hayat Problemleri - ${opNames[settings.operation]}`;
                 onGenerate(problems, clearPrevious, title, 'arithmetic', settings.pageCount);
-                addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateArithmeticProblem(settings));
                 
                 const firstResultWithError = results.find(r => (r as any).error);
 
                 if (firstResultWithError) {
-                    addToast((firstResultWithError as any).error, 'error');
+                    console.error((firstResultWithError as any).error);
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
                     onGenerate(problems, clearPrevious, title, 'arithmetic', isTableLayout ? 1 : settings.pageCount);
-                    addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }
         } catch (error: any) {
             console.error(error);
-            addToast(error.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'arithmetic') {
