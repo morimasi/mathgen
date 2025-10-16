@@ -209,10 +209,11 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                         { value: 'dashed', label: 'Kesik Çizgili (İnce)' },
                                         { value: 'dotted', label: 'Noktalı (İnce)' },
                                         { value: 'double', label: 'Çift Çizgi (İnce)' },
-                                        { value: 'fancy-geometric', label: 'Süslü - Geometrik' },
-                                        { value: 'fancy-ribbon', label: 'Süslü - Kurdele' },
-                                        { value: 'fancy-stars', label: 'Süslü - Yıldızlar' },
-                                        { value: 'fancy-lace', label: 'Süslü - Dantel' },
+                                        { value: 'shadow-lift', label: 'Gölge Efekti' },
+                                        { value: 'corner-accent', label: 'Köşe Vurgusu' },
+                                        { value: 'top-bar-color', label: 'Renkli Üst Çizgi' },
+                                        { value: 'stitched-edge', label: 'Dikişli Kenar' },
+                                        { value: 'double-frame', label: 'Çift Çerçeve' },
                                     ]}
                                 />
                             </div>
@@ -226,6 +227,12 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                 id="print-show-header"
                                 checked={settings.showHeader}
                                 onChange={e => handleChange('showHeader', e.target.checked)}
+                            />
+                             <Checkbox
+                                label="Problem Numaralarını Göster"
+                                id="print-show-problem-numbers"
+                                checked={settings.showProblemNumbers}
+                                onChange={e => handleChange('showProblemNumbers', e.target.checked)}
                             />
                         </div>
                     </div>

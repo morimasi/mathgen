@@ -282,8 +282,9 @@ export interface PrintSettings {
     columnGap: number;
     fontSize: number;
     showHeader: boolean;
+    showProblemNumbers: boolean;
     notebookStyle: 'none' | 'lines' | 'grid' | 'dotted';
-    borderStyle: 'none' | 'card' | 'solid' | 'dashed' | 'dotted' | 'double' | 'fancy-geometric' | 'fancy-ribbon' | 'fancy-stars' | 'fancy-lace';
+    borderStyle: 'none' | 'card' | 'solid' | 'dashed' | 'dotted' | 'double' | 'shadow-lift' | 'corner-accent' | 'top-bar-color' | 'stitched-edge' | 'double-frame';
     problemSpacing: number;
     pageMargin: number;
     lineHeight: number;

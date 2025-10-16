@@ -15,6 +15,7 @@ const initialPrintSettings: PrintSettings = {
     columnGap: 0,
     fontSize: 16,
     showHeader: false,
+    showProblemNumbers: true,
     notebookStyle: 'none',
     borderStyle: 'none',
     problemSpacing: 0,

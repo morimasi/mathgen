@@ -243,57 +243,77 @@ html.dark .problem-item-card {
 
 /* Border styles on individual items */
 .problem-item-bordered {
-    border-width: 1.5px;
-    border-color: var(--text-color, #1e293b);
     padding: 1em; /* Decoupled from page margin, scales with font-size */
 }
-.problem-item-bordered.border-solid { border-style: solid; }
-.problem-item-bordered.border-dashed { border-style: dashed; }
-.problem-item-bordered.border-dotted { border-style: dotted; }
-.problem-item-bordered.border-double { border-style: double; border-width: 5px; }
+.problem-item-bordered.border-solid { border: 1.5px solid var(--text-color, #1e293b); }
+.problem-item-bordered.border-dashed { border: 1.5px dashed var(--text-color, #1e293b); }
+.problem-item-bordered.border-dotted { border: 1.5px dotted var(--text-color, #1e293b); }
+.problem-item-bordered.border-double { border: 5px double var(--text-color, #1e293b); }
 
-/* Base style for all fancy borders */
-.problem-item-bordered.border-fancy-geometric,
-.problem-item-bordered.border-fancy-ribbon,
-.problem-item-bordered.border-fancy-stars,
-.problem-item-bordered.border-fancy-lace {
-    border: 12px solid transparent;
-    border-image-repeat: round;
-    padding: calc(1em + 0.5rem); /* Decoupled, consistent with base bordered item */
+/* --- NEW ACADEMIC/PROFESSIONAL BORDER STYLES --- */
+.problem-item-bordered.border-shadow-lift {
+    border: 1px solid #e2e8f0; /* slate-200 */
+    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.08);
+    border-radius: 0.375rem; /* 6px */
+}
+html.dark .problem-item-bordered.border-shadow-lift {
+    border-color: #334155; /* slate-700 */
 }
 
-/* Specific fancy border images */
-.problem-item-bordered.border-fancy-geometric {
-    border-image-slice: 12;
-    border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z' fill='currentColor'/%3E%3C/svg%3E");
+.problem-item-bordered.border-top-bar-color {
+    border-top: 5px solid var(--text-color, #1e293b);
+    border-left: 1px solid #e2e8f0; /* slate-200 */
+    border-right: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    padding-top: calc(1em - 4px); /* Adjust padding to account for thick top border */
 }
-.problem-item-bordered.border-fancy-ribbon {
-    border-image-slice: 16;
-    border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 20 c 10 -20, 30 -20, 40 0 v -40 c -10 20, -30 20, -40 0 z' fill='currentColor'/%3E%3C/svg%3E");
+html.dark .problem-item-bordered.border-top-bar-color {
+    border-left-color: #334155;
+    border-right-color: #334155;
+    border-bottom-color: #334155;
 }
-.problem-item-bordered.border-fancy-stars {
-    border-image-slice: 15;
-    border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cpath d='M15 2 l 4.5 9.5 l 10.5 1 l -8 7.5 l 2 10.5 l -9 -5.5 l -9 5.5 l 2 -10.5 l -8 -7.5 l 10.5 -1 Z' fill='currentColor'/%3E%3C/svg%3E");
+
+.problem-item-bordered.border-stitched-edge {
+    border: 2px dashed #a1a1aa; /* stone-400 */
 }
-.problem-item-bordered.border-fancy-lace {
-     border-image-slice: 10;
-     border-image-repeat: repeat;
-     border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='0' r='10' fill='currentColor'/%3E%3Ccircle cx='0' cy='10' r='10' fill='currentColor'/%3E%3Ccircle cx='20' cy='10' r='10' fill='currentColor'/%3E%3Ccircle cx='10' cy='20' r='10' fill='currentColor'/%3E%3C/svg%3E");
+
+.problem-item-bordered.border-double-frame {
+    border: 4px double var(--text-color, #1e293b);
+}
+
+.problem-item-bordered.border-corner-accent {
+    position: relative;
+    border: 1px solid #e2e8f0; /* slate-200 */
+    overflow: hidden; /* To contain the pseudo-element */
+}
+html.dark .problem-item-bordered.border-corner-accent {
+    border-color: #334155;
+}
+.problem-item-bordered.border-corner-accent::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--text-color, #1e293b);
+    opacity: 0.8;
+    transform: rotate(45deg);
 }
 
 
 /* Notebook styles on the entire worksheet content area */
 .worksheet-content.notebook-lines {
-    background-image: repeating-linear-gradient(to bottom, transparent, transparent calc(var(--font-size, 16px) * var(--line-height, 1.5) - 1px), var(--notebook-color) calc(var(--font-size, 16px) * var(--line-height, 1.5)));
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent calc(var(--font-size, 16px) * var(--line-height, 1.5) - 0.75px), var(--notebook-color) calc(var(--font-size, 16px) * var(--line-height, 1.5)));
 }
 .worksheet-content.notebook-grid {
     background-image: 
-        linear-gradient(to right, var(--notebook-color) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--notebook-color) 1px, transparent 1px);
+        linear-gradient(to right, var(--notebook-color) 0.75px, transparent 0.75px),
+        linear-gradient(to bottom, var(--notebook-color) 0.75px, transparent 0.75px);
     background-size: 1em 1em; /* Scale grid with font size */
 }
 .worksheet-content.notebook-dotted {
-     background-image: radial-gradient(var(--notebook-color) 1px, transparent 1px);
+     background-image: radial-gradient(var(--notebook-color) 0.75px, transparent 0.75px);
      background-size: 1em 1em; /* Scale dots with font size */
 }
 

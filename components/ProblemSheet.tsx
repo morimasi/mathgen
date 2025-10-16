@@ -81,7 +81,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
         '--view-scale': viewScale,
         '--print-scale': settings.scale,
         '--page-margin': `${settings.pageMargin}rem`,
-        '--notebook-color': settings.colorTheme === 'blue' ? 'rgba(0, 0, 255, 0.35)' : (settings.colorTheme === 'sepia' ? 'rgba(112, 66, 20, 0.35)' : 'rgba(0, 0, 0, 0.35)'),
+        '--notebook-color': settings.colorTheme === 'blue' ? 'rgba(0, 0, 255, 0.25)' : (settings.colorTheme === 'sepia' ? 'rgba(112, 66, 20, 0.25)' : 'rgba(0, 0, 0, 0.25)'),
         '--text-color': settings.colorTheme === 'blue' ? '#0000AA' : (settings.colorTheme === 'sepia' ? '#5a380a' : '#1e293b'),
         '--problem-text-align': settings.textAlign || 'left',
         '--problem-justify-content': settings.textAlign === 'right' ? 'flex-end' : settings.textAlign === 'center' ? 'center' : 'flex-start',
@@ -138,9 +138,8 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
 
                         <div className="problem-list" data-layout-mode={settings.layoutMode}>
                             {pageProblems.map((p, index) => {
-                                const isArithmetic = p.category === 'arithmetic';
-                                const isVisuallyHeavy = ['time', 'geometry', 'visual-support'].includes(p.category) || p.question.includes('<svg');
-                                const showProblemNumber = !isArithmetic && !isVisuallyHeavy;
+                                const isVisuallyHeavy = ['time', 'geometry', 'visual-support', 'place-value'].includes(p.category) || p.question.includes('<svg');
+                                const showProblemNumber = settings.showProblemNumbers && !isVisuallyHeavy;
                                 
                                 let itemClassName = `problem-item ${isVisuallyHeavy ? 'items-center' : ''}`;
                                 if (settings.layoutMode === 'table') {
@@ -157,7 +156,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
                                     <div key={index} className={itemClassName}>
                                         {showProblemNumber && <span className="problem-number">{index + 1 + (pageIndex * Math.ceil(problems.length / pageCount))}.</span>}
                                         <div 
-                                            className={(isArithmetic || isVisuallyHeavy) ? 'w-full' : 'problem-content'}
+                                            className={(!showProblemNumber || isVisuallyHeavy) ? 'w-full' : 'problem-content'}
                                             dangerouslySetInnerHTML={{ __html: p.question }}
                                          />
                                     </div>
