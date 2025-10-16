@@ -66,14 +66,13 @@ interface WorksheetToolbarProps {
     scale: number;
     setScale: (scale: number) => void;
     worksheetParentRef: React.RefObject<HTMLElement>;
-    problemCount: number;
     orientation: 'portrait' | 'landscape';
 }
 
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 
-const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, worksheetParentRef, problemCount, orientation }) => {
+const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, worksheetParentRef, orientation }) => {
 
     const handleFitToPage = useCallback(() => {
         if (!worksheetParentRef.current) return;
@@ -86,26 +85,6 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
         
         setScale(Math.min(1.5, Math.max(0.1, newScale))); // Clamp the scale to reasonable values
     }, [worksheetParentRef, setScale, orientation]);
-
-    useEffect(() => {
-        // Initial fit is handled by the observer firing on mount
-        const observer = new ResizeObserver(handleFitToPage);
-        const parentEl = worksheetParentRef.current;
-        if (parentEl) {
-            observer.observe(parentEl);
-        }
-
-        return () => {
-            if (parentEl) {
-                observer.unobserve(parentEl);
-            }
-        };
-    }, [handleFitToPage]);
-
-    // Re-fit when problem count or orientation changes, as it might affect layout needs.
-    useEffect(() => {
-        handleFitToPage();
-    }, [problemCount, orientation, handleFitToPage]);
 
     return (
         <div className="worksheet-toolbar">
@@ -146,7 +125,7 @@ const AppContent: React.FC = () => {
     const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [isPdfLoading, setIsPdfLoading] = useState(false);
-    const [worksheetScale, setWorksheetScale] = useState(0.7);
+    const [worksheetScale, setWorksheetScale] = useState(0.5);
     const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(false);
     const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>({
         operation: ArithmeticOperation.Addition,
@@ -358,7 +337,6 @@ const AppContent: React.FC = () => {
                             scale={worksheetScale}
                             setScale={setWorksheetScale}
                             worksheetParentRef={worksheetParentRef}
-                            problemCount={problems.length}
                             orientation={printSettings.orientation}
                         />
                         <div className="worksheet-viewport">
