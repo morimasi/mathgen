@@ -9,7 +9,399 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Caveat:wght@400..700&family=Lexend:wght@100..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/index.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Prevents flash of unstyled content based on theme */
+        body {
+            background-color: #fafaf9; /* stone-50 */
+        }
+        html.dark body {
+            background-color: #1c1917; /* stone-900 */
+        }
+
+        /* Font themes */
+        .font-theme-klasik { font-family: 'Lora', serif; }
+        .font-theme-modern { font-family: 'Nunito Sans', sans-serif; }
+        .font-theme-disleksi1 { font-family: 'Lexend', sans-serif; }
+        .font-theme-disleksi2 { font-family: 'Atkinson Hyperlegible', sans-serif; }
+        .font-theme-eglenceli { font-family: 'Caveat', cursive; }
+
+        /* Loader Styles */
+        .ladybug-loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            gap: 1rem;
+            min-height: 400px;
+        }
+
+        .ladybug-loader-animation {
+            position: relative;
+            width: 200px;
+            height: 100px;
+        }
+
+        .ladybug-loader-track {
+            stroke: #d1d5db; /* gray-300 */
+            stroke-width: 2;
+            stroke-dasharray: 4 4;
+        }
+
+        .ladybug-loader-bug {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            bottom: calc(50% - 15px);
+            animation: ladybug-move 3s infinite ease-in-out;
+        }
+
+        @keyframes ladybug-move {
+            0% { left: -25px; transform: rotate(0deg); }
+            48% { transform: rotate(0deg); }
+            50% { left: calc(100% - 25px); transform: rotate(180deg); }
+            98% { transform: rotate(180deg); }
+            100% { left: -25px; transform: rotate(360deg); }
+        }
+
+        /* NEW LOGO ANIMATIONS */
+        .daisy-sway {
+            transform-origin: bottom center;
+            animation: daisy-sway 8s infinite ease-in-out;
+        }
+
+        @keyframes daisy-sway {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        
+        .crawling-bug {
+            offset-path: path("M 30,53 C 40,30 70,30 80,53 S 100,85 80,107 S 40,125 30,107 S 10,80 30,53 Z");
+            animation: crawl-path 12s infinite linear;
+            offset-rotate: auto;
+        }
+
+        @keyframes crawl-path {
+            from { offset-distance: 0%; }
+            to { offset-distance: 100%; }
+        }
+        
+        /* Custom worksheet styles */
+        .worksheet-container {
+            transform: scale(var(--scale, 1));
+            transform-origin: top center;
+            transition: transform 0.2s ease-in-out;
+        }
+        .worksheet-content {
+            background-color: #fff;
+            color: var(--text-color, #1e293b);
+            position: relative;
+            width: 21cm;
+            min-height: 29.7cm;
+            padding: var(--page-margin, 0.7rem); /* Use variable for screen view */
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .worksheet-container[data-orientation="landscape"] .worksheet-content {
+            width: 29.7cm;
+            min-height: 21cm;
+        }
+
+        /* Card Style for items */
+        .problem-item-card {
+            background-color: #f8fafc; /* slate-50 */
+            padding: 1em;
+            border-radius: 0.5rem; /* 8px */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e2e8f0; /* slate-200 */
+        }
+        html.dark .problem-item-card {
+             background-color: #1e293b; /* slate-800 */
+             border-color: #334155; /* slate-700 */
+        }
+
+
+        /* Border styles on individual items */
+        .problem-item-bordered {
+            border-width: 1.5px;
+            border-color: var(--text-color, #1e293b);
+            padding: 1em; /* Decoupled from page margin, scales with font-size */
+        }
+        .problem-item-bordered.border-solid { border-style: solid; }
+        .problem-item-bordered.border-dashed { border-style: dashed; }
+        .problem-item-bordered.border-dotted { border-style: dotted; }
+        .problem-item-bordered.border-double { border-style: double; border-width: 5px; }
+
+        /* Base style for all fancy borders */
+        .problem-item-bordered.border-fancy-geometric,
+        .problem-item-bordered.border-fancy-ribbon,
+        .problem-item-bordered.border-fancy-stars,
+        .problem-item-bordered.border-fancy-lace {
+            border: 12px solid transparent;
+            border-image-repeat: round;
+            padding: calc(1em + 0.5rem); /* Decoupled, consistent with base bordered item */
+        }
+
+        /* Specific fancy border images */
+        .problem-item-bordered.border-fancy-geometric {
+            border-image-slice: 12;
+            border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z' fill='currentColor'/%3E%3C/svg%3E");
+        }
+        .problem-item-bordered.border-fancy-ribbon {
+            border-image-slice: 16;
+            border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 20 c 10 -20, 30 -20, 40 0 v -40 c -10 20, -30 20, -40 0 z' fill='currentColor'/%3E%3C/svg%3E");
+        }
+        .problem-item-bordered.border-fancy-stars {
+            border-image-slice: 15;
+            border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Cpath d='M15 2 l 4.5 9.5 l 10.5 1 l -8 7.5 l 2 10.5 l -9 -5.5 l -9 5.5 l 2 -10.5 l -8 -7.5 l 10.5 -1 Z' fill='currentColor'/%3E%3C/svg%3E");
+        }
+        .problem-item-bordered.border-fancy-lace {
+             border-image-slice: 10;
+             border-image-repeat: repeat;
+             border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='0' r='10' fill='currentColor'/%3E%3Ccircle cx='0' cy='10' r='10' fill='currentColor'/%3E%3Ccircle cx='20' cy='10' r='10' fill='currentColor'/%3E%3Ccircle cx='10' cy='20' r='10' fill='currentColor'/%3E%3C/svg%3E");
+        }
+
+
+        /* Notebook styles on individual items (only if bordered) */
+        .problem-item-bordered.notebook-lines {
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent calc(var(--font-size, 16px) * var(--line-height, 1.5) - 1px), var(--notebook-color) calc(var(--font-size, 16px) * var(--line-height, 1.5)));
+            background-position: 0 1em; /* Align lines with text inside padded box */
+            background-clip: content-box; /* Keep background within padding */
+        }
+        .problem-item-bordered.notebook-grid {
+            background-image: 
+                linear-gradient(to right, var(--notebook-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--notebook-color) 1px, transparent 1px);
+            background-size: 1em 1em; /* Scale grid with font size */
+            background-clip: content-box;
+        }
+        .problem-item-bordered.notebook-dotted {
+             background-image: radial-gradient(var(--notebook-color) 1px, transparent 1px);
+             background-size: 1em 1em; /* Scale dots with font size */
+             background-clip: content-box;
+        }
+
+        /* Problem list layout */
+        .problem-list {
+            display: grid;
+            grid-template-columns: repeat(var(--columns, 2), 1fr);
+            gap: var(--problem-spacing, 1.5rem) var(--column-gap, 1.5rem);
+            font-size: var(--font-size, 16px);
+            line-height: var(--line-height, 1.5);
+            flex-grow: 1;
+        }
+        .problem-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5em;
+            break-inside: avoid;
+            justify-content: var(--problem-justify-content, flex-start);
+            text-align: var(--problem-text-align, left);
+        }
+        .problem-number {
+            font-weight: bold;
+        }
+        .problem-content {
+            flex: 1;
+        }
+
+        /* Header on worksheet */
+        .worksheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--text-color, #1e293b);
+            flex-shrink: 0;
+        }
+        .worksheet-title {
+           font-weight: bold;
+           font-size: 1.5em;
+        }
+        .worksheet-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            font-weight: 500;
+            font-size: 1.1em;
+            white-space: nowrap;
+        }
+        .print-only {
+            display: none;
+        }
+
+        /* PDF Export specific styles */
+        body.pdf-export-mode .worksheet-container {
+            transform: scale(1) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        body.pdf-export-mode .worksheet-content {
+            box-shadow: none !important;
+            border: none !important;
+        }
+        body.pdf-export-mode .answer-key {
+            display: block !important;
+            margin-top: 0 !important;
+        }
+        
+        /* Print-specific styles */
+        @media print {
+            @page {
+                size: A4 var(--orientation, portrait);
+                margin: 0;
+            }
+
+            /* Hide UI elements, leaving only the main content area */
+            body > #root > div > header,
+            body > #root > div > div[role="dialog"], /* Modals and panels */
+            main aside,
+            .flying-ladybug-container {
+                display: none !important;
+            }
+
+            /* Reset layout for containers of the worksheet */
+            body {
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            main, main > div, main > div > section {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+            }
+
+            /* Style the printable worksheet itself */
+            .worksheet-container {
+                transform: scale(1) !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+            
+            .worksheet-content {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: var(--page-margin, 0.7rem) !important; 
+                box-sizing: border-box;
+                page-break-after: always;
+            }
+            
+            .answer-key {
+                 page-break-before: always;
+                 padding: var(--page-margin, 0.7rem) !important;
+                 box-sizing: border-box;
+                 margin-top: 0 !important;
+            }
+            
+            /* Ensure helper classes work */
+            .print\:hidden {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+        }
+
+        /* NEW FLYING LADYBUG ANIMATIONS */
+        .flying-ladybug-container {
+            position: fixed;
+            width: 45px;
+            height: 45px;
+            z-index: 9999;
+            will-change: transform, top, left, opacity;
+            pointer-events: none; /* Make sure it doesn't block clicks */
+        }
+
+        .left-wing {
+            transform-origin: 28px 30px;
+            animation: flap-wings-left 0.1s infinite alternate ease-in-out;
+        }
+        .right-wing {
+            transform-origin: 32px 30px;
+            animation: flap-wings-right 0.1s infinite alternate ease-in-out;
+        }
+
+        @keyframes flap-wings-left {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(35deg) scale(1.05); }
+        }
+        @keyframes flap-wings-right {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-35deg) scale(1.05); }
+        }
+
+        /* HEADER HOVER EFFECT */
+        .header-interactive-item {
+            transition: transform 0.2s ease-in-out;
+        }
+        .header-interactive-item:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .toast-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-width: 1px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            animation: toast-enter 0.3s ease-out;
+        }
+
+        @keyframes toast-enter {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-item-exit {
+            animation: toast-exit 0.3s ease-in forwards;
+        }
+
+        @keyframes toast-exit {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    </style>
 <script type="importmap">
 {
   "imports": {
@@ -18,15 +410,20 @@
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "jspdf": "https://aistudiocdn.com/jspdf@^3.0.3",
     "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0",
-    "vite": "https://aistudiocdn.com/vite@^7.1.10",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.0.4"
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0"
   }
 }
 </script>
 </head>
 <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <!-- 
+      BABEL STANDALONE SCRIPT:
+      Bu script, TSX (TypeScript + JSX) dosyalarını doğrudan tarayıcıda derlemek için eklenmiştir.
+      Bu, uygulamanın Netlify gibi statik hosting platformlarında bir derleme adımına ihtiyaç duymadan yayınlanmasını sağlar.
+      Ana uygulama script'inin tipi "module" yerine "text/babel" olarak değiştirilmiştir.
+    -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel" data-type="module" src="./index.tsx"></script>
 </body>
 </html>

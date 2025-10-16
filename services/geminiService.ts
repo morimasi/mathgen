@@ -1,10 +1,7 @@
-
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { Problem, WordProblemSettings } from '../types';
 import { TABS } from '../constants';
 
-// FIX: Initialize GoogleGenAI with the API key from environment variables as per coding guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const generateProblemsWithPrompt = async (prompt: string): Promise<Omit<Problem, 'category'>[]> => {
