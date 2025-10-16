@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 // FIX: The error "File '.../App.tsx' is not a module" was likely because App.tsx contained placeholder text.
 // The import itself is correct without the extension for most bundlers.
 import App from './App';
+import './index.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
