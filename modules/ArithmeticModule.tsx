@@ -151,10 +151,10 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
     const isTableLayout = printSettings.layoutMode === 'table';
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
             <h2 className="text-sm font-semibold">Dört İşlem Ayarları</h2>
             
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 gap-1.5">
                 <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                     <Checkbox
                         label="Gerçek Hayat Problemleri (AI)"
@@ -356,7 +356,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
-            <div className="flex flex-wrap gap-2 pt-2">
+            <div className="flex flex-wrap gap-2 pt-1.5">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
                 <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
                     <ShuffleIcon className="w-4 h-4" />

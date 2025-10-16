@@ -156,7 +156,7 @@ html.dark .star {
 /* NEW: Worksheet Toolbar & Viewport */
 .worksheet-toolbar {
     position: sticky;
-    top: 10.5rem; /* Match the sticky top of the settings panel */
+    top: 7rem; /* Match the sticky top of the settings panel */
     z-index: 15; /* Above worksheet but below header dropdowns */
     background-color: rgba(245, 245, 244, 0.8); /* stone-100 with transparency */
     backdrop-filter: blur(8px);

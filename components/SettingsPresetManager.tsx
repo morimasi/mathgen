@@ -54,11 +54,11 @@ const SettingsPresetManager = <T,>({ moduleKey, currentSettings, onLoadSettings 
     };
 
     return (
-        <div className="pt-6 mt-6 border-t border-stone-200 dark:border-stone-700 space-y-4">
-            <h3 className="text-lg font-bold text-stone-800 dark:text-stone-200">Ayar Setleri</h3>
+        <div className="pt-3 mt-3 border-t border-stone-200 dark:border-stone-700 space-y-2">
+            <h3 className="text-base font-bold text-stone-800 dark:text-stone-200">Ayar Setleri</h3>
             
-            <div className="space-y-2 p-4 bg-stone-50 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
-                <label htmlFor={`preset-name-${moduleKey}`} className="font-medium text-sm text-stone-700 dark:text-stone-300">Yeni Ayar Seti Kaydet</label>
+            <div className="space-y-1.5 p-3 bg-stone-50 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
+                <label htmlFor={`preset-name-${moduleKey}`} className="font-medium text-xs text-stone-700 dark:text-stone-300">Yeni Ayar Seti Kaydet</label>
                 <div className="flex gap-2">
                     <TextInput 
                         id={`preset-name-${moduleKey}`}
@@ -75,7 +75,7 @@ const SettingsPresetManager = <T,>({ moduleKey, currentSettings, onLoadSettings 
             </div>
 
             {presets.length > 0 && (
-                <div className="space-y-2 p-4 bg-stone-50 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
+                <div className="space-y-1.5 p-3 bg-stone-50 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
                      <Select 
                         id={`select-preset-${moduleKey}`}
                         label="Kayıtlı Ayar Setini Yönet"
@@ -86,7 +86,7 @@ const SettingsPresetManager = <T,>({ moduleKey, currentSettings, onLoadSettings 
                             ...presets.map(p => ({ value: p, label: p }))
                         ]}
                     />
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex gap-2">
                         <Button onClick={handleLoad} disabled={!selectedPreset} size="md">
                             <LoadIcon className="w-5 h-5" />
                             Yükle

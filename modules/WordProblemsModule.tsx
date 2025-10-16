@@ -122,14 +122,14 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
     const topicLabel = settings.sourceModule && settings.sourceModule !== 'none' ? 'Konu Detayı (İsteğe Bağlı)' : 'Konu';
 
     return (
-        <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Problemler (AI)</h2>
-            <p className="text-sm text-stone-600 dark:text-stone-400">
+        <div className="space-y-2">
+            <h2 className="text-sm font-semibold">Problemler (AI)</h2>
+            <p className="text-xs text-stone-600 dark:text-stone-400">
                 Bu modül, Google Gemini AI kullanarak özel matematik problemleri oluşturur. Lütfen API anahtarınızın doğru yapılandırıldığından emin olun.
             </p>
             
-            <div className="grid grid-cols-1 gap-4">
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="grid grid-cols-1 gap-2">
+                <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <Checkbox
                         label="Otomatik Sığdır"
                         id="auto-fit-word-problems"
@@ -139,7 +139,7 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                         title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
                     />
                 </div>
-                 <div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                 <div className="p-1.5 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
                     <Checkbox
                         label="Görsel Destek Ekle (Emoji)"
                         id="use-visuals-word-problems"
@@ -153,7 +153,7 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
             </div>
 
 
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                 <Select
                     label="Sınıf Seviyesi"
                     id="gradeLevel"
@@ -181,7 +181,7 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                         { value: 3, label: '3 İşlemli' },
                     ]}
                 />
-                <div className="col-span-2 grid grid-cols-2 gap-4">
+                <div className="col-span-2 grid grid-cols-2 gap-2">
                     <Select
                         label="Problem Modülü"
                         id="sourceModule"
@@ -227,12 +227,12 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                     disabled={isTableLayout}
                     title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
                 />
-                <div className="col-span-2 pt-2">
-                     <label htmlFor="custom-prompt" className="font-medium text-sm text-stone-700 dark:text-stone-300 mb-1 block">Veya Özel Talimat Girin</label>
+                <div className="col-span-2 pt-1">
+                     <label htmlFor="custom-prompt" className="font-medium text-xs text-stone-700 dark:text-stone-300 mb-1 block">Veya Özel Talimat Girin</label>
                      <textarea
                         id="custom-prompt"
                         rows={3}
-                        className="block w-full px-2.5 py-1.5 text-sm bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-600 focus:border-orange-600"
+                        className="block w-full px-2 py-0.5 text-xs bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-600 focus:border-orange-600"
                         placeholder={dynamicPlaceholder}
                         value={settings.customPrompt}
                         onChange={e => handleSettingChange('customPrompt', e.target.value)}
@@ -244,13 +244,13 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
-            <div className="flex flex-wrap gap-4 pt-4">
-                <Button onClick={() => handleGenerate(true)}>Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile">
-                    <ShuffleIcon className="w-5 h-5" />
+            <div className="flex flex-wrap gap-2 pt-2">
+                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
+                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
+                    <ShuffleIcon className="w-4 h-4" />
                     Yenile
                 </Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary">Mevcuta Ekle</Button>
+                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
             </div>
         </div>
     );

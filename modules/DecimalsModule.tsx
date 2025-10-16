@@ -128,12 +128,12 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
     const isTableLayout = printSettings.layoutMode === 'table';
 
     return (
-        <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Ondalık Sayılar Ayarları</h2>
+        <div className="space-y-2">
+            <h2 className="text-sm font-semibold">Ondalık Sayılar Ayarları</h2>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-2">
                 {isFourOps && (
-                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                         <Checkbox
                             label="Gerçek Hayat Problemleri (AI)"
                             id="use-word-problems-decimals"
@@ -141,7 +141,7 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                             onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
                         />
                          {settings.useWordProblems && (
-                            <div className="mt-3 pl-6 space-y-3">
+                            <div className="mt-1.5 pl-6 space-y-1.5">
                                 <Select
                                     label="Gereken İşlem Sayısı"
                                     id="decimals-op-count"
@@ -181,7 +181,7 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                         )}
                     </div>
                 )}
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <Checkbox
                         label="Otomatik Sığdır"
                         id="auto-fit-decimals"
@@ -193,7 +193,7 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                  <Select
                     label="Problem Türü"
                     id="decimals-type"
@@ -292,13 +292,13 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
-            <div className="flex flex-wrap gap-4 pt-4">
-                <Button onClick={() => handleGenerate(true)}>Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile">
-                    <ShuffleIcon className="w-5 h-5" />
+            <div className="flex flex-wrap gap-2 pt-2">
+                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
+                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
+                    <ShuffleIcon className="w-4 h-4" />
                     Yenile
                 </Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary">Mevcuta Ekle</Button>
+                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
             </div>
         </div>
     );

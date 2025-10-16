@@ -309,13 +309,13 @@ const AppContent: React.FC = () => {
                 </div>
             </header>
 
-            <main className="p-4 sm:p-6 lg:p-8">
+            <main className="px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8">
                 <div className={`main-layout-grid ${isSettingsPanelCollapsed ? 'sidebar-collapsed' : ''}`}>
                     <aside 
                         className="print:hidden settings-panel"
                         onMouseEnter={() => setIsSettingsPanelCollapsed(false)}
                     >
-                         <div className="settings-panel-content bg-white dark:bg-stone-800/80 p-4 rounded-lg shadow-sm sticky top-[10.5rem]">
+                         <div className="settings-panel-content bg-white dark:bg-stone-800/80 p-4 rounded-lg shadow-sm sticky top-[7rem]">
                             <SettingsPanel 
                                 onGenerate={handleGenerate} 
                                 setIsLoading={setIsLoading} 

@@ -87,15 +87,15 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
     };
 
     return (
-        <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Görsel Destek Ayarları</h2>
-             <p className="text-sm text-stone-600 dark:text-stone-400">
+        <div className="space-y-2">
+            <h2 className="text-sm font-semibold">Görsel Destek Ayarları</h2>
+             <p className="text-xs text-stone-600 dark:text-stone-400">
                 Bu modül, nesneler ve kutular kullanarak temel matematik işlemleri için görsel alıştırmalar oluşturur. Ayarlar anında çalışma kağıdına yansır.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 pt-1">
                  {/* --- LEFT COLUMN: CORE SETTINGS --- */}
-                <div className="flex flex-col gap-y-3">
+                <div className="flex flex-col gap-y-2">
                     <Select
                         label="İşlem Türü"
                         id="visual-operation"
@@ -119,7 +119,7 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                         title="İşlemlerde kullanılacak en büyük sayı (sonuçlar bunu aşabilir)."
                     />
                     
-                    <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                    <div className="p-1.5 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                         <Checkbox
                             label="Sayfayı Yatay Yap"
                             id="visual-orientation"
@@ -128,14 +128,14 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                         />
                     </div>
 
-                    <div className="p-3 bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 rounded-lg space-y-3">
+                    <div className="p-1.5 bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 rounded-lg space-y-2">
                          <Checkbox
                             label="Otomatik Sığdır"
                             id="auto-fit-visual"
                             checked={settings.autoFit}
                             onChange={e => handleSettingChange('autoFit', e.target.checked)}
                         />
-                        <div className={`grid grid-cols-2 gap-3 transition-opacity ${settings.autoFit ? 'opacity-50' : 'opacity-100'}`}>
+                        <div className={`grid grid-cols-2 gap-2 transition-opacity ${settings.autoFit ? 'opacity-50' : 'opacity-100'}`}>
                             <NumberInput 
                                 label="Problem Sayısı"
                                 id="problems-per-page-visual"
@@ -156,9 +156,9 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                 </div>
 
                 {/* --- RIGHT COLUMN: VISUAL SLIDERS --- */}
-                <div className="flex flex-col justify-around gap-y-2">
+                <div className="flex flex-col justify-around gap-y-1">
                      <div className="space-y-1">
-                        <label htmlFor="emoji-size" className="flex justify-between items-center font-medium text-sm text-stone-700 dark:text-stone-300">
+                        <label htmlFor="emoji-size" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
                             <span>Görsel Boyutu (Emoji)</span>
                             <span className="text-stone-500 dark:text-stone-400 font-normal">{settings.emojiSize}px</span>
                         </label>
@@ -170,7 +170,7 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                     </div>
                     
                     <div className="space-y-1">
-                        <label htmlFor="number-size" className="flex justify-between items-center font-medium text-sm text-stone-700 dark:text-stone-300">
+                        <label htmlFor="number-size" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
                             <span>Sayı/Operatör Boyutu</span>
                             <span className="text-stone-500 dark:text-stone-400 font-normal">{settings.numberSize}px</span>
                         </label>
@@ -182,7 +182,7 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                     </div>
                     
                     <div className="space-y-1">
-                        <label htmlFor="box-size" className="flex justify-between items-center font-medium text-sm text-stone-700 dark:text-stone-300">
+                        <label htmlFor="box-size" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
                             <span>Kutu Genişliği</span>
                             <span className="text-stone-500 dark:text-stone-400 font-normal">{settings.boxSize}px</span>
                         </label>
