@@ -14,7 +14,7 @@ import HowToUseModal from './components/HowToUseModal';
 import ContactModal from './components/ContactModal';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import ToastContainer from './components/ToastContainer';
-import { TABS } from './constants';
+import { TAB_GROUPS } from './constants';
 import { Problem, PrintSettings, VisualSupportSettings, ArithmeticOperation } from './types';
 import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon } from './components/icons/Icons';
 import AnimatedLogo from './components/AnimatedLogo';
@@ -231,7 +231,7 @@ const AppContent: React.FC = () => {
                         </div>
                     </div>
                     <div className="relative">
-                        <Tabs tabs={TABS} activeTab={activeTab} onTabClick={setActiveTab} />
+                        <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={setActiveTab} />
                     </div>
                 </div>
             </header>
