@@ -4,6 +4,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { PrintSettings } from '../types';
 import Checkbox from './form/Checkbox';
 import TableSelector from './form/TableSelector';
+import SettingsPresetManager from './SettingsPresetManager';
 
 interface PrintSettingsPanelProps {
     isVisible: boolean;
@@ -238,6 +239,12 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                         </div>
                     </div>
                 </div>
+
+                <SettingsPresetManager<PrintSettings>
+                    moduleKey="printSettings"
+                    currentSettings={settings}
+                    onLoadSettings={setSettings}
+                />
             </div>
         </div>
     );
