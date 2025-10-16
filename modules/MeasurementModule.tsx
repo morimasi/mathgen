@@ -13,7 +13,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -51,14 +51,14 @@ const MeasurementModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
                 const problems = await generateContextualWordProblems('measurement', adjustedSettings);
                 const typeNames: { [key: string]: string } = { 'length-conversion': 'Uzunluk', 'weight-conversion': 'Ağırlık', 'volume-conversion': 'Hacim', 'mixed': 'Karışık Ölçüler' };
                 const title = `Gerçek Hayat Problemleri - ${typeNames[settings.type]}`;
-                onGenerate(problems, clearPrevious, title, 'measurement');
+                onGenerate(problems, clearPrevious, title, 'measurement', settings.pageCount);
                 addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateMeasurementProblem(settings));
                 if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'measurement');
+                    onGenerate(problems, clearPrevious, title, 'measurement', settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }

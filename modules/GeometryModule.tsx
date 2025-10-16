@@ -13,7 +13,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -51,7 +51,7 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 const typeNames: { [key: string]: string } = { 'perimeter': 'Çevre', 'area': 'Alan' };
                 const shapeNames: { [key: string]: string } = { 'square': 'Kare', 'rectangle': 'Dikdörtgen', 'triangle': 'Üçgen', 'circle': 'Daire' };
                 const title = `Gerçek Hayat Problemleri - ${shapeNames[settings.shape!]} ${typeNames[settings.type]}`;
-                onGenerate(problems, clearPrevious, title, 'geometry');
+                onGenerate(problems, clearPrevious, title, 'geometry', settings.pageCount);
                 addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateGeometryProblem(settings));
@@ -62,7 +62,7 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'geometry');
+                    onGenerate(problems, clearPrevious, title, 'geometry', settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }

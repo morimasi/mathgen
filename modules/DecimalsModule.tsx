@@ -13,7 +13,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -55,14 +55,14 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 const problems = await generateContextualWordProblems('decimals', adjustedSettings);
                 const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed': 'Karışık Dört İşlem' };
                 const title = `Gerçek Hayat Problemleri - Ondalık Sayılarda ${opNames[settings.operation!]}`;
-                onGenerate(problems, clearPrevious, title, 'decimals');
+                onGenerate(problems, clearPrevious, title, 'decimals', settings.pageCount);
                 addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateDecimalProblem(settings));
                 if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'decimals');
+                    onGenerate(problems, clearPrevious, title, 'decimals', settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }

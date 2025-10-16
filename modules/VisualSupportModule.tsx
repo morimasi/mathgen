@@ -10,7 +10,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -51,7 +51,7 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
             if (results.length > 0) {
                 const problems = results.map(r => r.problem);
                 const title = results[0].title;
-                onGenerate(problems, clearPrevious, title, 'visual-support');
+                onGenerate(problems, clearPrevious, title, 'visual-support', settings.pageCount);
             }
         } catch (error: any) {
             console.error(error);

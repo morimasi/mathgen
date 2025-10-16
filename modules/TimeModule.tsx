@@ -13,7 +13,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -57,14 +57,14 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
                 const typeNames: { [key: string]: string } = { 'calculate-duration': 'Süre Hesaplama', 'calculate-end-time': 'Bitiş Zamanı Bulma', 'find-start-time': 'Başlangıç Zamanı Bulma' };
                 const diffNames: { [key: string]: string } = { 'easy': 'Kolay', 'medium': 'Orta', 'hard': 'Zor', 'mixed': 'Karışık' };
                 const title = `Gerçek Hayat Problemleri - ${typeNames[settings.type]} (${diffNames[settings.difficulty]})`;
-                onGenerate(problems, clearPrevious, title, 'time');
+                onGenerate(problems, clearPrevious, title, 'time', settings.pageCount);
                 addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateTimeProblem(settings));
                 if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'time');
+                    onGenerate(problems, clearPrevious, title, 'time', settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }

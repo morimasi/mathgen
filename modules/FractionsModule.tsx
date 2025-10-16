@@ -13,7 +13,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -57,7 +57,7 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                 const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed': 'Karışık Dört İşlem' };
                 const diffNames: { [key: string]: string } = { 'easy': 'Kolay', 'medium': 'Orta', 'hard': 'Zor' };
                 const title = `Gerçek Hayat Problemleri - Kesirlerde ${opNames[settings.operation!]} (${diffNames[settings.difficulty!]})`;
-                onGenerate(problems, clearPrevious, title, 'fractions');
+                onGenerate(problems, clearPrevious, title, 'fractions', settings.pageCount);
                 addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateFractionsProblem(settings));
@@ -68,7 +68,7 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'fractions');
+                    onGenerate(problems, clearPrevious, title, 'fractions', settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }

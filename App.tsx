@@ -127,6 +127,7 @@ const AppContent: React.FC = () => {
     const [isPdfLoading, setIsPdfLoading] = useState(false);
     const [worksheetScale, setWorksheetScale] = useState(0.5);
     const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(false);
+    const [pageCount, setPageCount] = useState(1);
     const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>({
         operation: ArithmeticOperation.Addition,
         maxNumber: 20,
@@ -147,11 +148,13 @@ const AppContent: React.FC = () => {
         newProblems: Problem[], 
         clearPrevious: boolean, 
         title: string,
-        generatorModule: string
+        generatorModule: string,
+        pageCount: number
     ) => {
         setProblems(prev => clearPrevious ? newProblems : [...prev, ...newProblems]);
         setWorksheetTitle(title);
         setLastGeneratorModule(generatorModule);
+        setPageCount(pageCount);
     }, []);
 
     const handlePrint = async () => {
@@ -234,6 +237,7 @@ const AppContent: React.FC = () => {
         setAutoRefreshTrigger(0);
         setLastGeneratorModule(null);
         setWorksheetScale(0.5); // Reset scale on app reset
+        setPageCount(1);
     };
 
     return (
@@ -348,6 +352,7 @@ const AppContent: React.FC = () => {
                                 contentRef={contentRef}
                                 visualSupportSettings={visualSupportSettings}
                                 viewScale={worksheetScale}
+                                pageCount={pageCount}
                             />
                         </div>
                     </div>

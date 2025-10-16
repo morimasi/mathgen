@@ -13,7 +13,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -51,7 +51,7 @@ const PlaceValueModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 const problems = await generateContextualWordProblems('place-value', adjustedSettings);
                  const typeNames: { [key: string]: string } = { 'identification': 'Basamak Değeri Bulma', 'rounding': 'Yuvarlama', 'comparison': 'Karşılaştırma' };
                 const title = `Gerçek Hayat Problemleri - ${typeNames[settings.type] || 'Basamak Değeri'}`;
-                onGenerate(problems, clearPrevious, title, 'place-value');
+                onGenerate(problems, clearPrevious, title, 'place-value', settings.pageCount);
                 addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generatePlaceValueProblem(settings));
@@ -62,7 +62,7 @@ const PlaceValueModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'place-value');
+                    onGenerate(problems, clearPrevious, title, 'place-value', settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }

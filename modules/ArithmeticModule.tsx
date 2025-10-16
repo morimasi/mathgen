@@ -13,7 +13,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -59,7 +59,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 const problems = await generateContextualWordProblems('arithmetic', adjustedSettings);
                 const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed-add-sub': 'Toplama ve Çıkarma' };
                 const title = `Gerçek Hayat Problemleri - ${opNames[settings.operation]}`;
-                onGenerate(problems, clearPrevious, title, 'arithmetic');
+                onGenerate(problems, clearPrevious, title, 'arithmetic', settings.pageCount);
                 addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const results = Array.from({ length: totalCount }, () => generateArithmeticProblem(settings));
@@ -71,7 +71,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'arithmetic');
+                    onGenerate(problems, clearPrevious, title, 'arithmetic', settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }

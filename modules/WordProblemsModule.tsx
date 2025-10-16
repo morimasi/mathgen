@@ -14,7 +14,7 @@ import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TABS } from '../constants';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -77,7 +77,7 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
             const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
             const problems = await generateWordProblems(adjustedSettings);
             const title = `Yapay Zeka Destekli Problemler (${settings.customPrompt ? 'Özel' : settings.topic})`;
-            onGenerate(problems, clearPrevious, title, 'word-problems');
+            onGenerate(problems, clearPrevious, title, 'word-problems', settings.pageCount);
             addToast(`${problems.length} AI problemi başarıyla oluşturuldu!`, 'success');
         } catch (err: any) {
             console.error(err);

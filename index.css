@@ -192,8 +192,13 @@ html.dark .worksheet-viewport {
     transform: scale(var(--view-scale, 1));
     transform-origin: top center;
     transition: transform 0.2s ease-in-out;
-    margin-bottom: 2rem;
 }
+
+/* Visual separation for multiple pages in the viewport */
+.worksheet-viewport .worksheet-container + .worksheet-container {
+    margin-top: 2rem;
+}
+
 .worksheet-content {
     background-color: #fff;
     color: var(--text-color, #1e293b);
@@ -345,6 +350,10 @@ body.pdf-export-mode .answer-key {
     display: block !important;
     margin-top: 0 !important;
 }
+body.pdf-export-mode .worksheet-container + .worksheet-container {
+    margin-top: 0 !important;
+}
+
 
 /* Print-specific styles */
 @media print {

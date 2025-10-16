@@ -52,9 +52,10 @@ interface ProblemSheetProps {
     contentRef: React.RefObject<HTMLDivElement>;
     visualSupportSettings?: VisualSupportSettings;
     viewScale: number;
+    pageCount: number;
 }
 
-const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title, contentRef, visualSupportSettings, viewScale }) => {
+const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title, contentRef, visualSupportSettings, viewScale, pageCount }) => {
     const { settings } = usePrintSettings();
     
     if (isLoading) {
@@ -98,52 +99,68 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
         worksheetContentClasses.push(`notebook-${settings.notebookStyle}`);
     }
 
+    const pages = [];
+    if (pageCount > 1 && problems.length > 0) {
+        const problemsPerPage = Math.ceil(problems.length / pageCount);
+        for (let i = 0; i < problems.length; i += problemsPerPage) {
+            pages.push(problems.slice(i, i + problemsPerPage));
+        }
+    } else {
+        pages.push(problems);
+    }
+
+
     return (
-        <div 
-            id="worksheet-container" 
-            className="worksheet-container" 
-            style={problemSheetStyle}
-            data-orientation={settings.orientation}
-        >
-            <div ref={contentRef} className={worksheetContentClasses.join(' ')}>
-                {settings.showHeader && (
-                    <header className="worksheet-header">
-                        <div className="worksheet-title" />
-                        <div className="worksheet-info">
-                            <span className="whitespace-nowrap">Okul: ..........................</span>
-                            <span className="whitespace-nowrap">İsim: ..........................</span>
-                            <span className="whitespace-nowrap">Tarih: ..........................</span>
-                        </div>
-                    </header>
-                )}
-                
-                {title && <h3 className="text-xl font-semibold mb-6 text-center flex-shrink-0">{title}</h3>}
-
-                <div className="problem-list">
-                    {problems.map((p, index) => {
-                        const isVisualProblem = p.display === 'long-division-html' || p.display === 'vertical-html' || p.question.includes('<svg') || p.category === 'visual-support';
+        <div ref={contentRef}>
+            {pages.map((pageProblems, pageIndex) => (
+                <div 
+                    key={pageIndex}
+                    id={`worksheet-container-${pageIndex}`} 
+                    className="worksheet-container" 
+                    style={problemSheetStyle}
+                    data-orientation={settings.orientation}
+                >
+                    <div className={worksheetContentClasses.join(' ')}>
+                        {settings.showHeader && (
+                            <header className="worksheet-header">
+                                <div className="worksheet-title" />
+                                <div className="worksheet-info">
+                                    <span className="whitespace-nowrap">Okul: ..........................</span>
+                                    <span className="whitespace-nowrap">İsim: ..........................</span>
+                                    <span className="whitespace-nowrap">Tarih: ..........................</span>
+                                </div>
+                            </header>
+                        )}
                         
-                        let itemClassName = `problem-item ${isVisualProblem ? 'items-center' : ''}`;
-                        const isArithmetic = p.category === 'arithmetic';
+                        {title && pageIndex === 0 && <h3 className="text-xl font-semibold mb-6 text-center flex-shrink-0">{title}</h3>}
 
-                        if (settings.borderStyle === 'card') {
-                            itemClassName += ` problem-item-card`;
-                        } else if (settings.borderStyle !== 'none') {
-                            itemClassName += ` problem-item-bordered border-${settings.borderStyle}`;
-                        }
+                        <div className="problem-list">
+                            {pageProblems.map((p, index) => {
+                                const isVisualProblem = p.display === 'long-division-html' || p.display === 'vertical-html' || p.question.includes('<svg') || p.category === 'visual-support';
+                                
+                                let itemClassName = `problem-item ${isVisualProblem ? 'items-center' : ''}`;
+                                const isArithmetic = p.category === 'arithmetic';
 
-                        return (
-                            <div key={index} className={itemClassName}>
-                                {!isArithmetic && <span className="problem-number">{index + 1}.</span>}
-                                <div 
-                                    className={(isArithmetic || isVisual) ? 'w-full' : 'problem-content'}
-                                    dangerouslySetInnerHTML={{ __html: p.question }}
-                                 />
-                            </div>
-                        );
-                    })}
+                                if (settings.borderStyle === 'card') {
+                                    itemClassName += ` problem-item-card`;
+                                } else if (settings.borderStyle !== 'none') {
+                                    itemClassName += ` problem-item-bordered border-${settings.borderStyle}`;
+                                }
+
+                                return (
+                                    <div key={index} className={itemClassName}>
+                                        {!isArithmetic && <span className="problem-number">{index + 1 + (pageIndex * Math.ceil(problems.length / pageCount))}.</span>}
+                                        <div 
+                                            className={(isArithmetic || isVisual) ? 'w-full' : 'problem-content'}
+                                            dangerouslySetInnerHTML={{ __html: p.question }}
+                                         />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
-            </div>
+            ))}
         </div>
     );
 };

@@ -13,7 +13,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
@@ -61,7 +61,7 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
                 const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
                 const problems = await generateContextualWordProblems('rhythmic-counting', adjustedSettings);
                 const title = `Gerçek Hayat Problemleri - Ritmik Sayma`;
-                onGenerate(problems, clearPrevious, title, 'rhythmic-counting');
+                onGenerate(problems, clearPrevious, title, 'rhythmic-counting', settings.pageCount);
                 addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
             } else {
                 const generationCount = isSheet ? settings.pageCount : totalCount;
@@ -74,7 +74,7 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'rhythmic-counting');
+                    onGenerate(problems, clearPrevious, title, 'rhythmic-counting', settings.pageCount);
                     addToast(isSheet ? `${results.length} sayfa başarıyla oluşturuldu!` : `${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }

@@ -12,7 +12,7 @@ import VisualSupportModule from '../modules/VisualSupportModule';
 import { Problem, VisualSupportSettings } from '../types';
 
 interface SettingsPanelProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
+    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
     setIsLoading: (loading: boolean) => void;
     activeTab: string;
     contentRef: React.RefObject<HTMLDivElement>;
