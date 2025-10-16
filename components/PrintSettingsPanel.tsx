@@ -153,7 +153,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                             </div>
                             <div className="space-y-1">
                                 <label htmlFor="print-scale" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
-                                   <span>Ölçek</span>
+                                   <span>İçerik Ölçeği</span>
                                    <span className="text-stone-500 dark:text-stone-400 font-normal">{`${Math.round(settings.scale * 100)}%`}</span>
                                 </label>
                                 <input

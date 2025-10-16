@@ -72,13 +72,14 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
     }
 
     const problemSheetStyle: React.CSSProperties = {
-        '--columns': settings.columns,
-        '--rows': settings.layoutMode === 'table' ? settings.rows : 'auto-fill',
+        '--table-cols': settings.columns,
+        '--table-rows': settings.layoutMode === 'table' ? settings.rows : 'auto-fill',
         '--font-size': `${settings.fontSize}px`,
         '--problem-spacing': `${settings.problemSpacing}rem`,
         '--column-gap': `${settings.columnGap}rem`,
         '--line-height': settings.lineHeight,
         '--view-scale': viewScale,
+        '--print-scale': settings.scale,
         '--page-margin': `${settings.pageMargin}rem`,
         '--notebook-color': settings.colorTheme === 'blue' ? 'rgba(0, 0, 255, 0.35)' : (settings.colorTheme === 'sepia' ? 'rgba(112, 66, 20, 0.35)' : 'rgba(0, 0, 0, 0.35)'),
         '--text-color': settings.colorTheme === 'blue' ? '#0000AA' : (settings.colorTheme === 'sepia' ? '#5a380a' : '#1e293b'),

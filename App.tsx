@@ -28,7 +28,7 @@ const generatePdfDocument = async (
 ): Promise<jsPDF | null> => {
     try {
         const canvas = await html2canvas(contentElement, {
-            scale: printSettings.scale, // Use print scale for PDF generation
+            scale: 2, // Use fixed high scale for PDF quality, independent of the content scale setting.
             useCORS: true,
             backgroundColor: '#ffffff',
             logging: false,
