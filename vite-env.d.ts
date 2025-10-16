@@ -1,2 +1,2 @@
-// FIX: Comment out to resolve a type definition error. The project does not appear to use Vite client types.
+// FIX: Comment out Vite client types to avoid conflicts with Node.js types.
 // /// <reference types="vite/client" />

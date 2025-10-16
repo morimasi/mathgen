@@ -43,8 +43,7 @@ const createVisualUnitHTML = (num: number, emoji: string): string => {
 
 export const generateVisualProblem = (settings: VisualSupportSettings): { problem: Problem, title: string } => {
     const { operation, maxNumber } = settings;
-    // FIX: The `display` property was inferred as `string`, which is not assignable to the `Problem` type's `display` property.
-    // Using `as const` ensures TypeScript infers the literal type `'inline'`, which is valid.
+    // FIX: Use 'as const' to assert the literal type 'inline' for the 'display' property, satisfying the 'Problem' type.
     const problemBase = { category: 'visual-support', display: 'inline' as const };
     const title = "Aşağıdaki nesneleri sayarak işlemleri yapınız.";
 
@@ -379,7 +378,7 @@ export const generateDecimalProblem = (settings: DecimalsSettings): { problem: P
                     answer = num1 + num2;
                     break;
                 case DecimalsOperation.Subtraction:
-                    // FIX: Changed `n2` to `num2` to fix a reference error.
+                    // FIX: Corrected a reference error by using `num2` instead of `n2`.
                     if (num1 < num2) [num1, num2] = [num2, num1];
                     answer = num1 - num2;
                     break;

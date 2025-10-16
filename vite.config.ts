@@ -1,4 +1,4 @@
-// FIX: Add a triple-slash directive to include Node.js types, which are needed for `process.cwd()`.
+// FIX: Add a triple-slash directive to include Node.js types for `process.cwd()`.
 /// <reference types="node" />
 
 import { defineConfig, loadEnv } from 'vite'

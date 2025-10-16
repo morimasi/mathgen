@@ -1,6 +1,6 @@
 
 
-// FIX: Import React to resolve the 'React.RefObject' type which caused the "Cannot find namespace 'React'" error.
+// FIX: Import React to make React types like `React.RefObject` available.
 import React from 'react';
 import { PrintSettings, Problem } from '../types';
 
