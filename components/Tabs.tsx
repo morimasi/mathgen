@@ -52,35 +52,37 @@ const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } =
 const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
     const { spawnLadybug } = useFlyingLadybugs();
     const [openMenu, setOpenMenu] = useState<string | null>(null);
+    const [isMenuSticky, setIsMenuSticky] = useState(false);
     const navRef = useRef<HTMLElement>(null);
-    const justHoverOpened = useRef(false);
-    const hoverTimeoutRef = useRef<number | null>(null);
 
     const handleMouseEnter = (event: React.MouseEvent<HTMLButtonElement>, menuTitle: string) => {
         spawnLadybug(event.clientX, event.clientY);
-        if (openMenu !== menuTitle) {
+        if (!isMenuSticky) {
             setOpenMenu(menuTitle);
-            justHoverOpened.current = true;
-            if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-            hoverTimeoutRef.current = window.setTimeout(() => {
-                justHoverOpened.current = false;
-            }, 300);
         }
     };
 
-    const handleMenuToggle = (menuTitle: string) => {
-        if (justHoverOpened.current) {
-            justHoverOpened.current = false;
-            if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-            return;
+    const handleClick = (menuTitle: string) => {
+        if (openMenu === menuTitle && isMenuSticky) {
+            setOpenMenu(null);
+            setIsMenuSticky(false);
+        } else {
+            setOpenMenu(menuTitle);
+            setIsMenuSticky(true);
         }
-        setOpenMenu(prevOpenMenu => (prevOpenMenu === menuTitle ? null : menuTitle));
+    };
+    
+    const handleItemClick = (tabId: string) => {
+        onTabClick(tabId);
+        setOpenMenu(null);
+        setIsMenuSticky(false);
     };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (navRef.current && !navRef.current.contains(event.target as Node)) {
                 setOpenMenu(null);
+                setIsMenuSticky(false);
             }
         };
 
@@ -90,7 +92,6 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
-            if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
         };
     }, [openMenu]);
 
@@ -106,7 +107,7 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
                         className="relative"
                     >
                         <button
-                            onClick={() => handleMenuToggle(group.title)}
+                            onClick={() => handleClick(group.title)}
                             onMouseEnter={(e) => handleMouseEnter(e, group.title)}
                             className={`tab-button-nav-item flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none ${
                                 isGroupActive
@@ -132,10 +133,7 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
                                 return (
                                     <button
                                         key={tab.id}
-                                        onClick={() => {
-                                            onTabClick(tab.id);
-                                            setOpenMenu(null);
-                                        }}
+                                        onClick={() => handleItemClick(tab.id)}
                                         className={`w-full text-left flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
                                             activeTab === tab.id
                                                 ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300'
