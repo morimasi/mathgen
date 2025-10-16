@@ -2,7 +2,7 @@
 
 export const TAB_GROUPS = [
     {
-        title: 'Temel İşlemler',
+        title: 'İşlemler',
         tabs: [
             { id: 'arithmetic', label: 'Dört İşlem' },
             { id: 'visual-support', label: 'Görsel Destek' },
@@ -10,7 +10,7 @@ export const TAB_GROUPS = [
         ]
     },
     {
-        title: 'Sayılar ve Kavramlar',
+        title: 'Sayılar',
         tabs: [
             { id: 'fractions', label: 'Kesirler' },
             { id: 'decimals', label: 'Ondalık Sayılar' },
@@ -19,7 +19,7 @@ export const TAB_GROUPS = [
         ]
     },
     {
-        title: 'Ölçme ve Geometri',
+        title: 'Ölçümler',
         tabs: [
             { id: 'time', label: 'Zaman Ölçme' },
             { id: 'geometry', label: 'Geometri' },

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFlyingLadybugs } from '../services/FlyingLadybugContext';
 import {
     ArithmeticIcon,
@@ -11,6 +11,7 @@ import {
     MeasurementIcon,
     WordProblemsIcon,
     VisualSupportIcon,
+    ChevronDownIcon,
 } from './icons/Icons';
 
 interface Tab {
@@ -29,7 +30,7 @@ interface TabsProps {
     onTabClick: (tabId: string) => void;
 }
 
-const iconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
+const itemIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
     'arithmetic': ArithmeticIcon,
     'visual-support': VisualSupportIcon,
     'fractions': FractionsIcon,
@@ -42,42 +43,75 @@ const iconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
     'word-problems': WordProblemsIcon,
 };
 
+const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
+    'İşlemler': ArithmeticIcon,
+    'Sayılar': RhythmicIcon,
+    'Ölçümler': MeasurementIcon,
+};
 
 const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
     const { spawnLadybug } = useFlyingLadybugs();
+    const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-    const handleMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
-        spawnLadybug(e.clientX, e.clientY);
-    };
-    
     return (
-        <nav className="-mb-px flex space-x-4 overflow-x-auto" aria-label="Tabs">
-            {tabGroups.map((group, groupIndex) => (
-                <div key={group.title} className="flex items-center gap-4">
-                    {groupIndex > 0 && <div className="h-6 w-px bg-white/20"></div>}
-                    <div className="flex items-center gap-4">
-                        {group.tabs.map((tab) => {
-                            const Icon = iconMap[tab.id];
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => onTabClick(tab.id)}
-                                    onMouseEnter={handleMouseEnter}
-                                    className={`tab-button-nav-item flex items-center gap-2 ${
-                                        activeTab === tab.id
-                                            ? 'border-amber-200 text-amber-200'
-                                            : 'border-transparent text-amber-100/60 hover:text-amber-100 hover:border-amber-300/70'
-                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors focus:outline-none`}
-                                    aria-current={activeTab === tab.id ? 'page' : undefined}
-                                >
-                                    {Icon && <Icon className="w-4 h-4" />}
-                                    {tab.label}
-                                </button>
-                            );
-                        })}
+        <nav className="-mb-px flex space-x-2" aria-label="Tabs">
+            {tabGroups.map((group) => {
+                const GroupIcon = groupIconMap[group.title];
+                const isGroupActive = group.tabs.some(tab => tab.id === activeTab);
+                
+                return (
+                    <div
+                        key={group.title}
+                        className="relative"
+                        onMouseEnter={() => setOpenMenu(group.title)}
+                        onMouseLeave={() => setOpenMenu(null)}
+                    >
+                        <button
+                            onMouseEnter={(e) => spawnLadybug(e.clientX, e.clientY)}
+                            className={`tab-button-nav-item flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none ${
+                                isGroupActive
+                                    ? 'bg-white/20 text-white'
+                                    : 'text-amber-100/70 hover:bg-white/10 hover:text-white'
+                            }`}
+                             aria-haspopup="true"
+                             aria-expanded={openMenu === group.title}
+                        >
+                            {GroupIcon && <GroupIcon className="w-4 h-4" />}
+                            <span>{group.title}</span>
+                            <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${openMenu === group.title ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        <div
+                             className={`absolute left-0 mt-2 w-56 origin-top-left bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20 py-1 transition-all duration-150 ease-out ${
+                                 openMenu === group.title ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+                             }`}
+                             role="menu"
+                        >
+                            {group.tabs.map((tab) => {
+                                const Icon = itemIconMap[tab.id];
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => {
+                                            onTabClick(tab.id);
+                                            setOpenMenu(null);
+                                        }}
+                                        className={`w-full text-left flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                                            activeTab === tab.id
+                                                ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300'
+                                                : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700'
+                                        }`}
+                                        role="menuitem"
+                                    >
+                                        {Icon && <Icon className="w-5 h-5" />}
+                                        {tab.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-            ))}
+                );
+            })}
         </nav>
     );
 };
