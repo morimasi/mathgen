@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -121,6 +122,32 @@ html.dark .star {
 @keyframes twinkle-star {
     0%, 100% { opacity: 0.4; transform: scale(0.8); }
     50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* DYNAMIC LAYOUT FOR SETTINGS PANEL */
+.main-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile-first default */
+    gap: 2rem; /* Equivalent to gap-8 */
+}
+
+@media (min-width: 768px) { /* md breakpoint */
+    .main-layout-grid {
+        /* Default state (approx 33% sidebar, 67% content) */
+        grid-template-columns: 1fr 2fr;
+        transition: grid-template-columns 400ms ease-in-out;
+    }
+
+    .main-layout-grid.sidebar-collapsed {
+        /* Collapsed state (sidebar is 2/3 of its original size) */
+        grid-template-columns: 0.67fr 2.33fr;
+    }
+}
+
+.settings-panel-content {
+    /* Ensure content doesn't overflow during transition */
+    overflow: hidden;
+    width: 100%; /* Make sure it fills its grid cell */
 }
 
 

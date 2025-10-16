@@ -148,6 +148,7 @@ const AppContent: React.FC = () => {
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [isPdfLoading, setIsPdfLoading] = useState(false);
     const [worksheetScale, setWorksheetScale] = useState(0.7);
+    const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(false);
     const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>({
         operation: ArithmeticOperation.Addition,
         maxNumber: 20,
@@ -162,7 +163,6 @@ const AppContent: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
     const contentRef = useRef<HTMLDivElement>(null);
-    // FIX: Changed ref type from HTMLElement to HTMLDivElement to match the expected prop type in child components.
     const worksheetParentRef = useRef<HTMLDivElement>(null);
 
     const handleGenerate = useCallback((
@@ -328,9 +328,12 @@ const AppContent: React.FC = () => {
             </header>
 
             <main className="p-4 sm:p-6 lg:p-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <aside className="md:col-span-1 print:hidden">
-                         <div className="bg-white dark:bg-stone-800/80 p-6 rounded-lg shadow-sm sticky top-[10.5rem]">
+                <div className={`main-layout-grid ${isSettingsPanelCollapsed ? 'sidebar-collapsed' : ''}`}>
+                    <aside 
+                        className="print:hidden settings-panel"
+                        onMouseEnter={() => setIsSettingsPanelCollapsed(false)}
+                    >
+                         <div className="settings-panel-content bg-white dark:bg-stone-800/80 p-6 rounded-lg shadow-sm sticky top-[10.5rem]">
                             <SettingsPanel 
                                 onGenerate={handleGenerate} 
                                 setIsLoading={setIsLoading} 
@@ -343,8 +346,11 @@ const AppContent: React.FC = () => {
                             />
                         </div>
                     </aside>
-                    {/* FIX: Changed section to div to match the `worksheetParentRef` type of `HTMLDivElement`. */}
-                    <div className="md:col-span-2" ref={worksheetParentRef}>
+                    <div 
+                        className="worksheet-area" 
+                        ref={worksheetParentRef}
+                        onMouseEnter={() => setIsSettingsPanelCollapsed(true)}
+                    >
                         <WorksheetToolbar
                             scale={worksheetScale}
                             setScale={setWorksheetScale}
