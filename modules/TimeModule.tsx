@@ -79,8 +79,9 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'time') {
             handleGenerate(true);
         }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
+    }, [autoRefreshTrigger, lastGeneratorModule]);
 
+    // Live update for auto-fit
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
@@ -90,11 +91,11 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
         if (settings.autoFit && lastGeneratorModule === 'time') {
             const handler = setTimeout(() => {
                 handleGenerate(true);
-            }, 300);
+            }, 300); // Debounce to prevent rapid updates
 
             return () => clearTimeout(handler);
         }
-    }, [printSettings, settings.autoFit, lastGeneratorModule, handleGenerate]);
+    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
 
     const handleSettingChange = (field: keyof TimeSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));

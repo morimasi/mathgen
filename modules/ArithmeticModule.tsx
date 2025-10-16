@@ -86,8 +86,9 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'arithmetic') {
             handleGenerate(true);
         }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
+    }, [autoRefreshTrigger, lastGeneratorModule]);
 
+    // Live update for auto-fit
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
@@ -97,11 +98,11 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         if (settings.autoFit && lastGeneratorModule === 'arithmetic') {
             const handler = setTimeout(() => {
                 handleGenerate(true);
-            }, 300);
+            }, 300); // Debounce to prevent rapid updates
 
             return () => clearTimeout(handler);
         }
-    }, [printSettings, settings.autoFit, lastGeneratorModule, handleGenerate]);
+    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
 
 
     const handleSettingChange = (field: keyof ArithmeticSettings, value: any) => {

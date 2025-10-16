@@ -77,8 +77,9 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'decimals') {
             handleGenerate(true);
         }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
+    }, [autoRefreshTrigger, lastGeneratorModule]);
 
+    // Live update for auto-fit
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
@@ -88,11 +89,11 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
         if (settings.autoFit && lastGeneratorModule === 'decimals') {
             const handler = setTimeout(() => {
                 handleGenerate(true);
-            }, 300);
+            }, 300); // Debounce to prevent rapid updates
 
             return () => clearTimeout(handler);
         }
-    }, [printSettings, settings.autoFit, lastGeneratorModule, handleGenerate]);
+    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
 
     const handleSettingChange = (field: keyof DecimalsSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));

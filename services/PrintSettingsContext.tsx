@@ -10,12 +10,12 @@ const PrintSettingsContext = createContext<PrintSettingsContextType | undefined>
 
 const initialPrintSettings: PrintSettings = {
     columns: 2,
-    columnGap: 0.6,
+    columnGap: 0,
     fontSize: 16,
     showHeader: false,
     notebookStyle: 'none',
     borderStyle: 'none',
-    problemSpacing: 0.7,
+    problemSpacing: 0,
     pageMargin: 0.7,
     lineHeight: 1.5,
     scale: 1,
