@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { generateVisualProblem } from '../services/mathService';
 import { Problem, VisualSupportSettings, ArithmeticOperation } from '../types';
 import NumberInput from '../components/form/NumberInput';
@@ -7,6 +7,7 @@ import Checkbox from '../components/form/Checkbox';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
+import Button from '../components/form/Button';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -57,6 +58,14 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
         setIsLoading(false);
     }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
     
+    // Deconstruct settings to create a stable dependency array for the live-update effect.
+    // This effect will now ignore changes to problemsPerPage and pageCount.
+    const { 
+        problemsPerPage, 
+        pageCount, 
+        ...liveSettings 
+    } = settings;
+
     useEffect(() => {
         // This module is "live", so it should update whenever its settings or print settings change.
         if (lastGeneratorModule !== 'visual-support' && !isInitialMount.current) {
@@ -73,7 +82,8 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
         }
 
         return () => clearTimeout(handler);
-    }, [settings, printSettings, handleGenerate, lastGeneratorModule]);
+    }, [JSON.stringify(liveSettings), printSettings, handleGenerate, lastGeneratorModule]);
+
 
     const handleSettingChange = (field: keyof VisualSupportSettings, value: any) => {
         setSettings({ ...settings, [field]: value });
@@ -135,22 +145,37 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                             checked={settings.autoFit}
                             onChange={e => handleSettingChange('autoFit', e.target.checked)}
                         />
-                        <div className={`grid grid-cols-2 gap-2 transition-opacity ${settings.autoFit ? 'opacity-50' : 'opacity-100'}`}>
-                            <NumberInput 
-                                label="Problem Sayısı"
-                                id="problems-per-page-visual"
-                                min={1} max={50}
-                                value={settings.problemsPerPage}
-                                onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                                disabled={settings.autoFit}
-                            />
-                            <NumberInput 
-                                label="Sayfa Sayısı"
-                                id="page-count-visual"
-                                min={1} max={20}
-                                value={settings.pageCount}
-                                onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                            />
+                        <div className={`transition-opacity ${settings.autoFit ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                           <div className="flex items-end gap-2">
+                                <NumberInput 
+                                    containerClassName="flex-grow"
+                                    label="Problem Sayısı"
+                                    id="problems-per-page-visual"
+                                    min={1} max={50}
+                                    value={settings.problemsPerPage}
+                                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10) || 1)}
+                                    disabled={settings.autoFit}
+                                />
+                                <NumberInput 
+                                    containerClassName="flex-grow"
+                                    label="Sayfa Sayısı"
+                                    id="page-count-visual"
+                                    min={1} max={20}
+                                    value={settings.pageCount}
+                                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10) || 1)}
+                                    disabled={settings.autoFit}
+                                />
+                                <Button
+                                    onClick={() => handleGenerate(true)}
+                                    disabled={settings.autoFit}
+                                    size="sm"
+                                    variant="secondary"
+                                    className="h-[27px]"
+                                    title="Manuel sayfa ve problem sayısını uygula"
+                                >
+                                    Uygula
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
