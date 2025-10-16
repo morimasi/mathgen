@@ -140,7 +140,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                    <span className="text-stone-500 dark:text-stone-400 font-normal">{`${settings.fontSize}px`}</span>
                                 </label>
                                 <input
-                                    type="range" id="print-font-size" value={settings.fontSize} min={10} max={24} step={1}
+                                    type="range" id="print-font-size" value={settings.fontSize} min={10} max={50} step={1}
                                     onChange={e => handleChange('fontSize', parseInt(e.target.value, 10))}
                                     className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
                                 />
