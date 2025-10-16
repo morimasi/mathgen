@@ -410,20 +410,15 @@
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "jspdf": "https://aistudiocdn.com/jspdf@^3.0.3",
     "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0"
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0",
+    "vite": "https://aistudiocdn.com/vite@^7.1.10",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.0.4"
   }
 }
 </script>
 </head>
 <body>
     <div id="root"></div>
-    <!-- 
-      BABEL STANDALONE SCRIPT:
-      Bu script, TSX (TypeScript + JSX) dosyalarını doğrudan tarayıcıda derlemek için eklenmiştir.
-      Bu, uygulamanın Netlify gibi statik hosting platformlarında bir derleme adımına ihtiyaç duymadan yayınlanmasını sağlar.
-      Ana uygulama script'inin tipi "module" yerine "text/babel" olarak değiştirilmiştir.
-    -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script type="text/babel" data-type="module" src="./index.tsx"></script>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>

@@ -1,23 +1,25 @@
 {
-  "name": "mathgen",
+  "name": "mathgen-vite",
+  "private": true,
   "version": "1.0.0",
-  "description": "Öğretmenler ve veliler için ilkokul seviyesinde, farklı zorluklarda özelleştirilebilir ve yazdırılabilir matematik problemleri üreten bir web uygulaması.",
+  "type": "module",
   "scripts": {
-    "start": "echo \"Application is served directly from index.html. No build step is required.\" && exit 0"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": [
-    "math",
-    "education",
-    "worksheet",
-    "generator"
-  ],
-  "author": "MathGen Developer",
-  "license": "UNLICENSED",
   "dependencies": {
     "@google/genai": "^0.15.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.13"
   }
 }
