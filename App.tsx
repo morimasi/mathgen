@@ -1,201 +1,396 @@
-
-import React, 'react';
-import { useState, useRef, useEffect, useCallback } from 'react';
-import {
-    PrintIcon,
-    ShuffleIcon,
-    SettingsIcon,
-    HelpIcon,
-    ContactIcon,
-    LoadingIcon
-} from './components/icons/Icons';
-import { Problem, VisualSupportSettings, ArithmeticOperation, PrintSettings } from './types';
-import { TAB_GROUPS } from './constants';
-import { ThemeProvider, useTheme } from './services/ThemeContext';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { ThemeProvider } from './services/ThemeContext';
 import { FontThemeProvider } from './services/FontThemeContext';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext';
-import { ToastProvider } from './services/ToastContext';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext';
+import { ToastProvider, useToast } from './services/ToastContext';
 import Tabs from './components/Tabs';
 import SettingsPanel from './components/SettingsPanel';
 import ProblemSheet from './components/ProblemSheet';
 import PrintSettingsPanel from './components/PrintSettingsPanel';
-import ToastContainer from './components/ToastContainer';
 import HowToUseModal from './components/HowToUseModal';
 import ContactModal from './components/ContactModal';
-import AnimatedLogo from './components/AnimatedLogo';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import ToastContainer from './components/ToastContainer';
+import { TAB_GROUPS } from './constants';
+import { Problem, PrintSettings, VisualSupportSettings, ArithmeticOperation } from './types';
+import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon } from './components/icons/Icons';
+import AnimatedLogo from './components/AnimatedLogo';
 
-function App() {
-    const [activeTab, setActiveTab] = useState('arithmetic');
-    const [problems, setProblems] = useState<Problem[]>([]);
-    const [worksheetTitle, setWorksheetTitle] = useState('Çalışma Kağıdı');
-    const [pageCount, setPageCount] = useState(1);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [activeSidebarTab, setActiveSidebarTab] = useState('problems'); // 'problems' or 'print'
-    const [isHowToUseVisible, setIsHowToUseVisible] = useState(false);
-    const [isContactVisible, setIsContactVisible] = useState(false);
-    const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
-    const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>('arithmetic');
+/**
+ * Generates a jsPDF document instance from the provided HTML element.
+ */
+const generatePdfDocument = async (
+    contentElement: HTMLElement,
+    printSettings: PrintSettings
+): Promise<jsPDF | null> => {
+    try {
+        const canvas = await html2canvas(contentElement, {
+            scale: printSettings.scale, // Use print scale for PDF generation
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+        });
 
-    const contentRef = useRef<HTMLDivElement>(null);
-    const { settings: printSettings } = usePrintSettings();
-    const { mode } = useTheme();
-    
-    // This state is managed here because the Visual Support module is "live" and its visual settings
-    // need to be applied as CSS variables at the top level.
-    const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>({
-        operation: ArithmeticOperation.Addition,
-        maxNumber: 10,
-        problemsPerPage: 6,
-        pageCount: 1,
-        autoFit: true,
-        emojiSize: 32,
-        numberSize: 18,
-        boxSize: 50,
-    });
-
-    // Apply styles dynamically as CSS variables
-    useEffect(() => {
-        const root = document.documentElement;
-        root.style.setProperty('--font-size', `${printSettings.fontSize}px`);
-        root.style.setProperty('--line-height', String(printSettings.lineHeight));
-        root.style.setProperty('--problem-spacing', `${printSettings.problemSpacing}rem`);
-        root.style.setProperty('--page-margin', `${printSettings.pageMargin}in`);
-        root.style.setProperty('--scale', String(printSettings.scale));
-        root.style.setProperty('--text-align', printSettings.textAlign);
-        root.style.setProperty('--color-theme', printSettings.colorTheme === 'black' ? '#111827' : (printSettings.colorTheme === 'blue' ? '#1e40af' : '#57534e'));
-        root.style.setProperty('--column-count', String(printSettings.columns));
-        root.style.setProperty('--column-gap', `${printSettings.columnGap}rem`);
+        const orientation = printSettings.orientation === 'landscape' ? 'l' : 'p';
+        const pdf = new jsPDF({ orientation, unit: 'mm', format: 'a4' });
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
         
-        // For Visual Support Module
-        root.style.setProperty('--visual-emoji-size', `${visualSupportSettings.emojiSize}px`);
-        root.style.setProperty('--visual-number-size', `${visualSupportSettings.numberSize}px`);
-        root.style.setProperty('--visual-box-width', `${visualSupportSettings.boxSize}px`);
-        root.style.setProperty('--visual-box-height', `${visualSupportSettings.boxSize}px`);
-        root.style.setProperty('--visual-container-min-width', `${visualSupportSettings.boxSize + 10}px`);
+        let heightLeft = imgHeight;
+        let position = 0;
 
-    }, [printSettings, visualSupportSettings, mode]);
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pdfHeight;
 
-
-    const handleGenerate = useCallback((newProblems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, newPageCount: number) => {
-        setProblems(prev => clearPrevious ? newProblems : [...prev, ...newProblems]);
-        setWorksheetTitle(title);
-        setLastGeneratorModule(generatorModule);
-        setPageCount(newPageCount > 0 ? newPageCount : 1);
-    }, []);
-
-    const handlePrint = () => window.print();
-
-    const handleRefresh = () => {
-        if (lastGeneratorModule) {
-            setAutoRefreshTrigger(val => val + 1);
+        while (heightLeft > 0) {
+            position -= pdfHeight;
+            pdf.addPage();
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
         }
-    };
-    
-    const handleReset = () => {
-        if (window.confirm("Bu işlem mevcut çalışma kağıdını ve tüm ayarları sıfırlayacaktır. Devam etmek istiyor musunuz?")) {
-            localStorage.clear();
-            window.location.reload();
-        }
-    };
-    
-    const handleTabClick = (tabId: string) => {
-        setActiveTab(tabId);
-        setActiveSidebarTab('problems');
+        
+        return pdf;
+
+    } catch (error) {
+        console.error("Error generating PDF document:", error);
+        return null;
+    }
+};
+
+// --- NEW COMPONENT: WorksheetToolbar ---
+interface WorksheetToolbarProps {
+    scale: number;
+    setScale: (scale: number) => void;
+    worksheetParentRef: React.RefObject<HTMLElement>;
+    orientation: 'portrait' | 'landscape';
+}
+
+const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
+
+const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, worksheetParentRef, orientation }) => {
+
+    const handleFitToPage = () => {
+        if (!worksheetParentRef.current) return;
+
+        const containerWidth = worksheetParentRef.current.clientWidth;
+        const worksheetWidth = orientation === 'portrait' ? A4_WIDTH_PX : A4_HEIGHT_PX;
+        
+        // Subtract some padding (e.g., 2rem) for better visual fit
+        const newScale = (containerWidth - 32) / worksheetWidth;
+        
+        setScale(Math.min(1.5, Math.max(0.1, newScale))); // Clamp the scale to reasonable values
     };
 
     return (
-        <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-            <header className="app-header print:hidden">
-                <div className="flex items-center gap-4">
-                    <AnimatedLogo onReset={handleReset} />
-                    <h1 className="text-xl font-bold text-white tracking-tight">MathGen</h1>
-                    <div className="hidden md:block">
-                        <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={handleTabClick} />
-                    </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <button onClick={handlePrint} className="header-button" title="Yazdır"><PrintIcon /></button>
-                    <button onClick={handleRefresh} className="header-button" title="Yenile"><ShuffleIcon /></button>
-                    <button onClick={() => setIsSidebarOpen(s => !s)} className="header-button" title="Ayarları Aç/Kapat"><SettingsIcon /></button>
-                    <button onClick={() => setIsHowToUseVisible(true)} className="header-button" title="Nasıl Kullanılır?"><HelpIcon /></button>
-                    <button onClick={() => setIsContactVisible(true)} className="header-button" title="İletişim"><ContactIcon /></button>
-                    <ThemeSwitcher />
-                </div>
-            </header>
+        <div className="worksheet-toolbar">
+            <div className="flex items-center gap-4">
+                <label htmlFor="scale-slider" className="text-sm font-medium">Ölçek:</label>
+                <input
+                    type="range"
+                    id="scale-slider"
+                    min="0.2"
+                    max="1.5"
+                    step="0.01"
+                    value={scale}
+                    onChange={(e) => setScale(parseFloat(e.target.value))}
+                    className="w-32 sm:w-48 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
+                />
+                <span className="text-sm font-semibold w-12 text-center">{Math.round(scale * 100)}%</span>
+            </div>
+            <button 
+                onClick={handleFitToPage} 
+                className="p-2 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors" 
+                title="Ekrana Sığdır"
+            >
+                <FitToScreenIcon className="w-5 h-5" />
+            </button>
+        </div>
+    );
+};
+
+
+const AppContent: React.FC = () => {
+    const [activeTab, setActiveTab] = useState('arithmetic');
+    const [problems, setProblems] = useState<Problem[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [worksheetTitle, setWorksheetTitle] = useState('');
+    const [isPrintSettingsVisible, setPrintSettingsVisible] = useState(false);
+    const [isHowToUseVisible, setHowToUseVisible] = useState(false);
+    const [isContactModalVisible, setContactModalVisible] = useState(false);
+    const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
+    const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
+    const [isPdfLoading, setIsPdfLoading] = useState(false);
+    const [worksheetScale, setWorksheetScale] = useState(0.5);
+    const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(false);
+    const [pageCount, setPageCount] = useState(1);
+    const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>({
+        operation: ArithmeticOperation.Addition,
+        maxNumber: 20,
+        problemsPerPage: 10,
+        pageCount: 1,
+        autoFit: true,
+        emojiSize: 22,
+        numberSize: 24,
+        boxSize: 60,
+    });
+
+    const { settings: printSettings } = usePrintSettings();
+    const { addToast } = useToast();
+    const contentRef = useRef<HTMLDivElement>(null);
+    const worksheetParentRef = useRef<HTMLDivElement>(null);
+
+    const handleGenerate = useCallback((
+        newProblems: Problem[], 
+        clearPrevious: boolean, 
+        title: string,
+        generatorModule: string,
+        pageCount: number
+    ) => {
+        setProblems(prev => clearPrevious ? newProblems : [...prev, ...newProblems]);
+        setWorksheetTitle(title);
+        setLastGeneratorModule(generatorModule);
+        setPageCount(pageCount);
+    }, []);
+
+    const handlePrint = async () => {
+        const contentElement = contentRef.current;
+        if (!contentElement || isPdfLoading) return;
+    
+        setIsPdfLoading(true);
+        addToast('Yazdırma için PDF oluşturuluyor...', 'info');
+        document.body.classList.add('pdf-export-mode');
+        
+        try {
+            await new Promise(resolve => setTimeout(resolve, 50));
+            const pdf = await generatePdfDocument(contentElement, printSettings);
             
-            <main className="app-main">
-                <aside className={`sidebar print:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                    <div className="sidebar-header">
-                        <div className="flex border-b border-stone-200 dark:border-stone-700">
-                             <button 
-                                className={`sidebar-tab ${activeSidebarTab === 'problems' ? 'active' : ''}`}
-                                onClick={() => setActiveSidebarTab('problems')}>
-                                Problem Ayarları
-                             </button>
-                             <button 
-                                className={`sidebar-tab ${activeSidebarTab === 'print' ? 'active' : ''}`}
-                                onClick={() => setActiveSidebarTab('print')}>
-                                Yazdırma Ayarları
+            if (pdf) {
+                pdf.autoPrint();
+                const blob = pdf.output('blob');
+                const pdfUrl = URL.createObjectURL(blob);
+                window.open(pdfUrl);
+            } else {
+                 addToast('PDF oluşturulamadı.', 'error');
+            }
+        } catch (error) {
+            console.error("Error preparing PDF for printing:", error);
+            addToast('PDF yazdırılırken bir hata oluştu.', 'error');
+        } finally {
+            document.body.classList.remove('pdf-export-mode');
+            setIsPdfLoading(false);
+        }
+    };
+    
+    const handleSaveAsPdf = async () => {
+        const contentElement = contentRef.current;
+        if (!contentElement || isPdfLoading) return;
+
+        setIsPdfLoading(true);
+        addToast('PDF dosyası oluşturuluyor...', 'info');
+        document.body.classList.add('pdf-export-mode');
+        
+        try {
+            await new Promise(resolve => setTimeout(resolve, 50));
+            const pdf = await generatePdfDocument(contentElement, printSettings);
+
+            if (pdf) {
+                const blob = pdf.output('blob');
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const safeTitle = worksheetTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                a.download = `${safeTitle || 'MathGen_Worksheet'}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                addToast('PDF başarıyla oluşturuldu ve indiriliyor.', 'success');
+            } else {
+                 addToast('PDF dosyası oluşturulamadı.', 'error');
+            }
+
+        } catch (error) {
+            console.error("Error generating PDF for saving:", error);
+            addToast('PDF kaydedilirken bir hata oluştu.', 'error');
+        } finally {
+            document.body.classList.remove('pdf-export-mode');
+            setIsPdfLoading(false);
+        }
+    };
+
+    const triggerAutoRefresh = () => {
+        if (problems.length > 0 && lastGeneratorModule) {
+            setAutoRefreshTrigger(c => c + 1);
+        }
+    };
+
+    const handleResetApp = () => {
+        setActiveTab('arithmetic');
+        setProblems([]);
+        setIsLoading(false);
+        setWorksheetTitle('');
+        setAutoRefreshTrigger(0);
+        setLastGeneratorModule(null);
+        setWorksheetScale(0.5); // Reset scale on app reset
+        setPageCount(1);
+    };
+
+    return (
+        <div className="bg-stone-50 dark:bg-stone-900 min-h-screen text-stone-800 dark:text-stone-200">
+            <header className="bg-orange-800 dark:bg-stone-950/70 text-amber-50 shadow-md sticky top-0 z-20 print:hidden">
+                <div className="header-constellation" aria-hidden="true">
+                    <svg viewBox="0 0 200 80" className="w-full h-full">
+                        <g>
+                            {/* Handle */}
+                            <polyline points="190,20 160,30 130,40 100,50" className="constellation-line" />
+                            {/* Bowl */}
+                            <polyline points="100,50 105,70 60,75 50,55 100,50" className="constellation-line" />
+                            
+                            {/* Stars */}
+                            <circle cx="190" cy="20" r="2" className="star" style={{ animationDelay: '0.1s' }} />
+                            <circle cx="160" cy="30" r="2.5" className="star" style={{ animationDelay: '0.8s' }} />
+                            <circle cx="130" cy="40" r="2" className="star" style={{ animationDelay: '0.3s' }} />
+                            <circle cx="100" cy="50" r="1.5" className="star" style={{ animationDelay: '1.2s' }} />
+                            <circle cx="105" cy="70" r="2" className="star" style={{ animationDelay: '1.5s' }} />
+                            <circle cx="60" cy="75" r="2.5" className="star" style={{ animationDelay: '0.5s' }} />
+                            <circle cx="50" cy="55" r="2" className="star" style={{ animationDelay: '0.2s' }} />
+                        </g>
+                    </svg>
+                </div>
+                <div className="px-4 sm:px-6 lg:px-8 relative">
+                    <div className="flex items-center justify-between h-16">
+                        <div className="flex items-center gap-4">
+                            <AnimatedLogo onReset={handleResetApp} />
+                            <h1 className="text-xl font-bold tracking-tight header-interactive-item">MathGen</h1>
+                        </div>
+                        <div className="flex items-center gap-2">
+                             <button onClick={() => setHowToUseVisible(true)} className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item" title="Nasıl Kullanılır?">
+                                <HelpIcon />
+                            </button>
+                            <button onClick={() => setContactModalVisible(true)} className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item" title="İletişim">
+                                <ContactIcon />
+                            </button>
+                            <div className="header-interactive-item">
+                                <ThemeSwitcher />
+                            </div>
+                            <div className="h-6 w-px bg-white/20 mx-1"></div>
+                            <button 
+                                onClick={triggerAutoRefresh} 
+                                disabled={!lastGeneratorModule || problems.length === 0}
+                                className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item disabled:opacity-50 disabled:cursor-not-allowed" 
+                                title="Yenile"
+                            >
+                                <ShuffleIcon />
+                            </button>
+                            <button onClick={() => setPrintSettingsVisible(true)} className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item" title="Yazdırma Ayarları">
+                                <PrintSettingsIcon />
+                            </button>
+                            <button 
+                                onClick={handleSaveAsPdf} 
+                                disabled={isPdfLoading || problems.length === 0}
+                                className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item disabled:opacity-50 disabled:cursor-not-allowed" 
+                                title="PDF olarak indir"
+                            >
+                                {isPdfLoading ? <LoadingIcon className="w-6 h-6" /> : <PdfIcon />}
+                            </button>
+                            <button 
+                                onClick={handlePrint} 
+                                disabled={isPdfLoading || problems.length === 0}
+                                className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item disabled:opacity-50 disabled:cursor-not-allowed" 
+                                title="Yazdır"
+                            >
+                                {isPdfLoading ? <LoadingIcon className="w-6 h-6" /> : <PrintIcon />}
                             </button>
                         </div>
                     </div>
-                    <div className="sidebar-content">
-                        {activeSidebarTab === 'problems' ? (
+                    <div className="relative">
+                        <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={setActiveTab} />
+                    </div>
+                </div>
+            </header>
+
+            <main className="p-4 sm:p-6 lg:p-8">
+                <div className={`main-layout-grid ${isSettingsPanelCollapsed ? 'sidebar-collapsed' : ''}`}>
+                    <aside 
+                        className="print:hidden settings-panel"
+                        onMouseEnter={() => setIsSettingsPanelCollapsed(false)}
+                    >
+                         <div className="settings-panel-content bg-white dark:bg-stone-800/80 p-6 rounded-lg shadow-sm sticky top-[10.5rem]">
                             <SettingsPanel 
                                 onGenerate={handleGenerate} 
                                 setIsLoading={setIsLoading} 
-                                activeTab={activeTab} 
+                                activeTab={activeTab}
                                 contentRef={contentRef}
                                 autoRefreshTrigger={autoRefreshTrigger}
                                 lastGeneratorModule={lastGeneratorModule}
                                 visualSupportSettings={visualSupportSettings}
                                 setVisualSupportSettings={setVisualSupportSettings}
                             />
-                        ) : (
-                            <PrintSettingsPanel />
-                        )}
-                    </div>
-                </aside>
-
-                <div className="main-content">
-                    {isLoading && (
-                        <div className="loading-overlay">
-                            <LoadingIcon className="w-24 h-24" />
-                            <p className="mt-4 text-lg font-semibold text-orange-800 dark:text-orange-300">Problemler oluşturuluyor...</p>
                         </div>
-                    )}
-                    <div ref={contentRef} className="worksheet-container">
-                        <ProblemSheet 
-                            problems={problems} 
-                            title={worksheetTitle}
-                            pageCount={pageCount}
+                    </aside>
+                    <div 
+                        className="worksheet-area" 
+                        ref={worksheetParentRef}
+                        onMouseEnter={() => setIsSettingsPanelCollapsed(true)}
+                    >
+                        <WorksheetToolbar
+                            scale={worksheetScale}
+                            setScale={setWorksheetScale}
+                            worksheetParentRef={worksheetParentRef}
+                            orientation={printSettings.orientation}
                         />
+                        <div className="worksheet-viewport">
+                            <ProblemSheet 
+                                problems={problems} 
+                                isLoading={isLoading} 
+                                title={worksheetTitle}
+                                contentRef={contentRef}
+                                visualSupportSettings={visualSupportSettings}
+                                viewScale={worksheetScale}
+                                pageCount={pageCount}
+                            />
+                        </div>
                     </div>
                 </div>
             </main>
-
+            
+            <PrintSettingsPanel 
+                isVisible={isPrintSettingsVisible}
+                onClose={() => setPrintSettingsVisible(false)}
+            />
+            <HowToUseModal 
+                isVisible={isHowToUseVisible}
+                onClose={() => setHowToUseVisible(false)}
+            />
+            <ContactModal
+                isVisible={isContactModalVisible}
+                onClose={() => setContactModalVisible(false)}
+            />
             <ToastContainer />
-            <HowToUseModal isVisible={isHowToUseVisible} onClose={() => setIsHowToUseVisible(false)} />
-            <ContactModal isVisible={isContactVisible} onClose={() => setIsContactVisible(false)} />
         </div>
     );
-}
+};
 
-const AppWrapper = () => (
+
+const App: React.FC = () => {
+  return (
     <ThemeProvider>
         <FontThemeProvider>
             <PrintSettingsProvider>
-                <ToastProvider>
-                    <FlyingLadybugProvider>
-                        <App />
-                    </FlyingLadybugProvider>
-                </ToastProvider>
+                <FlyingLadybugProvider>
+                    <ToastProvider>
+                        <AppContent />
+                    </ToastProvider>
+                </FlyingLadybugProvider>
             </PrintSettingsProvider>
         </FontThemeProvider>
     </ThemeProvider>
-);
+  );
+};
 
-export default AppWrapper;
+export default App;
