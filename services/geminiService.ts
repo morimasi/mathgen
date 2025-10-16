@@ -1,7 +1,9 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { Problem, WordProblemSettings } from '../types';
 import { TABS } from '../constants';
 
+// FIX: Per coding guidelines, the API key must be sourced from `process.env.API_KEY`. This also resolves the TypeScript error.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const generateProblemsWithPrompt = async (prompt: string): Promise<Omit<Problem, 'category'>[]> => {
