@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ThemeProvider } from './services/ThemeContext';
+import { ColorThemeProvider } from './services/ColorThemeContext';
 import { FontThemeProvider } from './services/FontThemeContext';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext';
@@ -206,7 +207,7 @@ const AppContent: React.FC = () => {
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             } else {
-                 console.error('PDF dosyası oluşturulamadı.');
+                 console.error('PDF oluşturulamadı.');
             }
 
         } catch (error) {
@@ -373,13 +374,15 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <ThemeProvider>
-        <FontThemeProvider>
-            <PrintSettingsProvider>
-                <FlyingLadybugProvider>
-                    <AppContent />
-                </FlyingLadybugProvider>
-            </PrintSettingsProvider>
-        </FontThemeProvider>
+        <ColorThemeProvider>
+            <FontThemeProvider>
+                <PrintSettingsProvider>
+                    <FlyingLadybugProvider>
+                        <AppContent />
+                    </FlyingLadybugProvider>
+                </PrintSettingsProvider>
+            </FontThemeProvider>
+        </ColorThemeProvider>
     </ThemeProvider>
   );
 };

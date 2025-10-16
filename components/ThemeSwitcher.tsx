@@ -1,17 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useFontTheme, fontThemes, FontTheme } from '../services/FontThemeContext';
+import { useColorTheme, colorThemes, ColorTheme } from '../services/ColorThemeContext';
 import { useTheme } from '../services/ThemeContext';
 import { PaletteIcon, SunIcon, MoonIcon } from './icons/Icons';
 
 const ThemeSwitcher: React.FC = () => {
     const { fontTheme, setFontTheme } = useFontTheme();
+    const { colorTheme, setColorTheme } = useColorTheme();
     const { mode, toggleMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-
-    const handleFontChange = (theme: FontTheme) => {
-        setFontTheme(theme);
-    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -68,13 +66,39 @@ const ThemeSwitcher: React.FC = () => {
                     
                     <Divider />
 
+                    {/* Color Theme Section */}
+                    <SectionTitle>Renk Paleti</SectionTitle>
+                     <div className="grid grid-cols-4 gap-3 px-3">
+                        {Object.entries(colorThemes).map(([key, value]) => {
+                            const themeKey = key as ColorTheme;
+                            const colorClass = {
+                                orange: 'bg-orange-500 text-orange-500',
+                                mint: 'bg-emerald-500 text-emerald-500',
+                                rose: 'bg-rose-500 text-rose-500',
+                                sky: 'bg-sky-500 text-sky-500',
+                            }[themeKey];
+                            
+                            return (
+                                <button
+                                    key={key}
+                                    onClick={() => setColorTheme(themeKey)}
+                                    className={`w-full h-8 rounded-full flex items-center justify-center transition-all ${colorClass} ${colorTheme === key ? 'ring-2 ring-offset-2 dark:ring-offset-stone-800 ring-current' : ''}`}
+                                    title={value.name}
+                                    aria-label={value.name}
+                                />
+                            );
+                        })}
+                    </div>
+                    
+                    <Divider />
+
                     {/* Font Theme Section */}
                     <SectionTitle>Yazı Tipi</SectionTitle>
                     <div className="flex flex-col gap-1">
                         {Object.entries(fontThemes).map(([key, value]) => (
                             <button
                                 key={key}
-                                onClick={() => handleFontChange(key as FontTheme)}
+                                onClick={() => setFontTheme(key as FontTheme)}
                                 className={`w-full text-left block px-3 py-1.5 text-sm rounded-md transition-colors ${
                                     fontTheme === key
                                         ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300'

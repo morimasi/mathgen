@@ -16,6 +16,9 @@ html.dark body {
 .font-theme-disleksi1 { font-family: 'Lexend', sans-serif; }
 .font-theme-disleksi2 { font-family: 'Atkinson Hyperlegible', sans-serif; }
 .font-theme-eglenceli { font-family: 'Caveat', cursive; }
+.font-theme-yumusak { font-family: 'Comfortaa', sans-serif; }
+.font-theme-blok { font-family: 'Roboto Slab', serif; }
+.font-theme-net { font-family: 'Montserrat', sans-serif; }
 
 /* Loader Styles */
 .ladybug-loader-container {
@@ -369,11 +372,13 @@ html.dark .problem-item-bordered.border-corner-accent {
 }
 .worksheet-info {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 1.5rem;
     font-weight: 500;
     font-size: 1.1em;
     white-space: nowrap;
+    align-items: center;
 }
 .print-only {
     display: none;
@@ -608,3 +613,50 @@ html.dark .prose ol > li::before {
 .prose a:hover {
     color: #9a3412; /* orange-800 */
 }
+
+/* --- THEME OVERRIDES --- */
+
+/* MINT THEME */
+body.theme-mint .bg-orange-800 { background-color: #047857; }
+body.theme-mint .bg-orange-700 { background-color: #059669; }
+body.theme-mint .hover\:bg-orange-800:hover { background-color: #047857; }
+body.theme-mint .accent-orange-700 { accent-color: #059669; }
+body.theme-mint .focus\:ring-orange-600:focus { --tw-ring-color: #059669; }
+body.theme-mint .bg-orange-100 { background-color: #d1fae5; }
+body.theme-mint .text-orange-800 { color: #065f46; }
+body.theme-mint .prose ul > li::before { background-color: #059669; }
+body.theme-mint .prose ol > li::before { color: #065f46; }
+.dark body.theme-mint .dark\:bg-orange-900\/50 { background-color: rgba(6, 78, 59, 0.5); }
+.dark body.theme-mint .dark\:text-orange-300 { color: #6ee7b7; }
+.dark body.theme-mint .dark\:text-orange-400 { color: #34d399; }
+.dark body.theme-mint .dark\:text-orange-500 { color: #10b981; }
+
+/* ROSE THEME */
+body.theme-rose .bg-orange-800 { background-color: #be185d; }
+body.theme-rose .bg-orange-700 { background-color: #db2777; }
+body.theme-rose .hover\:bg-orange-800:hover { background-color: #be185d; }
+body.theme-rose .accent-orange-700 { accent-color: #db2777; }
+body.theme-rose .focus\:ring-orange-600:focus { --tw-ring-color: #db2777; }
+body.theme-rose .bg-orange-100 { background-color: #fce7f3; }
+body.theme-rose .text-orange-800 { color: #9d174d; }
+body.theme-rose .prose ul > li::before { background-color: #db2777; }
+body.theme-rose .prose ol > li::before { color: #9d174d; }
+.dark body.theme-rose .dark\:bg-orange-900\/50 { background-color: rgba(136, 19, 55, 0.5); }
+.dark body.theme-rose .dark\:text-orange-300 { color: #f9a8d4; }
+.dark body.theme-rose .dark\:text-orange-400 { color: #f472b6; }
+.dark body.theme-rose .dark\:text-orange-500 { color: #ec4899; }
+
+/* SKY THEME */
+body.theme-sky .bg-orange-800 { background-color: #0369a1; }
+body.theme-sky .bg-orange-700 { background-color: #0284c7; }
+body.theme-sky .hover\:bg-orange-800:hover { background-color: #0369a1; }
+body.theme-sky .accent-orange-700 { accent-color: #0284c7; }
+body.theme-sky .focus\:ring-orange-600:focus { --tw-ring-color: #0284c7; }
+body.theme-sky .bg-orange-100 { background-color: #e0f2fe; }
+body.theme-sky .text-orange-800 { color: #075985; }
+body.theme-sky .prose ul > li::before { background-color: #0284c7; }
+body.theme-sky .prose ol > li::before { color: #075985; }
+.dark body.theme-sky .dark\:bg-orange-900\/50 { background-color: rgba(12, 74, 110, 0.5); }
+.dark body.theme-sky .dark\:text-orange-300 { color: #7dd3fc; }
+.dark body.theme-sky .dark\:text-orange-400 { color: #38bdf8; }
+.dark body.theme-sky .dark\:text-orange-500 { color: #0ea5e9; }

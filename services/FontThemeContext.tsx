@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 
-export type FontTheme = 'klasik' | 'modern' | 'disleksi1' | 'disleksi2' | 'eglenceli';
+export type FontTheme = 'klasik' | 'modern' | 'disleksi1' | 'disleksi2' | 'eglenceli' | 'yumusak' | 'blok' | 'net';
 
 export const fontThemes: Record<FontTheme, { name: string; className: string }> = {
   klasik: { name: 'Klasik (Lora)', className: 'font-theme-klasik' },
@@ -8,6 +8,9 @@ export const fontThemes: Record<FontTheme, { name: string; className: string }> 
   disleksi1: { name: 'Disleksi Dostu (Lexend)', className: 'font-theme-disleksi1' },
   disleksi2: { name: 'Okunaklı (Atkinson)', className: 'font-theme-disleksi2' },
   eglenceli: { name: 'El Yazısı (Caveat)', className: 'font-theme-eglenceli' },
+  yumusak: { name: 'Yumuşak (Comfortaa)', className: 'font-theme-yumusak' },
+  blok: { name: 'Blok (Roboto Slab)', className: 'font-theme-blok' },
+  net: { name: 'Net (Montserrat)', className: 'font-theme-net' },
 };
 
 interface FontThemeContextType {
