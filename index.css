@@ -391,3 +391,60 @@ body.pdf-export-mode .answer-key {
         transform: translateX(100%);
     }
 }
+
+/* Constellation Background */
+.constellation-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.constellation-svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 600px;
+    color: #cbd5e1; /* slate-300 */
+}
+
+html.dark .constellation-svg {
+    color: #475569; /* slate-600 */
+}
+
+.constellation-lines {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+    opacity: 0.7;
+}
+
+.star {
+    fill: currentColor;
+    animation-name: twinkle;
+    animation-iteration-count: infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* Staggered animations for natural twinkling */
+.star-1 { animation-duration: 3s; animation-delay: 0s; }
+.star-2 { animation-duration: 2.5s; animation-delay: 0.5s; }
+.star-3 { animation-duration: 4s; animation-delay: 1s; }
+.star-4 { animation-duration: 2.2s; animation-delay: 0.2s; }
+.star-5 { animation-duration: 3.5s; animation-delay: 1.5s; }
+.star-6 { animation-duration: 2.8s; animation-delay: 0.8s; }
+.star-7 { animation-duration: 5s; animation-delay: 2s; }

@@ -61,6 +61,26 @@ const generatePdfDocument = async (
     }
 };
 
+const BackgroundConstellation: React.FC = () => (
+    <div className="constellation-bg">
+        <svg viewBox="0 0 400 200" className="constellation-svg">
+            <polyline
+                className="constellation-lines"
+                points="380,40 330,70 250,90 170,125 100,150 30,180"
+            />
+             <line className="constellation-lines" x1="250" y1="90" x2="230" y2="135" />
+
+            <circle cx="380" cy="40" r="2" className="star star-1" />
+            <circle cx="330" cy="70" r="2" className="star star-2" />
+            <circle cx="250" cy="90" r="2" className="star star-3" />
+            <circle cx="170" cy="125" r="2.5" className="star star-4" />
+            <circle cx="100" cy="150" r="2" className="star star-5" />
+            <circle cx="30" cy="180" r="2.5" className="star star-6" />
+            <circle cx="230" cy="135" r="1.5" className="star star-7" />
+        </svg>
+    </div>
+);
+
 
 const AppContent: React.FC = () => {
     const [activeTab, setActiveTab] = useState('arithmetic');
@@ -182,7 +202,8 @@ const AppContent: React.FC = () => {
     };
 
     return (
-        <div className="bg-stone-50 dark:bg-stone-900 min-h-screen text-stone-800 dark:text-stone-200">
+        <div className="bg-stone-50 dark:bg-stone-900 min-h-screen text-stone-800 dark:text-stone-200 relative">
+            <BackgroundConstellation />
             <header className="bg-orange-800 dark:bg-stone-950/70 text-amber-50 shadow-md sticky top-0 z-20 print:hidden">
                 <div className="px-4 sm:px-6 lg:px-8 relative">
                     <div className="flex items-center justify-between h-16">
@@ -236,7 +257,7 @@ const AppContent: React.FC = () => {
                 </div>
             </header>
 
-            <main className="p-4 sm:p-6 lg:p-8">
+            <main className="p-4 sm:p-6 lg:p-8 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <aside className="md:col-span-1 print:hidden">
                          <div className="bg-white dark:bg-stone-800/80 p-6 rounded-lg shadow-sm sticky top-[10.5rem]">
