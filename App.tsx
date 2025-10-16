@@ -74,7 +74,7 @@ const A4_HEIGHT_PX = 1123;
 
 const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, worksheetParentRef, orientation }) => {
 
-    const handleFitToPage = useCallback(() => {
+    const handleFitToPage = () => {
         if (!worksheetParentRef.current) return;
 
         const containerWidth = worksheetParentRef.current.clientWidth;
@@ -84,7 +84,7 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
         const newScale = (containerWidth - 32) / worksheetWidth;
         
         setScale(Math.min(1.5, Math.max(0.1, newScale))); // Clamp the scale to reasonable values
-    }, [worksheetParentRef, setScale, orientation]);
+    };
 
     return (
         <div className="worksheet-toolbar">
@@ -233,6 +233,7 @@ const AppContent: React.FC = () => {
         setWorksheetTitle('');
         setAutoRefreshTrigger(0);
         setLastGeneratorModule(null);
+        setWorksheetScale(0.5); // Reset scale on app reset
     };
 
     return (
