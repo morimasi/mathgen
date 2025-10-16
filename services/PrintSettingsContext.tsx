@@ -9,7 +9,9 @@ interface PrintSettingsContextType {
 const PrintSettingsContext = createContext<PrintSettingsContextType | undefined>(undefined);
 
 const initialPrintSettings: PrintSettings = {
-    columns: 2,
+    layoutMode: 'flow',
+    rows: 10,
+    columns: 5,
     columnGap: 0,
     fontSize: 16,
     showHeader: false,

@@ -49,8 +49,11 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
         try {
             const isSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
             let totalCount;
-            
-            if (settings.autoFit && !isSheet) {
+            const isTableLayout = printSettings.layoutMode === 'table';
+
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit && !isSheet) {
                 const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
                 totalCount = problemsPerPage * settings.pageCount;
             } else {
@@ -74,7 +77,7 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'rhythmic-counting', settings.pageCount);
+                    onGenerate(problems, clearPrevious, title, 'rhythmic-counting', isTableLayout ? 1 : settings.pageCount);
                     addToast(isSheet ? `${results.length} sayfa başarıyla oluşturuldu!` : `${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }
@@ -89,7 +92,7 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'rhythmic-counting') {
             handleGenerate(true);
         }
-    }, [autoRefreshTrigger, lastGeneratorModule]);
+    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
 
     // Live update on settings change
     useEffect(() => {
@@ -136,10 +139,11 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
     const showRange = [RhythmicProblemType.Pattern, RhythmicProblemType.PracticeSheet, RhythmicProblemType.OddEven, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
     const showPattern = settings.type === RhythmicProblemType.Pattern;
     const isPracticeSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
+    const isTableLayout = printSettings.layoutMode === 'table';
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold">Ritmik Sayma Ayarları</h2>
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Ritmik Sayma Ayarları</h2>
             
             <div className="grid grid-cols-2 gap-4">
                 {showPattern && (
@@ -158,13 +162,13 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
                         id="auto-fit-rhythmic"
                         checked={settings.autoFit}
                         onChange={e => handleSettingChange('autoFit', e.target.checked)}
-                        disabled={isPracticeSheet}
-                        title={isPracticeSheet ? "Alıştırma kağıtları her zaman tüm sayfayı doldurur." : ""}
+                        disabled={isPracticeSheet || isTableLayout}
+                        title={isPracticeSheet ? "Alıştırma kağıtları her zaman tüm sayfayı doldurur." : (isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : "")}
                     />
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <Select
                     label="Problem Türü"
                     id="rhythmic-type"
@@ -218,7 +222,15 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
                     </>
                 )}
                  {!isPracticeSheet && (
-                     <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={settings.autoFit} />
+                     <NumberInput 
+                        label="Sayfa Başına Problem Sayısı" 
+                        id="problems-per-page" 
+                        min={1} max={100} 
+                        value={settings.problemsPerPage} 
+                        onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} 
+                        disabled={settings.autoFit || isTableLayout}
+                        title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
+                     />
                  )}
                  <NumberInput 
                     label="Sayfa Sayısı"
@@ -226,6 +238,8 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
                     min={1} max={20}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
+                    disabled={isTableLayout}
+                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
                 />
                  {showStep && (
                     <div className="flex items-center pt-5">

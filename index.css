@@ -1,4 +1,5 @@
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -290,6 +291,7 @@ html.dark .problem-item-card {
 .problem-list {
     display: grid;
     grid-template-columns: repeat(var(--columns, 2), 1fr);
+    grid-template-rows: repeat(var(--rows, auto-fill), minmax(0, 1fr));
     gap: var(--problem-spacing, 1.5rem) var(--column-gap, 1.5rem);
     font-size: var(--font-size, 16px);
     line-height: var(--line-height, 1.5);
@@ -302,6 +304,14 @@ html.dark .problem-item-card {
     break-inside: avoid;
     justify-content: var(--problem-justify-content, flex-start);
     text-align: var(--problem-text-align, left);
+}
+.problem-item-table {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
 }
 .problem-number {
     font-weight: bold;
@@ -508,4 +518,41 @@ body.pdf-export-mode .worksheet-container + .worksheet-container {
         opacity: 0;
         transform: translateX(100%);
     }
+}
+
+/* NEW: Table Selector Component */
+.table-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    gap: 3px;
+    border: 1px solid #d4d4d8; /* stone-300 */
+    padding: 4px;
+    border-radius: 4px;
+    background-color: #f5f5f4; /* stone-100 */
+    cursor: pointer;
+}
+html.dark .table-selector-grid {
+    border-color: #57534e; /* stone-600 */
+    background-color: #3f3f46; /* stone-700 */
+}
+
+.table-selector-cell {
+    width: 100%;
+    padding-bottom: 100%; /* Aspect ratio 1:1 */
+    background-color: #e7e5e4; /* stone-200 */
+    border: 1px solid #d4d4d8; /* stone-300 */
+    border-radius: 2px;
+    transition: background-color 0.1s ease-in-out;
+}
+html.dark .table-selector-cell {
+    background-color: #57534e; /* stone-600 */
+    border-color: #3f3f46; /* stone-700 */
+}
+
+.table-selector-cell.hovered {
+    background-color: #fdba74; /* orange-300 */
+}
+.table-selector-cell.selected {
+    background-color: #f97316; /* orange-500 */
 }

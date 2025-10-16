@@ -90,15 +90,15 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
     };
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold">Görsel Destek Ayarları</h2>
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Görsel Destek Ayarları</h2>
              <p className="text-sm text-stone-600 dark:text-stone-400">
                 Bu modül, nesneler ve kutular kullanarak temel matematik işlemleri için görsel alıştırmalar oluşturur. Ayarlar anında çalışma kağıdına yansır.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 pt-2">
                  {/* --- LEFT COLUMN: CORE SETTINGS --- */}
-                <div className="flex flex-col gap-y-4">
+                <div className="flex flex-col gap-y-3">
                     <Select
                         label="İşlem Türü"
                         id="visual-operation"
@@ -138,7 +138,7 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                             checked={settings.autoFit}
                             onChange={e => handleSettingChange('autoFit', e.target.checked)}
                         />
-                        <div className={`grid grid-cols-2 gap-4 transition-opacity ${settings.autoFit ? 'opacity-50' : 'opacity-100'}`}>
+                        <div className={`grid grid-cols-2 gap-3 transition-opacity ${settings.autoFit ? 'opacity-50' : 'opacity-100'}`}>
                             <NumberInput 
                                 label="Problem Sayısı"
                                 id="problems-per-page-visual"

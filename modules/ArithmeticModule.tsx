@@ -1,6 +1,3 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { generateArithmeticProblem } from '../services/mathService';
-import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
@@ -11,6 +8,9 @@ import { useToast } from '../services/ToastContext';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { generateArithmeticProblem } from '../services/mathService';
+import { generateContextualWordProblems } from '../services/geminiService';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -47,7 +47,11 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         setIsLoading(true);
         try {
             let totalCount;
-            if (settings.autoFit) {
+            const isTableLayout = printSettings.layoutMode === 'table';
+            
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit) {
                 const problemsPerPage = calculateMaxProblems(contentRef, printSettings);
                 totalCount = (problemsPerPage > 0 ? problemsPerPage : settings.problemsPerPage) * settings.pageCount;
             } else {
@@ -71,7 +75,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'arithmetic', settings.pageCount);
+                    onGenerate(problems, clearPrevious, title, 'arithmetic', isTableLayout ? 1 : settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }
@@ -86,7 +90,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'arithmetic') {
             handleGenerate(true);
         }
-    }, [autoRefreshTrigger, lastGeneratorModule]);
+    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
 
     // Live update on settings change
     useEffect(() => {
@@ -141,10 +145,11 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
     
     const isAddSub = settings.operation === ArithmeticOperation.Addition || settings.operation === ArithmeticOperation.Subtraction || settings.operation === ArithmeticOperation.MixedAdditionSubtraction;
     const isLongDivision = settings.format === 'long-division-html';
+    const isTableLayout = printSettings.layoutMode === 'table';
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold">Dört İşlem Ayarları</h2>
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Dört İşlem Ayarları</h2>
             
             <div className="grid grid-cols-1 gap-4">
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -155,7 +160,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                         onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
                     />
                     {settings.useWordProblems && (
-                        <div className="mt-4 pl-6 space-y-4">
+                        <div className="mt-3 pl-6 space-y-3">
                             <Select
                                 label="Gereken İşlem Sayısı"
                                 id="arithmetic-op-count"
@@ -182,12 +187,14 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                         id="auto-fit"
                         checked={settings.autoFit}
                         onChange={e => handleSettingChange('autoFit', e.target.checked)}
+                        disabled={isTableLayout}
+                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
                     />
                 </div>
             </div>
 
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <Select
                     label="Sınıf Düzeyi"
                     id="arithmetic-grade-level"
@@ -298,7 +305,8 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                     min={1} max={100}
                     value={settings.problemsPerPage}
                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={settings.autoFit}
+                    disabled={settings.autoFit || isTableLayout}
+                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
                 />
                  <NumberInput 
                     label="Sayfa Sayısı"
@@ -306,6 +314,8 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                     min={1} max={20}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
+                    disabled={isTableLayout}
+                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
                 />
                 <div className="flex items-center pt-5">
                     {isAddSub && (

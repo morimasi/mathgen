@@ -73,6 +73,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
 
     const problemSheetStyle: React.CSSProperties = {
         '--columns': settings.columns,
+        '--rows': settings.layoutMode === 'table' ? settings.rows : 'auto-fill',
         '--font-size': `${settings.fontSize}px`,
         '--problem-spacing': `${settings.problemSpacing}rem`,
         '--column-gap': `${settings.columnGap}rem`,
@@ -139,6 +140,10 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
                                 const isVisualProblem = p.display === 'long-division-html' || p.display === 'vertical-html' || p.question.includes('<svg') || p.category === 'visual-support';
                                 
                                 let itemClassName = `problem-item ${isVisualProblem ? 'items-center' : ''}`;
+                                if (settings.layoutMode === 'table') {
+                                    itemClassName += ' problem-item-table';
+                                }
+
                                 const isArithmetic = p.category === 'arithmetic';
 
                                 if (settings.borderStyle === 'card') {

@@ -61,7 +61,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     };
     
     return (
-        <div className="print:hidden">
+        <div className="print:hidden space-y-4">
             {renderModule()}
         </div>
     );

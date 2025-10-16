@@ -38,7 +38,11 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
         setIsLoading(true);
         try {
             let totalCount;
-            if (settings.autoFit) {
+            const isTableLayout = printSettings.layoutMode === 'table';
+
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit) {
                 const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
                 totalCount = problemsPerPage * settings.pageCount;
             } else {
@@ -62,7 +66,7 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'geometry', settings.pageCount);
+                    onGenerate(problems, clearPrevious, title, 'geometry', isTableLayout ? 1 : settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }
@@ -77,7 +81,7 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'geometry') {
             handleGenerate(true);
         }
-    }, [autoRefreshTrigger, lastGeneratorModule]);
+    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
 
     // Live update on settings change
     useEffect(() => {
@@ -142,11 +146,11 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
     };
     
     const shapeOptions = (settings.type === GeometryProblemType.Area ? areaShapes : perimeterShapes).map(s => ({value: s, label: shapeTurkishNames[s]}));
-
+    const isTableLayout = printSettings.layoutMode === 'table';
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold">Geometri Ayarları</h2>
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Geometri Ayarları</h2>
 
             <div className="grid grid-cols-2 gap-4">
                 {showShapeSelector && (
@@ -165,11 +169,13 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                         id="auto-fit-geometry"
                         checked={settings.autoFit}
                         onChange={e => handleSettingChange('autoFit', e.target.checked)}
+                        disabled={isTableLayout}
+                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
                     />
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <Select
                     label="Sınıf Düzeyi"
                     id="geometry-grade-level"
@@ -220,7 +226,8 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                     min={1} max={100}
                     value={settings.problemsPerPage}
                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={settings.autoFit}
+                    disabled={settings.autoFit || isTableLayout}
+                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
                 />
                  <NumberInput 
                     label="Sayfa Sayısı"
@@ -228,6 +235,8 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                     min={1} max={20}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
+                    disabled={isTableLayout}
+                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
                 />
             </div>
              <SettingsPresetManager 

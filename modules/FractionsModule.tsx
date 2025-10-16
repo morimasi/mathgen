@@ -44,7 +44,11 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
         setIsLoading(true);
         try {
             let totalCount;
-            if (settings.autoFit) {
+            const isTableLayout = printSettings.layoutMode === 'table';
+
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit) {
                 const problemsPerPage = calculateMaxProblems(contentRef, printSettings);
                 totalCount = (problemsPerPage > 0 ? problemsPerPage : settings.problemsPerPage) * settings.pageCount;
             } else {
@@ -68,7 +72,7 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                 } else if (results.length > 0) {
                     const problems = results.map(r => r.problem);
                     const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'fractions', settings.pageCount);
+                    onGenerate(problems, clearPrevious, title, 'fractions', isTableLayout ? 1 : settings.pageCount);
                     addToast(`${problems.length} problem başarıyla oluşturuldu!`, 'success');
                 }
             }
@@ -83,7 +87,7 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'fractions') {
             handleGenerate(true);
         }
-    }, [autoRefreshTrigger, lastGeneratorModule]);
+    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
 
     // Live update on settings change
     useEffect(() => {
@@ -129,10 +133,11 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
     const isFourOps = settings.type === FractionsProblemType.FourOperations;
     const isFractionOfSet = settings.type === FractionsProblemType.FractionOfSet;
     const isWordProblemMode = settings.useWordProblems;
+    const isTableLayout = printSettings.layoutMode === 'table';
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold">Kesirler Ayarları</h2>
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Kesirler Ayarları</h2>
             
             <div className="grid grid-cols-1 gap-4">
                  {isFourOps && (
@@ -144,7 +149,7 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                             onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
                         />
                         {settings.useWordProblems && (
-                            <div className="mt-4 pl-6 space-y-4">
+                            <div className="mt-3 pl-6 space-y-3">
                                 <Select
                                     label="Gereken İşlem Sayısı"
                                     id="fractions-op-count"
@@ -172,12 +177,14 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                         id="auto-fit-fractions"
                         checked={settings.autoFit}
                         onChange={e => handleSettingChange('autoFit', e.target.checked)}
+                        disabled={isTableLayout}
+                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
                     />
                 </div>
             </div>
 
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <Select
                     label="Problem Türü"
                     id="fractions-type"
@@ -271,7 +278,8 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                     min={1} max={100}
                     value={settings.problemsPerPage}
                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={settings.autoFit}
+                    disabled={settings.autoFit || isTableLayout}
+                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
                 />
                 <NumberInput 
                     label="Sayfa Sayısı"
@@ -279,6 +287,8 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                     min={1} max={20}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
+                    disabled={isTableLayout}
+                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
                 />
             </div>
             <SettingsPresetManager 

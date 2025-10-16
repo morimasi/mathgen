@@ -64,7 +64,11 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
         setIsLoading(true);
         try {
             let totalCount;
-            if (settings.autoFit) {
+            const isTableLayout = printSettings.layoutMode === 'table';
+
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit) {
                 const sampleProblem = {
                     question: "Bu, yapay zeka tarafından oluşturulmuş daha uzun bir metin problemi örneğidir ve genellikle birkaç satır yer kaplar.",
                     answer: "Cevap: 15 elma"
@@ -77,7 +81,7 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
             const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
             const problems = await generateWordProblems(adjustedSettings);
             const title = `Yapay Zeka Destekli Problemler (${settings.customPrompt ? 'Özel' : settings.topic})`;
-            onGenerate(problems, clearPrevious, title, 'word-problems', settings.pageCount);
+            onGenerate(problems, clearPrevious, title, 'word-problems', isTableLayout ? 1 : settings.pageCount);
             addToast(`${problems.length} AI problemi başarıyla oluşturuldu!`, 'success');
         } catch (err: any) {
             console.error(err);
@@ -90,7 +94,7 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'word-problems') {
             handleGenerate(true);
         }
-    }, [autoRefreshTrigger, lastGeneratorModule]);
+    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
 
     // Live update on settings change
     useEffect(() => {
@@ -116,9 +120,11 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
         const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
         handleSettingChange('topic', randomTopic);
     };
+    
+    const isTableLayout = printSettings.layoutMode === 'table';
 
     const dynamicPlaceholder = useMemo(() => {
-        const totalProblems = settings.autoFit ? '(otomatik)' : settings.problemsPerPage * settings.pageCount;
+        const totalProblems = isTableLayout ? `${printSettings.rows * printSettings.columns}` : (settings.autoFit ? '(otomatik)' : settings.problemsPerPage * settings.pageCount);
         let subjectText = '';
         if (settings.sourceModule && settings.sourceModule !== 'none') {
             const moduleName = TABS.find(tab => tab.id === settings.sourceModule)?.label || '';
@@ -130,13 +136,13 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
             subjectText = `'${settings.topic.toLowerCase()}' geçen`;
         }
         return `Örn: ${settings.gradeLevel}. sınıf seviyesinde, ${subjectText}, ${settings.operationCount} işlemli ${totalProblems} tane problem oluştur.`;
-    }, [settings.topic, settings.gradeLevel, settings.operationCount, settings.problemsPerPage, settings.pageCount, settings.autoFit, settings.sourceModule]);
+    }, [settings.topic, settings.gradeLevel, settings.operationCount, settings.problemsPerPage, settings.pageCount, settings.autoFit, settings.sourceModule, isTableLayout, printSettings.rows, printSettings.columns]);
 
     const topicLabel = settings.sourceModule && settings.sourceModule !== 'none' ? 'Konu Detayı (İsteğe Bağlı)' : 'Konu';
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold">Problemler (AI)</h2>
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Problemler (AI)</h2>
             <p className="text-sm text-stone-600 dark:text-stone-400">
                 Bu modül, Google Gemini AI kullanarak özel matematik problemleri oluşturur. Lütfen API anahtarınızın doğru yapılandırıldığından emin olun.
             </p>
@@ -148,6 +154,8 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                         id="auto-fit-word-problems"
                         checked={settings.autoFit}
                         onChange={e => handleSettingChange('autoFit', e.target.checked)}
+                        disabled={isTableLayout}
+                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
                     />
                 </div>
                  <div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
@@ -164,7 +172,7 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
             </div>
 
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <Select
                     label="Sınıf Seviyesi"
                     id="gradeLevel"
@@ -212,7 +220,7 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                         <button
                             type="button"
                             onClick={handleRandomTopic}
-                            className="absolute right-2.5 bottom-[9px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                            className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
                             title="Rastgele Konu Öner"
                         >
                             <ShuffleIcon className="w-5 h-5" />
@@ -226,7 +234,8 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                     min={1} max={20}
                     value={settings.problemsPerPage}
                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))}
-                    disabled={settings.autoFit}
+                    disabled={settings.autoFit || isTableLayout}
+                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
                 />
                  <NumberInput
                     label="Sayfa Sayısı"
@@ -234,13 +243,15 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                     min={1} max={20}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))}
+                    disabled={isTableLayout}
+                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
                 />
-                <div className="col-span-2 pt-4">
-                     <label htmlFor="custom-prompt" className="font-medium text-sm text-stone-700 dark:text-stone-300 mb-1.5 block">Veya Özel Talimat Girin</label>
+                <div className="col-span-2 pt-2">
+                     <label htmlFor="custom-prompt" className="font-medium text-sm text-stone-700 dark:text-stone-300 mb-1 block">Veya Özel Talimat Girin</label>
                      <textarea
                         id="custom-prompt"
-                        rows={4}
-                        className="block w-full px-3 py-2 bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-600 focus:border-orange-600 sm:text-sm"
+                        rows={3}
+                        className="block w-full px-2.5 py-1.5 text-sm bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-600 focus:border-orange-600"
                         placeholder={dynamicPlaceholder}
                         value={settings.customPrompt}
                         onChange={e => handleSettingChange('customPrompt', e.target.value)}

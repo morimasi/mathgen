@@ -1,3 +1,4 @@
+// FIX: Removed self-import of `Problem` which was causing a declaration conflict. Also removed an unused `React` import.
 // types.ts
 
 export interface Problem {
@@ -265,6 +266,8 @@ export interface WordProblemSettings {
 
 // --- PRINTING ---
 export interface PrintSettings {
+    layoutMode: 'flow' | 'table';
+    rows: number;
     columns: number;
     columnGap: number;
     fontSize: number;
