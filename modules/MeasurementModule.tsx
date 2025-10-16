@@ -6,10 +6,12 @@ import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
+import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
+import { TOPIC_SUGGESTIONS } from '../constants';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -30,6 +32,7 @@ const MeasurementModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
         useWordProblems: false,
         autoFit: true,
         useVisuals: false,
+        topic: '',
     });
     const isInitialMount = useRef(true);
 
@@ -94,6 +97,11 @@ const MeasurementModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
         setSettings(prev => ({ ...prev, [field]: value }));
     };
 
+    const handleRandomTopic = () => {
+        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
+        handleSettingChange('topic', randomTopic);
+    };
+
     const handleGradeLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const grade = parseInt(e.target.value, 10);
         let newSettings: Partial<MeasurementSettings> = { gradeLevel: grade };
@@ -128,7 +136,25 @@ const MeasurementModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
                         onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
                     />
                      {settings.useWordProblems && (
-                        <div className="mt-3 pl-6">
+                        <div className="mt-3 pl-6 space-y-3">
+                            <div className="relative">
+                                <TextInput
+                                    label="Problem Konusu (İsteğe bağlı)"
+                                    id="measurement-topic"
+                                    value={settings.topic || ''}
+                                    onChange={e => handleSettingChange('topic', e.target.value)}
+                                    placeholder="Örn: Mutfak, Terzi, Manav"
+                                    className="pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleRandomTopic}
+                                    className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                                    title="Rastgele Konu Öner"
+                                >
+                                    <ShuffleIcon className="w-5 h-5" />
+                                </button>
+                            </div>
                              <Checkbox
                                 label="Görsel Destek Ekle (Emoji)"
                                 id="use-visuals-measurement"

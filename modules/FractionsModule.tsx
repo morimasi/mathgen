@@ -6,10 +6,12 @@ import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
+import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
+import { TOPIC_SUGGESTIONS } from '../constants';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -35,6 +37,8 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
         operationCount: 1,
         autoFit: true,
         useVisuals: false,
+        topic: '',
+        useMixedNumbers: true,
     });
     const isInitialMount = useRef(true);
 
@@ -103,6 +107,11 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
     const handleSettingChange = (field: keyof FractionsSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
+
+    const handleRandomTopic = () => {
+        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
+        handleSettingChange('topic', randomTopic);
+    };
     
     const handleGradeLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const grade = parseInt(e.target.value, 10);
@@ -156,6 +165,24 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                                         { value: 3, label: '3 İşlemli' },
                                     ]}
                                 />
+                                <div className="relative">
+                                    <TextInput
+                                        label="Problem Konusu (İsteğe bağlı)"
+                                        id="fractions-topic"
+                                        value={settings.topic || ''}
+                                        onChange={e => handleSettingChange('topic', e.target.value)}
+                                        placeholder="Örn: Pizza, Pasta, Kurdele"
+                                        className="pr-10"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleRandomTopic}
+                                        className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                                        title="Rastgele Konu Öner"
+                                    >
+                                        <ShuffleIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
                                 <Checkbox
                                     label="Görsel Destek Ekle (Emoji)"
                                     id="use-visuals-fractions"
@@ -215,7 +242,7 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                             options={[
                                 { value: 'easy', label: 'Kolay (Paydalar Eşit)' },
                                 { value: 'medium', label: 'Orta (Paydalar Farklı)' },
-                                { value: 'hard', label: 'Zor (Tam Sayılı Kesirler)' },
+                                { value: 'hard', label: 'Zor (Bileşik/Tam Sayılı)' },
                             ]}
                         />
                         <Select
@@ -255,6 +282,17 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                                 { value: 'mixed', label: 'Karışık' },
                             ]}
                         />
+                         <div className="flex items-center pt-5">
+                            {settings.difficulty === 'hard' && (
+                                <Checkbox
+                                    label="Tam Sayılı Kesir Kullan"
+                                    id="use-mixed-numbers"
+                                    checked={settings.useMixedNumbers ?? true}
+                                    onChange={e => handleSettingChange('useMixedNumbers', e.target.checked)}
+                                    disabled={isWordProblemMode}
+                                />
+                            )}
+                        </div>
                     </>
                 )}
                  {isFractionOfSet && (

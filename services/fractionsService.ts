@@ -93,7 +93,7 @@ const generateFraction = (difficulty: 'easy' | 'medium' | 'hard' = 'medium', all
 
 
 export const generateFractionsProblem = (settings: FractionsSettings): { problem: Problem, title: string, error?: string } => {
-    const { type, operation, difficulty, maxSetSize, format = 'inline', representation = 'number' } = settings;
+    const { type, operation, difficulty, maxSetSize, format = 'inline', representation = 'number', useMixedNumbers = true } = settings;
     let problem: Problem;
     let title = '';
     const problemBase = { category: 'fractions' };
@@ -112,31 +112,44 @@ export const generateFractionsProblem = (settings: FractionsSettings): { problem
 
             let f1: Fraction, f2: Fraction;
             let whole1 = 0, whole2 = 0;
+            let q1_str: string, q2_str: string;
 
             if (difficulty === 'hard') {
-                whole1 = getRandomInt(1, 5);
-                whole2 = getRandomInt(1, 5);
-                f1 = generateFraction('easy');
-                f2 = generateFraction('medium');
-                f1.num += whole1 * f1.den;
-                f2.num += whole2 * f2.den;
+                if (useMixedNumbers) {
+                    whole1 = getRandomInt(1, 5);
+                    whole2 = getRandomInt(1, 5);
+                    f1 = generateFraction('easy');
+                    f2 = generateFraction('medium');
+                    q1_str = `${whole1} ${f1.num}/${f1.den}`;
+                    q2_str = `${whole2} ${f2.num}/${f2.den}`;
+                    f1.num += whole1 * f1.den;
+                    f2.num += whole2 * f2.den;
+                } else {
+                    f1 = generateFraction('medium', true);
+                    f2 = generateFraction('medium', true);
+                    while(f1.num <= f1.den) f1 = generateFraction('medium', true); // Ensure improper
+                    while(f2.num <= f2.den) f2 = generateFraction('medium', true); // Ensure improper
+                    q1_str = toMixed(f1);
+                    q2_str = toMixed(f2);
+                }
             } else if (difficulty === 'medium') {
                 f1 = generateFraction('medium');
                 f2 = generateFraction('medium');
-                 // ensure denominators are different
-                while(f1.den === f2.den) {
+                while(f1.den === f2.den) { // ensure denominators are different
                     f2 = generateFraction('medium');
                 }
+                q1_str = `${f1.num}/${f1.den}`;
+                q2_str = `${f2.num}/${f2.den}`;
             } else { // easy
                 f1 = generateFraction('easy');
                 f2 = generateFraction('easy');
                 f2.den = f1.den; // Common denominator
+                q1_str = `${f1.num}/${f1.den}`;
+                q2_str = `${f2.num}/${f2.den}`;
             }
             
             let f1_calc = f1;
             let f2_calc = f2;
-            let q1_str = difficulty === 'hard' ? `${whole1} ${f1.num % f1.den || f1.den}/${f1.den}` : `${f1.num}/${f1.den}`;
-            let q2_str = difficulty === 'hard' ? `${whole2} ${f2.num % f2.den || f2.den}/${f2.den}` : `${f2.num}/${f2.den}`;
 
             if (currentOperation === FractionsOperation.Subtraction && (f1.num / f1.den) < (f2.num / f2.den)) {
                 [f1_calc, f2_calc] = [f2, f1];

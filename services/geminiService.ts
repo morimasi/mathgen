@@ -107,10 +107,12 @@ export const generateWordProblems = async (settings: WordProblemSettings): Promi
 export const generateContextualWordProblems = async (category: string, settings: any): Promise<Problem[]> => {
     let prompt = '';
     const count = settings.problemsPerPage * settings.pageCount;
+    const gradeLevel = `${settings.gradeLevel || 'İlkokul'}. sınıf`;
+    const topicText = settings.topic ? `, özel olarak '${settings.topic}' temalı,` : '';
     
     switch(category) {
         case 'arithmetic': {
-            const opNames: {[key: string]: string} = { 'addition': 'toplama', 'subtraction': 'çıkarma', 'multiplication': 'çarpma', 'division': 'bölme', 'mixed-add-sub': 'toplama ve çıkarma' };
+            const opNames: {[key: string]: string} = { 'addition': 'toplama', 'subtraction': 'çıkarma', 'multiplication': 'çarpma', 'division': 'bölme', 'mixed-add-sub': 'toplama ve çıkarma', 'mixed-all': 'dört işlem' };
             let scenarioHint = 'Alışveriş, paylaşma, oyun gibi günlük yaşam senaryoları kullan.';
             switch(settings.operation) {
                 case 'addition': scenarioHint = 'Örneğin, bir şeye yeni öğeler ekleme (bilye, pul koleksiyonu) veya iki grubun toplamını bulma gibi senaryolar kullan.'; break;
@@ -118,7 +120,7 @@ export const generateContextualWordProblems = async (category: string, settings:
                 case 'multiplication': scenarioHint = 'Örneğin, her birinde eşit sayıda nesne bulunan grupların (kutu, paket) toplamını bulma veya katlarını alma gibi senaryolar kullan.'; break;
                 case 'division': scenarioHint = 'Örneğin, bir grup nesneyi eşit olarak paylaştırma (şeker, misket) veya büyük bir miktarın içinde kaç tane küçük grup olduğunu bulma gibi senaryolar kullan.'; break;
             }
-            prompt = `İlkokul seviyesinde, ${opNames[settings.operation]} işlemi içeren, tam olarak ${settings.operationCount || 1} işlem gerektiren, ${count} tane gerçek hayat problemi oluştur. Problemler, ${settings.digits1} basamaklı ve ${settings.digits2} basamaklı sayılar içermelidir. ${scenarioHint}`;
+            prompt = `${gradeLevel} seviyesi için, ${opNames[settings.operation]} işlemi içeren${topicText} tam olarak ${settings.operationCount || 1} işlem gerektiren, ${count} tane gerçek hayat problemi oluştur. Problemler, ${settings.digits1} basamaklı ve ${settings.digits2} basamaklı sayılar içermelidir. ${scenarioHint}`;
             if (settings.operationCount > 1) {
                 prompt += ` Problemler, öğrencilerin çözüme ulaşmak için birden fazla adım atmasını gerektirmelidir.`;
             }
@@ -137,7 +139,7 @@ export const generateContextualWordProblems = async (category: string, settings:
                 case 'division': 
                     scenarioHint = 'Örneğin, bir kesri tam sayıya veya başka bir kesre bölme üzerine odaklan. Yarım bir keki 3 kişiye paylaştırma veya 3/4 metrelik bir kurdeleden kaç tane 1/8 metrelik parça çıkacağını bulma gibi senaryolar kullan.'; break;
             }
-            prompt = `İlkokul seviyesi için, ${diff[settings.difficulty]} kullanarak kesirlerle ${fracOp[settings.operation]} işlemi gerektiren, tam olarak ${settings.operationCount || 1} işlem gerektiren, ${count} tane ilgi çekici ve gerçekçi metin problemi oluştur. ${scenarioHint}`;
+            prompt = `${gradeLevel} seviyesi için, ${diff[settings.difficulty]} kullanarak kesirlerle ${fracOp[settings.operation]} işlemi gerektiren${topicText} tam olarak ${settings.operationCount || 1} işlem gerektiren, ${count} tane ilgi çekici ve gerçekçi metin problemi oluştur. ${scenarioHint}`;
              if (settings.operationCount > 1) {
                 prompt += ` Problemler, öğrencilerin çözüme ulaşmak için birden fazla adım atmasını gerektirmelidir.`;
             }
@@ -145,7 +147,7 @@ export const generateContextualWordProblems = async (category: string, settings:
         }
         case 'decimals': {
             const decOp: {[key: string]: string} = { 'addition': 'toplama', 'subtraction': 'çıkarma', 'multiplication': 'çarpma', 'division': 'bölme', 'mixed': 'karışık dört işlem' };
-            prompt = `İlkokul orta seviyesinde, ondalık sayılarla ${decOp[settings.operation]} işlemi gerektiren, tam olarak ${settings.operationCount || 1} işlem gerektiren, ${count} tane gerçek hayat problemi oluştur. Problemler para (TL, kuruş), ölçümler (metre, kg) veya spor istatistikleri gibi konularla ilgili olsun. Zorluk seviyesi: ${settings.difficulty}.`;
+            prompt = `${gradeLevel} seviyesinde, ondalık sayılarla ${decOp[settings.operation]} işlemi gerektiren${topicText} tam olarak ${settings.operationCount || 1} işlem gerektiren, ${count} tane gerçek hayat problemi oluştur. Problemler para (TL, kuruş), ölçümler (metre, kg) veya spor istatistikleri gibi konularla ilgili olsun. Zorluk seviyesi: ${settings.difficulty}.`;
              if (settings.operationCount > 1) {
                 prompt += ` Problemler, öğrencilerin çözüme ulaşmak için birden fazla adım atmasını gerektirmelidir.`;
             }
@@ -153,29 +155,32 @@ export const generateContextualWordProblems = async (category: string, settings:
         }
         case 'place-value': {
             const pvType: {[key: string]: string} = { 'identification': 'basamak değeri bulma', 'rounding': 'yuvarlama', 'comparison': 'sayıları karşılaştırma' };
-            prompt = `İlkokul seviyesinde, basamak değeriyle ilgili ${count} tane gerçek hayat problemi oluştur. Problemler ${settings.digits} basamağa kadar olan sayıları içermeli ve özellikle "${pvType[settings.type]}" üzerine odaklanmalıdır. Örneğin, şehir nüfuslarını karşılaştırma, fiyatları yuvarlama gibi.`;
+            prompt = `${gradeLevel} seviyesinde, basamak değeriyle ilgili${topicText} ${count} tane gerçek hayat problemi oluştur. Problemler ${settings.digits} basamağa kadar olan sayıları içermeli ve özellikle "${pvType[settings.type]}" üzerine odaklanmalıdır. Örneğin, şehir nüfuslarını karşılaştırma, fiyatları yuvarlama gibi.`;
             break;
         }
         case 'rhythmic-counting': {
-            prompt = `İlkokul başlangıç seviyesinde, ${settings.step}'er ritmik sayma veya sayı örüntüleri içeren ${count} tane gerçek hayat problemi oluştur. Problemler, gruplar halinde nesneleri sayma veya bir olay dizisindeki sonraki adımı tahmin etme gibi senaryolar içermelidir. Yön: ${settings.direction}.`;
+            prompt = `${gradeLevel} seviyesinde, ${settings.step}'er ritmik sayma veya sayı örüntüleri içeren${topicText} ${count} tane gerçek hayat problemi oluştur. Problemler, gruplar halinde nesneleri sayma veya bir olay dizisindeki sonraki adımı tahmin etme gibi senaryolar içermelidir. Yön: ${settings.direction}.`;
             break;
         }
         case 'time': {
             const timeType: {[key: string]: string} = { 'calculate-duration': 'süre hesaplama', 'calculate-end-time': 'bitiş zamanı bulma', 'find-start-time': 'başlangıç zamanı bulma'};
             const timeDiff: {[key: string]: string} = { 'easy': 'kolay (sadece tam saatler)', 'medium': 'orta (yarım ve çeyrek saatler)', 'hard': 'zor (belirli dakikalar)'};
-            prompt = `İlkokul seviyesi için, zaman ölçme ile ilgili ${count} tane gerçek hayat problemi oluştur. Problemler "${timeType[settings.type]}" konusuna odaklanmalı ve zorluk seviyesi ${timeDiff[settings.difficulty]} olmalıdır. Örneğin, bir filmin ne kadar sürdüğünü bulma, bir etkinliğin ne zaman biteceğini hesaplama veya bir yolculuğun başlangıç saatini bulma gibi senaryolar kullan.`;
+            prompt = `${gradeLevel} seviyesi için, zaman ölçme ile ilgili${topicText} ${count} tane gerçek hayat problemi oluştur. Problemler "${timeType[settings.type]}" konusuna odaklanmalı ve zorluk seviyesi ${timeDiff[settings.difficulty]} olmalıdır. Örneğin, bir filmin ne kadar sürdüğünü bulma, bir etkinliğin ne zaman biteceğini hesaplama veya bir yolculuğun başlangıç saatini bulma gibi senaryolar kullan.`;
             break;
         }
         case 'geometry': {
-            const geoType: {[key: string]: string} = { 'perimeter': 'çevre', 'area': 'alan' };
+            const geoType: {[key: string]: string} = { 'perimeter': 'çevre', 'area': 'alan', 'solid-elements': 'geometrik cisimlerin elemanları (köşe, yüz, ayrıt)' };
             const shape: {[key: string]: string} = { 'square': 'kare', 'rectangle': 'dikdörtgen', 'triangle': 'üçgen', 'circle': 'daire' };
-            prompt = `İlkokul seviyesinde, geometri ile ilgili ${count} tane gerçek hayat problemi oluştur. Problemler bir ${shape[settings.shape]}'nin ${geoType[settings.type]} hesabını içermelidir. Örneğin, bir bahçenin alanını bulma, bir çitin uzunluğunu hesaplama gibi.`;
+            const typeString = geoType[settings.type] || 'geometri';
+            const shapeString = settings.shape ? `bir ${shape[settings.shape]}'nin` : '';
+
+            prompt = `${gradeLevel} seviyesinde, geometri ile ilgili${topicText} ${count} tane gerçek hayat problemi oluştur. Problemler ${shapeString} ${typeString} hesabını içermelidir. Örneğin, bir bahçenin alanını bulma, bir çitin uzunluğunu hesaplama veya bir kutunun köşe sayısını bulma gibi.`;
             break;
         }
         case 'measurement': {
             const measureType: {[key: string]: string} = { 'length-conversion': 'uzunluk ölçüleri (km, m, cm)', 'weight-conversion': 'ağırlık ölçüleri (kg, g)', 'volume-conversion': 'hacim ölçüleri (L, mL)', 'mixed': 'uzunluk, ağırlık ve hacim ölçüleri'};
             const diff: {[key: string]: string} = { 'easy': 'kolay (tam sayılarla basit dönüşümler)', 'medium': 'orta (ondalıklı sayılarla dönüşümler)', 'hard': 'zor (birden fazla birimi içeren dönüşümler)', 'mixed': 'karışık'};
-            prompt = `İlkokul seviyesi için, ${measureType[settings.type]} ile ilgili ${count} tane gerçek hayat problemi oluştur. Problemler birim dönüştürme üzerine odaklanmalı ve zorluk seviyesi ${diff[settings.difficulty]} olmalıdır. Örneğin, bir terzinin kumaş ölçmesi, bir manavın meyve tartması veya bir şişedeki suyun hacmi gibi senaryolar kullan.`;
+            prompt = `${gradeLevel} seviyesi için, ${measureType[settings.type]} ile ilgili${topicText} ${count} tane gerçek hayat problemi oluştur. Problemler birim dönüştürme üzerine odaklanmalı ve zorluk seviyesi ${diff[settings.difficulty]} olmalıdır. Örneğin, bir terzinin kumaş ölçmesi, bir manavın meyve tartması veya bir şişedeki suyun hacmi gibi senaryolar kullan.`;
             break;
         }
         default:

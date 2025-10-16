@@ -30,3 +30,18 @@ export const TAB_GROUPS = [
 
 // This is kept for any other part of the app that might need a flat list.
 export const TABS = TAB_GROUPS.flatMap(group => group.tabs);
+
+export const TOPIC_SUGGESTIONS = [
+    'Market Alışverişi',
+    'Okul Eşyaları',
+    'Hayvanlar Alemi',
+    'Spor Aktiviteleri',
+    'Doğa ve Çevre',
+    'Yemek Tarifleri',
+    'Seyahat ve Ulaşım',
+    'Para Hesaplamaları',
+    'Zaman Ölçme',
+    'Geometrik Şekiller',
+    'Bilim Deneyleri',
+    'Doğum Günü Partisi',
+];

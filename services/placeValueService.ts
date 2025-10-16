@@ -161,23 +161,31 @@ export const generatePlaceValueProblem = (settings: PlaceValueSettings): { probl
         }
         
         case PlaceValueProblemType.ResultAsWords: {
-            const num1 = getRandomByDigits(digits);
-            const num2 = getRandomByDigits(digits);
-            const operation = Math.random() < 0.5 ? 'addition' : 'subtraction';
+            const operations = ['addition', 'subtraction', 'multiplication'];
+            const operation = operations[getRandomInt(0, operations.length - 1)];
 
             let question: string;
             let result: number;
-
-            if (operation === 'addition') {
-                question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} + ${num2} = ?</span>`;
-                result = num1 + num2;
-            } else { // subtraction
-                if (num1 < num2) {
-                    question = `<span style="font-size: 1.25em; font-family: monospace;">${num2} - ${num1} = ?</span>`;
-                    result = num2 - num1;
-                } else {
-                    question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} - ${num2} = ?</span>`;
-                    result = num1 - num2;
+            
+            if (operation === 'multiplication') {
+                const num1 = getRandomByDigits(Math.min(digits, 3));
+                const num2 = getRandomByDigits(Math.min(digits, 2));
+                question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} × ${num2} = ?</span>`;
+                result = num1 * num2;
+            } else {
+                const num1 = getRandomByDigits(digits);
+                const num2 = getRandomByDigits(digits);
+                if (operation === 'addition') {
+                    question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} + ${num2} = ?</span>`;
+                    result = num1 + num2;
+                } else { // subtraction
+                    if (num1 < num2) {
+                        question = `<span style="font-size: 1.25em; font-family: monospace;">${num2} - ${num1} = ?</span>`;
+                        result = num2 - num1;
+                    } else {
+                        question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} - ${num2} = ?</span>`;
+                        result = num1 - num2;
+                    }
                 }
             }
 

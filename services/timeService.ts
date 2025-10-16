@@ -178,22 +178,61 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
         }
 
         case TimeProblemType.ConvertUnits: {
-            const type = ['minToHour', 'hourToMin'][getRandomInt(0,1)];
-            if (type === 'minToHour') {
-                const totalMinutes = getRandomInt(65, 300);
-                const hours = Math.floor(totalMinutes / 60);
-                const minutes = totalMinutes % 60;
-                const question = `<span style="font-size: 1.1em;">${totalMinutes} dakika</span>`;
-                const answer = `${hours} saat ${minutes} dakika`;
-                problem = { ...problemBase, question, answer };
-            } else { // hourToMin
-                const hours = getRandomInt(1, 5);
-                const minutes = getRandomInt(5, 55);
-                const totalMinutes = hours * 60 + minutes;
-                const question = `<span style="font-size: 1.1em;">${hours} saat ${minutes} dakika</span>`;
-                const answer = `${totalMinutes} dakika`;
-                problem = { ...problemBase, question, answer };
+            const types = ['minToHour', 'hourToMin', 'dayToHour', 'hourToDay', 'weekToDay', 'dayToWeek'];
+            const type = types[getRandomInt(0,types.length - 1)];
+            let question = '', answer = '';
+
+            switch(type) {
+                case 'minToHour': {
+                    const totalMinutes = getRandomInt(65, 300);
+                    const hours = Math.floor(totalMinutes / 60);
+                    const minutes = totalMinutes % 60;
+                    question = `${totalMinutes} dakika`;
+                    answer = `${hours} saat ${minutes} dakika`;
+                    break;
+                }
+                case 'hourToMin': {
+                    const hours = getRandomInt(1, 5);
+                    const minutes = getRandomInt(5, 55);
+                    const totalMinutes = hours * 60 + minutes;
+                    question = `${hours} saat ${minutes} dakika`;
+                    answer = `${totalMinutes} dakika`;
+                    break;
+                }
+                case 'dayToHour': {
+                    const days = getRandomInt(1, 4);
+                    const hours = getRandomInt(1, 23);
+                    const totalHours = days * 24 + hours;
+                    question = `${days} gün ${hours} saat`;
+                    answer = `${totalHours} saat`;
+                    break;
+                }
+                case 'hourToDay': {
+                    const totalHours = getRandomInt(25, 100);
+                    const days = Math.floor(totalHours / 24);
+                    const hours = totalHours % 24;
+                    question = `${totalHours} saat`;
+                    answer = `${days} gün ${hours} saat`;
+                    break;
+                }
+                case 'weekToDay': {
+                    const weeks = getRandomInt(1, 8);
+                    const days = getRandomInt(1, 6);
+                    const totalDays = weeks * 7 + days;
+                    question = `${weeks} hafta ${days} gün`;
+                    answer = `${totalDays} gün`;
+                    break;
+                }
+                case 'dayToWeek': {
+                    const totalDays = getRandomInt(8, 50);
+                    const weeks = Math.floor(totalDays / 7);
+                    const days = totalDays % 7;
+                    question = `${totalDays} gün`;
+                    answer = `${weeks} hafta ${days} gün`;
+                    break;
+                }
             }
+            problem = { ...problemBase, question: `<span style="font-size: 1.1em;">${question}</span>`, answer };
             break;
         }
 

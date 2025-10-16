@@ -1,4 +1,3 @@
-
 // types.ts
 
 export interface Problem {
@@ -17,6 +16,7 @@ export enum ArithmeticOperation {
     Multiplication = 'multiplication',
     Division = 'division',
     MixedAdditionSubtraction = 'mixed-add-sub',
+    MixedAll = 'mixed-all',
 }
 
 export type CarryBorrowPreference = 'with' | 'without' | 'mixed';
@@ -39,6 +39,7 @@ export interface ArithmeticSettings {
     autoFit: boolean;
     useVisuals?: boolean;
     gradeLevel: number;
+    topic?: string;
 }
 
 // --- VISUAL SUPPORT ---
@@ -84,6 +85,8 @@ export interface FractionsSettings {
     autoFit: boolean;
     useVisuals?: boolean;
     gradeLevel: number;
+    topic?: string;
+    useMixedNumbers?: boolean;
 }
 
 // --- DECIMALS ---
@@ -114,6 +117,7 @@ export interface DecimalsSettings {
     autoFit: boolean;
     useVisuals?: boolean;
     gradeLevel: number;
+    topic?: string;
 }
 
 // --- PLACE VALUE ---
@@ -139,6 +143,7 @@ export interface PlaceValueSettings {
     useWordProblems: boolean;
     autoFit: boolean;
     gradeLevel: number;
+    topic?: string;
 }
 
 // --- RHYTHMIC COUNTING ---
@@ -171,6 +176,8 @@ export interface RhythmicCountingSettings {
     useWordProblems: boolean;
     autoFit: boolean;
     gradeLevel: number;
+    topic?: string;
+    orderDirection?: 'ascending' | 'descending' | 'mixed';
 }
 
 // --- TIME ---
@@ -197,6 +204,7 @@ export interface TimeSettings {
     showDigitalTime: boolean;
     showMinuteMarkers: boolean;
     gradeLevel: number;
+    topic?: string;
 }
 
 // --- GEOMETRY ---
@@ -229,6 +237,7 @@ export interface GeometrySettings {
     useWordProblems: boolean;
     autoFit: boolean;
     gradeLevel: number;
+    topic?: string;
 }
 
 // --- MEASUREMENT ---
@@ -248,6 +257,7 @@ export interface MeasurementSettings {
     autoFit: boolean;
     useVisuals?: boolean;
     gradeLevel: number;
+    topic?: string;
 }
 
 

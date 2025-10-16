@@ -203,12 +203,17 @@ export const generateArithmeticProblem = (settings: ArithmeticSettings): { probl
         [ArithmeticOperation.Subtraction]: 'Çıkarma',
         [ArithmeticOperation.Multiplication]: 'Çarpma',
         [ArithmeticOperation.Division]: 'Bölme',
-        [ArithmeticOperation.MixedAdditionSubtraction]: 'Toplama ve Çıkarma'
+        [ArithmeticOperation.MixedAdditionSubtraction]: 'Toplama ve Çıkarma',
+        [ArithmeticOperation.MixedAll]: 'Dört İşlem'
     };
     
-    const currentOperation = operation === ArithmeticOperation.MixedAdditionSubtraction
-        ? (Math.random() < 0.5 ? ArithmeticOperation.Addition : ArithmeticOperation.Subtraction)
-        : operation;
+    let currentOperation = operation;
+    if (operation === ArithmeticOperation.MixedAll) {
+        const allOps = [ArithmeticOperation.Addition, ArithmeticOperation.Subtraction, ArithmeticOperation.Multiplication, ArithmeticOperation.Division];
+        currentOperation = allOps[getRandomInt(0, 3)];
+    } else if (operation === ArithmeticOperation.MixedAdditionSubtraction) {
+        currentOperation = (Math.random() < 0.5 ? ArithmeticOperation.Addition : ArithmeticOperation.Subtraction);
+    }
 
     const title = `Aşağıdaki ${operationNames[operation].toLowerCase()} işlemlerini yapınız.`;
     

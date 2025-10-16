@@ -6,10 +6,12 @@ import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
+import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
+import { TOPIC_SUGGESTIONS } from '../constants';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -35,6 +37,7 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
         autoFit: true,
         showDigitalTime: true,
         showMinuteMarkers: true,
+        topic: '',
     });
     const isInitialMount = useRef(true);
 
@@ -100,6 +103,11 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
         setSettings(prev => ({ ...prev, [field]: value }));
     };
 
+    const handleRandomTopic = () => {
+        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
+        handleSettingChange('topic', randomTopic);
+    };
+
      const handleGradeLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const grade = parseInt(e.target.value, 10);
         let newSettings: Partial<TimeSettings> = { gradeLevel: grade };
@@ -133,7 +141,7 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
         <div className="space-y-4">
             <h2 className="text-lg font-semibold">Zaman Ölçme Ayarları</h2>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 {isWordProblemCompatible && (
                     <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                         <Checkbox
@@ -142,6 +150,28 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
                             checked={settings.useWordProblems}
                             onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
                         />
+                         {settings.useWordProblems && (
+                             <div className="mt-3 pl-6">
+                                <div className="relative">
+                                    <TextInput
+                                        label="Problem Konusu (İsteğe bağlı)"
+                                        id="time-topic"
+                                        value={settings.topic || ''}
+                                        onChange={e => handleSettingChange('topic', e.target.value)}
+                                        placeholder="Örn: Yolculuk, Film, Fırın"
+                                        className="pr-10"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleRandomTopic}
+                                        className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                                        title="Rastgele Konu Öner"
+                                    >
+                                        <ShuffleIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
+                             </div>
+                         )}
                     </div>
                 )}
                  <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">

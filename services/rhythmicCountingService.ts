@@ -154,6 +154,12 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
     let title: string;
     const problemBase = { category: 'rhythmic-counting' };
 
+    let currentOrderDirection = settings.orderDirection;
+    if (type === RhythmicProblemType.Ordering && settings.orderDirection === 'mixed') {
+        currentOrderDirection = Math.random() < 0.5 ? 'ascending' : 'descending';
+    }
+    const orderText = currentOrderDirection === 'descending' ? 'büyükten küçüğe' : 'küçükten büyüğe';
+
     const titles: { [key in RhythmicProblemType]?: string } = {
         [RhythmicProblemType.Pattern]: "Örüntülerdeki boşlukları doldurunuz.",
         [RhythmicProblemType.FindRule]: "Aşağıdaki örüntülerin kuralını bulunuz.",
@@ -161,7 +167,7 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
         [RhythmicProblemType.FillBeforeAfter]: `Verilen sayıdan önceki ve sonraki sayıları ${settings.step}'er ritmik sayarak bulunuz.`,
         [RhythmicProblemType.FillBetween]: `Verilen sayılar arasındaki boşlukları ${settings.step}'er ritmik sayarak doldurunuz.`,
         [RhythmicProblemType.OddEven]: "Verilen sayıların tek mi çift mi olduğunu belirtiniz.",
-        [RhythmicProblemType.Ordering]: "Sayıları küçükten büyüğe doğru sıralayınız.",
+        [RhythmicProblemType.Ordering]: `Sayıları ${orderText} doğru sıralayınız.`,
     };
     title = titles[type] || "Ritmik Sayma Alıştırmaları";
 
@@ -278,8 +284,11 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             
             const numArray = Array.from(numbers);
             const sorted = [...numArray].sort((a, b) => a - b);
+            
+            const answerArray = currentOrderDirection === 'descending' ? [...sorted].reverse() : sorted;
+
             const question = `<span style="font-size: 1.25em; font-family: monospace;">${numArray.join(', ')}</span>`;
-            const answer = sorted.join(', ');
+            const answer = answerArray.join(' < ');
             problem = { ...problemBase, question, answer };
             break;
         }

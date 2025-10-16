@@ -10,7 +10,7 @@ import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
-import { TABS } from '../constants';
+import { TABS, TOPIC_SUGGESTIONS } from '../constants';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -19,21 +19,6 @@ interface ModuleProps {
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
 }
-
-const TOPIC_SUGGESTIONS = [
-    'Market Alışverişi',
-    'Okul Eşyaları',
-    'Hayvanlar Alemi',
-    'Spor Aktiviteleri',
-    'Doğa ve Çevre',
-    'Yemek Tarifleri',
-    'Seyahat ve Ulaşım',
-    'Para Hesaplamaları',
-    'Zaman Ölçme',
-    'Geometrik Şekiller',
-    'Bilim Deneyleri',
-    'Doğum Günü Partisi',
-];
 
 const moduleOptions = [
     { value: 'none', label: 'Genel Konu' },

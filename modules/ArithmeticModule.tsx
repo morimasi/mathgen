@@ -3,6 +3,7 @@ import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
+import TextInput from '../components/form/TextInput';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { calculateMaxProblems } from '../services/layoutService';
@@ -10,6 +11,7 @@ import SettingsPresetManager from '../components/SettingsPresetManager';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { generateArithmeticProblem } from '../services/mathService';
 import { generateContextualWordProblems } from '../services/geminiService';
+import { TOPIC_SUGGESTIONS } from '../constants';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -38,6 +40,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         operationCount: 1,
         autoFit: true,
         useVisuals: false,
+        topic: '',
     });
     const isInitialMount = useRef(true);
     
@@ -59,7 +62,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
             if (settings.useWordProblems) {
                 const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
                 const problems = await generateContextualWordProblems('arithmetic', adjustedSettings);
-                const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed-add-sub': 'Toplama ve Çıkarma' };
+                const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed-add-sub': 'Toplama ve Çıkarma', 'mixed-all': 'Dört İşlem' };
                 const title = `Gerçek Hayat Problemleri - ${opNames[settings.operation]}`;
                 onGenerate(problems, clearPrevious, title, 'arithmetic', settings.pageCount);
             } else {
@@ -108,6 +111,11 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         setSettings(prev => ({ ...prev, [field]: value }));
     };
 
+    const handleRandomTopic = () => {
+        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
+        handleSettingChange('topic', randomTopic);
+    };
+
     const handleGradeLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const grade = parseInt(e.target.value, 10);
         let newSettings: Partial<ArithmeticSettings> = { gradeLevel: grade };
@@ -126,7 +134,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 newSettings = { ...newSettings, digits1: 4, digits2: 3, operation: ArithmeticOperation.Division };
                 break;
             case 5:
-                newSettings = { ...newSettings, digits1: 5, digits2: 4, operation: ArithmeticOperation.Division };
+                newSettings = { ...newSettings, digits1: 5, digits2: 4, operation: ArithmeticOperation.MixedAll };
                 break;
         }
         setSettings(prev => ({ ...prev, ...newSettings }));
@@ -138,7 +146,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         }
     }, [settings.operation, settings.format]);
     
-    const isAddSub = settings.operation === ArithmeticOperation.Addition || settings.operation === ArithmeticOperation.Subtraction || settings.operation === ArithmeticOperation.MixedAdditionSubtraction;
+    const isAddSub = [ArithmeticOperation.Addition, ArithmeticOperation.Subtraction, ArithmeticOperation.MixedAdditionSubtraction].includes(settings.operation);
     const isLongDivision = settings.format === 'long-division-html';
     const isTableLayout = printSettings.layoutMode === 'table';
 
@@ -167,6 +175,24 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                                     { value: 3, label: '3 İşlemli' },
                                 ]}
                             />
+                            <div className="relative">
+                                <TextInput
+                                    label="Problem Konusu (İsteğe bağlı)"
+                                    id="arithmetic-topic"
+                                    value={settings.topic || ''}
+                                    onChange={e => handleSettingChange('topic', e.target.value)}
+                                    placeholder="Örn: Market, Park, Oyuncaklar"
+                                    className="pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleRandomTopic}
+                                    className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                                    title="Rastgele Konu Öner"
+                                >
+                                    <ShuffleIcon className="w-5 h-5" />
+                                </button>
+                            </div>
                              <Checkbox
                                 label="Görsel Destek Ekle (Emoji)"
                                 id="use-visuals-word-problems"
@@ -214,6 +240,7 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                         { value: ArithmeticOperation.Multiplication, label: 'Çarpma' },
                         { value: ArithmeticOperation.Division, label: 'Bölme' },
                         { value: ArithmeticOperation.MixedAdditionSubtraction, label: 'Karışık (Toplama-Çıkarma)' },
+                        { value: ArithmeticOperation.MixedAll, label: 'Karışık (Tümü)' },
                     ]}
                 />
                 <NumberInput 
