@@ -60,6 +60,18 @@ const AnimatedLogo: React.FC<AnimatedLogoProps> = ({ onReset }) => {
             aria-label="Uygulamayı Sıfırla"
         >
             <svg viewBox="0 0 150 150" className="absolute -top-8 -left-8 w-24 h-24 overflow-visible">
+                <g className="constellation-ursa-major">
+                    <polyline points="115,70 100,75 85,80 70,93" className="constellation-line" />
+                    <polyline points="70,93 60,110 80,100 70,93 90,90" className="constellation-line" />
+                    <circle cx="115" cy="70" r="2" className="star" style={{ animationDelay: '0.1s' }} />
+                    <circle cx="100" cy="75" r="2.5" className="star" style={{ animationDelay: '0.8s' }} />
+                    <circle cx="85" cy="80" r="2" className="star" style={{ animationDelay: '0.3s' }} />
+                    <circle cx="70" cy="93" r="1.5" className="star" style={{ animationDelay: '1.2s' }} />
+                    <circle cx="90" cy="90" r="2.5" className="star" style={{ animationDelay: '0.5s' }} />
+                    <circle cx="80" cy="100" r="2" className="star" style={{ animationDelay: '1.5s' }} />
+                    <circle cx="60" cy="110" r="2" className="star" style={{ animationDelay: '0.2s' }} />
+                </g>
+
                 <g className="daisy-sway" style={{ animationPlayState: isExploded ? 'paused' : 'running' }}>
                     
                     {/* Core parts that fade away */}
