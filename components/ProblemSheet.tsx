@@ -134,7 +134,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
                             </header>
                         )}
                         
-                        {title && pageIndex === 0 && <h3 className="text-xl font-semibold mb-6 text-center flex-shrink-0">{title}</h3>}
+                        {title && pageIndex === 0 && <h3 className="text-xl font-semibold mb-6 text-center">{title}</h3>}
 
                         <div className="problem-list">
                             {pageProblems.map((p, index) => {
