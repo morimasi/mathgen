@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useFlyingLadybugs } from '../services/FlyingLadybugContext';
 import {
     ArithmeticIcon,
     FractionsIcon,
@@ -50,13 +49,11 @@ const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } =
 };
 
 const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
-    const { spawnLadybug } = useFlyingLadybugs();
     const [openMenu, setOpenMenu] = useState<string | null>(null);
     const [isMenuSticky, setIsMenuSticky] = useState(false);
     const navRef = useRef<HTMLElement>(null);
 
-    const handleMouseEnter = (event: React.MouseEvent<HTMLButtonElement>, menuTitle: string) => {
-        spawnLadybug(event.clientX, event.clientY);
+    const handleMouseEnter = (menuTitle: string) => {
         if (!isMenuSticky) {
             setOpenMenu(menuTitle);
         }
@@ -108,7 +105,7 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
                     >
                         <button
                             onClick={() => handleClick(group.title)}
-                            onMouseEnter={(e) => handleMouseEnter(e, group.title)}
+                            onMouseEnter={() => handleMouseEnter(group.title)}
                             className={`tab-button-nav-item flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none ${
                                 isGroupActive
                                     ? 'bg-white/20 text-white'
