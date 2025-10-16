@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useFlyingLadybugs } from '../services/FlyingLadybugContext';
 import {
     ArithmeticIcon,
@@ -52,9 +52,30 @@ const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } =
 const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
     const { spawnLadybug } = useFlyingLadybugs();
     const [openMenu, setOpenMenu] = useState<string | null>(null);
+    const navRef = useRef<HTMLElement>(null);
+
+    const handleMenuToggle = (menuTitle: string) => {
+        setOpenMenu(prevOpenMenu => (prevOpenMenu === menuTitle ? null : menuTitle));
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (navRef.current && !navRef.current.contains(event.target as Node)) {
+                setOpenMenu(null);
+            }
+        };
+
+        if (openMenu) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [openMenu]);
 
     return (
-        <nav className="-mb-px flex space-x-2" aria-label="Tabs">
+        <nav ref={navRef} className="-mb-px flex space-x-2" aria-label="Tabs">
             {tabGroups.map((group) => {
                 const GroupIcon = groupIconMap[group.title];
                 const isGroupActive = group.tabs.some(tab => tab.id === activeTab);
@@ -63,10 +84,9 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
                     <div
                         key={group.title}
                         className="relative"
-                        onMouseEnter={() => setOpenMenu(group.title)}
-                        onMouseLeave={() => setOpenMenu(null)}
                     >
                         <button
+                            onClick={() => handleMenuToggle(group.title)}
                             onMouseEnter={(e) => spawnLadybug(e.clientX, e.clientY)}
                             className={`tab-button-nav-item flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none ${
                                 isGroupActive
