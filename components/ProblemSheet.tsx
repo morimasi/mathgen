@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Problem } from '../types';
 import AnswerKey from './AnswerKey';
@@ -50,6 +51,14 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, title, pageCount 
         </div>
     );
 
+    const problemListStyle: React.CSSProperties = {
+        '--table-rows': settings.rows,
+        '--table-cols': settings.columns,
+        '--column-count': settings.columns,
+        '--column-gap': `${settings.columnGap}rem`,
+        '--problem-spacing': `${settings.problemSpacing}rem`,
+    } as React.CSSProperties;
+
     return (
         <div className={`
             page-container 
@@ -62,7 +71,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, title, pageCount 
                 const isPracticeSheet = pageProblems[0]?.answer === 'PRACTICE_SHEET';
 
                 return (
-                    <div key={pageIndex} className="worksheet-page break-after-page">
+                    <div key={pageIndex} className={`worksheet-page break-after-page orientation-${settings.orientation}`}>
                         {settings.showHeader && (
                             <div className="worksheet-header">
                                 <div className="header-field">Ad-Soyad:</div>
@@ -75,11 +84,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, title, pageCount 
 
                         <div 
                             className={`problem-list layout-mode-${settings.layoutMode} ${isPracticeSheet ? 'practice-sheet-list' : ''}`}
-                            style={{
-                                gridTemplateColumns: settings.layoutMode === 'table' ? `repeat(${settings.columns}, 1fr)` : undefined,
-                                gridTemplateRows: settings.layoutMode === 'table' ? `repeat(${settings.rows}, auto)` : undefined,
-                                gap: settings.layoutMode === 'table' ? `${settings.columnGap}rem` : undefined,
-                            }}
+                            style={problemListStyle}
                         >
                             {pageProblems.map((p, i) => renderProblemItem(p, i, (pageIndex * Math.ceil(problems.length / totalPages)) + i))}
                         </div>
