@@ -51,9 +51,10 @@ interface ProblemSheetProps {
     title: string;
     contentRef: React.RefObject<HTMLDivElement>;
     visualSupportSettings?: VisualSupportSettings;
+    viewScale: number;
 }
 
-const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title, contentRef, visualSupportSettings }) => {
+const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title, contentRef, visualSupportSettings, viewScale }) => {
     const { settings } = usePrintSettings();
     
     if (isLoading) {
@@ -75,7 +76,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
         '--problem-spacing': `${settings.problemSpacing}rem`,
         '--column-gap': `${settings.columnGap}rem`,
         '--line-height': settings.lineHeight,
-        '--scale': settings.scale,
+        '--view-scale': viewScale,
         '--page-margin': `${settings.pageMargin}rem`,
         '--notebook-color': settings.colorTheme === 'blue' ? 'rgba(0, 0, 255, 0.35)' : (settings.colorTheme === 'sepia' ? 'rgba(112, 66, 20, 0.35)' : 'rgba(0, 0, 0, 0.35)'),
         '--text-color': settings.colorTheme === 'blue' ? '#0000AA' : (settings.colorTheme === 'sepia' ? '#5a380a' : '#1e293b'),

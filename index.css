@@ -78,10 +78,22 @@ html.dark body {
     to { offset-distance: 100%; }
 }
 
-/* LOGO CONSTELLATION */
-.constellation-ursa-major {
+/* HEADER CONSTELLATION */
+.header-constellation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    pointer-events: none; /* Allows clicks to pass through */
+    z-index: 10; /* Behind header content (z-20) */
     opacity: 0.7;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+}
+
+html.dark .header-constellation {
+    filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.5));
 }
 
 .constellation-line {
@@ -98,9 +110,6 @@ html.dark body {
     animation: twinkle-star 4s infinite ease-in-out;
 }
 
-html.dark .constellation-ursa-major {
-    filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.5));
-}
 html.dark .constellation-line {
     stroke: #fde047; /* yellow-300 */
     opacity: 0.4;
@@ -115,11 +124,48 @@ html.dark .star {
 }
 
 
+/* NEW: Worksheet Toolbar & Viewport */
+.worksheet-toolbar {
+    position: sticky;
+    top: 10.5rem; /* Match the sticky top of the settings panel */
+    z-index: 15; /* Above worksheet but below header dropdowns */
+    background-color: rgba(245, 245, 244, 0.8); /* stone-100 with transparency */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+}
+
+html.dark .worksheet-toolbar {
+    background-color: rgba(39, 39, 42, 0.8); /* stone-800 with transparency */
+    border-color: #3f3f46; /* stone-700 */
+}
+
+.worksheet-viewport {
+    overflow: auto;
+    height: calc(100vh - 15rem); /* Adjust based on header and toolbar height */
+    border-radius: 0.5rem;
+    background-color: #e7e5e4; /* stone-200 */
+    padding-top: 1rem;
+}
+
+html.dark .worksheet-viewport {
+    background-color: #292524; /* stone-800 */
+}
+
+
 /* Custom worksheet styles */
 .worksheet-container {
-    transform: scale(var(--scale, 1));
+    transform: scale(var(--view-scale, 1));
     transform-origin: top center;
     transition: transform 0.2s ease-in-out;
+    margin-bottom: 2rem;
 }
 .worksheet-content {
     background-color: #fff;
@@ -288,7 +334,9 @@ body.pdf-export-mode .answer-key {
     body > #root > div > header,
     body > #root > div > div[role="dialog"], /* Modals and panels */
     main aside,
-    .flying-ladybug-container {
+    .flying-ladybug-container,
+    .worksheet-toolbar,
+    .worksheet-viewport {
         display: none !important;
     }
 
@@ -309,7 +357,7 @@ body.pdf-export-mode .answer-key {
 
     /* Style the printable worksheet itself */
     .worksheet-container {
-        transform: scale(1) !important;
+        transform: scale(var(--scale, 1)) !important; /* Use print scale */
         margin: 0 !important;
         padding: 0 !important;
         box-shadow: none !important;

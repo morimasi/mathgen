@@ -1,4 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
+
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ThemeProvider } from './services/ThemeContext';
@@ -16,7 +17,7 @@ import ThemeSwitcher from './components/ThemeSwitcher';
 import ToastContainer from './components/ToastContainer';
 import { TAB_GROUPS } from './constants';
 import { Problem, PrintSettings, VisualSupportSettings, ArithmeticOperation } from './types';
-import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon } from './components/icons/Icons';
+import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon } from './components/icons/Icons';
 import AnimatedLogo from './components/AnimatedLogo';
 
 /**
@@ -28,7 +29,7 @@ const generatePdfDocument = async (
 ): Promise<jsPDF | null> => {
     try {
         const canvas = await html2canvas(contentElement, {
-            scale: 2,
+            scale: printSettings.scale, // Use print scale for PDF generation
             useCORS: true,
             backgroundColor: '#ffffff',
             logging: false,
@@ -61,6 +62,79 @@ const generatePdfDocument = async (
     }
 };
 
+// --- NEW COMPONENT: WorksheetToolbar ---
+interface WorksheetToolbarProps {
+    scale: number;
+    setScale: (scale: number) => void;
+    worksheetParentRef: React.RefObject<HTMLElement>;
+    problemCount: number;
+    orientation: 'portrait' | 'landscape';
+}
+
+const A4_WIDTH_PX = 794;
+const A4_HEIGHT_PX = 1123;
+
+const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, worksheetParentRef, problemCount, orientation }) => {
+
+    const handleFitToPage = useCallback(() => {
+        if (!worksheetParentRef.current) return;
+
+        const containerWidth = worksheetParentRef.current.clientWidth;
+        const worksheetWidth = orientation === 'portrait' ? A4_WIDTH_PX : A4_HEIGHT_PX;
+        
+        // Subtract some padding (e.g., 2rem) for better visual fit
+        const newScale = (containerWidth - 32) / worksheetWidth;
+        
+        setScale(Math.min(1.5, Math.max(0.1, newScale))); // Clamp the scale to reasonable values
+    }, [worksheetParentRef, setScale, orientation]);
+
+    useEffect(() => {
+        // Initial fit is handled by the observer firing on mount
+        const observer = new ResizeObserver(handleFitToPage);
+        const parentEl = worksheetParentRef.current;
+        if (parentEl) {
+            observer.observe(parentEl);
+        }
+
+        return () => {
+            if (parentEl) {
+                observer.unobserve(parentEl);
+            }
+        };
+    }, [handleFitToPage]);
+
+    // Re-fit when problem count or orientation changes, as it might affect layout needs.
+    useEffect(() => {
+        handleFitToPage();
+    }, [problemCount, orientation, handleFitToPage]);
+
+    return (
+        <div className="worksheet-toolbar">
+            <div className="flex items-center gap-4">
+                <label htmlFor="scale-slider" className="text-sm font-medium">Ölçek:</label>
+                <input
+                    type="range"
+                    id="scale-slider"
+                    min="0.2"
+                    max="1.5"
+                    step="0.01"
+                    value={scale}
+                    onChange={(e) => setScale(parseFloat(e.target.value))}
+                    className="w-32 sm:w-48 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
+                />
+                <span className="text-sm font-semibold w-12 text-center">{Math.round(scale * 100)}%</span>
+            </div>
+            <button 
+                onClick={handleFitToPage} 
+                className="p-2 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors" 
+                title="Ekrana Sığdır"
+            >
+                <FitToScreenIcon className="w-5 h-5" />
+            </button>
+        </div>
+    );
+};
+
 
 const AppContent: React.FC = () => {
     const [activeTab, setActiveTab] = useState('arithmetic');
@@ -73,6 +147,7 @@ const AppContent: React.FC = () => {
     const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [isPdfLoading, setIsPdfLoading] = useState(false);
+    const [worksheetScale, setWorksheetScale] = useState(0.7);
     const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>({
         operation: ArithmeticOperation.Addition,
         maxNumber: 20,
@@ -87,7 +162,8 @@ const AppContent: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
     const contentRef = useRef<HTMLDivElement>(null);
-    const worksheetRef = useRef<HTMLDivElement>(null);
+    // FIX: Changed ref type from HTMLElement to HTMLDivElement to match the expected prop type in child components.
+    const worksheetParentRef = useRef<HTMLDivElement>(null);
 
     const handleGenerate = useCallback((
         newProblems: Problem[], 
@@ -184,6 +260,21 @@ const AppContent: React.FC = () => {
     return (
         <div className="bg-stone-50 dark:bg-stone-900 min-h-screen text-stone-800 dark:text-stone-200">
             <header className="bg-orange-800 dark:bg-stone-950/70 text-amber-50 shadow-md sticky top-0 z-20 print:hidden">
+                <div className="header-constellation" aria-hidden="true">
+                    <svg viewBox="60 60 70 60" className="w-full h-full">
+                        <g>
+                            <polyline points="115,70 100,75 85,80 70,93" className="constellation-line" />
+                            <polyline points="70,93 60,110 80,100 70,93 90,90" className="constellation-line" />
+                            <circle cx="115" cy="70" r="2" className="star" style={{ animationDelay: '0.1s' }} />
+                            <circle cx="100" cy="75" r="2.5" className="star" style={{ animationDelay: '0.8s' }} />
+                            <circle cx="85" cy="80" r="2" className="star" style={{ animationDelay: '0.3s' }} />
+                            <circle cx="70" cy="93" r="1.5" className="star" style={{ animationDelay: '1.2s' }} />
+                            <circle cx="90" cy="90" r="2.5" className="star" style={{ animationDelay: '0.5s' }} />
+                            <circle cx="80" cy="100" r="2" className="star" style={{ animationDelay: '1.5s' }} />
+                            <circle cx="60" cy="110" r="2" className="star" style={{ animationDelay: '0.2s' }} />
+                        </g>
+                    </svg>
+                </div>
                 <div className="px-4 sm:px-6 lg:px-8 relative">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-4">
@@ -244,7 +335,7 @@ const AppContent: React.FC = () => {
                                 onGenerate={handleGenerate} 
                                 setIsLoading={setIsLoading} 
                                 activeTab={activeTab}
-                                worksheetRef={worksheetRef}
+                                worksheetRef={worksheetParentRef}
                                 autoRefreshTrigger={autoRefreshTrigger}
                                 lastGeneratorModule={lastGeneratorModule}
                                 visualSupportSettings={visualSupportSettings}
@@ -252,15 +343,26 @@ const AppContent: React.FC = () => {
                             />
                         </div>
                     </aside>
-                    <section className="md:col-span-2" ref={worksheetRef}>
-                        <ProblemSheet 
-                            problems={problems} 
-                            isLoading={isLoading} 
-                            title={worksheetTitle}
-                            contentRef={contentRef}
-                            visualSupportSettings={visualSupportSettings}
+                    {/* FIX: Changed section to div to match the `worksheetParentRef` type of `HTMLDivElement`. */}
+                    <div className="md:col-span-2" ref={worksheetParentRef}>
+                        <WorksheetToolbar
+                            scale={worksheetScale}
+                            setScale={setWorksheetScale}
+                            worksheetParentRef={worksheetParentRef}
+                            problemCount={problems.length}
+                            orientation={printSettings.orientation}
                         />
-                    </section>
+                        <div className="worksheet-viewport">
+                            <ProblemSheet 
+                                problems={problems} 
+                                isLoading={isLoading} 
+                                title={worksheetTitle}
+                                contentRef={contentRef}
+                                visualSupportSettings={visualSupportSettings}
+                                viewScale={worksheetScale}
+                            />
+                        </div>
+                    </div>
                 </div>
             </main>
             
