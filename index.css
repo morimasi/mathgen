@@ -301,11 +301,15 @@ html.dark .problem-item-card {
 .problem-list {
     display: grid;
     grid-template-columns: repeat(var(--table-cols, 2), 1fr);
-    grid-template-rows: repeat(var(--table-rows, auto-fill), minmax(0, 1fr));
+    grid-auto-rows: min-content; /* Allow rows to grow naturally in flow mode */
     gap: var(--problem-spacing, 1.5rem) var(--column-gap, 1.5rem);
     font-size: var(--font-size, 16px);
     line-height: var(--line-height, 1.5);
 }
+.problem-list[data-layout-mode="table"] {
+    grid-template-rows: repeat(var(--table-rows-count), minmax(0, 1fr));
+}
+
 .problem-item {
     display: flex;
     align-items: flex-start;
@@ -566,4 +570,21 @@ html.dark .table-selector-cell {
 }
 .table-selector-cell.selected {
     background-color: #f97316; /* orange-500 */
+}
+
+/* Tailwind Prose Overrides for HowToUse Modal */
+.prose ul > li::before {
+    background-color: #f97316; /* orange-500 */
+}
+.prose ol > li::before {
+    color: #9a3412; /* orange-800 */
+}
+html.dark .prose ol > li::before {
+     color: #ffedd5; /* orange-100 */
+}
+.prose a {
+    color: #c2410c; /* orange-600 */
+}
+.prose a:hover {
+    color: #9a3412; /* orange-800 */
 }

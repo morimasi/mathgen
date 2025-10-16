@@ -73,7 +73,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
 
     const problemSheetStyle: React.CSSProperties = {
         '--table-cols': settings.columns,
-        '--table-rows': settings.layoutMode === 'table' ? settings.rows : 'auto-fill',
+        '--table-rows-count': settings.layoutMode === 'table' ? settings.rows : undefined,
         '--font-size': `${settings.fontSize}px`,
         '--problem-spacing': `${settings.problemSpacing}rem`,
         '--column-gap': `${settings.columnGap}rem`,
@@ -136,16 +136,16 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
                         
                         {title && pageIndex === 0 && <h3 className="text-xl font-semibold mb-6 text-center">{title}</h3>}
 
-                        <div className="problem-list">
+                        <div className="problem-list" data-layout-mode={settings.layoutMode}>
                             {pageProblems.map((p, index) => {
-                                const isVisualProblem = p.display === 'long-division-html' || p.display === 'vertical-html' || p.question.includes('<svg') || p.category === 'visual-support';
+                                const isArithmetic = p.category === 'arithmetic';
+                                const isVisuallyHeavy = ['time', 'geometry', 'visual-support'].includes(p.category) || p.question.includes('<svg');
+                                const showProblemNumber = !isArithmetic && !isVisuallyHeavy;
                                 
-                                let itemClassName = `problem-item ${isVisualProblem ? 'items-center' : ''}`;
+                                let itemClassName = `problem-item ${isVisuallyHeavy ? 'items-center' : ''}`;
                                 if (settings.layoutMode === 'table') {
                                     itemClassName += ' problem-item-table';
                                 }
-
-                                const isArithmetic = p.category === 'arithmetic';
 
                                 if (settings.borderStyle === 'card') {
                                     itemClassName += ` problem-item-card`;
@@ -155,9 +155,9 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
 
                                 return (
                                     <div key={index} className={itemClassName}>
-                                        {!isArithmetic && <span className="problem-number">{index + 1 + (pageIndex * Math.ceil(problems.length / pageCount))}.</span>}
+                                        {showProblemNumber && <span className="problem-number">{index + 1 + (pageIndex * Math.ceil(problems.length / pageCount))}.</span>}
                                         <div 
-                                            className={(isArithmetic || isVisual) ? 'w-full' : 'problem-content'}
+                                            className={(isArithmetic || isVisuallyHeavy) ? 'w-full' : 'problem-content'}
                                             dangerouslySetInnerHTML={{ __html: p.question }}
                                          />
                                     </div>
