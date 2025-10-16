@@ -266,23 +266,19 @@ html.dark .problem-item-card {
 }
 
 
-/* Notebook styles on individual items (only if bordered) */
-.problem-item-bordered.notebook-lines {
+/* Notebook styles on the entire worksheet content area */
+.worksheet-content.notebook-lines {
     background-image: repeating-linear-gradient(to bottom, transparent, transparent calc(var(--font-size, 16px) * var(--line-height, 1.5) - 1px), var(--notebook-color) calc(var(--font-size, 16px) * var(--line-height, 1.5)));
-    background-position: 0 1em; /* Align lines with text inside padded box */
-    background-clip: content-box; /* Keep background within padding */
 }
-.problem-item-bordered.notebook-grid {
+.worksheet-content.notebook-grid {
     background-image: 
         linear-gradient(to right, var(--notebook-color) 1px, transparent 1px),
         linear-gradient(to bottom, var(--notebook-color) 1px, transparent 1px);
     background-size: 1em 1em; /* Scale grid with font size */
-    background-clip: content-box;
 }
-.problem-item-bordered.notebook-dotted {
+.worksheet-content.notebook-dotted {
      background-image: radial-gradient(var(--notebook-color) 1px, transparent 1px);
      background-size: 1em 1em; /* Scale dots with font size */
-     background-clip: content-box;
 }
 
 /* Problem list layout */

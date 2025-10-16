@@ -93,6 +93,11 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
         problemSheetStyle['--visual-container-min-width'] = `${visualSupportSettings.boxSize + 20}px`;
     }
 
+    const worksheetContentClasses = ['worksheet-content'];
+    if (settings.notebookStyle !== 'none') {
+        worksheetContentClasses.push(`notebook-${settings.notebookStyle}`);
+    }
+
     return (
         <div 
             id="worksheet-container" 
@@ -100,7 +105,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
             style={problemSheetStyle}
             data-orientation={settings.orientation}
         >
-            <div ref={contentRef} className="worksheet-content">
+            <div ref={contentRef} className={worksheetContentClasses.join(' ')}>
                 {settings.showHeader && (
                     <header className="worksheet-header">
                         <div className="worksheet-title" />
@@ -125,9 +130,6 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
                             itemClassName += ` problem-item-card`;
                         } else if (settings.borderStyle !== 'none') {
                             itemClassName += ` problem-item-bordered border-${settings.borderStyle}`;
-                            if (settings.notebookStyle !== 'none') {
-                                itemClassName += ` notebook-${settings.notebookStyle}`;
-                            }
                         }
 
                         return (
