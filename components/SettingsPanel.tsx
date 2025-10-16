@@ -15,7 +15,7 @@ interface SettingsPanelProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
     setIsLoading: (loading: boolean) => void;
     activeTab: string;
-    worksheetRef: React.RefObject<HTMLDivElement>;
+    contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
     visualSupportSettings: VisualSupportSettings;
@@ -26,14 +26,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     onGenerate, 
     setIsLoading, 
     activeTab, 
-    worksheetRef, 
+    contentRef, 
     autoRefreshTrigger, 
     lastGeneratorModule,
     visualSupportSettings,
     setVisualSupportSettings
 }) => {
     const renderModule = () => {
-        const commonProps = { onGenerate, setIsLoading, worksheetRef, autoRefreshTrigger, lastGeneratorModule };
+        const commonProps = { onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule };
         switch (activeTab) {
             case 'arithmetic':
                 return <ArithmeticModule {...commonProps} />;

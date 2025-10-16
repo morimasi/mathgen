@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { generateWordProblems } from '../services/geminiService';
 import { Problem, WordProblemSettings } from '../types';
 import Button from '../components/form/Button';
@@ -16,7 +16,7 @@ import { TABS } from '../constants';
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
     setIsLoading: (loading: boolean) => void;
-    worksheetRef: React.RefObject<HTMLDivElement>;
+    contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
 }
@@ -44,7 +44,7 @@ const moduleOptions = [
     }))
 ];
 
-const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, worksheetRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
     const [settings, setSettings] = useState<WordProblemSettings>({
@@ -58,17 +58,21 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, w
         sourceModule: 'none',
         useVisuals: false,
     });
+    const isInitialMount = useRef(true);
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            let totalCount = settings.problemsPerPage * settings.pageCount;
+            let totalCount;
             if (settings.autoFit) {
                 const sampleProblem = {
                     question: "Bu, yapay zeka tarafından oluşturulmuş daha uzun bir metin problemi örneğidir ve genellikle birkaç satır yer kaplar.",
                     answer: "Cevap: 15 elma"
                 };
-                totalCount = calculateMaxProblems(worksheetRef, printSettings, sampleProblem) || settings.problemsPerPage;
+                const problemsPerPage = calculateMaxProblems(contentRef, printSettings, sampleProblem) || settings.problemsPerPage;
+                totalCount = problemsPerPage * settings.pageCount;
+            } else {
+                 totalCount = settings.problemsPerPage * settings.pageCount;
             }
             const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
             const problems = await generateWordProblems(adjustedSettings);
@@ -80,13 +84,28 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, w
             addToast(err.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, worksheetRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'word-problems') {
             handleGenerate(true);
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
+
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        if (settings.autoFit && lastGeneratorModule === 'word-problems') {
+            const handler = setTimeout(() => {
+                handleGenerate(true);
+            }, 300);
+
+            return () => clearTimeout(handler);
+        }
+    }, [printSettings, settings.autoFit, lastGeneratorModule, handleGenerate]);
 
     const handleSettingChange = (field: keyof WordProblemSettings, value: string | number | boolean) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -214,7 +233,6 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, w
                     min={1} max={20}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))}
-                    disabled={settings.autoFit}
                 />
                 <div className="col-span-2 pt-4">
                      <label htmlFor="custom-prompt" className="font-medium text-sm text-stone-700 dark:text-stone-300 mb-1.5 block">Veya Özel Talimat Girin</label>

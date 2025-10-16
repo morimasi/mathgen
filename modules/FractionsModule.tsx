@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateFractionsProblem } from '../services/fractionsService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types';
@@ -15,12 +15,12 @@ import SettingsPresetManager from '../components/SettingsPresetManager';
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
     setIsLoading: (loading: boolean) => void;
-    worksheetRef: React.RefObject<HTMLDivElement>;
+    contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
 }
 
-const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, worksheetRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
     const [settings, setSettings] = useState<FractionsSettings>({
@@ -38,14 +38,17 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, work
         autoFit: true,
         useVisuals: false,
     });
+    const isInitialMount = useRef(true);
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            let totalCount = settings.problemsPerPage * settings.pageCount;
+            let totalCount;
             if (settings.autoFit) {
-                const calculatedCount = calculateMaxProblems(worksheetRef, printSettings);
-                totalCount = calculatedCount > 0 ? calculatedCount : settings.problemsPerPage;
+                const problemsPerPage = calculateMaxProblems(contentRef, printSettings);
+                totalCount = (problemsPerPage > 0 ? problemsPerPage : settings.problemsPerPage) * settings.pageCount;
+            } else {
+                totalCount = settings.problemsPerPage * settings.pageCount;
             }
 
             if (settings.useWordProblems && settings.type === FractionsProblemType.FourOperations) {
@@ -74,13 +77,28 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, work
             addToast(error.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, worksheetRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'fractions') {
             handleGenerate(true);
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
+
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        if (settings.autoFit && lastGeneratorModule === 'fractions') {
+            const handler = setTimeout(() => {
+                handleGenerate(true);
+            }, 300);
+
+            return () => clearTimeout(handler);
+        }
+    }, [printSettings, settings.autoFit, lastGeneratorModule, handleGenerate]);
 
     const handleSettingChange = (field: keyof FractionsSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -260,7 +278,6 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, work
                     min={1} max={20}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                    disabled={settings.autoFit}
                 />
             </div>
             <SettingsPresetManager 

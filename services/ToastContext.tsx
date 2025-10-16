@@ -13,8 +13,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
     const addToast = useCallback((message: string, type: ToastType) => {
-        const id = Date.now() + Math.random();
-        setToasts(prev => [...prev, { id, message, type }]);
+        // Toasts disabled by user request.
     }, []);
     
     const removeToast = useCallback((id: number) => {

@@ -341,7 +341,7 @@ const AppContent: React.FC = () => {
                                 onGenerate={handleGenerate} 
                                 setIsLoading={setIsLoading} 
                                 activeTab={activeTab}
-                                worksheetRef={worksheetParentRef}
+                                contentRef={contentRef}
                                 autoRefreshTrigger={autoRefreshTrigger}
                                 lastGeneratorModule={lastGeneratorModule}
                                 visualSupportSettings={visualSupportSettings}

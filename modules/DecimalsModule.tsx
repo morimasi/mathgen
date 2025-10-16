@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateDecimalProblem } from '../services/mathService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, DecimalsSettings, DecimalsProblemType, DecimalsOperation, Difficulty } from '../types';
@@ -15,12 +15,12 @@ import SettingsPresetManager from '../components/SettingsPresetManager';
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
     setIsLoading: (loading: boolean) => void;
-    worksheetRef: React.RefObject<HTMLDivElement>;
+    contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
 }
 
-const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, worksheetRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
     const [settings, setSettings] = useState<DecimalsSettings>({
@@ -37,13 +37,17 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, works
         autoFit: true,
         useVisuals: false,
     });
+    const isInitialMount = useRef(true);
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            let totalCount = settings.problemsPerPage * settings.pageCount;
+            let totalCount;
             if (settings.autoFit) {
-                totalCount = calculateMaxProblems(worksheetRef, printSettings) || settings.problemsPerPage;
+                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
+                totalCount = problemsPerPage * settings.pageCount;
+            } else {
+                totalCount = settings.problemsPerPage * settings.pageCount;
             }
 
             if (settings.useWordProblems && settings.type === DecimalsProblemType.FourOperations) {
@@ -67,13 +71,28 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, works
             addToast(error.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, worksheetRef, onGenerate, setIsLoading, addToast]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'decimals') {
             handleGenerate(true);
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
+
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        if (settings.autoFit && lastGeneratorModule === 'decimals') {
+            const handler = setTimeout(() => {
+                handleGenerate(true);
+            }, 300);
+
+            return () => clearTimeout(handler);
+        }
+    }, [printSettings, settings.autoFit, lastGeneratorModule, handleGenerate]);
 
     const handleSettingChange = (field: keyof DecimalsSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -234,7 +253,6 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, works
                     min={1} max={20}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                    disabled={settings.autoFit}
                 />
             </div>
              <SettingsPresetManager 

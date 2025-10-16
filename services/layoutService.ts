@@ -1,22 +1,20 @@
-
-
 // FIX: Import React to resolve the 'React.RefObject' type which caused the "Cannot find namespace 'React'" error.
 import React from 'react';
 import { PrintSettings, Problem } from '../types';
 
 /**
  * Calculates the maximum number of problems that can fit onto the worksheet.
- * @param worksheetRef A React ref pointing to the main content container of the worksheet.
+ * @param pageElementRef A React ref pointing to the main content container of the worksheet.
  * @param printSettings The current printing settings.
  * @param sampleProblem An optional sample problem object to get a more accurate height for certain types like word problems.
  * @returns The total number of problems that can fit on the page.
  */
 export const calculateMaxProblems = (
-    worksheetRef: React.RefObject<HTMLDivElement>,
+    pageElementRef: React.RefObject<HTMLDivElement>,
     printSettings: PrintSettings,
     sampleProblem?: Partial<Problem>
 ): number => {
-    const container = worksheetRef.current;
+    const container = pageElementRef.current;
     if (!container) {
         return 0; // Cannot calculate if the container is not rendered
     }
@@ -24,7 +22,6 @@ export const calculateMaxProblems = (
     const remToPx = (rem: number) => rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 
     // --- 1. Get Available Height ---
-    const containerStyle = getComputedStyle(container);
     const containerHeight = container.clientHeight;
     
     let occupiedHeight = 0;
@@ -56,7 +53,12 @@ export const calculateMaxProblems = (
     tempItem.className = 'problem-item';
     tempItem.style.position = 'absolute';
     tempItem.style.visibility = 'hidden';
-    tempItem.style.width = `${(problemList.clientWidth / printSettings.columns) - remToPx(printSettings.problemSpacing)}px`; // Approximate width
+
+    // FIX: Correctly calculate the width of a single column
+    const problemListWidth = problemList.clientWidth;
+    const gapWidth = (printSettings.columns - 1) * remToPx(printSettings.columnGap);
+    const columnWidth = (problemListWidth - gapWidth) / printSettings.columns;
+    tempItem.style.width = `${columnWidth}px`;
 
     const tempNumber = document.createElement('span');
     tempNumber.className = 'problem-number';
@@ -95,10 +97,10 @@ export const calculateMaxProblems = (
     
     // --- 3. Calculate Final Count ---
     const problemsPerColumn = Math.floor(availableHeight / totalProblemHeight);
-    const totalProblems = problemsPerColumn * printSettings.columns;
+    const totalProblemsForPage = problemsPerColumn * printSettings.columns;
 
     // Return a slightly smaller number to be safe, especially for word problems
     const safetyMargin = (sampleProblem ? 0.95 : 1.0);
 
-    return Math.max(1, Math.floor(totalProblems * safetyMargin));
+    return Math.max(1, Math.floor(totalProblemsForPage * safetyMargin));
 };

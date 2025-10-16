@@ -1,20 +1,18 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { generateVisualProblem } from '../services/mathService';
 import { Problem, VisualSupportSettings, ArithmeticOperation } from '../types';
-import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { useToast } from '../services/ToastContext';
-import { ShuffleIcon } from '../components/icons/Icons';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string) => void;
     setIsLoading: (loading: boolean) => void;
-    worksheetRef: React.RefObject<HTMLDivElement>;
+    contentRef: React.RefObject<HTMLDivElement>;
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
 }
@@ -27,8 +25,7 @@ interface VisualSupportModuleProps extends ModuleProps {
 const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({ 
     onGenerate, 
     setIsLoading, 
-    worksheetRef, 
-    autoRefreshTrigger, 
+    contentRef,
     lastGeneratorModule,
     settings,
     setSettings
@@ -40,11 +37,13 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            let totalCount = settings.problemsPerPage * settings.pageCount;
+            let totalCount;
             if (settings.autoFit) {
                 const sampleProblem = { question: '<div style="height: 120px">Sample</div>', answer: '1' };
-                const calculatedCount = calculateMaxProblems(worksheetRef, printSettings, sampleProblem);
-                totalCount = calculatedCount > 0 ? calculatedCount : settings.problemsPerPage;
+                const problemsPerPage = calculateMaxProblems(contentRef, printSettings, sampleProblem);
+                totalCount = (problemsPerPage > 0 ? problemsPerPage : settings.problemsPerPage) * settings.pageCount;
+            } else {
+                totalCount = settings.problemsPerPage * settings.pageCount;
             }
 
             const results = Array.from({ length: totalCount }, () => generateVisualProblem(settings));
@@ -59,26 +58,25 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
             addToast(error.message || "Problem oluşturulurken bir hata oluştu.", 'error');
         }
         setIsLoading(false);
-    }, [settings, printSettings, worksheetRef, onGenerate, setIsLoading, addToast]);
-
-    // Handles the global "Refresh" button
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, addToast]);
+    
     useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'visual-support') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    // New effect for instant regeneration on settings change
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
+        // This module is "live", so it should update whenever its settings or print settings change.
+        if (lastGeneratorModule !== 'visual-support' && !isInitialMount.current) {
+            // Do not auto-run if another module is active
             return;
         }
 
-        if (lastGeneratorModule === 'visual-support') {
+        const handler = setTimeout(() => {
             handleGenerate(true);
+        }, 300); // Debounce to prevent rapid updates while sliding
+
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
         }
-    }, [settings, printSettings.orientation, handleGenerate, lastGeneratorModule]);
+
+        return () => clearTimeout(handler);
+    }, [settings, printSettings, handleGenerate, lastGeneratorModule]);
 
     const handleSettingChange = (field: keyof VisualSupportSettings, value: any) => {
         setSettings({ ...settings, [field]: value });
@@ -155,7 +153,6 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                                 min={1} max={20}
                                 value={settings.pageCount}
                                 onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                                disabled={settings.autoFit}
                             />
                         </div>
                     </div>
@@ -205,14 +202,6 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
-            <div className="flex flex-wrap gap-4 pt-4">
-                <Button onClick={() => handleGenerate(true)}>Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile">
-                    <ShuffleIcon className="w-5 h-5" />
-                    Yenile
-                </Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary">Mevcuta Ekle</Button>
-            </div>
         </div>
     );
 };
