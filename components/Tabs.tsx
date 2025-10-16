@@ -53,8 +53,27 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
     const { spawnLadybug } = useFlyingLadybugs();
     const [openMenu, setOpenMenu] = useState<string | null>(null);
     const navRef = useRef<HTMLElement>(null);
+    const justHoverOpened = useRef(false);
+    const hoverTimeoutRef = useRef<number | null>(null);
+
+    const handleMouseEnter = (event: React.MouseEvent<HTMLButtonElement>, menuTitle: string) => {
+        spawnLadybug(event.clientX, event.clientY);
+        if (openMenu !== menuTitle) {
+            setOpenMenu(menuTitle);
+            justHoverOpened.current = true;
+            if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = window.setTimeout(() => {
+                justHoverOpened.current = false;
+            }, 300);
+        }
+    };
 
     const handleMenuToggle = (menuTitle: string) => {
+        if (justHoverOpened.current) {
+            justHoverOpened.current = false;
+            if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+            return;
+        }
         setOpenMenu(prevOpenMenu => (prevOpenMenu === menuTitle ? null : menuTitle));
     };
 
@@ -71,6 +90,7 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
         };
     }, [openMenu]);
 
@@ -87,7 +107,7 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
                     >
                         <button
                             onClick={() => handleMenuToggle(group.title)}
-                            onMouseEnter={(e) => spawnLadybug(e.clientX, e.clientY)}
+                            onMouseEnter={(e) => handleMouseEnter(e, group.title)}
                             className={`tab-button-nav-item flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none ${
                                 isGroupActive
                                     ? 'bg-white/20 text-white'
