@@ -91,14 +91,14 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
         }
     }, [autoRefreshTrigger, lastGeneratorModule]);
 
-    // Live update for auto-fit
+    // Live update on settings change
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
             return;
         }
 
-        if (settings.autoFit && lastGeneratorModule === 'rhythmic-counting') {
+        if (lastGeneratorModule === 'rhythmic-counting') {
             const handler = setTimeout(() => {
                 handleGenerate(true);
             }, 300); // Debounce to prevent rapid updates

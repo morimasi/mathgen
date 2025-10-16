@@ -85,14 +85,14 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
         }
     }, [autoRefreshTrigger, lastGeneratorModule]);
 
-    // Live update for auto-fit
+    // Live update on settings change
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
             return;
         }
 
-        if (settings.autoFit && lastGeneratorModule === 'fractions') {
+        if (lastGeneratorModule === 'fractions') {
             const handler = setTimeout(() => {
                 handleGenerate(true);
             }, 300); // Debounce to prevent rapid updates

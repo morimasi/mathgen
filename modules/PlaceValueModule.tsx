@@ -79,14 +79,14 @@ const PlaceValueModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         }
     }, [autoRefreshTrigger, lastGeneratorModule]);
 
-    // Live update for auto-fit
+    // Live update on settings change
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
             return;
         }
 
-        if (settings.autoFit && lastGeneratorModule === 'place-value') {
+        if (lastGeneratorModule === 'place-value') {
             const handler = setTimeout(() => {
                 handleGenerate(true);
             }, 300); // Debounce to prevent rapid updates
