@@ -39,15 +39,31 @@ const moduleContent: { [key: string]: { title: string; content: React.ReactNode 
         content: (
             <>
                 <p>MathGen'e hoş geldiniz! Bu uygulama, öğretmenler ve veliler için hızlı ve esnek matematik çalışma kağıtları oluşturmak üzere tasarlanmıştır.</p>
-                <h4 className="font-semibold mt-3">Temel Adımlar:</h4>
+                <h4 className="font-semibold mt-4">Temel Akış (3 Adım):</h4>
                 <ol className="list-decimal list-inside space-y-1">
-                    <li>Üst menüden bir konu grubu (İşlemler, Sayılar, Ölçümler) ve ardından bir alt modül (Dört İşlem, Kesirler vb.) seçin.</li>
-                    <li>Sol taraftaki ayarlar panelini kullanarak problem türünü, zorluğu, sayısını ve diğer özellikleri özelleştirin.</li>
-                    <li>"Oluştur" butonlarından birine tıklayarak çalışma kağıdınızı anında sağdaki önizleme alanında görün.</li>
-                    <li>Sağ üstteki menüden yazdırma ayarlarını yapın, PDF olarak indirin veya doğrudan yazdırın.</li>
+                    <li><strong>Modül Seçin:</strong> Üst menüden bir konu grubu (İşlemler, Sayılar, Ölçümler) ve ardından bir alt modül (Dört İşlem, Kesirler vb.) seçin.</li>
+                    <li><strong>Özelleştirin:</strong> Sol taraftaki ayarlar panelini kullanarak problem türünü, zorluğu, sayısını ve diğer özellikleri belirleyin.</li>
+                    <li><strong>Oluşturun ve Yazdırın:</strong> "Oluştur" butonuna tıklayarak çalışma kağıdınızı sağdaki önizleme alanında anında görün. Ardından sağ üstteki ikonları kullanarak PDF olarak indirin veya doğrudan yazdırın.</li>
                 </ol>
+                <h4 className="font-semibold mt-4">Arayüz Elemanları:</h4>
+                <ul className="list-disc list-inside space-y-2">
+                    <li><strong>Başlık Çubuğu (Üst Menü):</strong>
+                        <ul className="list-[circle] list-inside ml-4">
+                            <li><strong>Logo (Papatya):</strong> Tıkladığınızda uygulamayı başlangıç durumuna sıfırlar.</li>
+                            <li><strong>Tema Ayarları (Palet):</strong> Karanlık/Aydınlık mod, renk temaları ve yazı tipi arasında geçiş yapmanızı sağlar.</li>
+                            <li><strong>Yenile (Karışık Oklar):</strong> Mevcut ayarları koruyarak sadece soruları yeniler.</li>
+                            <li><strong>Yazdırma Ayarları:</strong> Sayfa düzeni, kenarlık, yazı tipi boyutu gibi tüm çıktı ayarlarını buradan yönetirsiniz.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Çalışma Alanı (Sağ Bölüm):</strong>
+                         <ul className="list-[circle] list-inside ml-4">
+                            <li><strong>Ölçek Çubuğu:</strong> Çalışma kağıdının ekrandaki görünümünü büyütüp küçültmenizi sağlar. "Ekrana Sığdır" butonu, kağıdı pencerenize en uygun boyuta getirir.</li>
+                            <li><strong>Önizleme Alanı:</strong> Oluşturduğunuz çalışma kağıdının canlı önizlemesini gösterir.</li>
+                        </ul>
+                    </li>
+                </ul>
                 <div className="mt-4 p-3 bg-amber-50 dark:bg-stone-700/50 rounded-lg border border-amber-200 dark:border-stone-600">
-                    <p className="font-semibold">💡 İpucu: Sık kullandığınız ayarları "Ayar Setleri" bölümünden kaydedebilir ve daha sonra tek tıkla tekrar yükleyebilirsiniz.</p>
+                    <p className="font-semibold">💡 İpucu: Her modülün altındaki "Ayar Setleri" bölümü, sık kullandığınız ayarları kaydetmenize ve daha sonra tek tıkla tekrar yüklemenize olanak tanır. Bu, zaman kazanmak için harika bir yoldur!</p>
                 </div>
             </>
         )
@@ -59,97 +75,130 @@ const moduleContent: { [key: string]: { title: string; content: React.ReactNode 
                 <>
                     {tab.id === 'arithmetic' && 
                         <>
-                            <p>Toplama, çıkarma, çarpma ve bölme işlemleri için temel modül.</p>
-                            <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Sınıf Düzeyi:</b> Ayarları 1-5. sınıf seviyelerine göre otomatik olarak düzenler.</li>
-                                <li><b>Basamak Sayısı:</b> İşlemlerde kullanılacak sayıların basamak sayısını belirleyin.</li>
-                                <li><b>Eldeli/Onluk Bozma:</b> Toplama ve çıkarma işlemlerinde eldeli veya onluk bozmalı soruların zorunlu olup olmayacağını seçin.</li>
-                                <li><b>Gerçek Hayat Problemleri (AI):</b> Belirttiğiniz ayarlara uygun, günlük yaşam senaryoları içeren metin problemleri oluşturmak için yapay zekayı kullanır.</li>
+                            <p>Toplama, çıkarma, çarpma ve bölme işlemleri için temel modül. Hem basit alıştırmalar hem de yapay zeka destekli metin problemleri oluşturabilirsiniz.</p>
+                            <h4 className="font-semibold mt-3">Öne Çıkan Ayarlar:</h4>
+                            <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Gerçek Hayat Problemleri (AI):</strong> Bu seçeneği işaretlediğinizde, belirlediğiniz ayarlara (işlem türü, basamak sayısı vb.) uygun, günlük yaşam senaryoları içeren metin problemleri oluşturmak için yapay zeka kullanılır.
+                                    <ul className="list-[circle] list-inside ml-4">
+                                        <li><strong>Problem Konusu:</strong> Problemlerin senaryosunu belirleyebilirsiniz (örn: "Okul Eşyaları").</li>
+                                        <li><strong>Görsel Destek:</strong> Yapay zekanın, problem metnine konuyla ilgili emojiler eklemesini sağlar.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Sınıf Düzeyi:</strong> Ayarları 1-5. sınıf seviyelerine göre otomatik olarak düzenleyen bir hızlı başlangıç seçeneğidir.</li>
+                                <li><strong>Basamak Sayısı:</strong> İşlemlerde kullanılacak sayıların basamak sayısını (1'den 7'ye kadar) belirleyebilirsiniz. "Üçüncü Sayı Ekle" ile üç terimli işlemler oluşturabilirsiniz.</li>
+                                <li><strong>Eldeli/Onluk Bozma & Bölme Türü:</strong> Soruların zorluğunu hassas bir şekilde kontrol etmenizi sağlar. Örneğin, sadece onluk bozma gerektiren çıkarma işlemleri hazırlayabilirsiniz.</li>
+                                 <li><strong>Format:</strong> Soruların "Yan Yana", "Alt Alta" veya bölme işlemi için "Bölme Çatısı" formatında gösterilmesini seçin.</li>
+                                <li><strong>Gösterim:</strong> Sayıların "Rakamla", "Yazıyla" veya her ikisini de içeren "Karışık" bir formatta sunulmasını sağlar.</li>
                             </ul>
                         </>
                     }
                     {tab.id === 'visual-support' && 
                         <>
-                            <p>Öğrencilerin işlemleri somutlaştırmasına yardımcı olmak için nesneler ve kutular kullanan interaktif bir modüldür. Özellikle küçük yaş grupları için idealdir.</p>
-                            <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Canlı Güncelleme:</b> Bu modüldeki ayarlar anında çalışma kağıdına yansır.</li>
-                                <li><b>Görsel Boyutu:</b> Emoji, sayı ve kutuların boyutlarını ayarlayarak sayfa düzenini optimize edebilirsiniz.</li>
-                                <li><b>Sayfayı Yatay Yap:</b> Görsellerin daha iyi sığması için çalışma kağıdını tek tıkla yatay formata geçirebilirsiniz.</li>
+                            <p>Öğrencilerin işlemleri somutlaştırmasına yardımcı olmak için nesneler ve boş kutular kullanan interaktif bir modüldür. Özellikle okul öncesi ve 1. sınıf için idealdir.</p>
+                             <h4 className="font-semibold mt-3">Öne Çıkan Özellikler:</h4>
+                            <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Canlı Güncelleme:</strong> Bu modüldeki ayarlar anında çalışma kağıdına yansır. Herhangi bir "Oluştur" butonuna basmanıza gerek yoktur.</li>
+                                <li><strong>Otomatik Sığdır vs. Manuel:</strong> "Otomatik Sığdır" seçeneği, sayfayı mevcut ayarlarla en verimli şekilde doldurur. Bu seçeneği kapattığınızda, "Problem Sayısı" ve "Sayfa Sayısı" alanları aktif olur. Değişiklik yaptıktan sonra bu ayarları yansıtmak için yanda beliren **"Uygula"** butonuna basmanız gerekir.</li>
+                                <li><strong>Görsel Ayarları:</strong> Sağdaki kaydırma çubukları ile emoji, sayı ve kutuların boyutlarını ayarlayarak sayfa düzenini tam olarak istediğiniz gibi optimize edebilirsiniz.</li>
+                                <li><strong>Sayfayı Yatay Yap:</strong> Görsellerin daha iyi sığması için çalışma kağıdını tek tıkla yatay formata geçirebilirsiniz.</li>
                             </ul>
                         </>
                     }
                      {tab.id === 'word-problems' && 
                         <>
-                            <p>Google Gemini yapay zeka modelini kullanarak tamamen özelleştirilebilir metin problemleri oluşturun.</p>
-                            <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Problem Modülü:</b> Problemlerin hangi matematik konusuyla (örn: Kesirler, Zaman Ölçme) ilgili olacağını seçin.</li>
-                                <li><b>Konu:</b> Problemlerin senaryosunu belirleyin (örn: Market Alışverişi, Spor). "Rastgele Konu" butonu ile ilham alabilirsiniz.</li>
-                                <li><b>İşlem Sayısı:</b> Problemlerin tek veya çok adımlı (2 veya 3 işlem gerektiren) olmasını sağlayın.</li>
-                                <li><b>Özel Talimat:</b> Yukarıdaki ayarlar yerine doğrudan kendi talimatınızı yazarak tamamen size özel problemler oluşturun.</li>
+                            <p>Google Gemini yapay zeka modelini kullanarak tamamen özelleştirilebilir, yaratıcı ve bağlamsal metin problemleri oluşturabileceğiniz en esnek modüldür.</p>
+                             <h4 className="font-semibold mt-3">Kullanım Senaryoları:</h4>
+                            <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Modül Tabanlı Problemler:</strong> "Problem Modülü" listesinden "Kesirler" seçip, "Konu" alanına "Doğum Günü Partisi" yazarak bir doğum günü partisinde geçen kesir problemleri oluşturun.</li>
+                                <li><strong>Çok Adımlı Sorular:</strong> "İşlem Sayısı" ayarını 2 veya 3 yaparak, öğrencilerin çözüme ulaşmak için birden fazla adım atmasını gerektiren kompleks problemler hazırlayın.</li>
+                                <li><strong>Tamamen Özgür Yaratıcılık:</strong> "Özel Talimat Girin" alanını kullanarak hayal gücünüzü serbest bırakın. Örneğin: <em>"3. sınıf seviyesinde, içinde uzaylılar ve gezegenler geçen, hem çarpma hem de toplama işlemi gerektiren 5 tane eğlenceli problem oluştur."</em></li>
+                                <li><strong>Görsel Destek (Emoji):</strong> Yapay zekanın, problem metnine konuyla ilgili emojiler (🍎, 🚗) ekleyerek soruları daha ilgi çekici hale getirmesini sağlayın.</li>
                             </ul>
                         </>
                     }
                     {tab.id === 'fractions' && 
                         <>
-                            <p>Kesirler konusunu pekiştirmek için çeşitli problem türleri sunar.</p>
-                            <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Problem Türü:</b> Dört işlem, şekille gösterme, karşılaştırma veya bir bütünün kesrini bulma gibi farklı problem tipleri arasından seçim yapın.</li>
-                                <li><b>Zorluk:</b> Dört işlem için paydaların eşit, farklı veya tam sayılı kesirler olmasını sağlayarak zorluğu ayarlayın.</li>
-                                <li><b>Format:</b> İşlemlerin yan yana veya alt alta (kesir çizgisiyle) gösterilmesini seçin.</li>
+                            <p>Kesirler konusunu pekiştirmek için dört işlemden görselleştirmeye kadar çeşitli problem türleri sunar.</p>
+                            <h4 className="font-semibold mt-3">Problem Türleri:</h4>
+                            <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Dört İşlem:</strong> Kesirlerle toplama, çıkarma, çarpma ve bölme alıştırmaları.
+                                    <ul className="list-[circle] list-inside ml-4">
+                                        <li><strong>Zorluk Ayarı:</strong> "Kolay" (paydaları eşit), "Orta" (paydaları farklı) ve "Zor" (tam sayılı/bileşik kesirler) seçenekleriyle zorluğu kademeli olarak artırın.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Şekille Gösterme:</strong> Boyanmış bir daire dilimi gösterir ve öğrencinin bu şeklin ifade ettiği kesri yazmasını ister.</li>
+                                <li><strong>Karşılaştırma:</strong> İki kesir arasına &lt;, &gt; veya = sembollerinden uygun olanı yerleştirme alıştırmasıdır.</li>
+                                <li><strong>Bir Bütünün Kesrini Bulma:</strong> "30'un 2/3'ü kaçtır?" gibi problemler oluşturur.</li>
                             </ul>
                         </>
                     }
                     {tab.id === 'decimals' && 
                         <>
-                             <p>Ondalık sayılarla ilgili temel becerileri geliştirmeye yönelik bir modüldür.</p>
-                            <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Problem Türü:</b> Dört işlem, okuma/yazma veya ondalık sayıları kesre çevirme alıştırmaları oluşturun.</li>
-                                <li><b>Zorluk:</b> Dört işlemde kullanılacak sayıların büyüklüğünü ve ondalık basamak sayısını ayarlar.</li>
+                             <p>Ondalık sayılarla ilgili temel becerileri (dört işlem, okuma-yazma, çevirme) geliştirmeye yönelik bir modüldür.</p>
+                            <h4 className="font-semibold mt-3">Problem Türleri:</h4>
+                            <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Dört İşlem:</strong> Ondalık sayılarla temel aritmetik işlemler. "Zorluk" ayarı, sayıların büyüklüğünü ve ondalık basamak sayısını kontrol eder.</li>
+                                <li><strong>Okuma / Yazma:</strong> Rakamla verilen ondalık sayının okunuşunu veya okunuşu verilen sayının rakamla yazılmasını ister.</li>
+                                <li><strong>Kesre Çevirme:</strong> Verilen bir ondalık sayının en sade kesir haline dönüştürülmesi alıştırmasıdır.</li>
                             </ul>
                         </>
                     }
                     {tab.id === 'place-value' && 
                         <>
-                            <p>Sayıların basamak değerlerini anlama ve kullanma becerilerini hedefler.</p>
-                             <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Problem Türü:</b> Basamak değeri bulma, çözümleme, yuvarlama, okunuşunu yazma ve karşılaştırma gibi birçok farklı beceriye yönelik problem oluşturabilirsiniz.</li>
-                                <li><b>Basamak Sayısı:</b> Problemlerde kullanılacak sayıların kaç basamaklı olacağını (en fazla 7) belirleyin.</li>
+                            <p>Sayıların basamak ve sayı değerlerini anlama, çözümleme ve yuvarlama gibi temel becerileri hedefler.</p>
+                             <h4 className="font-semibold mt-3">Problem Türleri:</h4>
+                             <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Basamak Değeri Bulma:</strong> Bir sayıda altı çizili olan rakamın basamak değerini bulmayı hedefler.</li>
+                                <li><strong>Yuvarlama:</strong> Sayıları en yakın onluğa, yüzlüğe veya binliğe yuvarlama alıştırmaları içerir.</li>
+                                <li><strong>Çözümleme / Çözümlenmiş Sayıyı Bulma:</strong> Sayıları basamak değerlerinin toplamı şeklinde yazma veya bu şekilde verilen sayıyı bulma pratiği sunar.</li>
+                                <li><strong>Yazıyla Yazma / Okunuşu Verilen Sayıyı Yazma:</strong> Sayıların metin ve rakam formatları arasında dönüşümünü sağlar.</li>
                             </ul>
                         </>
                     }
                      {tab.id === 'rhythmic-counting' && 
                         <>
-                            <p>İleri ve geri ritmik sayma, örüntüleri tamamlama ve sayıları sıralama gibi temel beceriler üzerine odaklanır.</p>
-                             <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Problem Türü:</b> Örüntü tamamlama, kural bulma, sıralama veya tek/çift sayıları bulma gibi çeşitli alıştırmalar sunar.</li>
-                                <li><b>Alıştırma Kağıdı:</b> Tek bir problem yerine, tüm sayfayı kaplayan, öğrencilerin doldurması için tasarlanmış pratik sayfaları oluşturur.</li>
+                            <p>İleri ve geri ritmik sayma, sayı örüntüleri ve sıralama gibi temel beceriler üzerine odaklanır.</p>
+                            <h4 className="font-semibold mt-3">Öne Çıkan Özellikler:</h4>
+                             <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Problem Türü:</strong> "Örüntü Tamamlama" (boşluk doldurma), "Örüntü Kuralı Bulma" (örn: 3'er artıyor), "Sıralama" (küçükten büyüğe/büyükten küçüğe) ve "Tek/Çift" sayı bulma gibi çeşitli alıştırmalar sunar.</li>
+                                <li><strong>Alıştırma Kağıdı:</strong> Bu türler, tek tek sorular yerine tüm sayfayı kaplayan, öğrencilerin doldurması için tasarlanmış pratik sayfaları oluşturur. Hızlıca ödev hazırlamak için mükemmeldir.</li>
+                                <li><strong>Ayarlar:</strong> Saymanın kaçar kaçar (`Adım`), hangi yönde (`Yön`) ve hangi aralıkta (`Min/Max Değer`) olacağını detaylıca belirleyebilirsiniz.</li>
                             </ul>
                         </>
                     }
                     {tab.id === 'time' && 
                         <>
-                            <p>Analog saat okuma, süre hesaplama ve takvim gibi zamanla ilgili kavramları içerir.</p>
-                             <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Saat Okuma (Analog):</b> Etkileşimli bir şekilde analog saatler oluşturun. İsterseniz akrep, yelkovan veya sayıları gizleyerek farklı zorluklarda sorular hazırlayabilirsiniz.</li>
-                                <li><b>Süre Hesaplama:</b> Başlangıç ve bitiş zamanları arasındaki süreyi bulma veya bir olayın ne zaman başlayıp biteceğini hesaplama problemleri oluşturun.</li>
+                            <p>Analog saat okuma, süre hesaplama ve takvim gibi zamanla ilgili soyut kavramları somutlaştıran bir modüldür.</p>
+                             <h4 className="font-semibold mt-3">Problem Türleri:</h4>
+                             <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Saat Okuma (Analog):</strong> Etkileşimli bir şekilde analog saatler oluşturun. Soruları zorlaştırmak için "Analog Saat Özelleştirme" bölümünden akrep, yelkovan veya sayıları gizleyebilirsiniz.</li>
+                                <li><strong>Süre Hesaplama:</strong> "Başlangıç Zamanını Bulma", "Bitiş Zamanını Bulma" ve "Süre Hesaplama" türleriyle farklı senaryolara uygun problemler hazırlayın.</li>
+                                <li><strong>Birim Dönüştürme:</strong> Saat-dakika, gün-hafta gibi zaman birimleri arasında dönüşüm alıştırmaları içerir.</li>
+                                <li><strong>Zorluk Ayarı:</strong> "Kolay" (tam saatler), "Orta" (çeyrek/yarım saatler) ve "Zor" (tüm dakikalar) seçenekleriyle hassas kontrol sağlar.</li>
                             </ul>
                         </>
                     }
                      {tab.id === 'geometry' && 
                         <>
-                            <p>Temel geometrik şekillerin ve cisimlerin özelliklerini, alan ve çevre hesaplamalarını konu alır.</p>
-                             <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Alan ve Çevre:</b> Kare, dikdörtgen, üçgen ve daire gibi şekillerin alan ve çevrelerini hesaplamak için görsel destekli problemler oluşturun.</li>
-                                <li><b>Şekil/Cisim Tanıma:</b> Özellikleri verilen geometrik şekil veya cisimlerin adlarını bulmaya yönelik sözel problemler hazırlayın.</li>
+                            <p>Temel geometrik şekillerin ve cisimlerin özelliklerini, alan ve çevre hesaplamalarını görsel olarak desteklenmiş bir şekilde öğretir.</p>
+                            <h4 className="font-semibold mt-3">Problem Türleri:</h4>
+                             <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Alan ve Çevre Hesaplama:</strong> Seçtiğiniz geometrik şeklin (kare, üçgen, daire vb.) kenar uzunlukları üzerinde gösterilmiş bir görselini oluşturur ve alan veya çevresini sorar.</li>
+                                <li><strong>Şekil/Cisim Tanıma:</strong> "4 eşit kenarı ve 4 dik açısı olan şekil hangisidir?" gibi sözel tanımlar üzerinden geometrik kavramları sorgular.</li>
+                                <li><strong>Açı Türleri:</strong> Rastgele bir açı çizer ve öğrencinin bu açının "Dar, Dik veya Geniş" olduğunu belirtmesini ister.</li>
+                                <li><strong>Cisimlerin Elemanları:</strong> Küp, silindir gibi 3B cisimlerin köşe, ayrıt ve yüz sayılarını sorar.</li>
                             </ul>
                         </>
                     }
                     {tab.id === 'measurement' && 
                         <>
-                             <p>Uzunluk, ağırlık ve hacim ölçü birimleri arasında dönüşüm yapma becerisini geliştirir.</p>
-                             <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li><b>Zorluk:</b> Dönüşümlerin tam sayılarla (kolay), ondalıklı sayılarla (orta) veya kesirli/karışık birimlerle (zor) yapılmasını sağlayarak zorluğu ayarlayın.</li>
-                                <li><b>Problem Türü:</b> Sadece uzunluk, ağırlık, hacim veya tümünü içeren karışık problemler oluşturun.</li>
+                             <p>Uzunluk (km-m-cm), ağırlık (t-kg-g) ve hacim (L-mL) ölçü birimleri arasında dönüşüm yapma becerisini geliştirir.</p>
+                             <h4 className="font-semibold mt-3">Zorluk Seviyeleri:</h4>
+                             <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Kolay:</strong> Sadece tam sayılarla basit dönüşümler içerir (örn: 2 m = ? cm).</li>
+                                <li><strong>Orta:</strong> Ondalıklı sayılarla dönüşümler eklenir (örn: 1.5 kg = ? g).</li>
+                                <li><strong>Zor:</strong> Kesirli ifadeler ve karışık birimlerle daha karmaşık dönüşümler sunar (örn: 1250 m = ? km ? m).</li>
+                                <li><strong>Yapay Zeka Desteği:</strong> "Gerçek Hayat Problemleri (AI)" seçeneği ile bu dönüşümleri içeren metin problemleri oluşturabilirsiniz.</li>
                             </ul>
                         </>
                     }
