@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateGeometryProblem } from '../services/geometryService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, GeometrySettings, GeometryProblemType, ShapeType } from '../types';
-import Select from '../components/form/Select';
-import Checkbox from '../components/form/Checkbox';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
+import Select from '../components/form/Select';
+import Checkbox from '../components/form/Checkbox';
+import TextInput from '../components/form/TextInput';
+import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
-import { LoadingIcon } from '../components/icons/Icons';
+import { TOPIC_SUGGESTIONS } from '../constants';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -20,52 +22,58 @@ interface ModuleProps {
 }
 
 const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
-    const [settings, setSettings] = useState<GeometrySettings>({
-        type: GeometryProblemType.Perimeter,
-        shape: ShapeType.Rectangle,
-        problemsPerPage: 10,
-        pageCount: 1,
-        autoFit: true,
-        useWordProblems: false,
-        gradeLevel: 4,
-    });
-    const [isGenerating, setIsGenerating] = useState(false);
     const { settings: printSettings } = usePrintSettings();
+    const [settings, setSettings] = useState<GeometrySettings>({
+        gradeLevel: 1,
+        type: GeometryProblemType.ShapeRecognition,
+        shape: ShapeType.Rectangle,
+        problemsPerPage: 12,
+        pageCount: 1,
+        useWordProblems: false,
+        autoFit: true,
+        topic: '',
+    });
+    const isInitialMount = useRef(true);
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsGenerating(true);
         setIsLoading(true);
         try {
-            let problems: Problem[] = [];
-            let title = '';
+            let totalCount;
+            const isTableLayout = printSettings.layoutMode === 'table';
 
-            const problemCount = settings.autoFit
-                ? calculateMaxProblems(contentRef, printSettings, { question: '<svg height="120"></svg>' })
-                : settings.problemsPerPage * settings.pageCount;
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit) {
+                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
+                totalCount = problemsPerPage * settings.pageCount;
+            } else {
+                totalCount = settings.problemsPerPage * settings.pageCount;
+            }
 
             if (settings.useWordProblems) {
-                problems = await generateContextualWordProblems('geometry', { ...settings, problemsPerPage: problemCount, pageCount: 1 });
-                title = 'Geometri Problemleri (AI)';
-            } else {
-                const results = Array.from({ length: problemCount }, () => generateGeometryProblem(settings));
-                 if (results.some(r => r.error)) {
-                    const error = results.find(r => r.error)?.error;
-                    alert(error);
-                }
-                problems = results.map(r => r.problem);
-                title = results.length > 0 ? results[0].title : '';
-            }
-
-            if (problems.length > 0) {
+                const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
+                const problems = await generateContextualWordProblems('geometry', adjustedSettings);
+                const typeNames: { [key: string]: string } = { 'perimeter': 'Çevre', 'area': 'Alan' };
+                const shapeNames: { [key: string]: string } = { 'square': 'Kare', 'rectangle': 'Dikdörtgen', 'triangle': 'Üçgen', 'circle': 'Daire' };
+                const title = `Gerçek Hayat Problemleri - ${shapeNames[settings.shape!]} ${typeNames[settings.type]}`;
                 onGenerate(problems, clearPrevious, title, 'geometry', settings.pageCount);
+            } else {
+                const results = Array.from({ length: totalCount }, () => generateGeometryProblem(settings));
+                 
+                const firstResultWithError = results.find(r => (r as any).error);
+                if (firstResultWithError) {
+                    console.error((firstResultWithError as any).error);
+                } else if (results.length > 0) {
+                    const problems = results.map(r => r.problem);
+                    const title = results[0].title;
+                    onGenerate(problems, clearPrevious, title, 'geometry', isTableLayout ? 1 : settings.pageCount);
+                }
             }
         } catch (error: any) {
-            alert(error.message);
             console.error(error);
         }
         setIsLoading(false);
-        setIsGenerating(false);
-    }, [settings, onGenerate, setIsLoading, contentRef, printSettings]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'geometry') {
@@ -73,63 +81,202 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
 
+    // Live update on settings change
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        if (lastGeneratorModule === 'geometry') {
+            const handler = setTimeout(() => {
+                handleGenerate(true);
+            }, 300); // Debounce to prevent rapid updates
+
+            return () => clearTimeout(handler);
+        }
+    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+
     const handleSettingChange = (field: keyof GeometrySettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
 
-    const showShapeSelector = settings.type === GeometryProblemType.Perimeter || settings.type === GeometryProblemType.Area;
+    const handleRandomTopic = () => {
+        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
+        handleSettingChange('topic', randomTopic);
+    };
+
+    const handleGradeLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const grade = parseInt(e.target.value, 10);
+        let newSettings: Partial<GeometrySettings> = { gradeLevel: grade };
+
+        switch (grade) {
+            case 1:
+                newSettings = { ...newSettings, type: GeometryProblemType.ShapeRecognition };
+                break;
+            case 2:
+                newSettings = { ...newSettings, type: GeometryProblemType.Perimeter, shape: ShapeType.Rectangle };
+                break;
+            case 3:
+                newSettings = { ...newSettings, type: GeometryProblemType.Area, shape: ShapeType.Square };
+                break;
+            case 4:
+                newSettings = { ...newSettings, type: GeometryProblemType.AngleInfo };
+                break;
+            case 5:
+                newSettings = { ...newSettings, type: GeometryProblemType.SolidRecognition };
+                break;
+        }
+        setSettings(prev => ({ ...prev, ...newSettings }));
+    };
+
+    const showShapeSelector = [GeometryProblemType.Perimeter, GeometryProblemType.Area].includes(settings.type);
     
+    const areaShapes = [
+        ShapeType.Square, ShapeType.Rectangle, ShapeType.Triangle, ShapeType.Circle, ShapeType.Parallelogram, ShapeType.Trapezoid
+    ];
+    const perimeterShapes = Object.values(ShapeType);
+    
+    const shapeTurkishNames: { [key in ShapeType]: string } = {
+        [ShapeType.Square]: 'Kare',
+        [ShapeType.Rectangle]: 'Dikdörtgen',
+        [ShapeType.Triangle]: 'Üçgen',
+        [ShapeType.Circle]: 'Daire',
+        [ShapeType.Parallelogram]: 'Paralelkenar',
+        [ShapeType.Trapezoid]: 'Yamuk',
+        [ShapeType.Pentagon]: 'Beşgen',
+        [ShapeType.Hexagon]: 'Altıgen',
+    };
+    
+    const shapeOptions = (settings.type === GeometryProblemType.Area ? areaShapes : perimeterShapes).map(s => ({value: s, label: shapeTurkishNames[s]}));
+    const isTableLayout = printSettings.layoutMode === 'table';
+
     return (
-        <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Geometri Ayarları</h2>
-            <Select
-                label="Problem Türü"
-                id="geometry-type"
-                value={settings.type}
-                onChange={e => handleSettingChange('type', e.target.value as GeometryProblemType)}
-                options={[
-                    { value: GeometryProblemType.Perimeter, label: 'Çevre Hesaplama' },
-                    { value: GeometryProblemType.Area, label: 'Alan Hesaplama' },
-                    { value: GeometryProblemType.ShapeRecognition, label: 'Şekil Tanıma (Sözel)' },
-                    { value: GeometryProblemType.AngleInfo, label: 'Açı Türleri' },
-                    { value: GeometryProblemType.Symmetry, label: 'Simetri' },
-                    { value: GeometryProblemType.SolidRecognition, label: 'Cisim Tanıma (Sözel)' },
-                    { value: GeometryProblemType.SolidElements, label: 'Cisimlerin Elemanları' },
-                ]}
-            />
-            {showShapeSelector && (
-                 <Select
-                    label="Şekil"
-                    id="geometry-shape"
-                    value={settings.shape}
-                    onChange={e => handleSettingChange('shape', e.target.value as ShapeType)}
+        <div className="space-y-2">
+            <h2 className="text-sm font-semibold">Geometri Ayarları</h2>
+
+            <div className="grid grid-cols-1 gap-2">
+                {showShapeSelector && (
+                    <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <Checkbox
+                            label="Gerçek Hayat Problemleri (AI)"
+                            id="use-word-problems-geometry"
+                            checked={settings.useWordProblems}
+                            onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
+                        />
+                         {settings.useWordProblems && (
+                            <div className="mt-1.5 pl-6">
+                                <div className="relative">
+                                     <TextInput
+                                        label="Problem Konusu (İsteğe bağlı)"
+                                        id="geometry-topic"
+                                        value={settings.topic || ''}
+                                        onChange={e => handleSettingChange('topic', e.target.value)}
+                                        placeholder="Örn: Bahçe, Oda, Çit"
+                                        className="pr-10"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleRandomTopic}
+                                        className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                                        title="Rastgele Konu Öner"
+                                    >
+                                        <ShuffleIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+                         )}
+                    </div>
+                )}
+                 <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <Checkbox
+                        label="Otomatik Sığdır"
+                        id="auto-fit-geometry"
+                        checked={settings.autoFit}
+                        onChange={e => handleSettingChange('autoFit', e.target.checked)}
+                        disabled={isTableLayout}
+                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                <Select
+                    label="Sınıf Düzeyi"
+                    id="geometry-grade-level"
+                    value={settings.gradeLevel}
+                    onChange={handleGradeLevelChange}
                     options={[
-                        { value: ShapeType.Rectangle, label: 'Dikdörtgen' },
-                        { value: ShapeType.Square, label: 'Kare' },
-                        { value: ShapeType.Triangle, label: 'Üçgen' },
-                        { value: ShapeType.Circle, label: 'Daire' },
-                        { value: ShapeType.Parallelogram, label: 'Paralelkenar' },
-                        { value: ShapeType.Trapezoid, label: 'Yamuk' },
-                        { value: ShapeType.Pentagon, label: 'Düzgün Beşgen' },
-                        { value: ShapeType.Hexagon, label: 'Düzgün Altıgen' },
+                        { value: 1, label: '1. Sınıf' },
+                        { value: 2, label: '2. Sınıf' },
+                        { value: 3, label: '3. Sınıf' },
+                        { value: 4, label: '4. Sınıf' },
+                        { value: 5, label: '5. Sınıf' },
                     ]}
                 />
-            )}
-            <Checkbox label="Gerçek Hayat Problemleri (AI)" id="use-word-problems" checked={settings.useWordProblems} onChange={e => handleSettingChange('useWordProblems', e.target.checked)} />
-            <div className="grid grid-cols-2 gap-4">
-                <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={settings.autoFit} />
-                <NumberInput label="Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={settings.autoFit} />
+                <Select
+                    label="Problem Türü"
+                    id="geo-type"
+                    value={settings.type}
+                    onChange={e => {
+                        const newType = e.target.value as GeometryProblemType;
+                        // Reset shape if it's not applicable to the new type
+                        if (newType === GeometryProblemType.Area && !areaShapes.includes(settings.shape!)) {
+                            handleSettingChange('shape', ShapeType.Rectangle);
+                        }
+                        handleSettingChange('type', newType);
+                    }}
+                    options={[
+                        { value: GeometryProblemType.Perimeter, label: 'Çevre Hesaplama' },
+                        { value: GeometryProblemType.Area, label: 'Alan Hesaplama' },
+                        { value: GeometryProblemType.ShapeRecognition, label: 'Şekil Tanıma (Tanımdan)' },
+                        { value: GeometryProblemType.AngleInfo, label: 'Açı Türleri' },
+                        { value: GeometryProblemType.Symmetry, label: 'Simetri' },
+                        { value: GeometryProblemType.SolidRecognition, label: 'Cisim Tanıma (Tanımdan)' },
+                        { value: GeometryProblemType.SolidElements, label: 'Cisimlerin Elemanları' },
+                    ]}
+                />
+                {showShapeSelector && (
+                    <Select
+                        label="Şekil"
+                        id="geo-shape"
+                        value={settings.shape}
+                        onChange={e => handleSettingChange('shape', e.target.value as ShapeType)}
+                        options={shapeOptions}
+                    />
+                )}
+                <NumberInput 
+                    label="Sayfa Başına Problem Sayısı"
+                    id="problems-per-page"
+                    min={1} max={100}
+                    value={settings.problemsPerPage}
+                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
+                    disabled={settings.autoFit || isTableLayout}
+                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
+                />
+                 <NumberInput 
+                    label="Sayfa Sayısı"
+                    id="page-count"
+                    min={1} max={20}
+                    value={settings.pageCount}
+                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
+                    disabled={isTableLayout}
+                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
+                />
             </div>
-            <Checkbox label="Otomatik Sığdır" id="auto-fit" checked={settings.autoFit} onChange={e => handleSettingChange('autoFit', e.target.checked)} />
-            <Button onClick={() => handleGenerate(true)} className="w-full" disabled={isGenerating}>
-                {isGenerating && <LoadingIcon className="w-5 h-5" />}
-                Oluştur
-            </Button>
-            <SettingsPresetManager
+             <SettingsPresetManager 
                 moduleKey="geometry"
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
+            <div className="flex flex-wrap gap-2 pt-2">
+                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
+                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
+                    <ShuffleIcon className="w-4 h-4" />
+                    Yenile
+                </Button>
+                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+            </div>
         </div>
     );
 };

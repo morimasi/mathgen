@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { generateArithmeticProblem } from '../services/mathService';
-import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types';
+import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
-import Button from '../components/form/Button';
+import TextInput from '../components/form/TextInput';
 import { usePrintSettings } from '../services/PrintSettingsContext';
+import { ShuffleIcon } from '../components/icons/Icons';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
-import { LoadingIcon } from '../components/icons/Icons';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { generateArithmeticProblem } from '../services/mathService';
+import { generateContextualWordProblems } from '../services/geminiService';
 import { TOPIC_SUGGESTIONS } from '../constants';
 
 interface ModuleProps {
@@ -21,7 +22,9 @@ interface ModuleProps {
 }
 
 const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+    const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<ArithmeticSettings>({
+        gradeLevel: 2,
         operation: ArithmeticOperation.Addition,
         digits1: 2,
         digits2: 2,
@@ -36,46 +39,50 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         useWordProblems: false,
         operationCount: 1,
         autoFit: true,
-        gradeLevel: 2,
+        useVisuals: false,
         topic: '',
     });
-    const [isGenerating, setIsGenerating] = useState(false);
-    const { settings: printSettings } = usePrintSettings();
-
+    const isInitialMount = useRef(true);
+    
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsGenerating(true);
         setIsLoading(true);
         try {
-            let problems: Problem[] = [];
-            let title = '';
-
-            const problemCount = settings.autoFit
-                ? calculateMaxProblems(contentRef, printSettings)
-                : settings.problemsPerPage * settings.pageCount;
+            let totalCount;
+            const isTableLayout = printSettings.layoutMode === 'table';
+            
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit) {
+                const problemsPerPage = calculateMaxProblems(contentRef, printSettings);
+                totalCount = (problemsPerPage > 0 ? problemsPerPage : settings.problemsPerPage) * settings.pageCount;
+            } else {
+                totalCount = settings.problemsPerPage * settings.pageCount;
+            }
 
             if (settings.useWordProblems) {
-                problems = await generateContextualWordProblems('arithmetic', { ...settings, problemsPerPage: problemCount, pageCount: 1 });
-                title = 'Sözel Problemler';
-            } else {
-                const results = Array.from({ length: problemCount }, () => generateArithmeticProblem(settings));
-                if (results.some(r => r.error)) {
-                    const error = results.find(r => r.error)?.error;
-                    alert(error);
-                }
-                problems = results.map(r => r.problem);
-                title = results.length > 0 ? results[0].title : '';
-            }
-
-            if (problems.length > 0) {
+                const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
+                const problems = await generateContextualWordProblems('arithmetic', adjustedSettings);
+                const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed-add-sub': 'Toplama ve Çıkarma', 'mixed-all': 'Dört İşlem' };
+                const title = `Gerçek Hayat Problemleri - ${opNames[settings.operation]}`;
                 onGenerate(problems, clearPrevious, title, 'arithmetic', settings.pageCount);
+            } else {
+                const results = Array.from({ length: totalCount }, () => generateArithmeticProblem(settings));
+                
+                const firstResultWithError = results.find(r => (r as any).error);
+
+                if (firstResultWithError) {
+                    console.error((firstResultWithError as any).error);
+                } else if (results.length > 0) {
+                    const problems = results.map(r => r.problem);
+                    const title = results[0].title;
+                    onGenerate(problems, clearPrevious, title, 'arithmetic', isTableLayout ? 1 : settings.pageCount);
+                }
             }
         } catch (error: any) {
-            alert(error.message);
             console.error(error);
         }
         setIsLoading(false);
-        setIsGenerating(false);
-    }, [settings, onGenerate, setIsLoading, contentRef, printSettings]);
+    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'arithmetic') {
@@ -83,14 +90,145 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
 
+    // Live update on settings change
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        if (lastGeneratorModule === 'arithmetic') {
+            const handler = setTimeout(() => {
+                handleGenerate(true);
+            }, 300); // Debounce to prevent rapid updates
+
+            return () => clearTimeout(handler);
+        }
+    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+
+
     const handleSettingChange = (field: keyof ArithmeticSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
 
+    const handleRandomTopic = () => {
+        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
+        handleSettingChange('topic', randomTopic);
+    };
+
+    const handleGradeLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const grade = parseInt(e.target.value, 10);
+        let newSettings: Partial<ArithmeticSettings> = { gradeLevel: grade };
+
+        switch (grade) {
+            case 1:
+                newSettings = { ...newSettings, digits1: 1, digits2: 1, carryBorrow: 'without', operation: ArithmeticOperation.Addition, hasThirdNumber: false };
+                break;
+            case 2:
+                newSettings = { ...newSettings, digits1: 2, digits2: 2, carryBorrow: 'mixed', operation: ArithmeticOperation.MixedAdditionSubtraction };
+                break;
+            case 3:
+                newSettings = { ...newSettings, digits1: 3, digits2: 2, operation: ArithmeticOperation.Multiplication };
+                break;
+            case 4:
+                newSettings = { ...newSettings, digits1: 4, digits2: 3, operation: ArithmeticOperation.Division };
+                break;
+            case 5:
+                newSettings = { ...newSettings, digits1: 5, digits2: 4, operation: ArithmeticOperation.MixedAll };
+                break;
+        }
+        setSettings(prev => ({ ...prev, ...newSettings }));
+    };
+
+    useEffect(() => {
+        if (settings.format === 'long-division-html' && settings.operation !== ArithmeticOperation.Division) {
+            handleSettingChange('format', 'inline');
+        }
+    }, [settings.operation, settings.format]);
+    
+    const isAddSub = [ArithmeticOperation.Addition, ArithmeticOperation.Subtraction, ArithmeticOperation.MixedAdditionSubtraction].includes(settings.operation);
+    const isLongDivision = settings.format === 'long-division-html';
+    const isTableLayout = printSettings.layoutMode === 'table';
+
     return (
-        <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Dört İşlem Ayarları</h2>
-            <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+            <h2 className="text-sm font-semibold">Dört İşlem Ayarları</h2>
+            
+            <div className="grid grid-cols-1 gap-1.5">
+                <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <Checkbox
+                        label="Gerçek Hayat Problemleri (AI)"
+                        id="use-word-problems"
+                        checked={settings.useWordProblems}
+                        onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
+                    />
+                    {settings.useWordProblems && (
+                        <div className="mt-1.5 pl-6 space-y-1.5">
+                            <Select
+                                label="Gereken İşlem Sayısı"
+                                id="arithmetic-op-count"
+                                value={settings.operationCount}
+                                onChange={e => handleSettingChange('operationCount', parseInt(e.target.value, 10))}
+                                options={[
+                                    { value: 1, label: '1 İşlemli' },
+                                    { value: 2, label: '2 İşlemli' },
+                                    { value: 3, label: '3 İşlemli' },
+                                ]}
+                            />
+                            <div className="relative">
+                                <TextInput
+                                    label="Problem Konusu (İsteğe bağlı)"
+                                    id="arithmetic-topic"
+                                    value={settings.topic || ''}
+                                    onChange={e => handleSettingChange('topic', e.target.value)}
+                                    placeholder="Örn: Market, Park, Oyuncaklar"
+                                    className="pr-9"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleRandomTopic}
+                                    className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                                    title="Rastgele Konu Öner"
+                                >
+                                    <ShuffleIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+                             <Checkbox
+                                label="Görsel Destek Ekle (Emoji)"
+                                id="use-visuals-word-problems"
+                                checked={settings.useVisuals ?? false}
+                                onChange={e => handleSettingChange('useVisuals', e.target.checked)}
+                            />
+                        </div>
+                    )}
+                </div>
+                 <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <Checkbox
+                        label="Otomatik Sığdır"
+                        id="auto-fit"
+                        checked={settings.autoFit}
+                        onChange={e => handleSettingChange('autoFit', e.target.checked)}
+                        disabled={isTableLayout}
+                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
+                    />
+                </div>
+            </div>
+
+
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                <Select
+                    label="Sınıf Düzeyi"
+                    id="arithmetic-grade-level"
+                    value={settings.gradeLevel}
+                    onChange={handleGradeLevelChange}
+                    options={[
+                        { value: 1, label: '1. Sınıf' },
+                        { value: 2, label: '2. Sınıf' },
+                        { value: 3, label: '3. Sınıf' },
+                        { value: 4, label: '4. Sınıf' },
+                        { value: 5, label: '5. Sınıf' },
+                    ]}
+                />
                 <Select
                     label="İşlem Türü"
                     id="operation"
@@ -102,77 +240,130 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                         { value: ArithmeticOperation.Multiplication, label: 'Çarpma' },
                         { value: ArithmeticOperation.Division, label: 'Bölme' },
                         { value: ArithmeticOperation.MixedAdditionSubtraction, label: 'Karışık (Toplama-Çıkarma)' },
-                        { value: ArithmeticOperation.MixedAll, label: 'Karışık (Dört İşlem)' },
+                        { value: ArithmeticOperation.MixedAll, label: 'Karışık (Tümü)' },
                     ]}
                 />
-                <Select
+                <NumberInput 
+                    label="1. Sayı Basamak"
+                    id="digits1"
+                    min={1} max={7}
+                    value={settings.digits1}
+                    onChange={e => handleSettingChange('digits1', parseInt(e.target.value))}
+                />
+                <NumberInput 
+                    label="2. Sayı Basamak"
+                    id="digits2"
+                    min={1} max={7}
+                    value={settings.digits2}
+                    onChange={e => handleSettingChange('digits2', parseInt(e.target.value))}
+                />
+                {settings.hasThirdNumber && (
+                    <NumberInput 
+                        label="3. Sayı Basamak"
+                        id="digits3"
+                        min={1} max={7}
+                        value={settings.digits3}
+                        onChange={e => handleSettingChange('digits3', parseInt(e.target.value))}
+                        disabled={settings.useWordProblems}
+                    />
+                )}
+                 {isAddSub && (
+                    <Select
+                        label={settings.operation === 'addition' ? "Eldeli" : "Onluk Bozma"}
+                        id="carryBorrow"
+                        value={settings.carryBorrow}
+                        onChange={e => handleSettingChange('carryBorrow', e.target.value as CarryBorrowPreference)}
+                        disabled={settings.useWordProblems}
+                        options={[
+                            { value: 'mixed', label: 'Karışık' },
+                            { value: 'with', label: 'Sadece Eldeli/Bozmalı' },
+                            { value: 'without', label: 'Sadece Eldesiz/Bozmasız' },
+                        ]}
+                    />
+                )}
+                {settings.operation === ArithmeticOperation.Division && (
+                    <Select
+                        label="Bölme Türü"
+                        id="divisionType"
+                        value={settings.divisionType}
+                        onChange={e => handleSettingChange('divisionType', e.target.value as DivisionType)}
+                        disabled={settings.useWordProblems}
+                        options={[
+                            { value: 'mixed', label: 'Karışık' },
+                            { value: 'with-remainder', label: 'Sadece Kalanlı' },
+                            { value: 'without-remainder', label: 'Sadece Kalansız' },
+                        ]}
+                    />
+                )}
+                 <Select
                     label="Format"
                     id="format"
                     value={settings.format}
                     onChange={e => handleSettingChange('format', e.target.value)}
+                    disabled={settings.useWordProblems}
+                    title={settings.useWordProblems ? "Bu özellik AI modunda otomatik ayarlanır." : ""}
                     options={[
-                        { value: 'vertical-html', label: 'Alt Alta' },
                         { value: 'inline', label: 'Yan Yana' },
-                        ...(settings.operation === 'division' ? [{ value: 'long-division-html', label: 'Bölme Çatısı' }] : []),
+                        { value: 'vertical-html', label: 'Alt Alta' },
+                        ...(settings.operation === ArithmeticOperation.Division ? [{ value: 'long-division-html', label: 'Bölme Çatısı' }] : [])
                     ]}
                 />
-                <NumberInput label="1. Sayı Basamak" id="digits1" min={1} max={7} value={settings.digits1} onChange={e => handleSettingChange('digits1', parseInt(e.target.value))} />
-                <NumberInput label="2. Sayı Basamak" id="digits2" min={1} max={7} value={settings.digits2} onChange={e => handleSettingChange('digits2', parseInt(e.target.value))} />
-                {settings.hasThirdNumber && <NumberInput label="3. Sayı Basamak" id="digits3" min={1} max={7} value={settings.digits3} onChange={e => handleSettingChange('digits3', parseInt(e.target.value))} />}
-            </div>
-             <Checkbox label="Üçüncü Sayı Ekle" id="has-third-number" checked={settings.hasThirdNumber} onChange={e => handleSettingChange('hasThirdNumber', e.target.checked)} />
-
-            {(settings.operation === ArithmeticOperation.Addition || settings.operation === ArithmeticOperation.Subtraction || settings.operation === ArithmeticOperation.MixedAdditionSubtraction) && (
                 <Select
-                    label={settings.operation === ArithmeticOperation.Addition ? 'Eldeli Toplama' : 'Onluk Bozmalı Çıkarma'}
-                    id="carry-borrow"
-                    value={settings.carryBorrow}
-                    onChange={e => handleSettingChange('carryBorrow', e.target.value as CarryBorrowPreference)}
+                    label="Gösterim"
+                    id="representation"
+                    value={settings.representation}
+                    onChange={e => handleSettingChange('representation', e.target.value)}
+                    disabled={isLongDivision || settings.useWordProblems}
+                    title={isLongDivision ? "Bu özellik 'Bölme Çatısı' formatında kullanılamaz." : ""}
                     options={[
+                        { value: 'number', label: 'Rakamla' },
+                        { value: 'word', label: 'Yazıyla' },
                         { value: 'mixed', label: 'Karışık' },
-                        { value: 'with', label: 'Sadece Gerektirenler' },
-                        { value: 'without', label: 'Sadece Gerektirmeyenler' },
                     ]}
                 />
-            )}
-             {settings.operation === ArithmeticOperation.Division && (
-                <Select
-                    label="Bölme Türü"
-                    id="division-type"
-                    value={settings.divisionType}
-                    onChange={e => handleSettingChange('divisionType', e.target.value as DivisionType)}
-                    options={[
-                        { value: 'mixed', label: 'Karışık' },
-                        { value: 'with-remainder', label: 'Kalanlı' },
-                        { value: 'without-remainder', label: 'Kalansız' },
-                    ]}
+                <NumberInput 
+                    label="Sayfa Başına Problem Sayısı"
+                    id="problems-per-page"
+                    min={1} max={100}
+                    value={settings.problemsPerPage}
+                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
+                    disabled={settings.autoFit || isTableLayout}
+                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
                 />
-            )}
-            <Checkbox label="Gerçek Hayat Problemleri (AI)" id="use-word-problems" checked={settings.useWordProblems} onChange={e => handleSettingChange('useWordProblems', e.target.checked)} />
-            {settings.useWordProblems && (
-                 <Select
-                    label="Problem Konusu"
-                    id="word-problem-topic"
-                    value={settings.topic}
-                    onChange={(e) => handleSettingChange('topic', e.target.value)}
-                    options={[{ value: '', label: 'Genel' }, ...TOPIC_SUGGESTIONS.map(s => ({ value: s, label: s }))]}
+                 <NumberInput 
+                    label="Sayfa Sayısı"
+                    id="page-count"
+                    min={1} max={20}
+                    value={settings.pageCount}
+                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
+                    disabled={isTableLayout}
+                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
                 />
-            )}
-
-            <div className="grid grid-cols-2 gap-4">
-                <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={settings.autoFit} />
-                <NumberInput label="Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={settings.autoFit} />
+                <div className="flex items-center pt-3">
+                    {isAddSub && (
+                        <Checkbox
+                            label="Üçüncü Sayı Ekle"
+                            id="hasThirdNumber"
+                            checked={settings.hasThirdNumber}
+                            onChange={e => handleSettingChange('hasThirdNumber', e.target.checked)}
+                            disabled={settings.useWordProblems}
+                        />
+                    )}
+                </div>
             </div>
-             <Checkbox label="Otomatik Sığdır" id="auto-fit" checked={settings.autoFit} onChange={e => handleSettingChange('autoFit', e.target.checked)} />
-             <Button onClick={() => handleGenerate(true)} className="w-full" disabled={isGenerating}>
-                {isGenerating && <LoadingIcon className="w-5 h-5" />}
-                Oluştur
-             </Button>
-             <SettingsPresetManager
+             <SettingsPresetManager 
                 moduleKey="arithmetic"
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
+            <div className="flex flex-wrap gap-2 pt-1.5">
+                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
+                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
+                    <ShuffleIcon className="w-4 h-4" />
+                    Yenile
+                </Button>
+                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+            </div>
         </div>
     );
 };

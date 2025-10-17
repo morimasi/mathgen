@@ -1,23 +1,22 @@
 import React from 'react';
-// FIX: Add .tsx extensions to module imports to resolve module resolution issues.
-import ArithmeticModule from '../modules/ArithmeticModule.tsx';
-import FractionsModule from '../modules/FractionsModule.tsx';
-import DecimalsModule from '../modules/DecimalsModule.tsx';
-import PlaceValueModule from '../modules/PlaceValueModule.tsx';
-import RhythmicCountingModule from '../modules/RhythmicCountingModule.tsx';
-import TimeModule from '../modules/TimeModule.tsx';
-import GeometryModule from '../modules/GeometryModule.tsx';
-import MeasurementModule from '../modules/MeasurementModule.tsx';
-import WordProblemsModule from '../modules/WordProblemsModule.tsx';
-import VisualSupportModule from '../modules/VisualSupportModule.tsx';
-import MatchingAndSortingModule from '../modules/MatchingAndSortingModule.tsx';
-import ComparingQuantitiesModule from '../modules/ComparingQuantitiesModule.tsx';
-import NumberRecognitionModule from '../modules/NumberRecognitionModule.tsx';
-import PatternsModule from '../modules/PatternsModule.tsx';
-import BasicShapesModule from '../modules/BasicShapesModule.tsx';
-import PositionalConceptsModule from '../modules/PositionalConceptsModule.tsx';
-import IntroToMeasurementModule from '../modules/IntroToMeasurementModule.tsx';
-import SimpleGraphsModule from '../modules/SimpleGraphsModule.tsx';
+import ArithmeticModule from '../modules/ArithmeticModule';
+import FractionsModule from '../modules/FractionsModule';
+import DecimalsModule from '../modules/DecimalsModule';
+import PlaceValueModule from '../modules/PlaceValueModule';
+import RhythmicCountingModule from '../modules/RhythmicCountingModule';
+import TimeModule from '../modules/TimeModule';
+import GeometryModule from '../modules/GeometryModule';
+import MeasurementModule from '../modules/MeasurementModule';
+import WordProblemsModule from '../modules/WordProblemsModule';
+import VisualSupportModule from '../modules/VisualSupportModule';
+import MatchingAndSortingModule from '../modules/MatchingAndSortingModule';
+import ComparingQuantitiesModule from '../modules/ComparingQuantitiesModule';
+import NumberRecognitionModule from '../modules/NumberRecognitionModule';
+import PatternsModule from '../modules/PatternsModule';
+import BasicShapesModule from '../modules/BasicShapesModule';
+import PositionalConceptsModule from '../modules/PositionalConceptsModule';
+import IntroToMeasurementModule from '../modules/IntroToMeasurementModule';
+import SimpleGraphsModule from '../modules/SimpleGraphsModule';
 import { Problem, VisualSupportSettings } from '../types';
 
 interface SettingsPanelProps {

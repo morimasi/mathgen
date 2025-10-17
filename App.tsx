@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -16,8 +15,7 @@ import ContactModal from './components/ContactModal';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { TAB_GROUPS } from './constants';
 import { Problem, PrintSettings, VisualSupportSettings, ArithmeticOperation } from './types';
-// FIX: Add .tsx extension to icon import to resolve module resolution issue.
-import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon, FontSizeIcon, PaletteIcon, GridIcon, BorderStyleIcon } from './components/icons/Icons.tsx';
+import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon, FontSizeIcon, PaletteIcon, GridIcon, BorderStyleIcon } from './components/icons/Icons';
 import AnimatedLogo from './components/AnimatedLogo';
 import Select from './components/form/Select';
 
