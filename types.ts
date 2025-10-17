@@ -1,32 +1,15 @@
+// FIX: Replaced file content with proper type definitions and exports to resolve circular dependency and missing type errors.
 
 export interface Problem {
     question: string;
     answer: string | number;
     category: string;
-    display?: 'inline' | 'vertical-html' | 'long-division-html' | 'practice-sheet';
+    display?: 'inline' | 'vertical-html' | 'long-division-html' | 'flow' | 'table';
 }
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'mixed';
 
-export interface PrintSettings {
-    layoutMode: 'flow' | 'table';
-    rows: number;
-    columns: number;
-    columnGap: number;
-    fontSize: number;
-    showHeader: boolean;
-    showProblemNumbers: boolean;
-    notebookStyle: 'none' | 'lines' | 'grid' | 'dotted';
-    borderStyle: 'none' | 'card' | 'solid' | 'dashed' | 'shadow-lift' | 'top-bar-color';
-    problemSpacing: number;
-    pageMargin: number;
-    lineHeight: number;
-    scale: number;
-    colorTheme: 'black' | 'blue' | 'sepia';
-    orientation: 'portrait' | 'landscape';
-    textAlign: 'left' | 'center' | 'right';
-}
-
+// --- ARITHMETIC ---
 export enum ArithmeticOperation {
     Addition = 'addition',
     Subtraction = 'subtraction',
@@ -36,8 +19,8 @@ export enum ArithmeticOperation {
     MixedAll = 'mixed-all',
 }
 
-export type CarryBorrowPreference = 'with' | 'without' | 'mixed';
-export type DivisionType = 'with-remainder' | 'without-remainder' | 'mixed';
+export type CarryBorrowPreference = 'mixed' | 'with' | 'without';
+export type DivisionType = 'mixed' | 'with-remainder' | 'without-remainder';
 
 export interface ArithmeticSettings {
     gradeLevel: number;
@@ -55,10 +38,11 @@ export interface ArithmeticSettings {
     useWordProblems: boolean;
     operationCount: number;
     autoFit: boolean;
-    useVisuals?: boolean;
-    topic?: string;
+    useVisuals: boolean;
+    topic: string;
 }
 
+// --- VISUAL SUPPORT ---
 export interface VisualSupportSettings {
     operation: ArithmeticOperation;
     maxNumber: number;
@@ -70,12 +54,14 @@ export interface VisualSupportSettings {
     boxSize: number;
 }
 
+
+// --- FRACTIONS ---
 export enum FractionsProblemType {
     FourOperations = 'four-operations',
     Recognition = 'recognition',
     Comparison = 'comparison',
     Equivalent = 'equivalent',
-    FractionOfSet = 'fraction-of-set'
+    FractionOfSet = 'fraction-of-set',
 }
 
 export enum FractionsOperation {
@@ -83,8 +69,9 @@ export enum FractionsOperation {
     Subtraction = 'subtraction',
     Multiplication = 'multiplication',
     Division = 'division',
-    Mixed = 'mixed'
+    Mixed = 'mixed',
 }
+
 export interface FractionsSettings {
     gradeLevel: number;
     type: FractionsProblemType;
@@ -98,15 +85,17 @@ export interface FractionsSettings {
     useWordProblems: boolean;
     operationCount: number;
     autoFit: boolean;
-    useVisuals?: boolean;
-    topic?: string;
-    useMixedNumbers?: boolean;
+    useVisuals: boolean;
+    topic: string;
+    useMixedNumbers: boolean;
 }
 
+
+// --- DECIMALS ---
 export enum DecimalsProblemType {
     FourOperations = 'four-operations',
     ReadWrite = 'read-write',
-    ToFraction = 'to-fraction'
+    ToFraction = 'to-fraction',
 }
 
 export enum DecimalsOperation {
@@ -114,8 +103,9 @@ export enum DecimalsOperation {
     Subtraction = 'subtraction',
     Multiplication = 'multiplication',
     Division = 'division',
-    Mixed = 'mixed'
+    Mixed = 'mixed',
 }
+
 export interface DecimalsSettings {
     gradeLevel: number;
     type: DecimalsProblemType;
@@ -128,36 +118,11 @@ export interface DecimalsSettings {
     useWordProblems: boolean;
     operationCount: number;
     autoFit: boolean;
-    useVisuals?: boolean;
-    topic?: string;
+    useVisuals: boolean;
+    topic: string;
 }
 
-export enum TimeProblemType {
-    ReadClock = 'read-clock',
-    CalculateDuration = 'calculate-duration',
-    CalculateEndTime = 'calculate-end-time',
-    FindStartTime = 'find-start-time',
-    ConvertUnits = 'convert-units',
-    Calendar = 'calendar'
-}
-
-export interface TimeSettings {
-    gradeLevel: number;
-    type: TimeProblemType;
-    difficulty: Difficulty;
-    format: '12h' | '24h';
-    problemsPerPage: number;
-    pageCount: number;
-    showClockNumbers: boolean;
-    showHourHand: boolean;
-    showMinuteHand: boolean;
-    useWordProblems: boolean;
-    autoFit: boolean;
-    showDigitalTime: boolean;
-    showMinuteMarkers: boolean;
-    topic?: string;
-}
-
+// --- PLACE VALUE ---
 export enum PlaceValueProblemType {
     Identification = 'identification',
     Rounding = 'rounding',
@@ -166,7 +131,7 @@ export enum PlaceValueProblemType {
     WriteInWords = 'write-in-words',
     WordsToNumber = 'words-to-number',
     Comparison = 'comparison',
-    ResultAsWords = 'result-as-words'
+    ResultAsWords = 'result-as-words',
 }
 
 export type RoundingPlace = 'auto' | 'tens' | 'hundreds' | 'thousands';
@@ -175,14 +140,15 @@ export interface PlaceValueSettings {
     gradeLevel: number;
     type: PlaceValueProblemType;
     digits: number;
-    roundingPlace?: RoundingPlace;
+    roundingPlace: RoundingPlace;
     problemsPerPage: number;
     pageCount: number;
     useWordProblems: boolean;
     autoFit: boolean;
-    topic?: string;
+    topic: string;
 }
 
+// --- RHYTHMIC COUNTING ---
 export enum RhythmicProblemType {
     Pattern = 'pattern',
     FindRule = 'find-rule',
@@ -202,20 +168,48 @@ export interface RhythmicCountingSettings {
     useMultiplesOnly: boolean;
     min: number;
     max: number;
-    patternLength?: number;
-    missingCount?: number;
-    orderCount?: number;
-    orderDigits?: number;
-    beforeCount?: number;
-    afterCount?: number;
+    patternLength: number;
+    missingCount: number;
+    orderCount: number;
+    orderDigits: number;
+    beforeCount: number;
+    afterCount: number;
     problemsPerPage: number;
     pageCount: number;
     useWordProblems: boolean;
     autoFit: boolean;
-    topic?: string;
-    orderDirection?: 'ascending' | 'descending' | 'mixed';
+    topic: string;
+    orderDirection: 'ascending' | 'descending' | 'mixed';
 }
 
+// --- TIME ---
+export enum TimeProblemType {
+    ReadClock = 'read-clock',
+    CalculateDuration = 'calculate-duration',
+    CalculateEndTime = 'calculate-end-time',
+    FindStartTime = 'find-start-time',
+    ConvertUnits = 'convert-units',
+    Calendar = 'calendar',
+}
+
+export interface TimeSettings {
+    gradeLevel: number;
+    type: TimeProblemType;
+    difficulty: Difficulty;
+    format: '12h' | '24h';
+    problemsPerPage: number;
+    pageCount: number;
+    showClockNumbers: boolean;
+    showHourHand: boolean;
+    showMinuteHand: boolean;
+    useWordProblems: boolean;
+    autoFit: boolean;
+    showDigitalTime: boolean;
+    showMinuteMarkers: boolean;
+    topic: string;
+}
+
+// --- GEOMETRY ---
 export enum GeometryProblemType {
     Perimeter = 'perimeter',
     Area = 'area',
@@ -234,7 +228,7 @@ export enum ShapeType {
     Parallelogram = 'parallelogram',
     Trapezoid = 'trapezoid',
     Pentagon = 'pentagon',
-    Hexagon = 'hexagon'
+    Hexagon = 'hexagon',
 }
 
 export interface GeometrySettings {
@@ -245,9 +239,10 @@ export interface GeometrySettings {
     pageCount: number;
     useWordProblems: boolean;
     autoFit: boolean;
-    topic?: string;
+    topic: string;
 }
 
+// --- WORD PROBLEMS ---
 export interface WordProblemSettings {
     topic: string;
     gradeLevel: string;
@@ -257,22 +252,15 @@ export interface WordProblemSettings {
     customPrompt: string;
     autoFit: boolean;
     sourceModule: string;
-    useVisuals?: boolean;
+    useVisuals: boolean;
 }
 
-export type ToastType = 'success' | 'error' | 'info' | 'warning';
-
-export interface ToastMessage {
-    id: number;
-    message: string;
-    type: ToastType;
-}
-
+// --- MEASUREMENT ---
 export enum MeasurementProblemType {
     LengthConversion = 'length',
     WeightConversion = 'weight',
     VolumeConversion = 'volume',
-    Mixed = 'mixed'
+    Mixed = 'mixed',
 }
 export interface MeasurementSettings {
     gradeLevel: number;
@@ -282,28 +270,60 @@ export interface MeasurementSettings {
     pageCount: number;
     useWordProblems: boolean;
     autoFit: boolean;
-    useVisuals?: boolean;
-    topic?: string;
+    useVisuals: boolean;
+    topic: string;
 }
 
-// Readiness
-export type MathReadinessTheme = 'mixed' | 'animals' | 'vehicles' | 'fruits' | 'shapes';
-
-export enum ShapeRecognitionType {
-    ColorShape = 'color-shape',
-    MatchObjectShape = 'match-object-shape',
-    CountShapes = 'count-shapes'
+// --- PRINT SETTINGS ---
+export interface PrintSettings {
+    layoutMode: 'flow' | 'table';
+    rows: number;
+    columns: number;
+    columnGap: number;
+    fontSize: number;
+    showHeader: boolean;
+    showProblemNumbers: boolean;
+    notebookStyle: 'none' | 'lines' | 'grid' | 'dotted';
+    borderStyle: 'none' | 'card' | 'solid' | 'dashed' | 'shadow-lift' | 'top-bar-color';
+    problemSpacing: number;
+    pageMargin: number;
+    lineHeight: number;
+    scale: number;
+    colorTheme: 'black' | 'blue' | 'sepia';
+    orientation: 'portrait' | 'landscape';
+    textAlign: 'left' | 'center' | 'right';
 }
-export interface BasicShapesSettings {
-    type: ShapeRecognitionType;
-    shapes: ShapeType[];
+
+// --- TOAST ---
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
+export interface ToastMessage {
+    id: number;
+    message: string;
+    type: ToastType;
+}
+
+// --- MATH READINESS ---
+export type MathReadinessTheme = 'animals' | 'vehicles' | 'fruits' | 'shapes' | 'mixed' | 'measurement';
+
+// --- Matching & Sorting ---
+export enum MatchingType {
+    OneToOne = 'one-to-one',
+    Shadow = 'shadow',
+    ByProperty = 'by-property'
+}
+export interface MatchingAndSortingSettings {
+    type: MatchingType;
+    theme: MathReadinessTheme;
+    itemCount: number;
+    difficulty: 'easy' | 'hard';
     problemsPerPage: number;
     pageCount: number;
     autoFit: boolean;
     useWordProblems: boolean;
-    topic?: string;
+    topic: string;
 }
 
+// --- Comparing Quantities ---
 export enum ComparisonType {
     MoreLess = 'more-less',
     BiggerSmaller = 'bigger-smaller',
@@ -317,26 +337,10 @@ export interface ComparingQuantitiesSettings {
     pageCount: number;
     autoFit: boolean;
     useWordProblems: boolean;
-    topic?: string;
+    topic: string;
 }
 
-export enum MatchingType {
-    OneToOne = 'one-to-one',
-    Shadow = 'shadow',
-    ByProperty = 'by-property'
-}
-export interface MatchingAndSortingSettings {
-    type: MatchingType;
-    theme: MathReadinessTheme;
-    itemCount: number;
-    difficulty: Difficulty;
-    problemsPerPage: number;
-    pageCount: number;
-    autoFit: boolean;
-    useWordProblems: boolean;
-    topic?: string;
-}
-
+// --- Number Recognition ---
 export enum NumberRecognitionType {
     CountAndWrite = 'count-and-write',
     CountAndColor = 'count-and-color',
@@ -350,9 +354,10 @@ export interface NumberRecognitionSettings {
     pageCount: number;
     autoFit: boolean;
     useWordProblems: boolean;
-    topic?: string;
+    topic: string;
 }
 
+// --- Patterns ---
 export enum PatternType {
     RepeatingAB = 'repeating-ab',
     RepeatingABC = 'repeating-abc',
@@ -361,14 +366,31 @@ export enum PatternType {
 export interface PatternsSettings {
     type: PatternType;
     theme: MathReadinessTheme;
-    difficulty: Difficulty;
+    difficulty: 'easy' | 'hard';
     problemsPerPage: number;
     pageCount: number;
     autoFit: boolean;
     useWordProblems: boolean;
-    topic?: string;
+    topic: string;
 }
 
+// --- Basic Shapes ---
+export enum ShapeRecognitionType {
+    ColorShape = 'color-shape',
+    MatchObjectShape = 'match-object-shape',
+    CountShapes = 'count-shapes'
+}
+export interface BasicShapesSettings {
+    type: ShapeRecognitionType;
+    shapes: ShapeType[];
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic: string;
+}
+
+// --- Positional Concepts ---
 export enum PositionalConceptType {
     AboveBelow = 'above-below',
     InsideOutside = 'inside-outside',
@@ -382,9 +404,10 @@ export interface PositionalConceptsSettings {
     pageCount: number;
     autoFit: boolean;
     useWordProblems: boolean;
-    topic?: string;
+    topic: string;
 }
 
+// --- Intro to Measurement ---
 export enum IntroMeasurementType {
     CompareLength = 'compare-length',
     CompareWeight = 'compare-weight',
@@ -394,17 +417,18 @@ export enum IntroMeasurementType {
 export interface IntroToMeasurementSettings {
     type: IntroMeasurementType;
     theme: MathReadinessTheme;
-    difficulty: Difficulty;
+    difficulty: 'easy' | 'hard';
     problemsPerPage: number;
     pageCount: number;
     autoFit: boolean;
     useWordProblems: boolean;
-    topic?: string;
+    topic: string;
 }
 
+// --- Simple Graphs ---
 export enum SimpleGraphType {
     Pictograph = 'pictograph',
-    BarChart = 'bar-chart'
+    BarChart = 'barchart'
 }
 export interface SimpleGraphsSettings {
     graphType: SimpleGraphType;
@@ -415,28 +439,27 @@ export interface SimpleGraphsSettings {
     pageCount: number;
     autoFit: boolean;
     useWordProblems: boolean;
-    topic?: string;
+    topic: string;
 }
 
-// Dyslexia
-export type DyslexiaSubModuleType =
-  | 'attention-questions' | 'sound-wizard' | 'letter-detective' | 'reading-fluency-coach'
-  | 'comprehension-explorer' | 'vocabulary-explorer' | 'visual-master' | 'word-hunter'
-  | 'spelling-champion' | 'memory-gamer' | 'auditory-writing' | 'interactive-story';
-
-export interface AttentionQuestionSettings { questionType: 'numerical' | 'verbal'; difficulty: Difficulty; numberRange: '1-50' | '1-100' | '100-999'; }
-export interface SoundWizardSettings { type: 'rhyme' | 'syllable' | 'blend'; difficulty: Difficulty; wordLength: number; }
-export interface LetterDetectiveSettings { letterGroup: 'vowels' | 'common_consonants' | 'tricky_consonants' | 'mixed'; difficulty: Difficulty; }
+// --- DYSLEXIA ---
+export type DyslexiaSubModuleType = 'attention-questions' | 'sound-wizard' | 'letter-detective' | 'reading-fluency-coach' | 'comprehension-explorer' | 'vocabulary-explorer' | 'visual-master' | 'word-hunter' | 'spelling-champion' | 'memory-gamer' | 'auditory-writing' | 'interactive-story';
+export interface AttentionQuestionSettings { 
+    questionType: 'numerical' | 'verbal';
+    difficulty: 'easy' | 'medium' | 'hard'; 
+    numberRange: '1-50' | '1-100' | '100-999'; 
+}
+export interface SoundWizardSettings { type: 'rhyme' | 'syllable' | 'blend'; difficulty: 'easy' | 'medium'; wordLength: number; }
+export interface LetterDetectiveSettings { letterGroup: 'vowels' | 'common_consonants' | 'tricky_consonants' | 'mixed'; difficulty: 'easy' | 'medium'; }
 export interface ReadingFluencyCoachSettings { gradeLevel: string; topic: string; }
 export interface ComprehensionExplorerSettings { textLength: 'short' | 'medium' | 'long'; questionType: 'main_idea' | 'inference' | 'vocabulary' | 'mixed'; gradeLevel: string; }
-export interface VocabularyExplorerSettings { difficulty: Difficulty; gradeLevel: string; }
+export interface VocabularyExplorerSettings { difficulty: 'easy' | 'medium' | 'hard'; gradeLevel: string; }
 export interface VisualMasterSettings { type: 'letter' | 'word'; pair: 'b-d' | 'p-q' | 'm-n' | 'ev-ve' | 'yok-koy' | 'kar-rak' | 'mixed'; }
-export interface WordHunterSettings { focus: 'prefix' | 'suffix' | 'root'; difficulty: Difficulty; }
-export interface SpellingChampionSettings { difficulty: Difficulty; category: 'common_errors' | 'homophones' | 'mixed'; }
+export interface WordHunterSettings { focus: 'prefix' | 'suffix' | 'root'; difficulty: 'easy' | 'medium'; }
+export interface SpellingChampionSettings { difficulty: 'easy' | 'medium' | 'hard'; category: 'common_errors' | 'homophones' | 'mixed'; }
 export interface MemoryGamerSettings { type: 'digit_span' | 'word_sequence' | 'sentence_repeat'; sequenceLength: number; }
-export interface AuditoryWritingSettings { type: 'single_words' | 'short_sentences'; difficulty: Difficulty; }
+export interface AuditoryWritingSettings { type: 'single_words' | 'short_sentences'; difficulty: 'easy' | 'medium' | 'hard'; }
 export interface InteractiveStorySettings { genre: 'adventure' | 'mystery' | 'fantasy' | 'sci-fi'; gradeLevel: string; }
-
 export interface DyslexiaSettings {
     activeSubModule: DyslexiaSubModuleType;
     problemsPerPage: number;
@@ -456,14 +479,10 @@ export interface DyslexiaSettings {
     interactiveStory: InteractiveStorySettings;
 }
 
-// Dyscalculia
-export type DyscalculiaSubModuleType =
-  | 'number-sense' | 'arithmetic-fluency' | 'number-grouping' | 'problem-solving'
-  | 'math-language' | 'time-measurement-geometry' | 'spatial-reasoning' | 'estimation-skills'
-  | 'fractions-decimals-intro' | 'visual-number-representation' | 'visual-arithmetic' | 'interactive-story-dc';
-
+// --- DYSCALCULIA ---
+export type DyscalculiaSubModuleType = 'number-sense' | 'arithmetic-fluency' | 'number-grouping' | 'problem-solving' | 'math-language' | 'time-measurement-geometry' | 'spatial-reasoning' | 'estimation-skills' | 'fractions-decimals-intro' | 'visual-number-representation' | 'visual-arithmetic' | 'interactive-story-dc';
 export interface NumberSenseSettings { type: 'compare' | 'order' | 'number-line'; maxNumber: number; }
-export interface ArithmeticFluencySettings { operation: 'addition' | 'subtraction' | 'mixed'; difficulty: Difficulty; }
+export interface ArithmeticFluencySettings { operation: 'addition' | 'subtraction' | 'mixed'; difficulty: 'easy' | 'medium'; }
 export interface NumberGroupingSettings { maxNumber: number; }
 export interface ProblemSolvingSettings { gradeLevel: string; topic: string; }
 export interface MathLanguageSettings { type: 'symbol-match' | 'word-to-symbol'; }
@@ -474,7 +493,6 @@ export interface FractionsDecimalsIntroSettings { type: 'visual-match' | 'compar
 export interface VisualNumberRepresentationSettings { maxNumber: number; representation: 'dots' | 'blocks' | 'fingers'; }
 export interface VisualArithmeticSettings { operation: 'addition' | 'subtraction'; maxNumber: number; }
 export interface InteractiveStoryDcSettings { genre: 'market' | 'playground' | 'space'; gradeLevel: string; }
-
 export interface DyscalculiaSettings {
     activeSubModule: DyscalculiaSubModuleType;
     problemsPerPage: number; pageCount: number; autoFit: boolean;
@@ -492,15 +510,11 @@ export interface DyscalculiaSettings {
     interactiveStoryDc: InteractiveStoryDcSettings;
 }
 
-// Dysgraphia
-export type DysgraphiaSubModuleType =
-  | 'fine-motor-skills' | 'letter-formation' | 'letter-form-recognition' | 'legible-writing'
-  | 'picture-sequencing' | 'writing-speed' | 'sentence-construction' | 'punctuation'
-  | 'writing-planning' | 'creative-writing' | 'keyboard-skills' | 'interactive-story-dg';
-
+// --- DYSGRAPHIA ---
+export type DysgraphiaSubModuleType = 'fine-motor-skills' | 'letter-formation' | 'letter-form-recognition' | 'legible-writing' | 'picture-sequencing' | 'writing-speed' | 'sentence-construction' | 'punctuation' | 'writing-planning' | 'creative-writing' | 'keyboard-skills' | 'interactive-story-dg';
 export interface FineMotorSkillsSettings { type: 'line-trace' | 'shape-trace' | 'maze'; }
 export interface LetterFormationSettings { letter: string; case: 'lower' | 'upper' | 'mixed'; }
-export interface LetterFormRecognitionSettings { targetLetter: string; difficulty: Difficulty; }
+export interface LetterFormRecognitionSettings { targetLetter: string; difficulty: 'easy' | 'medium'; }
 export interface LegibleWritingSettings { type: 'spacing' | 'sizing'; }
 export interface PictureSequencingSettings { storyLength: 3 | 4 | 5; topic: string; }
 export interface WritingSpeedSettings { duration: 1 | 2 | 5; }
@@ -510,7 +524,6 @@ export interface WritingPlanningSettings { topic: string; }
 export interface CreativeWritingSettings { promptType: 'story-starter' | 'what-if'; topic: string; }
 export interface KeyboardSkillsSettings { level: 'home-row' | 'top-row' | 'full'; }
 export interface InteractiveStoryDgSettings { genre: 'journal' | 'adventure' | 'fantasy'; gradeLevel: string; }
-
 export interface DysgraphiaSettings {
     activeSubModule: DysgraphiaSubModuleType;
     problemsPerPage: number; pageCount: number; autoFit: boolean;

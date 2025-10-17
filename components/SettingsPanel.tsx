@@ -1,91 +1,69 @@
-
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useUI } from '../services/UIContext';
+import { LoadingIcon } from './icons/Icons';
 
-import ArithmeticModule from '../modules/ArithmeticModule';
-import FractionsModule from '../modules/FractionsModule';
-import DecimalsModule from '../modules/DecimalsModule';
-import PlaceValueModule from '../modules/PlaceValueModule';
-import RhythmicCountingModule from '../modules/RhythmicCountingModule';
-import TimeModule from '../modules/TimeModule';
-import GeometryModule from '../modules/GeometryModule';
-import MeasurementModule from '../modules/MeasurementModule';
-import WordProblemsModule from '../modules/WordProblemsModule';
-import VisualSupportModule from '../modules/VisualSupportModule';
-
-import MatchingAndSortingModule from '../modules/MatchingAndSortingModule';
-import ComparingQuantitiesModule from '../modules/ComparingQuantitiesModule';
-import NumberRecognitionModule from '../modules/NumberRecognitionModule';
-import BasicShapesModule from '../modules/BasicShapesModule';
-import PatternsModule from '../modules/PatternsModule';
-import PositionalConceptsModule from '../modules/PositionalConceptsModule';
-import IntroToMeasurementModule from '../modules/IntroToMeasurementModule';
-import SimpleGraphsModule from '../modules/SimpleGraphsModule';
-
-import DyslexiaModule from '../modules/DyslexiaModule';
-import DyscalculiaModule from '../modules/DyscalculiaModule';
-import DysgraphiaModule from '../modules/DysgraphiaModule';
-
+// Lazily import all module components for code-splitting
+const ArithmeticModule = React.lazy(() => import('../modules/ArithmeticModule'));
+const FractionsModule = React.lazy(() => import('../modules/FractionsModule'));
+const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule'));
+const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule'));
+const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule'));
+const TimeModule = React.lazy(() => import('../modules/TimeModule'));
+const GeometryModule = React.lazy(() => import('../modules/GeometryModule'));
+const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule'));
+const WordProblemsModule = React.lazy(() => import('../modules/WordProblemsModule'));
+const VisualSupportModule = React.lazy(() => import('../modules/VisualSupportModule'));
+const MatchingAndSortingModule = React.lazy(() => import('../modules/MatchingAndSortingModule'));
+const ComparingQuantitiesModule = React.lazy(() => import('../modules/ComparingQuantitiesModule'));
+const NumberRecognitionModule = React.lazy(() => import('../modules/NumberRecognitionModule'));
+const PatternsModule = React.lazy(() => import('../modules/PatternsModule'));
+const BasicShapesModule = React.lazy(() => import('../modules/BasicShapesModule'));
+const PositionalConceptsModule = React.lazy(() => import('../modules/PositionalConceptsModule'));
+const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule'));
+const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule'));
+const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule'));
+const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule'));
+const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule'));
 
 const SettingsPanel: React.FC = () => {
     const { activeTab } = useUI();
 
-    switch (activeTab) {
-        // Okul Hazırbulunuşluğu
-        case 'matching-and-sorting':
-            return <MatchingAndSortingModule />;
-        case 'comparing-quantities':
-            return <ComparingQuantitiesModule />;
-        case 'number-recognition':
-            return <NumberRecognitionModule />;
-        case 'basic-shapes':
-            return <BasicShapesModule />;
-        case 'patterns':
-            return <PatternsModule />;
-        case 'positional-concepts':
-            return <PositionalConceptsModule />;
-        case 'intro-to-measurement':
-            return <IntroToMeasurementModule />;
-        case 'simple-graphs':
-            return <SimpleGraphsModule />;
+    const renderActiveModule = () => {
+        switch (activeTab) {
+            case 'arithmetic': return <ArithmeticModule />;
+            case 'visual-support': return <VisualSupportModule />;
+            case 'word-problems': return <WordProblemsModule />;
+            case 'fractions': return <FractionsModule />;
+            case 'decimals': return <DecimalsModule />;
+            case 'place-value': return <PlaceValueModule />;
+            case 'rhythmic-counting': return <RhythmicCountingModule />;
+            case 'time': return <TimeModule />;
+            case 'geometry': return <GeometryModule />;
+            case 'measurement': return <MeasurementModule />;
+            case 'matching-and-sorting': return <MatchingAndSortingModule />;
+            case 'comparing-quantities': return <ComparingQuantitiesModule />;
+            case 'number-recognition': return <NumberRecognitionModule />;
+            case 'patterns': return <PatternsModule />;
+            case 'basic-shapes': return <BasicShapesModule />;
+            case 'positional-concepts': return <PositionalConceptsModule />;
+            case 'intro-to-measurement': return <IntroToMeasurementModule />;
+            case 'simple-graphs': return <SimpleGraphsModule />;
+            case 'dyslexia': return <DyslexiaModule />;
+            case 'dyscalculia': return <DyscalculiaModule />;
+            case 'dysgraphia': return <DysgraphiaModule />;
+            default: return <div>Lütfen yukarıdaki menüden bir modül seçin.</div>;
+        }
+    };
 
-        // Sayılar ve İşlemler
-        case 'visual-support':
-            return <VisualSupportModule />;
-        case 'arithmetic':
-            return <ArithmeticModule />;
-        case 'fractions':
-            return <FractionsModule />;
-        case 'decimals':
-            return <DecimalsModule />;
-        case 'place-value':
-            return <PlaceValueModule />;
-        case 'rhythmic-counting':
-            return <RhythmicCountingModule />;
-        
-        // Ölçme ve Geometri
-        case 'time':
-            return <TimeModule />;
-        case 'geometry':
-            return <GeometryModule />;
-        case 'measurement':
-            return <MeasurementModule />;
-
-        // Problem Çözme
-        case 'word-problems':
-            return <WordProblemsModule />;
-
-        // Öğrenme Güçlükleri
-        case 'dyslexia':
-            return <DyslexiaModule />;
-        case 'dyscalculia':
-            return <DyscalculiaModule />;
-        case 'dysgraphia':
-            return <DysgraphiaModule />;
-            
-        default:
-            return <div>Select a module</div>;
-    }
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center h-48">
+                <LoadingIcon className="w-8 h-8" />
+            </div>
+        }>
+            {renderActiveModule()}
+        </Suspense>
+    );
 };
 
 export default SettingsPanel;
