@@ -6,7 +6,7 @@ import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
-import { generateDyslexiaProblem } from './../services/dyslexiaService';
+import { generateDyslexiaProblem } from '../services/dyslexiaService';
 
 // Import all sub-module setting components
 import SoundWizardSettings from './dyslexia/SoundWizardSettings';
@@ -137,8 +137,7 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
     };
     
     const handleSubModuleSettingChange = (subModuleSettings: any) => {
-        // FIX on line 139: Spread types may only be created from object types.
-        // The settings object uses camelCase keys (e.g. soundWizard), but activeSubModuleId is kebab-case.
+        // FIX: The settings object uses camelCase keys (e.g. soundWizard), but activeSubModuleId is kebab-case.
         // Convert to camelCase to update the correct property. The original code used the wrong key,
         // which resulted in spreading `undefined`.
         const subModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase());
@@ -217,7 +216,8 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
 
                 <SettingsPresetManager 
                     moduleKey={`dyslexia-${activeSubModuleId}`}
-                    currentSettings={settings[activeSubModuleId as keyof typeof settings]}
+                    // FIX: Use the correctly-keyed `activeSubModuleSettings` object instead of trying to access the main settings object with a kebab-case key.
+                    currentSettings={activeSubModuleSettings}
                     onLoadSettings={handleSubModuleSettingChange}
                 />
 

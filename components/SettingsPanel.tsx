@@ -1,4 +1,7 @@
 import React from 'react';
+import { Problem, VisualSupportSettings } from '../types';
+
+// Import all module components
 import ArithmeticModule from '../modules/ArithmeticModule';
 import FractionsModule from '../modules/FractionsModule';
 import DecimalsModule from '../modules/DecimalsModule';
@@ -20,7 +23,7 @@ import SimpleGraphsModule from '../modules/SimpleGraphsModule';
 import DyslexiaModule from '../modules/DyslexiaModule';
 import DyscalculiaModule from '../modules/DyscalculiaModule';
 import DysgraphiaModule from '../modules/DysgraphiaModule';
-import { Problem, VisualSupportSettings } from '../types';
+
 
 interface SettingsPanelProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -30,82 +33,74 @@ interface SettingsPanelProps {
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
     visualSupportSettings: VisualSupportSettings;
-    setVisualSupportSettings: React.Dispatch<React.SetStateAction<VisualSupportSettings>>;
+    setVisualSupportSettings: (settings: VisualSupportSettings) => void;
 }
 
-const SettingsPanel: React.FC<SettingsPanelProps> = ({ 
-    onGenerate, 
-    setIsLoading, 
-    activeTab, 
-    contentRef, 
-    autoRefreshTrigger, 
-    lastGeneratorModule,
-    visualSupportSettings,
-    setVisualSupportSettings
-}) => {
-    const renderModule = () => {
-        const commonProps = { onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule };
+const SettingsPanel: React.FC<SettingsPanelProps> = (props) => {
+    const { activeTab, visualSupportSettings, setVisualSupportSettings } = props;
+
+    const moduleProps = {
+        onGenerate: props.onGenerate,
+        setIsLoading: props.setIsLoading,
+        contentRef: props.contentRef,
+        autoRefreshTrigger: props.autoRefreshTrigger,
+        lastGeneratorModule: props.lastGeneratorModule,
+    };
+
+    const renderActiveModule = () => {
         switch (activeTab) {
-            // Math Readiness
-            case 'matching-and-sorting':
-                return <MatchingAndSortingModule {...commonProps} />;
-            case 'comparing-quantities':
-                return <ComparingQuantitiesModule {...commonProps} />;
-            case 'number-recognition':
-                return <NumberRecognitionModule {...commonProps} />;
-            case 'patterns':
-                return <PatternsModule {...commonProps} />;
-            case 'basic-shapes':
-                return <BasicShapesModule {...commonProps} />;
-            case 'positional-concepts':
-                return <PositionalConceptsModule {...commonProps} />;
-            case 'intro-to-measurement':
-                return <IntroToMeasurementModule {...commonProps} />;
-            case 'simple-graphs':
-                return <SimpleGraphsModule {...commonProps} />;
-            
-            // Operations
             case 'arithmetic':
-                return <ArithmeticModule {...commonProps} />;
+                return <ArithmeticModule {...moduleProps} />;
             case 'visual-support':
-                return <VisualSupportModule {...commonProps} settings={visualSupportSettings} setSettings={setVisualSupportSettings} />;
+                return <VisualSupportModule {...moduleProps} settings={visualSupportSettings} setSettings={setVisualSupportSettings} />;
             case 'word-problems':
-                return <WordProblemsModule {...commonProps} />;
-
-            // Numbers
+                return <WordProblemsModule {...moduleProps} />;
             case 'fractions':
-                return <FractionsModule {...commonProps} />;
+                return <FractionsModule {...moduleProps} />;
             case 'decimals':
-                return <DecimalsModule {...commonProps} />;
+                return <DecimalsModule {...moduleProps} />;
             case 'place-value':
-                return <PlaceValueModule {...commonProps} />;
+                return <PlaceValueModule {...moduleProps} />;
             case 'rhythmic-counting':
-                return <RhythmicCountingModule {...commonProps} />;
-
-            // Measurements
+                return <RhythmicCountingModule {...moduleProps} />;
             case 'time':
-                return <TimeModule {...commonProps} />;
+                return <TimeModule {...moduleProps} />;
             case 'geometry':
-                return <GeometryModule {...commonProps} />;
+                return <GeometryModule {...moduleProps} />;
             case 'measurement':
-                return <MeasurementModule {...commonProps} />;
-            
-            // Special Learning
+                return <MeasurementModule {...moduleProps} />;
+            case 'matching-and-sorting':
+                return <MatchingAndSortingModule {...moduleProps} />;
+            case 'comparing-quantities':
+                return <ComparingQuantitiesModule {...moduleProps} />;
+            case 'number-recognition':
+                return <NumberRecognitionModule {...moduleProps} />;
+            case 'patterns':
+                return <PatternsModule {...moduleProps} />;
+            case 'basic-shapes':
+                return <BasicShapesModule {...moduleProps} />;
+            case 'positional-concepts':
+                return <PositionalConceptsModule {...moduleProps} />;
+            case 'intro-to-measurement':
+                return <IntroToMeasurementModule {...moduleProps} />;
+            case 'simple-graphs':
+                return <SimpleGraphsModule {...moduleProps} />;
             case 'dyslexia':
-                return <DyslexiaModule {...commonProps} />;
+                return <DyslexiaModule {...moduleProps} />;
             case 'dyscalculia':
-                return <DyscalculiaModule {...commonProps} />;
+// FIX: Removed {...moduleProps} as the DyscalculiaModule component is a placeholder and does not accept props.
+                return <DyscalculiaModule />;
             case 'dysgraphia':
-                return <DysgraphiaModule {...commonProps} />;
-
+// FIX: Removed {...moduleProps} as the DysgraphiaModule component is a placeholder and does not accept props.
+                return <DysgraphiaModule />;
             default:
-                return null;
+                return <div>Please select a module from the top menu.</div>;
         }
     };
-    
+
     return (
-        <div className="print:hidden space-y-4">
-            {renderModule()}
+        <div className="settings-panel-wrapper">
+            {renderActiveModule()}
         </div>
     );
 };
