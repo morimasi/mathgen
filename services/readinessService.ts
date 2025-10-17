@@ -16,6 +16,7 @@ const THEME_OBJECTS: { [key: string]: string[] } = {
     vehicles: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛴', '🚲', '🛵', '🏍', '🛺', '🚔', '🚍', '🚘', '🚖', '✈️', '🛫', '🛬', '💺', '🚁', '🚟', '🚠', '🚡', '🛰', '🚀', '🛸', '⛵️', '🛶', '🚤', '🛳', '⛴', '🛥', '🚢'],
     fruits: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛', '🍼', '☕️', '🍵', '🧃', '🥤', '🍶', '🍺', '🍻', '🥂', '🍷', '🥃', '🍸', '🍹', '🧉', '🍾', '🧊', '🥄', '🍴', '🍽', '🥣', '🥡', '🥢', '🧂'],
     shapes: ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '⚫️', '⚪️', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛️', '⬜️', '🔶', '🔷', '🔸', '🔹'],
+    measurement: ['✏️', '🔑', '📏', '📎', '🟥', '➖'],
 };
 
 const getRandomItems = (theme: string, count: number): string[] => {
@@ -196,17 +197,144 @@ const generatePositionalProblem = (settings: PositionalConceptsSettings): { prob
 };
 
 const generateMeasurementIntroProblem = (settings: IntroToMeasurementSettings): { problem: Problem, title: string } => {
-    const title = "Ölçmeye Giriş";
-    let question = "Ölçme problemi";
-    let answer = "cevap";
+    const { type, theme } = settings;
+    let question = '';
+    let answer = '';
+    let instruction = '';
+    let title = "Ölçmeye Giriş";
+
+    const FONT_SIZE = 30;
+
+    switch (type) {
+        case IntroMeasurementType.CompareLength:
+        case IntroMeasurementType.CompareWeight:
+        case IntroMeasurementType.CompareCapacity: {
+            const item = getRandomItems(theme, 1)[0];
+            const [scale1, scale2] = shuffleArray([0.8, 1.5]);
+            let svg1: string, svg2: string;
+
+            if (type === IntroMeasurementType.CompareLength) {
+                title = "Uzun/Kısa Karşılaştırması";
+                instruction = "Hangisi daha uzun?";
+                svg1 = `<rect x="10" y="${60 - (20 * scale1) / 2}" width="${100 * scale1}" height="20" fill="#3b82f6" />`;
+                svg2 = `<rect x="10" y="${140 - (20 * scale2) / 2}" width="${100 * scale2}" height="20" fill="#3b82f6" />`;
+                answer = scale1 > scale2 ? "1. Nesne" : "2. Nesne";
+            } else if (type === IntroMeasurementType.CompareWeight) {
+                title = "Ağır/Hafif Karşılaştırması";
+                instruction = "Hangisi daha ağır?";
+                const tilt = scale1 > scale2 ? -5 : 5;
+                svg1 = `<g transform="rotate(${-tilt} 150 150)"><text x="50" y="120" font-size="${FONT_SIZE * scale1}" text-anchor="middle">${item}</text></g>`;
+                svg2 = `<g transform="rotate(${-tilt} 150 150)"><text x="250" y="120" font-size="${FONT_SIZE * scale2}" text-anchor="middle">${item}</text></g>`;
+                // Balance Scale SVG
+                const balance = `<path d="M 150 180 L 150 50 M 100 50 L 200 50 M 100 50 L 50 150 M 200 50 L 250 150" stroke="#854d0e" stroke-width="4" fill="none" transform-origin="150 50" transform="rotate(${tilt})" />`;
+                svg1 = balance + svg1 + svg2;
+                svg2 = ''; // Combined into svg1
+                answer = scale1 > scale2 ? "Soldaki" : "Sağdaki";
+            } else { // CompareCapacity
+                title = "Dolu/Boş Karşılaştırması";
+                instruction = "Hangisi daha dolu?";
+                const createGlass = (x: number, fill: number) => `
+                    <path d="M ${x} 80 L ${x+10} 180 L ${x+70} 180 L ${x+80} 80 Z" stroke="#4b5563" fill="#e5e7eb" stroke-width="2" />
+                    <rect x="${x+11}" y="${180 - 100 * fill}" width="58" height="${100 * fill}" fill="#60a5fa" />
+                `;
+                svg1 = createGlass(50, scale1 / 2);
+                svg2 = createGlass(200, scale2 / 2);
+                answer = scale1 > scale2 ? "1. Kap" : "2. Kap";
+            }
+            question = `<div><p style="font-size: 1.2rem; text-align: center;">${instruction}</p><svg viewBox="0 0 350 200">${svg1}${svg2}</svg></div>`;
+            break;
+        }
+        case IntroMeasurementType.NonStandardLength: {
+            title = "Standart Olmayan Birimlerle Ölçme";
+            const [target, unit] = getRandomItems('measurement', 2);
+            const count = getRandomInt(3, 8);
+            answer = String(count);
+            instruction = `${target} kaç ${unit} uzunluğundadır?`;
+
+            const unitWidth = 25;
+            const targetWidth = count * unitWidth;
+
+            let unitsSVG = '';
+            for(let i = 0; i < count; i++) {
+                unitsSVG += `<text x="${50 + i * unitWidth + unitWidth/2}" y="100" font-size="20" text-anchor="middle">${unit}</text>`;
+            }
+
+            const questionSVG = `
+                <text x="${50 + targetWidth/2}" y="50" font-size="30" text-anchor="middle">${target}</text>
+                <line x1="50" y1="70" x2="${50 + targetWidth}" y2="70" stroke="black" stroke-dasharray="4 2" />
+                <line x1="50" y1="70" x2="50" y2="30" stroke="black" stroke-dasharray="4 2" />
+                <line x1="${50 + targetWidth}" y1="70" x2="${50 + targetWidth}" y2="30" stroke="black" stroke-dasharray="4 2" />
+                ${unitsSVG}
+            `;
+            question = `<div><p style="font-size: 1.2rem; text-align: center;">${instruction}</p><svg viewBox="0 0 ${100 + targetWidth} 140">${questionSVG}</svg></div>`;
+            break;
+        }
+    }
+
     return { problem: { question, answer, category: 'intro-to-measurement' }, title };
 };
 
 const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: Problem, title: string } => {
-    const title = "Basit Grafikler";
-    let question = "Grafik problemi";
-    let answer = "cevap";
-    return { problem: { question, answer, category: 'simple-graphs' }, title };
+    const { graphType, theme, categoryCount, maxItemCount } = settings;
+    const title = "Nesneleri Say ve Grafiği Doldur";
+    const instruction = "Yukarıdaki nesneleri sayın ve grafikte uygun yerleri boyayın/işaretleyin.";
+    
+    const categories = getRandomItems(theme, categoryCount);
+    const data: {[key: string]: number} = {};
+    let allObjects: string[] = [];
+    
+    categories.forEach(cat => {
+        const count = getRandomInt(1, maxItemCount);
+        data[cat] = count;
+        allObjects.push(...Array(count).fill(cat));
+    });
+    
+    allObjects = shuffleArray(allObjects);
+
+    const dataSVG = `<div style="font-size: 2.5rem; text-align: center; line-height: 1.5; padding: 1rem; border: 2px solid #ccc; border-radius: 8px; margin-bottom: 1.5rem;">${allObjects.join(' ')}</div>`;
+
+    let graphSVG = '';
+    const graphWidth = 400;
+    const graphHeight = 250;
+    const padding = 50;
+
+    if (graphType === SimpleGraphType.Pictograph) {
+        const rowHeight = (graphHeight - padding) / categoryCount;
+        graphSVG += `<g>`;
+        for(let i = 0; i < categoryCount; i++) {
+            const y = rowHeight * i + rowHeight / 2 + padding / 2;
+            graphSVG += `<text x="${padding - 10}" y="${y}" font-size="30" text-anchor="end" dominant-baseline="middle">${categories[i]}</text>`;
+            for (let j = 0; j < maxItemCount; j++) {
+                graphSVG += `<rect x="${padding + 10 + j * 40}" y="${y - 18}" width="36" height="36" fill="#f3f4f6" stroke="#d1d5db" />`;
+            }
+        }
+        graphSVG += `</g>`;
+    } else { // BarChart
+        const barWidth = (graphWidth - padding * 2) / categoryCount;
+        // Y Axis
+        for (let i = 0; i <= maxItemCount; i++) {
+            const y = graphHeight - padding - (i * (graphHeight - padding * 1.5) / maxItemCount);
+            graphSVG += `<text x="${padding - 10}" y="${y}" text-anchor="end" dominant-baseline="middle">${i}</text>`;
+            graphSVG += `<line x1="${padding - 5}" y1="${y}" x2="${graphWidth - padding}" y2="${y}" stroke="#e5e7eb" />`;
+        }
+        // X Axis
+        for (let i = 0; i < categoryCount; i++) {
+            const x = padding + i * barWidth + barWidth / 2;
+            graphSVG += `<text x="${x}" y="${graphHeight - padding + 20}" text-anchor="middle" font-size="24">${categories[i]}</text>`;
+        }
+        graphSVG += `<line x1="${padding}" y1="${graphHeight - padding}" x2="${graphWidth - padding}" y2="${graphHeight - padding}" stroke="black" />`;
+        graphSVG += `<line x1="${padding}" y1="${padding/2}" x2="${padding}" y2="${graphHeight - padding}" stroke="black" />`;
+    }
+
+    const question = `
+        <div>
+            <p style="font-size: 1.2rem; text-align: center; margin-bottom: 0.5rem;">${instruction}</p>
+            ${dataSVG}
+            <svg viewBox="0 0 ${graphWidth} ${graphHeight}">${graphSVG}</svg>
+        </div>
+    `;
+
+    return { problem: { question, answer: "Grafiği doldurunuz.", category: 'simple-graphs' }, title };
 };
 
 export const generateReadinessProblem = (
