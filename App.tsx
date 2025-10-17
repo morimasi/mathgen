@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useCallback } from 'react';
 
 // Providers
@@ -85,28 +86,25 @@ const AppContent: React.FC = () => {
 
                 <div ref={mainAreaRef} className="flex-grow flex flex-col bg-stone-50 dark:bg-stone-900/50 overflow-auto p-4 lg:p-6">
                     <div className="print:hidden worksheet-toolbar">
-                         <div className="flex items-center justify-between w-full gap-4">
-                            <div className="flex items-center gap-2">
-                                <ScaleIcon className="w-5 h-5 text-stone-500 dark:text-stone-400" />
-                                <input
-                                    type="range"
-                                    min="0.5"
-                                    max="1.5"
-                                    step="0.05"
-                                    value={viewScale}
-                                    onChange={(e) => setViewScale(parseFloat(e.target.value))}
-                                    className="w-24 accent-orange-700"
-                                />
-                                <span className="text-xs text-stone-600 dark:text-stone-400 w-10 text-center">{Math.round(viewScale * 100)}%</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={fitToScreen} className="p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700" title="Ekrana Sığdır">
-                                    <FitToScreenIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
-                                </button>
-                                <button onClick={handlePrint} className="p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700" title="Yazdır">
-                                    <PrintIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
-                                </button>
-                            </div>
+                        <div className="flex items-center gap-2">
+                            <ScaleIcon className="w-5 h-5 text-stone-500 dark:text-stone-400" />
+                            <input
+                                type="range"
+                                min="0.5"
+                                max="1.5"
+                                step="0.05"
+                                value={viewScale}
+                                onChange={(e) => setViewScale(parseFloat(e.target.value))}
+                                className="w-32 accent-orange-700"
+                            />
+                            <span className="text-xs text-stone-600 dark:text-stone-400 w-10 text-center">{Math.round(viewScale * 100)}%</span>
+                            <button onClick={fitToScreen} className="p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700" title="Ekrana Sığdır">
+                                <FitToScreenIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                            </button>
+                             <button onClick={handlePrint} className="ml-auto p-1.5 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 flex items-center gap-2 text-sm">
+                                <PrintIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                                <span>Yazdır</span>
+                            </button>
                         </div>
                     </div>
                     <div className="worksheet-preview-area">

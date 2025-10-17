@@ -1,5 +1,4 @@
-import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType, VisualAdditionSubtractionSettings, VerbalArithmeticSettings, MissingNumberPuzzlesSettings, SymbolicArithmeticSettings, ProblemCreationSettings } from '../types';
-import { numberToWords } from './utils';
+import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType } from '../types';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -21,13 +20,12 @@ const THEME_OBJECTS: { [key: string]: string[] } = {
 };
 
 const getRandomItems = (theme: string, count: number): string[] => {
-    const themeKey = theme === 'mixed' ? Object.keys(THEME_OBJECTS)[getRandomInt(0, Object.keys(THEME_OBJECTS).length - 2)] : theme;
+    const themeKey = theme === 'mixed' ? Object.keys(THEME_OBJECTS)[getRandomInt(0, Object.keys(THEME_OBJECTS).length - 1)] : theme;
     const items = THEME_OBJECTS[themeKey];
-    if (!items) return Array(count).fill('❓');
     return shuffleArray(items).slice(0, count);
 };
 
-// --- GENERATOR FUNCTIONS (Existing) ---
+// --- GENERATOR FUNCTIONS ---
 
 const generateMatchingProblem = (settings: MatchingAndSortingSettings): { problem: Problem, title: string } => {
     const { type, theme, itemCount } = settings;
@@ -103,7 +101,8 @@ const generateComparingProblem = (settings: ComparingQuantitiesSettings): { prob
 };
 
 const generateNumberRecProblem = (settings: NumberRecognitionSettings): { problem: Problem, title: string } => {
-    const {numberRange, theme} = settings;
+    // This is a placeholder as this module requires more complex logic.
+    const {type, theme, numberRange} = settings;
     const title = "Sayıları Tanıma ve Sayma";
     const [min, max] = numberRange.split('-').map(Number);
     
@@ -121,6 +120,7 @@ const generateNumberRecProblem = (settings: NumberRecognitionSettings): { proble
 };
 
 const generatePatternsProblem = (settings: PatternsSettings): { problem: Problem, title: string } => {
+    // This is a placeholder
     const {type, theme} = settings;
     const title = "Örüntüyü Tamamlayınız";
     
@@ -150,6 +150,7 @@ const generatePatternsProblem = (settings: PatternsSettings): { problem: Problem
 };
 
 const generateBasicShapesProblem = (settings: BasicShapesSettings): { problem: Problem, title: string } => {
+    // This is a placeholder
     const title = "Şekilleri Tanıma";
     const question = `<div style="font-size: 3rem;">🔺 🔵 🟥 🔵 🟥</div>`;
     return { problem: { question, answer: "Görsel", category: 'basic-shapes' }, title };
@@ -186,6 +187,7 @@ const generatePositionalProblem = (settings: PositionalConceptsSettings): { prob
             question = `<div><p style="font-size: 1.2rem; text-align: center;">${instruction}</p><svg viewBox="0 0 400 250">${itemsSVG}</svg></div>`;
             break;
         }
+        // ... other cases
         default:
              question = "Hata";
              answer = "Hata";
@@ -223,11 +225,12 @@ const generateMeasurementIntroProblem = (settings: IntroToMeasurementSettings): 
                 const tilt = scale1 > scale2 ? -5 : 5;
                 svg1 = `<g transform="rotate(${-tilt} 150 150)"><text x="50" y="120" font-size="${FONT_SIZE * scale1}" text-anchor="middle">${item}</text></g>`;
                 svg2 = `<g transform="rotate(${-tilt} 150 150)"><text x="250" y="120" font-size="${FONT_SIZE * scale2}" text-anchor="middle">${item}</text></g>`;
+                // Balance Scale SVG
                 const balance = `<path d="M 150 180 L 150 50 M 100 50 L 200 50 M 100 50 L 50 150 M 200 50 L 250 150" stroke="#854d0e" stroke-width="4" fill="none" transform-origin="150 50" transform="rotate(${tilt})" />`;
                 svg1 = balance + svg1 + svg2;
-                svg2 = '';
+                svg2 = ''; // Combined into svg1
                 answer = scale1 > scale2 ? "Soldaki" : "Sağdaki";
-            } else { 
+            } else { // CompareCapacity
                 title = "Dolu/Boş Karşılaştırması";
                 instruction = "Hangisi daha dolu?";
                 const createGlass = (x: number, fill: number) => `
@@ -306,13 +309,15 @@ const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: 
             }
         }
         graphSVG += `</g>`;
-    } else { 
+    } else { // BarChart
         const barWidth = (graphWidth - padding * 2) / categoryCount;
+        // Y Axis
         for (let i = 0; i <= maxItemCount; i++) {
             const y = graphHeight - padding - (i * (graphHeight - padding * 1.5) / maxItemCount);
             graphSVG += `<text x="${padding - 10}" y="${y}" text-anchor="end" dominant-baseline="middle">${i}</text>`;
             graphSVG += `<line x1="${padding - 5}" y1="${y}" x2="${graphWidth - padding}" y2="${y}" stroke="#e5e7eb" />`;
         }
+        // X Axis
         for (let i = 0; i < categoryCount; i++) {
             const x = padding + i * barWidth + barWidth / 2;
             graphSVG += `<text x="${x}" y="${graphHeight - padding + 20}" text-anchor="middle" font-size="24">${categories[i]}</text>`;
@@ -335,7 +340,7 @@ const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: 
 export const generateReadinessProblem = (
     module: string,
     settings: any
-): { problem: Problem, title: string, error?: string, preamble?: string } => {
+): { problem: Problem, title: string, error?: string } => {
     switch (module) {
         case 'matching-and-sorting':
             return generateMatchingProblem(settings as MatchingAndSortingSettings);
@@ -353,17 +358,6 @@ export const generateReadinessProblem = (
             return generateMeasurementIntroProblem(settings as IntroToMeasurementSettings);
         case 'simple-graphs':
             return generateSimpleGraphProblem(settings as SimpleGraphsSettings);
-        // FIX: Added new readiness modules to the dispatcher function.
-        case 'visual-addition-subtraction':
-            return generateVisualAdditionSubtractionProblem(settings as VisualAdditionSubtractionSettings);
-        case 'verbal-arithmetic':
-            return generateVerbalArithmeticProblem(settings as VerbalArithmeticSettings);
-        case 'missing-number-puzzles':
-            return generateMissingNumberPuzzlesProblem(settings as MissingNumberPuzzlesSettings);
-        case 'symbolic-arithmetic':
-            return generateSymbolicArithmeticProblem(settings as SymbolicArithmeticSettings);
-        case 'problem-creation':
-            return generateProblemCreationProblem(settings as ProblemCreationSettings);
         default:
             return {
                 problem: { question: "Hata", answer: "Hata", category: 'error' },
@@ -371,186 +365,4 @@ export const generateReadinessProblem = (
                 error: "Bilinmeyen bir hazırlık modülü seçildi."
             };
     }
-};
-
-// --- NEW GENERATOR FUNCTIONS (V2) ---
-
-export const generateVisualAdditionSubtractionProblem = (settings: VisualAdditionSubtractionSettings): { problem: Problem, title: string } => {
-    const { operation, theme, maxNumber } = settings;
-    const title = "Şekillerle Toplama ve Çıkarma";
-    const item = getRandomItems(theme, 1)[0];
-    
-    const currentOperation = operation === 'mixed' ? (Math.random() < 0.5 ? 'addition' : 'subtraction') : operation;
-
-    let n1 = 0, n2 = 0, answer = 0;
-    let opSymbol = '';
-
-    if (currentOperation === 'addition') {
-        n1 = getRandomInt(1, maxNumber - 2);
-        n2 = getRandomInt(1, maxNumber - n1);
-        answer = n1 + n2;
-        opSymbol = '+';
-    } else { // subtraction
-        n1 = getRandomInt(2, maxNumber);
-        n2 = getRandomInt(1, n1 - 1);
-        answer = n1 - n2;
-        opSymbol = '-';
-    }
-
-    const question = `<div style="display: flex; align-items: center; justify-content: center; gap: 1rem; font-size: 2.5rem; flex-wrap: wrap;">
-                        <span>${item.repeat(n1)}</span>
-                        <b style="color: #c2410c;">${opSymbol}</b>
-                        <span>${item.repeat(n2)}</span>
-                        <b style="color: #c2410c;">=</b>
-                        <span style="border: 2px solid #a8a29e; width: 4rem; height: 3.5rem; display: inline-block; border-radius: 4px;"></span>
-                      </div>`;
-
-    return { problem: { question, answer, category: 'visual-addition-subtraction' }, title };
-};
-
-export const generateVerbalArithmeticProblem = (settings: VerbalArithmeticSettings): { problem: Problem, title: string } => {
-    const { operation, maxResult } = settings;
-    const title = "İşlemi Sözel Olarak İfade Etme";
-    
-    let n1 = 0, n2 = 0, result = 0;
-    let opSymbol = '', opWord = '';
-    
-    if (operation === 'addition') {
-        n1 = getRandomInt(1, maxResult - 2);
-        n2 = getRandomInt(1, maxResult - n1);
-        result = n1 + n2;
-        opSymbol = '+';
-        opWord = 'artı';
-    } else { // subtraction
-        result = getRandomInt(1, maxResult - 1);
-        n1 = getRandomInt(result + 1, maxResult);
-        n2 = n1 - result;
-        opSymbol = '-';
-        opWord = 'eksi';
-    }
-
-    const question = `<p style="font-size: 1.5rem; font-family: monospace; text-align: center;">${n1} ${opSymbol} ${n2} = ${result}</p>`;
-    const answer = `${numberToWords(n1)} ${opWord} ${numberToWords(n2)} eşittir ${numberToWords(result)}`;
-    
-    return { problem: { question, answer, category: 'verbal-arithmetic' }, title };
-};
-
-export const generateMissingNumberPuzzlesProblem = (settings: MissingNumberPuzzlesSettings): { problem: Problem, title: string } => {
-    const { operation, maxResult } = settings;
-    const title = "Eksik Sayıyı Bulma";
-    const dot = '●';
-    
-    let n1 = 0, n2 = 0, result = 0, answer = 0;
-    let questionHTML = '';
-    const box = `<span style="border: 2px solid #333; width: 3rem; height: 2.5rem; display: inline-block; border-radius: 4px; vertical-align: middle;"></span>`;
-    const createDots = (n: number) => `<div style="letter-spacing: 0.2em; font-size: 1.5rem; color: #6b7280; text-align: center;">${dot.repeat(n)}</div>`;
-
-    if (operation === 'addition') {
-        result = getRandomInt(3, maxResult);
-        n1 = getRandomInt(1, result - 1);
-        n2 = result - n1;
-        const missingTerm = getRandomInt(1, 3);
-        
-        switch(missingTerm) {
-            case 1: answer = n1; questionHTML = `${box} + ${n2} = ${result}`; break;
-            case 2: answer = n2; questionHTML = `${n1} + ${box} = ${result}`; break;
-            default: answer = result; questionHTML = `${n1} + ${n2} = ${box}`; break;
-        }
-    } else { // subtraction
-        n1 = getRandomInt(3, maxResult);
-        n2 = getRandomInt(1, n1 - 1);
-        result = n1 - n2;
-        const missingTerm = getRandomInt(1, 3);
-
-        switch(missingTerm) {
-            case 1: answer = n1; questionHTML = `${box} - ${n2} = ${result}`; break;
-            case 2: answer = n2; questionHTML = `${n1} - ${box} = ${result}`; break;
-            default: answer = result; questionHTML = `${n1} - ${n2} = ${box}`; break;
-        }
-    }
-
-    const question = `
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-            ${createDots(result)}
-            <p style="font-size: 1.5rem; font-family: monospace; display: flex; align-items: center; gap: 0.5rem;">${questionHTML}</p>
-        </div>`;
-
-    return { problem: { question, answer, category: 'missing-number-puzzles' }, title };
-};
-
-export const generateSymbolicArithmeticProblem = (settings: SymbolicArithmeticSettings): { problem: Problem, title: string, preamble: string } => {
-    const { operation, theme, maxNumber } = settings;
-    const title = "Simgelerle İşlemler";
-
-    const symbols = getRandomItems(theme, 4);
-    const values = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4);
-    const key = symbols.map((s, i) => ({ symbol: s, value: values[i] }));
-    
-    let preambleHTML = '<div style="font-size: 1.2rem; margin-bottom: 1rem; text-align: center; border: 1px solid #ccc; padding: 0.5rem; border-radius: 8px;"><b>ANAHTAR:</b><div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.5rem;">';
-    key.forEach(k => {
-        preambleHTML += `<span style="font-family: monospace; font-size: 1.5rem;">${k.symbol} = ${k.value}</span>`;
-    });
-    preambleHTML += '</div></div>';
-
-    const currentOperation = operation === 'mixed' ? (Math.random() < 0.5 ? 'addition' : 'subtraction') : operation;
-    const item1 = key[0];
-    const item2 = key[1];
-    let question = '', answer = 0, opSymbol = '';
-
-    if (currentOperation === 'addition') {
-        opSymbol = '+';
-        answer = item1.value + item2.value;
-    } else {
-        opSymbol = '-';
-        if(item1.value < item2.value) {
-            answer = item2.value - item1.value;
-            question = `${item2.symbol} ${opSymbol} ${item1.symbol} = ?`;
-        } else {
-            answer = item1.value - item2.value;
-            question = `${item1.symbol} ${opSymbol} ${item2.symbol} = ?`;
-        }
-    }
-    if (!question) question = `${item1.symbol} ${opSymbol} ${item2.symbol} = ?`;
-
-    const finalQuestion = `<div style="font-size: 2.5rem; text-align: center;">${question}</div>`;
-
-    return { 
-        problem: { question: finalQuestion, answer, category: 'symbolic-arithmetic' }, 
-        title, 
-        preamble: preambleHTML 
-    };
-};
-
-export const generateProblemCreationProblem = (settings: ProblemCreationSettings): { problem: Problem, title: string } => {
-    const { operation, difficulty, theme } = settings;
-    const title = "Verilen Bilgilerle Problem Kurma";
-    const item = getRandomItems(theme, 1)[0];
-
-    const maxByDifficulty = { easy: 10, medium: 50, hard: 100 }[difficulty];
-    let n1 = 0, n2 = 0, result = 0, opSymbol = '';
-
-    if (operation === 'addition') {
-        n1 = getRandomInt(1, maxByDifficulty - 2);
-        n2 = getRandomInt(1, maxByDifficulty - n1);
-        result = n1 + n2;
-        opSymbol = '+';
-    } else { // subtraction
-        result = getRandomInt(1, maxByDifficulty - 1);
-        n1 = getRandomInt(result + 1, maxByDifficulty);
-        n2 = n1 - result;
-        opSymbol = '-';
-    }
-
-    const question = `
-        <div style="display: flex; flex-direction: column; gap: 1rem; border: 1px dashed #d4d4d8; padding: 1rem; border-radius: 8px; background-color: #fafafa;">
-            <p style="font-weight: 500;">Aşağıdaki bilgileri kullanarak bir problem yazınız:</p>
-            <ul style="list-style-type: disc; margin-left: 20px;">
-                <li><b>İşlem:</b> <code style="font-family: monospace; background: #e7e5e4; padding: 2px 5px; border-radius: 3px;">${n1} ${opSymbol} ${n2} = ${result}</code></li>
-                <li><b>Tema / Nesne:</b> ${item}</li>
-            </ul>
-            <div style="margin-top: 0.5rem; border: 1px solid #a8a29e; min-height: 150px; border-radius: 4px; background: white; padding: 0.5rem;"></div>
-        </div>`;
-    const answer = 'Öğrenciye özel cevap.';
-    
-    return { problem: { question, answer, category: 'problem-creation' }, title };
 };

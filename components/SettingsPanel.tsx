@@ -1,4 +1,3 @@
-
 import React, { Suspense } from 'react';
 import { useUI } from '../services/UIContext';
 import { LoadingIcon } from './icons/Icons';

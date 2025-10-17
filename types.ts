@@ -163,14 +163,17 @@ export enum RhythmicProblemType {
 }
 
 export interface RhythmicCountingSettings {
-    digits: number;
+    gradeLevel: number;
     type: RhythmicProblemType;
     step: number;
     direction: 'forward' | 'backward' | 'mixed';
     useMultiplesOnly: boolean;
+    min: number;
+    max: number;
     patternLength: number;
     missingCount: number;
     orderCount: number;
+    orderDigits: number;
     beforeCount: number;
     afterCount: number;
     problemsPerPage: number;

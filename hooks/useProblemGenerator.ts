@@ -54,17 +54,9 @@ export const useProblemGenerator = <T,>({
             if (isPracticeSheet) {
                 totalCount = pageCount;
             } else if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns * pageCount;
+                totalCount = printSettings.rows * printSettings.columns;
             } else if (autoFit) {
-                 // Generate a single sample problem to measure its height accurately.
-                let sampleForMeasurement: Problem | undefined;
-                if (!useWordProblems) { // Don't generate sample for AI problems
-                    const sampleResult = generatorFn(settings);
-                    if (sampleResult.problem) {
-                        sampleForMeasurement = sampleResult.problem;
-                    }
-                }
-                const calculatedProblems = calculateMaxProblems(contentRef, printSettings, sampleForMeasurement);
+                const calculatedProblems = calculateMaxProblems(contentRef, printSettings);
                 totalCount = (calculatedProblems > 0 ? calculatedProblems : problemsPerPage) * pageCount;
             } else {
                 totalCount = problemsPerPage * pageCount;
