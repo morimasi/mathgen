@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
 import { ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateArithmeticProblem } from '../../services/mathService';
-import { generateContextualWordProblems } from '../../services/geminiService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Checkbox from '../../components/form/Checkbox';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
-import { TOPIC_SUGGESTIONS } from '../../constants';
-import TextInput from '../../components/form/TextInput';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { generateArithmeticProblem } from '../services/mathService';
+import { generateContextualWordProblems } from '../services/geminiService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Checkbox from '../components/form/Checkbox';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
+import { TOPIC_SUGGESTIONS } from '../constants';
+import TextInput from '../components/form/TextInput';
 
 const initialSettings: ArithmeticSettings = {
     gradeLevel: 1,

@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { DyscalculiaSettings, DyscalculiaSubModuleType } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateDyscalculiaProblem } from '../../services/dyscalculiaService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { generateDyscalculiaProblem } from '../services/dyscalculiaService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
 
 import NumberSenseSettings from './dyscalculia/NumberSenseSettings';
 import ArithmeticFluencySettings from './dyscalculia/ArithmeticFluencySettings';
