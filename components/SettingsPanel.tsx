@@ -24,6 +24,12 @@ const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModul
 const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule'));
 const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule'));
 const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule'));
+const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/VisualAdditionSubtractionModule'));
+const VerbalArithmeticModule = React.lazy(() => import('../modules/VerbalArithmeticModule'));
+const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNumberPuzzlesModule'));
+const SymbolicArithmeticModule = React.lazy(() => import('../modules/SymbolicArithmeticModule'));
+const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule'));
+
 
 const SettingsPanel: React.FC = () => {
     const { activeTab } = useUI();
@@ -51,6 +57,11 @@ const SettingsPanel: React.FC = () => {
             case 'dyslexia': return <DyslexiaModule />;
             case 'dyscalculia': return <DyscalculiaModule />;
             case 'dysgraphia': return <DysgraphiaModule />;
+            case 'visual-addition-subtraction': return <VisualAdditionSubtractionModule />;
+            case 'verbal-arithmetic': return <VerbalArithmeticModule />;
+            case 'missing-number-puzzles': return <MissingNumberPuzzlesModule />;
+            case 'symbolic-arithmetic': return <SymbolicArithmeticModule />;
+            case 'problem-creation': return <ProblemCreationModule />;
             default: return <div>Lütfen yukarıdaki menüden bir modül seçin.</div>;
         }
     };

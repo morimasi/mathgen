@@ -7,6 +7,7 @@ interface UpdateWorksheetPayload {
     title: string;
     generatorModule: string;
     pageCount: number;
+    preamble?: string;
 }
 
 interface WorksheetContextType {
@@ -14,6 +15,7 @@ interface WorksheetContextType {
     isLoading: boolean;
     worksheetTitle: string;
     pageCount: number;
+    preamble: string | null;
     lastGeneratorModule: string | null;
     autoRefreshTrigger: number;
     visualSupportSettings: VisualSupportSettings;
@@ -42,13 +44,22 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [isLoading, setIsLoading] = useState(false);
     const [worksheetTitle, setWorksheetTitle] = useState('');
     const [pageCount, setPageCount] = useState(1);
+    const [preamble, setPreamble] = useState<string | null>(null);
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
     const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>(initialVisualSupportSettings);
 
     const updateWorksheet = useCallback((payload: UpdateWorksheetPayload) => {
-        const { newProblems, clearPrevious, title, generatorModule, pageCount } = payload;
-        setProblems(prev => clearPrevious ? newProblems : [...prev, ...newProblems]);
+        const { newProblems, clearPrevious, title, generatorModule, pageCount, preamble: newPreamble } = payload;
+        
+        if (clearPrevious) {
+            setProblems(newProblems);
+            setPreamble(newPreamble || null);
+        } else {
+            setProblems(prev => [...prev, ...newProblems]);
+            // Don't change preamble when adding to existing sheet
+        }
+
         setWorksheetTitle(title);
         setLastGeneratorModule(generatorModule);
         setPageCount(pageCount);
@@ -64,6 +75,7 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
         setProblems([]);
         setIsLoading(false);
         setWorksheetTitle('');
+        setPreamble(null);
         setAutoRefreshTrigger(0);
         setLastGeneratorModule(null);
         setPageCount(1);
@@ -75,6 +87,7 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             isLoading,
             worksheetTitle,
             pageCount,
+            preamble,
             lastGeneratorModule,
             autoRefreshTrigger,
             visualSupportSettings,

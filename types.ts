@@ -5,6 +5,8 @@ export interface Problem {
     answer: string | number;
     category: string;
     display?: 'inline' | 'vertical-html' | 'long-division-html' | 'flow' | 'table';
+    // FIX: Added optional layout property to support different problem layouts like 'given-wanted'.
+    layout?: 'default' | 'with-visual-space' | 'given-wanted';
 }
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'mixed';
@@ -253,6 +255,8 @@ export interface WordProblemSettings {
     autoFit: boolean;
     sourceModule: string;
     useVisuals: boolean;
+    // FIX: Added optional layout property to support different problem layouts from the AI module.
+    layout?: 'default' | 'with-visual-space' | 'given-wanted';
 }
 
 // --- MEASUREMENT ---
@@ -441,6 +445,52 @@ export interface SimpleGraphsSettings {
     useWordProblems: boolean;
     topic: string;
 }
+
+// FIX: Added missing type definitions for new readiness modules to resolve import errors.
+// --- Visual Addition & Subtraction ---
+export interface VisualAdditionSubtractionSettings {
+    operation: 'addition' | 'subtraction' | 'mixed';
+    theme: MathReadinessTheme;
+    maxNumber: number;
+    problemsPerPage: number;
+    pageCount: number;
+}
+
+// --- Verbal Arithmetic ---
+export interface VerbalArithmeticSettings {
+    operation: 'addition' | 'subtraction';
+    maxResult: number;
+    problemsPerPage: number;
+    pageCount: number;
+}
+
+// --- Missing Number Puzzles ---
+export interface MissingNumberPuzzlesSettings {
+    operation: 'addition' | 'subtraction';
+    termCount: number;
+    maxResult: number;
+    problemsPerPage: number;
+    pageCount: number;
+}
+
+// --- Symbolic Arithmetic ---
+export interface SymbolicArithmeticSettings {
+    operation: 'addition' | 'subtraction' | 'mixed';
+    theme: MathReadinessTheme;
+    maxNumber: number;
+    problemsPerPage: number;
+    pageCount: number;
+}
+
+// --- Problem Creation ---
+export interface ProblemCreationSettings {
+    operation: 'addition' | 'subtraction';
+    difficulty: 'easy' | 'medium' | 'hard';
+    theme: MathReadinessTheme;
+    problemsPerPage: number;
+    pageCount: number;
+}
+
 
 // --- DYSLEXIA ---
 export type DyslexiaSubModuleType = 'attention-questions' | 'sound-wizard' | 'letter-detective' | 'reading-fluency-coach' | 'comprehension-explorer' | 'vocabulary-explorer' | 'visual-master' | 'word-hunter' | 'spelling-champion' | 'memory-gamer' | 'auditory-writing' | 'interactive-story';

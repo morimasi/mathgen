@@ -24,6 +24,11 @@ import {
     DyslexiaIcon,
     DyscalculiaIcon,
     DysgraphiaIcon,
+    VisualAdditionSubtractionIcon,
+    VerbalArithmeticIcon,
+    MissingNumberIcon,
+    SymbolicArithmeticIcon,
+    ProblemCreationIcon,
 } from './icons/Icons';
 
 interface Tab {
@@ -64,6 +69,11 @@ const itemIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = 
     'dyslexia': DyslexiaIcon,
     'dyscalculia': DyscalculiaIcon,
     'dysgraphia': DysgraphiaIcon,
+    'visual-addition-subtraction': VisualAdditionSubtractionIcon,
+    'verbal-arithmetic': VerbalArithmeticIcon,
+    'missing-number-puzzles': MissingNumberIcon,
+    'symbolic-arithmetic': SymbolicArithmeticIcon,
+    'problem-creation': ProblemCreationIcon,
 };
 
 const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {

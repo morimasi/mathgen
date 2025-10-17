@@ -41,6 +41,7 @@ const WordProblemsModule: React.FC = () => {
         autoFit: true,
         sourceModule: 'none',
         useVisuals: false,
+        layout: 'default',
     });
     
     const { generate } = useProblemGenerator({
@@ -157,6 +158,18 @@ const WordProblemsModule: React.FC = () => {
                         { value: 2, label: '2 İşlemli' },
                         { value: 3, label: '3 İşlemli' },
                     ]}
+                />
+                 <Select
+                    label="Problem Formatı"
+                    id="problem-layout"
+                    value={settings.layout || 'default'}
+                    onChange={e => handleSettingChange('layout', e.target.value)}
+                    options={[
+                        { value: 'default', label: 'Standart' },
+                        { value: 'with-visual-space', label: 'Çizim Alanı Ekle' },
+                        { value: 'given-wanted', label: 'Verilen/İstenen/Çözüm' },
+                    ]}
+                    containerClassName="col-span-2"
                 />
                 <div className="col-span-2 grid grid-cols-2 gap-2">
                     <Select

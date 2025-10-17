@@ -1,5 +1,14 @@
 // constants.ts
 
+import {
+    VisualAdditionSubtractionIcon,
+    VerbalArithmeticIcon,
+    MissingNumberIcon,
+    SymbolicArithmeticIcon,
+    ProblemCreationIcon
+} from './components/icons/Icons';
+
+
 export const TAB_GROUPS = [
     {
         title: 'Matematiğe Hazırlık',
@@ -12,6 +21,11 @@ export const TAB_GROUPS = [
             { id: 'positional-concepts', label: 'Konum ve Yön' },
             { id: 'intro-to-measurement', label: 'Ölçmeye Giriş' },
             { id: 'simple-graphs', label: 'Basit Grafikler' },
+            { id: 'visual-addition-subtraction', label: 'Şekillerle Toplama/Çıkarma' },
+            { id: 'verbal-arithmetic', label: 'İşlemi Sözel İfade Etme' },
+            { id: 'missing-number-puzzles', label: 'Eksik Sayıyı Bulma' },
+            { id: 'symbolic-arithmetic', label: 'Simgelerle İşlemler' },
+            { id: 'problem-creation', label: 'Problem Kurma' },
         ]
     },
     {

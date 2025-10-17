@@ -1,6 +1,7 @@
 import React from 'react';
 import { useWorksheet } from '../services/WorksheetContext';
 import { usePrintSettings } from '../services/PrintSettingsContext';
+import { Problem } from '../types';
 
 const LadybugSVGLoader: React.FC<{ className?: string }> = ({ className }) => (
     <svg viewBox="0 0 50 50" width="100%" height="100%" className={className}>
@@ -49,9 +50,57 @@ interface ProblemSheetProps {
     viewScale: number;
 }
 
+
+const ProblemRenderer: React.FC<{ problem: Problem, problemNumber: number, showProblemNumber: boolean }> = ({ problem, problemNumber, showProblemNumber }) => {
+    const renderContent = () => {
+        const questionHTML = <div dangerouslySetInnerHTML={{ __html: problem.question }} />;
+        
+        switch (problem.layout) {
+            case 'with-visual-space':
+                return (
+                    <div className="flex flex-col gap-4">
+                        {questionHTML}
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                            <div className="border border-dashed border-stone-400 p-2 rounded-md">
+                                <h4 className="text-sm font-semibold text-center text-stone-600 dark:text-stone-400 mb-2">Şekille Göster</h4>
+                                <div className="aspect-video bg-stone-50 dark:bg-stone-700/50 rounded-sm"></div>
+                            </div>
+                            <div className="border border-dashed border-stone-400 p-2 rounded-md">
+                                <h4 className="text-sm font-semibold text-center text-stone-600 dark:text-stone-400 mb-2">Problemi Çöz</h4>
+                                <div className="aspect-video bg-stone-50 dark:bg-stone-700/50 rounded-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            case 'given-wanted':
+                 return (
+                    <div className="flex flex-col gap-2">
+                        {questionHTML}
+                        <div className="grid grid-cols-1 gap-2 mt-2 text-sm">
+                            <div className="border-t border-stone-300 dark:border-stone-600 pt-1"><b className="font-semibold">Verilen:</b></div>
+                            <div className="border-t border-stone-300 dark:border-stone-600 pt-1"><b className="font-semibold">İstenen:</b></div>
+                            <div className="border-t border-stone-300 dark:border-stone-600 pt-1"><b className="font-semibold">Çözüm:</b></div>
+                        </div>
+                    </div>
+                );
+            default:
+                return questionHTML;
+        }
+    };
+
+    return (
+        <>
+            {showProblemNumber && <span className="problem-number">{problemNumber}.</span>}
+            <div className={!showProblemNumber ? 'w-full' : 'problem-content'}>
+                {renderContent()}
+            </div>
+        </>
+    );
+};
+
+
 const ProblemSheet: React.FC<ProblemSheetProps> = ({ contentRef, viewScale }) => {
-    // FIX: Changed `title` to `worksheetTitle` to match the context type.
-    const { problems, isLoading, worksheetTitle, visualSupportSettings, pageCount } = useWorksheet();
+    const { problems, isLoading, worksheetTitle, visualSupportSettings, pageCount, preamble } = useWorksheet();
     const { settings } = usePrintSettings();
     
     if (isLoading) {
@@ -129,11 +178,14 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ contentRef, viewScale }) =>
                             </header>
                         )}
                         
-                        {worksheetTitle && pageIndex === 0 && <h3 className="text-xl font-semibold mb-6 text-center">{worksheetTitle}</h3>}
+                        {worksheetTitle && <h3 className="text-xl font-semibold mb-6 text-center">{worksheetTitle}</h3>}
+                        
+                        {preamble && pageIndex === 0 && <div className="worksheet-preamble mb-6" dangerouslySetInnerHTML={{ __html: preamble }} />}
 
                         <div className="problem-list" data-layout-mode={settings.layoutMode}>
                             {pageProblems.map((p, index) => {
-                                const isVisuallyHeavy = ['time', 'geometry', 'visual-support', 'place-value'].includes(p.category) || p.question.includes('<svg');
+                                const problemNumber = index + 1 + (pageIndex * Math.ceil(problems.length / pageCount));
+                                const isVisuallyHeavy = ['time', 'geometry', 'visual-support', 'place-value', 'visual-addition-subtraction'].includes(p.category) || p.question.includes('<svg');
                                 const showProblemNumber = settings.showProblemNumbers && !isVisuallyHeavy;
                                 
                                 let itemClassName = `problem-item ${isVisuallyHeavy ? 'items-center' : ''}`;
@@ -149,11 +201,11 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ contentRef, viewScale }) =>
 
                                 return (
                                     <div key={index} className={itemClassName}>
-                                        {showProblemNumber && <span className="problem-number">{index + 1 + (pageIndex * Math.ceil(problems.length / pageCount))}.</span>}
-                                        <div 
-                                            className={(!showProblemNumber || isVisuallyHeavy) ? 'w-full' : 'problem-content'}
-                                            dangerouslySetInnerHTML={{ __html: p.question }}
-                                         />
+                                        <ProblemRenderer
+                                            problem={p}
+                                            problemNumber={problemNumber}
+                                            showProblemNumber={showProblemNumber}
+                                        />
                                     </div>
                                 );
                             })}

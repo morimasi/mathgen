@@ -32,7 +32,7 @@ const ArithmeticModule: React.FC = () => {
         useWordProblems: false,
         operationCount: 1,
         autoFit: true,
-        useVisuals: false,
+        useVisuals: false, // Changed to boolean
         topic: '',
     });
     
@@ -81,7 +81,7 @@ const ArithmeticModule: React.FC = () => {
         if (settings.useWordProblems) return "Yapay zeka ile daha yaratıcı problemler için 'Problem Konusu' alanını kullanın (örn: 'parkta geçen', 'uzay macerası'). 'Görsel Destek' seçeneği, problemlere konuyla ilgili emojiler ekler.";
         if (settings.operation === ArithmeticOperation.Division) return "'Bölme Çatısı' formatı, öğrencilerin bölme işlemini adım adım yapmaları için klasik bir görünüm sunar. 'Bölme Türü' ile sadece kalanlı veya kalansız problemler üretebilirsiniz.";
         if (isAddSub) return "'Sınıf Düzeyi' seçimi, basamak sayısı ve eldeli/onluk bozma gibi ayarları o sınıf seviyesine uygun olarak otomatik düzenler. Daha hassas kontrol için bu ayarları manuel olarak da değiştirebilirsiniz.";
-        return "Bu modül, temel dört işlem alıştırmaları oluşturur. 'Sınıf Düzeyi' seçerek hızlıca başlayabilir veya tüm ayarları manuel olarak düzenleyebilirsiniz.";
+        return "Bu modül, temel dört işlem alıştırmaları oluşturur. 'Sınıf Düzeyi' seçerek hızlıca başlayabilir veya tüm ayarları manuel olarak da düzenleyebilirsiniz.";
     };
 
     return (
@@ -126,8 +126,9 @@ const ArithmeticModule: React.FC = () => {
                     <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 mt-2">
                         <Select label="Format" id="format" value={settings.format} onChange={e => handleSettingChange('format', e.target.value)} disabled={settings.useWordProblems} title={settings.useWordProblems ? "Bu özellik AI modunda otomatik ayarlanır." : ""} options={[{ value: 'inline', label: 'Yan Yana' },{ value: 'vertical-html', label: 'Alt Alta' }, ...(settings.operation === ArithmeticOperation.Division ? [{ value: 'long-division-html', label: 'Bölme Çatısı' }] : [])]}/>
                         <Select label="Gösterim" id="representation" value={settings.representation} onChange={e => handleSettingChange('representation', e.target.value)} disabled={isLongDivision || settings.useWordProblems} title={isLongDivision ? "Bu özellik 'Bölme Çatısı' formatında kullanılamaz." : ""} options={[{ value: 'number', label: 'Rakamla' },{ value: 'word', label: 'Yazıyla' },{ value: 'mixed', label: 'Karışık' }]}/>
-                         <div className="flex items-center pt-3">
+                         <div className="flex items-center pt-3 col-span-2 gap-4">
                             {isAddSub && <Checkbox label="Üçüncü Sayı Ekle" id="hasThirdNumber" checked={settings.hasThirdNumber} onChange={e => handleSettingChange('hasThirdNumber', e.target.checked)} disabled={settings.useWordProblems}/>}
+                            <Checkbox label="Görsel Destek (Nokta)" id="use-visual-dots" checked={settings.useVisuals} onChange={e => handleSettingChange('useVisuals', e.target.checked)} disabled={settings.format !== 'vertical-html' || settings.useWordProblems} title={settings.format !== 'vertical-html' ? "Sadece 'Alt Alta' formatında kullanılabilir." : ""} />
                         </div>
                     </div>
                 </details>

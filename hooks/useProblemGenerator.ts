@@ -7,8 +7,8 @@ import { Problem } from '../types';
 
 interface GeneratorOptions<T> {
     moduleKey: string;
-    settings: T & { useWordProblems?: boolean; autoFit?: boolean; problemsPerPage?: number; pageCount?: number };
-    generatorFn: (settings: T) => { problem: Problem, title: string, error?: string };
+    settings: T & { useWordProblems?: boolean; autoFit?: boolean; problemsPerPage?: number; pageCount?: number, layout?: Problem['layout'] };
+    generatorFn: (settings: T) => { problem: Problem, title: string, error?: string, preamble?: string };
     aiGeneratorFn?: (moduleKey: string, settings: T) => Promise<Problem[]>;
     aiGeneratorTitle?: string;
     isLive?: boolean;
@@ -46,7 +46,7 @@ export const useProblemGenerator = <T,>({
     const generate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            const { useWordProblems, autoFit, problemsPerPage = 20, pageCount = 1 } = settings;
+            const { useWordProblems, autoFit, problemsPerPage = 20, pageCount = 1, layout } = settings;
             const isTableLayout = printSettings.layoutMode === 'table';
 
             let totalCount: number;
@@ -65,15 +65,31 @@ export const useProblemGenerator = <T,>({
             if (useWordProblems && aiGeneratorFn) {
                 const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
                 const problems = await aiGeneratorFn(moduleKey, adjustedSettings);
+                // Assign layout to each problem
+                const problemsWithLayout = problems.map(p => ({ ...p, layout }));
+
                 updateWorksheet({
-                    newProblems: problems,
+                    newProblems: problemsWithLayout,
                     clearPrevious,
                     title: aiGeneratorTitle || `Yapay Zeka Problemleri - ${moduleKey}`,
                     generatorModule: moduleKey,
                     pageCount: isTableLayout ? 1 : pageCount
                 });
             } else {
-                const results = Array.from({ length: totalCount }, () => generatorFn(settings));
+                let preamble: string | undefined = undefined;
+                const results = Array.from({ length: totalCount }, (_, i) => {
+                    const result = generatorFn(settings);
+                    // Capture preamble only from the first generated problem
+                    if (i === 0 && result.preamble) {
+                        preamble = result.preamble;
+                    }
+                    // Assign layout if it exists in settings
+                    if (layout) {
+                        result.problem.layout = layout;
+                    }
+                    return result;
+                });
+
                 const firstError = results.find(r => r.error);
 
                 if (firstError?.error) {
@@ -84,7 +100,8 @@ export const useProblemGenerator = <T,>({
                         clearPrevious,
                         title: results[0].title,
                         generatorModule: moduleKey,
-                        pageCount: isTableLayout || isPracticeSheet ? 1 : pageCount
+                        pageCount: isTableLayout || isPracticeSheet ? 1 : pageCount,
+                        preamble: preamble
                     });
                 }
             }
