@@ -15,20 +15,20 @@ export const TAB_GROUPS = [
         ]
     },
     {
-        title: 'İşlemler',
-        tabs: [
-            { id: 'arithmetic', label: 'Dört İşlem' },
-            { id: 'visual-support', label: 'Görsel Destek' },
-            { id: 'word-problems', label: 'Problemler (AI)' },
-        ]
-    },
-    {
         title: 'Sayılar',
         tabs: [
             { id: 'fractions', label: 'Kesirler' },
             { id: 'decimals', label: 'Ondalık Sayılar' },
             { id: 'place-value', label: 'Basamak Değeri' },
             { id: 'rhythmic-counting', label: 'Ritmik Sayma' },
+        ]
+    },
+    {
+        title: 'İşlemler',
+        tabs: [
+            { id: 'arithmetic', label: 'Dört İşlem' },
+            { id: 'visual-support', label: 'Görsel Destek' },
+            { id: 'word-problems', label: 'Problemler (AI)' },
         ]
     },
     {
