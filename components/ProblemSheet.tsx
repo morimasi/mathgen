@@ -1,5 +1,5 @@
 import React from 'react';
-import { Problem, VisualSupportSettings } from '../types';
+import { useWorksheet } from '../services/WorksheetContext';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 
 const LadybugSVGLoader: React.FC<{ className?: string }> = ({ className }) => (
@@ -44,18 +44,14 @@ const LadybugLoader: React.FC = () => {
     );
 };
 
-
 interface ProblemSheetProps {
-    problems: Problem[];
-    isLoading: boolean;
-    title: string;
     contentRef: React.RefObject<HTMLDivElement>;
-    visualSupportSettings?: VisualSupportSettings;
     viewScale: number;
-    pageCount: number;
 }
 
-const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title, contentRef, visualSupportSettings, viewScale, pageCount }) => {
+const ProblemSheet: React.FC<ProblemSheetProps> = ({ contentRef, viewScale }) => {
+    // FIX: Changed `title` to `worksheetTitle` to match the context type.
+    const { problems, isLoading, worksheetTitle, visualSupportSettings, pageCount } = useWorksheet();
     const { settings } = usePrintSettings();
     
     if (isLoading) {
@@ -111,7 +107,6 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
         pages.push(problems);
     }
 
-
     return (
         <div ref={contentRef}>
             {pages.map((pageProblems, pageIndex) => (
@@ -134,7 +129,7 @@ const ProblemSheet: React.FC<ProblemSheetProps> = ({ problems, isLoading, title,
                             </header>
                         )}
                         
-                        {title && pageIndex === 0 && <h3 className="text-xl font-semibold mb-6 text-center">{title}</h3>}
+                        {worksheetTitle && pageIndex === 0 && <h3 className="text-xl font-semibold mb-6 text-center">{worksheetTitle}</h3>}
 
                         <div className="problem-list" data-layout-mode={settings.layoutMode}>
                             {pageProblems.map((p, index) => {

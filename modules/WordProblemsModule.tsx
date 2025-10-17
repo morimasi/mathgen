@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { Problem, WordProblemSettings } from '../types';
+import { WordProblemSettings, Problem } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -8,10 +8,10 @@ import TextInput from '../components/form/TextInput';
 import Checkbox from '../components/form/Checkbox';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TABS, TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -29,7 +29,7 @@ const moduleOptions = [
     }))
 ];
 
-const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const WordProblemsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<WordProblemSettings>({
         topic: 'Dört İşlem',
@@ -42,57 +42,15 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
         sourceModule: 'none',
         useVisuals: false,
     });
-    const isInitialMount = useRef(true);
-
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
-
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit) {
-                const sampleProblem = {
-                    question: "Bu, yapay zeka tarafından oluşturulmuş daha uzun bir metin problemi örneğidir ve genellikle birkaç satır yer kaplar.",
-                    answer: "Cevap: 15 elma"
-                };
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings, sampleProblem) || settings.problemsPerPage;
-                totalCount = problemsPerPage * settings.pageCount;
-            } else {
-                 totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-            const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
-            const problems = await generateContextualWordProblems(settings.sourceModule, adjustedSettings);
-            const title = `Yapay Zeka Destekli Problemler (${settings.customPrompt ? 'Özel' : settings.topic})`;
-            onGenerate(problems, clearPrevious, title, 'word-problems', isTableLayout ? 1 : settings.pageCount);
-        } catch (err: any) {
-            console.error(err);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-
-    useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'word-problems') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    // Live update on settings change
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        if (lastGeneratorModule === 'word-problems') {
-            const handler = setTimeout(() => {
-                handleGenerate(true);
-            }, 300); // Debounce to prevent rapid updates
-
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+    
+    const { generate } = useProblemGenerator({
+        moduleKey: 'word-problems',
+        settings: { ...settings, useWordProblems: true }, // Force useWordProblems for this module
+        // This module ONLY uses AI, so provide a dummy local generator
+        generatorFn: () => ({ problem: { question: '', answer: '', category: '' }, title: '' }),
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: `Yapay Zeka Destekli Problemler (${settings.customPrompt ? 'Özel' : settings.topic})`
+    });
 
     const handleSettingChange = (field: keyof WordProblemSettings, value: string | number | boolean) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -132,6 +90,10 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
         }
         return "Bu modül, Google Gemini AI kullanarak tamamen size özel problemler üretir. 'Problem Modülü' seçerek belirli bir konuya odaklanabilir veya 'Özel Talimat' alanına hayalinizdeki problemi yazarak yaratıcılığınızı kullanabilirsiniz.";
     };
+    
+    const handleGenerate = useCallback((clearPrevious: boolean) => {
+        generate(clearPrevious);
+    }, [generate]);
 
     return (
         <div className="space-y-2">

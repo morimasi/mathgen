@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { Problem, RhythmicCountingSettings, RhythmicProblemType } from '../types';
+import { RhythmicCountingSettings, RhythmicProblemType } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -9,20 +9,12 @@ import Checkbox from '../components/form/Checkbox';
 import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
-
-const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const RhythmicCountingModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<RhythmicCountingSettings>({
         gradeLevel: 1,
@@ -45,70 +37,17 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
         topic: '',
         orderDirection: 'ascending',
     });
-    const isInitialMount = useRef(true);
 
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            const isSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
+    const isPracticeSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
 
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit && !isSheet) {
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
-                totalCount = problemsPerPage * settings.pageCount;
-            } else {
-                 totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-
-             if (settings.useWordProblems && settings.type === RhythmicProblemType.Pattern) {
-                const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
-                const problems = await generateContextualWordProblems('rhythmic-counting', adjustedSettings);
-                const title = `Gerçek Hayat Problemleri - Ritmik Sayma`;
-                onGenerate(problems, clearPrevious, title, 'rhythmic-counting', settings.pageCount);
-            } else {
-                const generationCount = isSheet ? settings.pageCount : totalCount;
-
-                const results = Array.from({ length: generationCount }, () => generateRhythmicCountingProblem(settings));
-                
-                const firstResultWithError = results.find(r => (r as any).error);
-                if (firstResultWithError) {
-                    console.error((firstResultWithError as any).error);
-                } else if (results.length > 0) {
-                    const problems = results.map(r => r.problem);
-                    const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'rhythmic-counting', isTableLayout ? 1 : settings.pageCount);
-                }
-            }
-        } catch (error: any) {
-            console.error(error);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-
-    useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'rhythmic-counting') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    // Live update on settings change
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        if (lastGeneratorModule === 'rhythmic-counting') {
-            const handler = setTimeout(() => {
-                handleGenerate(true);
-            }, 300); // Debounce to prevent rapid updates
-
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+    const { generate } = useProblemGenerator({
+        moduleKey: 'rhythmic-counting',
+        settings,
+        generatorFn: generateRhythmicCountingProblem,
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: 'Gerçek Hayat Problemleri - Ritmik Sayma',
+        isPracticeSheet,
+    });
 
     const handleSettingChange = (field: keyof RhythmicCountingSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -143,7 +82,6 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
     const showStep = [RhythmicProblemType.Pattern, RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
     const showRange = [RhythmicProblemType.Pattern, RhythmicProblemType.PracticeSheet, RhythmicProblemType.OddEven, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
     const showPattern = settings.type === RhythmicProblemType.Pattern;
-    const isPracticeSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
     const isOrdering = settings.type === RhythmicProblemType.Ordering;
     const isTableLayout = printSettings.layoutMode === 'table';
 
@@ -159,6 +97,10 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
         }
         return "Ritmik sayma ve sayı örüntüleri becerilerini geliştirmek için çeşitli problem türleri sunar. 'Alıştırma Kağıdı' seçenekleri, hızlıca ödev hazırlamak için idealdir.";
     };
+
+    const handleGenerate = useCallback((clearPrevious: boolean) => {
+        generate(clearPrevious);
+    }, [generate]);
 
     return (
         <div className="space-y-2">

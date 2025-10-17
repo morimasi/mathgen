@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateReadinessProblem } from '../services/readinessService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { Problem, ComparingQuantitiesSettings, ComparisonType, MathReadinessTheme } from '../types';
+import { ComparingQuantitiesSettings, ComparisonType, MathReadinessTheme } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -9,20 +9,12 @@ import Checkbox from '../components/form/Checkbox';
 import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
-
-const ComparingQuantitiesModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const ComparingQuantitiesModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<ComparingQuantitiesSettings>({
         type: ComparisonType.MoreLess,
@@ -34,60 +26,14 @@ const ComparingQuantitiesModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoa
         useWordProblems: false,
         topic: '',
     });
-    const isInitialMount = useRef(true);
 
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
-
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit) {
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
-                totalCount = problemsPerPage * settings.pageCount;
-            } else {
-                totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-
-            if (settings.useWordProblems) {
-                 const problems = await generateContextualWordProblems('comparing-quantities', { ...settings, problemsPerPage: totalCount, pageCount: 1 });
-                onGenerate(problems, clearPrevious, "Yapay Zeka Destekli Karşılaştırma Problemleri", 'comparing-quantities', settings.pageCount);
-            } else {
-                const results = Array.from({ length: totalCount }, () => generateReadinessProblem('comparing-quantities', settings));
-                
-                const firstResultWithError = results.find(r => (r as any).error);
-                if (firstResultWithError) {
-                    console.error((firstResultWithError as any).error);
-                } else if (results.length > 0) {
-                    const problems = results.map(r => r.problem);
-                    const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'comparing-quantities', isTableLayout ? 1 : settings.pageCount);
-                }
-            }
-        } catch (error: any) {
-            console.error(error);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-
-    useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'comparing-quantities') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-        if (lastGeneratorModule === 'comparing-quantities') {
-            const handler = setTimeout(() => handleGenerate(true), 300);
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+    const { generate } = useProblemGenerator({
+        moduleKey: 'comparing-quantities',
+        settings,
+        generatorFn: (s) => generateReadinessProblem('comparing-quantities', s),
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: 'Yapay Zeka Destekli Karşılaştırma Problemleri'
+    });
 
     const handleSettingChange = (field: keyof ComparingQuantitiesSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -99,6 +45,10 @@ const ComparingQuantitiesModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoa
     };
 
     const isTableLayout = printSettings.layoutMode === 'table';
+
+    const handleGenerate = useCallback((clearPrevious: boolean) => {
+        generate(clearPrevious);
+    }, [generate]);
 
     return (
         <div className="space-y-2">

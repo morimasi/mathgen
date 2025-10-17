@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import {
     ArithmeticIcon,
     FractionsIcon,
@@ -177,4 +177,4 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
     );
 };
 
-export default Tabs;
+export default memo(Tabs);

@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateTimeProblem } from '../services/timeService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { Problem, TimeSettings, TimeProblemType, Difficulty } from '../types';
+import { TimeSettings, TimeProblemType, Difficulty } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -9,20 +9,12 @@ import Checkbox from '../components/form/Checkbox';
 import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
-
-const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const TimeModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<TimeSettings>({
         gradeLevel: 2,
@@ -40,65 +32,14 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
         showMinuteMarkers: true,
         topic: '',
     });
-    const isInitialMount = useRef(true);
 
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
-
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit) {
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
-                totalCount = problemsPerPage * settings.pageCount;
-            } else {
-                totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-
-            if (settings.useWordProblems) {
-                const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
-                const problems = await generateContextualWordProblems('time', adjustedSettings);
-                const typeNames: { [key: string]: string } = { 'calculate-duration': 'Süre Hesaplama', 'calculate-end-time': 'Bitiş Zamanı Bulma', 'find-start-time': 'Başlangıç Zamanı Bulma' };
-                const diffNames: { [key: string]: string } = { 'easy': 'Kolay', 'medium': 'Orta', 'hard': 'Zor', 'mixed': 'Karışık' };
-                const title = `Gerçek Hayat Problemleri - ${typeNames[settings.type]} (${diffNames[settings.difficulty]})`;
-                onGenerate(problems, clearPrevious, title, 'time', settings.pageCount);
-            } else {
-                const results = Array.from({ length: totalCount }, () => generateTimeProblem(settings));
-                if (results.length > 0) {
-                    const problems = results.map(r => r.problem);
-                    const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'time', isTableLayout ? 1 : settings.pageCount);
-                }
-            }
-        } catch (error: any) {
-            console.error(error);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-
-    useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'time') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    // Live update on settings change
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        if (lastGeneratorModule === 'time') {
-            const handler = setTimeout(() => {
-                handleGenerate(true);
-            }, 300); // Debounce to prevent rapid updates
-
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+    const { generate } = useProblemGenerator({
+        moduleKey: 'time',
+        settings,
+        generatorFn: generateTimeProblem,
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: 'Gerçek Hayat Problemleri - Zaman Ölçme'
+    });
 
     const handleSettingChange = (field: keyof TimeSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -149,6 +90,10 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
         }
         return "'Zorluk' ayarı, saat problemlerinin hassasiyetini belirler: Kolay (tam saatler), Orta (çeyrek/yarım saatler), Zor (tüm dakikalar).";
     };
+
+    const handleGenerate = useCallback((clearPrevious: boolean) => {
+        generate(clearPrevious);
+    }, [generate]);
 
     return (
         <div className="space-y-2">

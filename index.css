@@ -420,7 +420,8 @@ body.pdf-export-mode .worksheet-container + .worksheet-container {
     body > #root > div > div[role="dialog"], /* Modals and panels */
     main aside,
     .flying-ladybug-container,
-    .worksheet-toolbar {
+    .worksheet-toolbar,
+    .pdf-loading-overlay {
         display: none !important;
     }
 
@@ -684,3 +685,46 @@ body.theme-sky .prose ol > li::before { color: #075985; }
 .dark body.theme-sky .dark\:text-orange-300 { color: #7dd3fc; }
 .dark body.theme-sky .dark\:text-orange-400 { color: #38bdf8; }
 .dark body.theme-sky .dark\:text-orange-500, .dark body.theme-sky .dark\:hover\:text-orange-500:hover { color: #0ea5e9; }
+
+/* NEW: PDF Loading Overlay */
+.pdf-loading-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 50; /* High z-index */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* NEW: Live Indicator */
+.live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background-color: #dc2626; /* red-600 */
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+}
+.live-indicator::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background-color: white;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

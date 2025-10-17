@@ -1,89 +1,30 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import { generateVisualProblem } from '../services/mathService';
-import { Problem, VisualSupportSettings, ArithmeticOperation } from '../types';
+import { VisualSupportSettings, ArithmeticOperation } from '../types';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import Button from '../components/form/Button';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { useWorksheet } from '../services/WorksheetContext';
 
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
-
-interface VisualSupportModuleProps extends ModuleProps {
-    settings: VisualSupportSettings;
-    setSettings: (settings: VisualSupportSettings) => void;
-}
-
-const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({ 
-    onGenerate, 
-    setIsLoading, 
-    contentRef,
-    lastGeneratorModule,
-    settings,
-    setSettings
-}) => {
+const VisualSupportModule: React.FC = () => {
+    const { visualSupportSettings: settings, setVisualSupportSettings: setSettings } = useWorksheet();
     const { settings: printSettings, setSettings: setPrintSettings } = usePrintSettings();
-    const isInitialMount = useRef(true);
-    
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            let totalCount;
-            if (settings.autoFit) {
-                const sampleProblem = { question: '<div style="height: 120px">Sample</div>', answer: '1' };
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings, sampleProblem);
-                totalCount = (problemsPerPage > 0 ? problemsPerPage : settings.problemsPerPage) * settings.pageCount;
-            } else {
-                totalCount = settings.problemsPerPage * settings.pageCount;
-            }
 
-            const results = Array.from({ length: totalCount }, () => generateVisualProblem(settings));
-            
-            if (results.length > 0) {
-                const problems = results.map(r => r.problem);
-                const title = results[0].title;
-                onGenerate(problems, clearPrevious, title, 'visual-support', settings.pageCount);
-            }
-        } catch (error: any) {
-            console.error(error);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-    
-    // Deconstruct settings to create a stable dependency array for the live-update effect.
-    // This effect will now ignore changes to problemsPerPage and pageCount.
-    const { 
-        problemsPerPage, 
-        pageCount, 
-        ...liveSettings 
-    } = settings;
+    const { generate } = useProblemGenerator({
+        moduleKey: 'visual-support',
+        settings,
+        generatorFn: generateVisualProblem,
+        isLive: true,
+    });
 
     useEffect(() => {
-        // This module is "live", so it should update whenever its settings or print settings change.
-        if (lastGeneratorModule !== 'visual-support' && !isInitialMount.current) {
-            // Do not auto-run if another module is active
-            return;
-        }
-
-        const handler = setTimeout(() => {
-            handleGenerate(true);
-        }, 300); // Debounce to prevent rapid updates while sliding
-
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-        }
-
-        return () => clearTimeout(handler);
-    }, [JSON.stringify(liveSettings), printSettings, handleGenerate, lastGeneratorModule]);
-
+        // Automatically generate on initial mount for this specific module
+        generate(true);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSettingChange = (field: keyof VisualSupportSettings, value: any) => {
         setSettings({ ...settings, [field]: value });
@@ -98,13 +39,15 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
 
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Görsel Destek Ayarları</h2>
+            <h2 className="text-sm font-semibold flex items-center gap-2">
+                Görsel Destek Ayarları
+                <span className="live-indicator" title="Bu modüldeki değişiklikler anında yansıtılır">Canlı</span>
+            </h2>
              <p className="text-xs text-stone-600 dark:text-stone-400">
                 Bu modül, nesneler ve kutular kullanarak temel matematik işlemleri için görsel alıştırmalar oluşturur. Ayarlar anında çalışma kağıdına yansır.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 pt-1">
-                 {/* --- LEFT COLUMN: CORE SETTINGS --- */}
                 <div className="flex flex-col gap-y-2">
                     <Select
                         label="İşlem Türü"
@@ -166,7 +109,7 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                                     disabled={settings.autoFit}
                                 />
                                 <Button
-                                    onClick={() => handleGenerate(true)}
+                                    onClick={() => generate(true)}
                                     disabled={settings.autoFit}
                                     size="sm"
                                     variant="secondary"
@@ -180,7 +123,6 @@ const VisualSupportModule: React.FC<VisualSupportModuleProps> = ({
                     </div>
                 </div>
 
-                {/* --- RIGHT COLUMN: VISUAL SLIDERS --- */}
                 <div className="flex flex-col justify-around gap-y-1">
                      <div className="space-y-1">
                         <label htmlFor="emoji-size" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">

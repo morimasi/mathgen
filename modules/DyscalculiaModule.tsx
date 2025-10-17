@@ -7,6 +7,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { generateDyscalculiaProblem } from '../services/dyscalculiaService';
+import { useWorksheet } from '../services/WorksheetContext';
 
 // Import all sub-module setting components
 import NumberSenseSettings from './dyscalculia/NumberSenseSettings';
@@ -29,14 +30,6 @@ import {
     TimeIcon, SpatialReasoningIcon, EstimationSkillsIcon, FractionsDecimalsIntroIcon,
     VisualNumberRepresentationIcon, VisualArithmeticIcon, InteractiveStoryIcon
 } from '../components/icons/Icons';
-
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
 
 const subModules: { id: DyscalculiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
     { id: 'number-sense', label: 'Sayı Hissi', icon: NumberSenseIcon },
@@ -71,14 +64,22 @@ const defaultSettings: DyscalculiaSettings = {
 };
 
 
-const DyscalculiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const DyscalculiaModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<DyscalculiaSettings>(defaultSettings);
+    const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
+    const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
     
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyscalculiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
+
+    useEffect(() => {
+        if (!contentRef.current) {
+            (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = document.getElementById('worksheet-container-0') as HTMLDivElement;
+        }
+    }, []);
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
@@ -100,13 +101,19 @@ const DyscalculiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
             if (result.error) {
                 console.error(result.error);
             } else if (result.problems.length > 0) {
-                onGenerate(result.problems, clearPrevious, result.title, `dyscalculia-${activeSubModuleId}`, isTableLayout ? 1 : settings.pageCount);
+                updateWorksheet({
+                    newProblems: result.problems, 
+                    clearPrevious, 
+                    title: result.title, 
+                    generatorModule: `dyscalculia-${activeSubModuleId}`, 
+                    pageCount: isTableLayout ? 1 : settings.pageCount
+                });
             }
         } catch (error: any) {
             console.error(error);
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
+    }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === `dyscalculia-${activeSubModuleId}`) {

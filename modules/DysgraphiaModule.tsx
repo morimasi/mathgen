@@ -7,6 +7,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { generateDysgraphiaProblem } from '../services/dysgraphiaService';
+import { useWorksheet } from '../services/WorksheetContext';
 
 // Import all sub-module setting components
 import FineMotorSkillsSettings from './dysgraphia/FineMotorSkillsSettings';
@@ -28,14 +29,6 @@ import {
     WritingSpeedIcon, SentenceConstructionIcon, PunctuationIcon, WritingPlanningIcon, CreativeWritingIcon,
     KeyboardSkillsIcon, InteractiveStoryIcon
 } from '../components/icons/Icons';
-
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
 
 const subModules: { id: DysgraphiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
     { id: 'fine-motor-skills', label: 'İnce Motor Becerileri', icon: FineMotorSkillsIcon },
@@ -69,14 +62,22 @@ const defaultSettings: DysgraphiaSettings = {
     interactiveStoryDg: { genre: 'adventure', gradeLevel: '3' },
 };
 
-const DysgraphiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const DysgraphiaModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<DysgraphiaSettings>(defaultSettings);
+    const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
+    const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
     
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DysgraphiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
+
+    useEffect(() => {
+        if (!contentRef.current) {
+            (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = document.getElementById('worksheet-container-0') as HTMLDivElement;
+        }
+    }, []);
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
@@ -98,13 +99,19 @@ const DysgraphiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
             if (result.error) {
                 console.error(result.error);
             } else if (result.problems.length > 0) {
-                onGenerate(result.problems, clearPrevious, result.title, `dysgraphia-${activeSubModuleId}`, isTableLayout ? 1 : settings.pageCount);
+                updateWorksheet({
+                    newProblems: result.problems, 
+                    clearPrevious, 
+                    title: result.title, 
+                    generatorModule: `dysgraphia-${activeSubModuleId}`, 
+                    pageCount: isTableLayout ? 1 : settings.pageCount
+                });
             }
         } catch (error: any) {
             console.error(error);
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
+    }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === `dysgraphia-${activeSubModuleId}`) {

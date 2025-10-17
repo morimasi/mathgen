@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateReadinessProblem } from '../services/readinessService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { Problem, BasicShapesSettings, ShapeRecognitionType, ShapeType } from '../types';
+import { BasicShapesSettings, ShapeRecognitionType, ShapeType } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -9,20 +9,12 @@ import Checkbox from '../components/form/Checkbox';
 import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
-
-const BasicShapesModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const BasicShapesModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<BasicShapesSettings>({
         type: ShapeRecognitionType.ColorShape,
@@ -33,63 +25,14 @@ const BasicShapesModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
         useWordProblems: false,
         topic: '',
     });
-    const isInitialMount = useRef(true);
 
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
-
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit) {
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
-                totalCount = problemsPerPage * settings.pageCount;
-            } else {
-                totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-
-            if (settings.useWordProblems) {
-                // AI integration would be here
-                // For now, it falls back to standard generation
-                console.warn("AI for Basic Shapes not implemented yet, falling back to standard.");
-                 const problems = await generateContextualWordProblems('basic-shapes', { ...settings, problemsPerPage: totalCount, pageCount: 1 });
-                onGenerate(problems, clearPrevious, "Yapay Zeka Destekli Şekil Problemleri", 'basic-shapes', settings.pageCount);
-            } else {
-                const results = Array.from({ length: totalCount }, () => generateReadinessProblem('basic-shapes', settings));
-                
-                const firstResultWithError = results.find(r => (r as any).error);
-                if (firstResultWithError) {
-                    console.error((firstResultWithError as any).error);
-                } else if (results.length > 0) {
-                    const problems = results.map(r => r.problem);
-                    const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'basic-shapes', isTableLayout ? 1 : settings.pageCount);
-                }
-            }
-        } catch (error: any) {
-            console.error(error);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-
-    useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'basic-shapes') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-        if (lastGeneratorModule === 'basic-shapes') {
-            const handler = setTimeout(() => handleGenerate(true), 300);
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+    const { generate } = useProblemGenerator({
+        moduleKey: 'basic-shapes',
+        settings,
+        generatorFn: (s) => generateReadinessProblem('basic-shapes', s),
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: 'Yapay Zeka Destekli Şekil Problemleri'
+    });
 
     const handleSettingChange = (field: keyof BasicShapesSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -101,6 +44,10 @@ const BasicShapesModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
     };
 
     const isTableLayout = printSettings.layoutMode === 'table';
+
+    const handleGenerate = useCallback((clearPrevious: boolean) => {
+        generate(clearPrevious);
+    }, [generate]);
 
     return (
         <div className="space-y-2">

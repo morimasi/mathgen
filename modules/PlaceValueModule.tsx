@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { generatePlaceValueProblem } from '../services/placeValueService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { Problem, PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types';
+import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -9,20 +9,12 @@ import Checkbox from '../components/form/Checkbox';
 import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
-
-const PlaceValueModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const PlaceValueModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<PlaceValueSettings>({
         gradeLevel: 2,
@@ -35,68 +27,14 @@ const PlaceValueModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         autoFit: true,
         topic: '',
     });
-    const isInitialMount = useRef(true);
 
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
-
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit) {
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
-                totalCount = problemsPerPage * settings.pageCount;
-            } else {
-                totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-
-            if (settings.useWordProblems) {
-                const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
-                const problems = await generateContextualWordProblems('place-value', adjustedSettings);
-                 const typeNames: { [key: string]: string } = { 'identification': 'Basamak Değeri Bulma', 'rounding': 'Yuvarlama', 'comparison': 'Karşılaştırma' };
-                const title = `Gerçek Hayat Problemleri - ${typeNames[settings.type] || 'Basamak Değeri'}`;
-                onGenerate(problems, clearPrevious, title, 'place-value', settings.pageCount);
-            } else {
-                const results = Array.from({ length: totalCount }, () => generatePlaceValueProblem(settings));
-                
-                const firstResultWithError = results.find(r => (r as any).error);
-                if (firstResultWithError) {
-                    console.error((firstResultWithError as any).error);
-                } else if (results.length > 0) {
-                    const problems = results.map(r => r.problem);
-                    const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'place-value', isTableLayout ? 1 : settings.pageCount);
-                }
-            }
-        } catch (error: any) {
-            console.error(error);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-
-    useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'place-value') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    // Live update on settings change
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        if (lastGeneratorModule === 'place-value') {
-            const handler = setTimeout(() => {
-                handleGenerate(true);
-            }, 300); // Debounce to prevent rapid updates
-
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+    const { generate } = useProblemGenerator({
+        moduleKey: 'place-value',
+        settings,
+        generatorFn: generatePlaceValueProblem,
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: 'Gerçek Hayat Problemleri - Basamak Değeri'
+    });
 
     const handleSettingChange = (field: keyof PlaceValueSettings, value: any) => {
         const newSettings: PlaceValueSettings = { ...settings, [field]: value };
@@ -173,6 +111,10 @@ const PlaceValueModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                 return "'Sınıf Düzeyi' ayarı, basamak sayısı ve problem türü gibi özellikleri ilgili sınıf seviyesi için otomatik olarak ayarlar. Hızlı bir başlangıç için idealdir.";
         }
     };
+
+    const handleGenerate = useCallback((clearPrevious: boolean) => {
+        generate(clearPrevious);
+    }, [generate]);
 
     return (
         <div className="space-y-2">

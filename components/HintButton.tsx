@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 
 // A simple lightbulb icon
 const LightbulbIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -76,4 +76,4 @@ const HintButton: React.FC<HintButtonProps> = ({ text }) => {
     );
 };
 
-export default HintButton;
+export default memo(HintButton);

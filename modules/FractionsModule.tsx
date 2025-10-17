@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateFractionsProblem } from '../services/fractionsService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { Problem, FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types';
+import { FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -9,20 +9,12 @@ import Checkbox from '../components/form/Checkbox';
 import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
-
-const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const FractionsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<FractionsSettings>({
         gradeLevel: 3,
@@ -41,69 +33,14 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
         topic: '',
         useMixedNumbers: true,
     });
-    const isInitialMount = useRef(true);
-
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
-
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit) {
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings);
-                totalCount = (problemsPerPage > 0 ? problemsPerPage : settings.problemsPerPage) * settings.pageCount;
-            } else {
-                totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-
-            if (settings.useWordProblems && settings.type === FractionsProblemType.FourOperations) {
-                const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
-                const problems = await generateContextualWordProblems('fractions', adjustedSettings);
-                const opNames: { [key: string]: string } = { 'addition': 'Toplama', 'subtraction': 'Çıkarma', 'multiplication': 'Çarpma', 'division': 'Bölme', 'mixed': 'Karışık Dört İşlem' };
-                const diffNames: { [key: string]: string } = { 'easy': 'Kolay', 'medium': 'Orta', 'hard': 'Zor' };
-                const title = `Gerçek Hayat Problemleri - Kesirlerde ${opNames[settings.operation!]} (${diffNames[settings.difficulty!]})`;
-                onGenerate(problems, clearPrevious, title, 'fractions', settings.pageCount);
-            } else {
-                const results = Array.from({ length: totalCount }, () => generateFractionsProblem(settings));
-                
-                const firstResultWithError = results.find(r => (r as any).error);
-                if (firstResultWithError) {
-                    console.error((firstResultWithError as any).error);
-                } else if (results.length > 0) {
-                    const problems = results.map(r => r.problem);
-                    const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'fractions', isTableLayout ? 1 : settings.pageCount);
-                }
-            }
-        } catch (error: any) {
-            console.error(error);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-
-    useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'fractions') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    // Live update on settings change
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        if (lastGeneratorModule === 'fractions') {
-            const handler = setTimeout(() => {
-                handleGenerate(true);
-            }, 300); // Debounce to prevent rapid updates
-
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+    
+    const { generate } = useProblemGenerator({
+        moduleKey: 'fractions',
+        settings,
+        generatorFn: generateFractionsProblem,
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: 'Gerçek Hayat Problemleri - Kesirler'
+    });
 
     const handleSettingChange = (field: keyof FractionsSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -153,6 +90,13 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
                 return "Kesirlerle ilgili farklı becerileri geliştirmek için 'Problem Türü' menüsündeki seçenekleri keşfedin.";
         }
     };
+
+    const handleGenerate = useCallback(
+      (clearPrevious: boolean) => {
+        generate(clearPrevious);
+      },
+      [generate],
+    );
 
     return (
         <div className="space-y-2">

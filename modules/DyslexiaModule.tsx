@@ -7,6 +7,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { generateDyslexiaProblem } from '../services/dyslexiaService';
+import { useWorksheet } from '../services/WorksheetContext';
 
 // Import all sub-module setting components
 import SoundWizardSettings from './dyslexia/SoundWizardSettings';
@@ -27,14 +28,6 @@ import {
     VocabularyExplorerIcon, VisualMasterIcon, WordHunterIcon, SpellingChampionIcon, MemoryGamerIcon,
     AuditoryWritingIcon, InteractiveStoryIcon
 } from '../components/icons/Icons';
-
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
 
 const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
     { id: 'sound-wizard', label: 'Ses Büyücüsü', icon: SoundWizardIcon },
@@ -69,14 +62,22 @@ const defaultSettings: DyslexiaSettings = {
 };
 
 
-const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const DyslexiaModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<DyslexiaSettings>(defaultSettings);
+    const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
+    const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
     
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyslexiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
+
+    useEffect(() => {
+        if (!contentRef.current) {
+            (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = document.getElementById('worksheet-container-0') as HTMLDivElement;
+        }
+    }, []);
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
@@ -98,13 +99,19 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
             if (result.error) {
                 console.error(result.error);
             } else if (result.problems.length > 0) {
-                onGenerate(result.problems, clearPrevious, result.title, `dyslexia-${activeSubModuleId}`, isTableLayout ? 1 : settings.pageCount);
+                updateWorksheet({
+                    newProblems: result.problems, 
+                    clearPrevious, 
+                    title: result.title, 
+                    generatorModule: `dyslexia-${activeSubModuleId}`, 
+                    pageCount: isTableLayout ? 1 : settings.pageCount
+                });
             }
         } catch (error: any) {
             console.error(error);
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
+    }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === `dyslexia-${activeSubModuleId}`) {
@@ -130,8 +137,6 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
         setSettings(prev => ({ ...prev, activeSubModule: id }));
     };
 
-    // FIX: The DyslexiaModule component function was incomplete, lacking helper functions and a return statement.
-    // The following functions and the JSX return block have been added to complete the component.
     const handleSettingChange = (field: keyof DyslexiaSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };

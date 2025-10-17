@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateReadinessProblem } from '../services/readinessService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { Problem, PositionalConceptsSettings, PositionalConceptType, MathReadinessTheme } from '../types';
+import { PositionalConceptsSettings, PositionalConceptType, MathReadinessTheme } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -9,20 +9,12 @@ import Checkbox from '../components/form/Checkbox';
 import TextInput from '../components/form/TextInput';
 import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
-
-const PositionalConceptsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
+const PositionalConceptsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<PositionalConceptsSettings>({
         type: PositionalConceptType.AboveBelow,
@@ -34,60 +26,14 @@ const PositionalConceptsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoad
         useWordProblems: false,
         topic: '',
     });
-    const isInitialMount = useRef(true);
 
-    const handleGenerate = useCallback(async (clearPrevious: boolean) => {
-        setIsLoading(true);
-        try {
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
-
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit) {
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
-                totalCount = problemsPerPage * settings.pageCount;
-            } else {
-                totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-
-            if (settings.useWordProblems) {
-                 const problems = await generateContextualWordProblems('positional-concepts', { ...settings, problemsPerPage: totalCount, pageCount: 1 });
-                onGenerate(problems, clearPrevious, "Yapay Zeka Destekli Konum Problemleri", 'positional-concepts', settings.pageCount);
-            } else {
-                const results = Array.from({ length: totalCount }, () => generateReadinessProblem('positional-concepts', settings));
-                
-                const firstResultWithError = results.find(r => (r as any).error);
-                if (firstResultWithError) {
-                    console.error((firstResultWithError as any).error);
-                } else if (results.length > 0) {
-                    const problems = results.map(r => r.problem);
-                    const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'positional-concepts', isTableLayout ? 1 : settings.pageCount);
-                }
-            }
-        } catch (error: any) {
-            console.error(error);
-        }
-        setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
-
-    useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === 'positional-concepts') {
-            handleGenerate(true);
-        }
-    }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
-
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-        if (lastGeneratorModule === 'positional-concepts') {
-            const handler = setTimeout(() => handleGenerate(true), 300);
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
+    const { generate } = useProblemGenerator({
+        moduleKey: 'positional-concepts',
+        settings,
+        generatorFn: (s) => generateReadinessProblem('positional-concepts', s),
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: 'Yapay Zeka Destekli Konum Problemleri'
+    });
 
     const handleSettingChange = (field: keyof PositionalConceptsSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -99,6 +45,10 @@ const PositionalConceptsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoad
     };
 
     const isTableLayout = printSettings.layoutMode === 'table';
+
+    const handleGenerate = useCallback((clearPrevious: boolean) => {
+        generate(clearPrevious);
+    }, [generate]);
 
     return (
         <div className="space-y-2">
