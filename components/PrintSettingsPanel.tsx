@@ -103,7 +103,6 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                         rows={settings.rows} 
                                         cols={settings.columns}
                                         onSelect={handleTableSelect} 
-                                        isVisible={isVisible}
                                     />
                                 </div>
                             ) : (
