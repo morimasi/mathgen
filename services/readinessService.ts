@@ -332,39 +332,9 @@ const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: 
     return { problem: { question, answer: "Grafiği doldurunuz.", category: 'simple-graphs' }, title };
 };
 
-export const generateReadinessProblem = (
-    module: string,
-    settings: any
-): { problem: Problem, title: string, error?: string } => {
-    switch (module) {
-        case 'matching-and-sorting':
-            return generateMatchingProblem(settings as MatchingAndSortingSettings);
-        case 'comparing-quantities':
-            return generateComparingProblem(settings as ComparingQuantitiesSettings);
-        case 'number-recognition':
-            return generateNumberRecProblem(settings as NumberRecognitionSettings);
-        case 'patterns':
-            return generatePatternsProblem(settings as PatternsSettings);
-        case 'basic-shapes':
-            return generateBasicShapesProblem(settings as BasicShapesSettings);
-        case 'positional-concepts':
-            return generatePositionalProblem(settings as PositionalConceptsSettings);
-        case 'intro-to-measurement':
-            return generateMeasurementIntroProblem(settings as IntroToMeasurementSettings);
-        case 'simple-graphs':
-            return generateSimpleGraphProblem(settings as SimpleGraphsSettings);
-        default:
-            return {
-                problem: { question: "Hata", answer: "Hata", category: 'error' },
-                title: "Geçersiz Modül",
-                error: "Bilinmeyen bir hazırlık modülü seçildi."
-            };
-    }
-};
-
 // --- NEW GENERATOR FUNCTIONS (V2) ---
 
-export const generateVisualAdditionSubtractionProblem = (settings: VisualAdditionSubtractionSettings): { problem: Problem, title: string } => {
+const generateVisualAdditionSubtractionProblem = (settings: VisualAdditionSubtractionSettings): { problem: Problem, title: string } => {
     const { operation, theme, maxNumber } = settings;
     const title = "Şekillerle Toplama ve Çıkarma";
     const item = getRandomItems(theme, 1)[0];
@@ -397,7 +367,7 @@ export const generateVisualAdditionSubtractionProblem = (settings: VisualAdditio
     return { problem: { question, answer, category: 'visual-addition-subtraction' }, title };
 };
 
-export const generateVerbalArithmeticProblem = (settings: VerbalArithmeticSettings): { problem: Problem, title: string } => {
+const generateVerbalArithmeticProblem = (settings: VerbalArithmeticSettings): { problem: Problem, title: string } => {
     const { operation, maxResult } = settings;
     const title = "İşlemi Sözel Olarak İfade Etme";
     
@@ -424,7 +394,7 @@ export const generateVerbalArithmeticProblem = (settings: VerbalArithmeticSettin
     return { problem: { question, answer, category: 'verbal-arithmetic' }, title };
 };
 
-export const generateMissingNumberPuzzlesProblem = (settings: MissingNumberPuzzlesSettings): { problem: Problem, title: string } => {
+const generateMissingNumberPuzzlesProblem = (settings: MissingNumberPuzzlesSettings): { problem: Problem, title: string } => {
     const { operation, maxResult } = settings;
     const title = "Eksik Sayıyı Bulma";
     const dot = '●';
@@ -467,7 +437,7 @@ export const generateMissingNumberPuzzlesProblem = (settings: MissingNumberPuzzl
     return { problem: { question, answer, category: 'missing-number-puzzles' }, title };
 };
 
-export const generateSymbolicArithmeticProblem = (settings: SymbolicArithmeticSettings): { problem: Problem, title: string, preamble: string } => {
+const generateSymbolicArithmeticProblem = (settings: SymbolicArithmeticSettings): { problem: Problem, title: string, preamble: string } => {
     const { operation, theme, maxNumber } = settings;
     const title = "Simgelerle İşlemler";
 
@@ -510,7 +480,7 @@ export const generateSymbolicArithmeticProblem = (settings: SymbolicArithmeticSe
     };
 };
 
-export const generateProblemCreationProblem = (settings: ProblemCreationSettings): { problem: Problem, title: string } => {
+const generateProblemCreationProblem = (settings: ProblemCreationSettings): { problem: Problem, title: string } => {
     const { operation, difficulty, theme } = settings;
     const title = "Verilen Bilgilerle Problem Kurma";
     const item = getRandomItems(theme, 1)[0];
@@ -542,4 +512,44 @@ export const generateProblemCreationProblem = (settings: ProblemCreationSettings
     const answer = 'Öğrenciye özel cevap.';
     
     return { problem: { question, answer, category: 'problem-creation' }, title };
+};
+
+export const generateReadinessProblem = (
+    module: string,
+    settings: any
+): { problem: Problem, title: string, error?: string, preamble?: string } => {
+    switch (module) {
+        case 'matching-and-sorting':
+            return generateMatchingProblem(settings as MatchingAndSortingSettings);
+        case 'comparing-quantities':
+            return generateComparingProblem(settings as ComparingQuantitiesSettings);
+        case 'number-recognition':
+            return generateNumberRecProblem(settings as NumberRecognitionSettings);
+        case 'patterns':
+            return generatePatternsProblem(settings as PatternsSettings);
+        case 'basic-shapes':
+            return generateBasicShapesProblem(settings as BasicShapesSettings);
+        case 'positional-concepts':
+            return generatePositionalProblem(settings as PositionalConceptsSettings);
+        case 'intro-to-measurement':
+            return generateMeasurementIntroProblem(settings as IntroToMeasurementSettings);
+        case 'simple-graphs':
+            return generateSimpleGraphProblem(settings as SimpleGraphsSettings);
+        case 'visual-addition-subtraction':
+            return generateVisualAdditionSubtractionProblem(settings as VisualAdditionSubtractionSettings);
+        case 'verbal-arithmetic':
+            return generateVerbalArithmeticProblem(settings as VerbalArithmeticSettings);
+        case 'missing-number-puzzles':
+            return generateMissingNumberPuzzlesProblem(settings as MissingNumberPuzzlesSettings);
+        case 'symbolic-arithmetic':
+            return generateSymbolicArithmeticProblem(settings as SymbolicArithmeticSettings);
+        case 'problem-creation':
+            return generateProblemCreationProblem(settings as ProblemCreationSettings);
+        default:
+            return {
+                problem: { question: "Hata", answer: "Hata", category: 'error' },
+                title: "Geçersiz Modül",
+                error: "Bilinmeyen bir hazırlık modülü seçildi."
+            };
+    }
 };

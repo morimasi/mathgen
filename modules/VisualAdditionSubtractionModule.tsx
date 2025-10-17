@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { VisualAdditionSubtractionSettings } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateVisualAdditionSubtractionProblem } from '../../services/readinessService';
+import { generateReadinessProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
 import NumberInput from '../../components/form/NumberInput';
 import Checkbox from '../../components/form/Checkbox';
@@ -23,7 +23,7 @@ const VisualAdditionSubtractionModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'visual-addition-subtraction',
         settings,
-        generatorFn: generateVisualAdditionSubtractionProblem,
+        generatorFn: (settings) => generateReadinessProblem('visual-addition-subtraction', settings),
     });
 
     const handleGenerateClick = () => {
