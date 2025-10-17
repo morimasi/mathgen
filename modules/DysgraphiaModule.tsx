@@ -81,16 +81,24 @@ const DysgraphiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            let totalCount = settings.autoFit 
-                ? (calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage) * settings.pageCount
-                : settings.problemsPerPage * settings.pageCount;
+            let totalCount;
+            const isTableLayout = printSettings.layoutMode === 'table';
+
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit) {
+                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
+                totalCount = problemsPerPage * settings.pageCount;
+            } else {
+                totalCount = settings.problemsPerPage * settings.pageCount;
+            }
             
             const result = await generateDysgraphiaProblem(activeSubModuleId, activeSubModuleSettings, totalCount);
 
             if (result.error) {
                 console.error(result.error);
             } else if (result.problems.length > 0) {
-                onGenerate(result.problems, clearPrevious, result.title, `dysgraphia-${activeSubModuleId}`, settings.pageCount);
+                onGenerate(result.problems, clearPrevious, result.title, `dysgraphia-${activeSubModuleId}`, isTableLayout ? 1 : settings.pageCount);
             }
         } catch (error: any) {
             console.error(error);

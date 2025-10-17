@@ -6,7 +6,6 @@ import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
-// FIX: Import the problem generation service for dyscalculia.
 import { generateDyscalculiaProblem } from '../services/dyscalculiaService';
 
 // Import all sub-module setting components
@@ -84,16 +83,24 @@ const DyscalculiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            let totalCount = settings.autoFit 
-                ? (calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage) * settings.pageCount
-                : settings.problemsPerPage * settings.pageCount;
+            let totalCount;
+            const isTableLayout = printSettings.layoutMode === 'table';
+
+            if (isTableLayout) {
+                totalCount = printSettings.rows * printSettings.columns;
+            } else if (settings.autoFit) {
+                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
+                totalCount = problemsPerPage * settings.pageCount;
+            } else {
+                totalCount = settings.problemsPerPage * settings.pageCount;
+            }
             
             const result = await generateDyscalculiaProblem(activeSubModuleId, activeSubModuleSettings, totalCount);
 
             if (result.error) {
                 console.error(result.error);
             } else if (result.problems.length > 0) {
-                onGenerate(result.problems, clearPrevious, result.title, `dyscalculia-${activeSubModuleId}`, settings.pageCount);
+                onGenerate(result.problems, clearPrevious, result.title, `dyscalculia-${activeSubModuleId}`, isTableLayout ? 1 : settings.pageCount);
             }
         } catch (error: any) {
             console.error(error);
