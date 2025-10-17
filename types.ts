@@ -41,6 +41,7 @@ export interface ArithmeticSettings {
     operationCount: number;
     useVisuals: boolean;
     topic: string;
+    autoFit?: boolean;
 }
 
 // --- VISUAL SUPPORT ---
@@ -88,6 +89,7 @@ export interface FractionsSettings {
     useVisuals: boolean;
     topic: string;
     useMixedNumbers: boolean;
+    autoFit?: boolean;
 }
 
 
@@ -119,6 +121,7 @@ export interface DecimalsSettings {
     operationCount: number;
     useVisuals: boolean;
     topic: string;
+    autoFit?: boolean;
 }
 
 // --- PLACE VALUE ---
@@ -144,6 +147,7 @@ export interface PlaceValueSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
+    autoFit?: boolean;
 }
 
 // --- RHYTHMIC COUNTING ---
@@ -177,6 +181,7 @@ export interface RhythmicCountingSettings {
     useWordProblems: boolean;
     topic: string;
     orderDirection: 'ascending' | 'descending' | 'mixed';
+    autoFit?: boolean;
 }
 
 // --- TIME ---
@@ -203,6 +208,7 @@ export interface TimeSettings {
     showDigitalTime: boolean;
     showMinuteMarkers: boolean;
     topic: string;
+    autoFit?: boolean;
 }
 
 // --- GEOMETRY ---
@@ -235,7 +241,6 @@ export interface GeometrySettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -249,9 +254,7 @@ export interface WordProblemSettings {
     customPrompt: string;
     sourceModule: string;
     useVisuals: boolean;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
-    // FIX: Added optional layout property to support different problem layouts from the AI module.
     layout?: 'default' | 'with-visual-space' | 'given-wanted';
 }
 
@@ -271,7 +274,6 @@ export interface MeasurementSettings {
     useWordProblems: boolean;
     useVisuals: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -321,7 +323,6 @@ export interface MatchingAndSortingSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -339,7 +340,6 @@ export interface ComparingQuantitiesSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -357,7 +357,6 @@ export interface NumberRecognitionSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -375,7 +374,6 @@ export interface PatternsSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -392,7 +390,6 @@ export interface BasicShapesSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -410,7 +407,6 @@ export interface PositionalConceptsSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -429,7 +425,6 @@ export interface IntroToMeasurementSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
@@ -447,11 +442,9 @@ export interface SimpleGraphsSettings {
     pageCount: number;
     useWordProblems: boolean;
     topic: string;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
 }
 
-// FIX: Added missing type definitions for new readiness modules to resolve import errors.
 // --- Visual Addition & Subtraction ---
 export interface VisualAdditionSubtractionSettings {
     operation: 'addition' | 'subtraction' | 'mixed';
@@ -459,6 +452,7 @@ export interface VisualAdditionSubtractionSettings {
     maxNumber: number;
     problemsPerPage: number;
     pageCount: number;
+    autoFit?: boolean;
 }
 
 // --- Verbal Arithmetic ---
@@ -467,6 +461,7 @@ export interface VerbalArithmeticSettings {
     maxResult: number;
     problemsPerPage: number;
     pageCount: number;
+    autoFit?: boolean;
 }
 
 // --- Missing Number Puzzles ---
@@ -476,6 +471,7 @@ export interface MissingNumberPuzzlesSettings {
     maxResult: number;
     problemsPerPage: number;
     pageCount: number;
+    autoFit?: boolean;
 }
 
 // --- Symbolic Arithmetic ---
@@ -485,6 +481,7 @@ export interface SymbolicArithmeticSettings {
     maxNumber: number;
     problemsPerPage: number;
     pageCount: number;
+    autoFit?: boolean;
 }
 
 // --- Problem Creation ---
@@ -494,6 +491,7 @@ export interface ProblemCreationSettings {
     theme: MathReadinessTheme;
     problemsPerPage: number;
     pageCount: number;
+    autoFit?: boolean;
 }
 
 
@@ -519,7 +517,6 @@ export interface DyslexiaSettings {
     activeSubModule: DyslexiaSubModuleType;
     problemsPerPage: number;
     pageCount: number;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
     attentionQuestions: AttentionQuestionSettings;
     soundWizard: SoundWizardSettings;
@@ -552,7 +549,6 @@ export interface InteractiveStoryDcSettings { genre: 'market' | 'playground' | '
 export interface DyscalculiaSettings {
     activeSubModule: DyscalculiaSubModuleType;
     problemsPerPage: number; pageCount: number;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
     numberSense: NumberSenseSettings;
     arithmeticFluency: ArithmeticFluencySettings;
@@ -585,7 +581,6 @@ export interface InteractiveStoryDgSettings { genre: 'journal' | 'adventure' | '
 export interface DysgraphiaSettings {
     activeSubModule: DysgraphiaSubModuleType;
     problemsPerPage: number; pageCount: number;
-    // FIX: Added missing autoFit property
     autoFit?: boolean;
     fineMotorSkills: FineMotorSkillsSettings;
     letterFormation: LetterFormationSettings;

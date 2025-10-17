@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { generateMeasurementProblem } from '../services/measurementService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { MeasurementSettings, MeasurementProblemType, Difficulty } from '../types';
@@ -72,10 +72,6 @@ const MeasurementModule: React.FC = () => {
         }
         return "'Zorluk' ayarı, dönüşümlerin karmaşıklığını belirler. 'Kolay' tam sayılarla, 'Orta' ondalıklı sayılarla, 'Zor' ise kesirli ifadeler ve birden fazla birim içeren (örn: 3 km 250 m = ? m) problemler üretir.";
     };
-    
-    const handleGenerate = useCallback((clearPrevious: boolean) => {
-        generate(clearPrevious);
-    }, [generate]);
 
     return (
         <div className="space-y-2">
@@ -84,123 +80,86 @@ const MeasurementModule: React.FC = () => {
                 <HintButton text={getHintText()} />
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-                <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <Checkbox
-                        label="Gerçek Hayat Problemleri (AI)"
-                        id="use-word-problems-measurement"
-                        checked={!!settings.useWordProblems}
-                        onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
-                    />
-                     {settings.useWordProblems && (
-                        <div className="mt-1.5 pl-6 space-y-1.5">
-                            <div className="relative">
-                                <TextInput
-                                    label="Problem Konusu (İsteğe bağlı)"
-                                    id="measurement-topic"
-                                    value={settings.topic || ''}
-                                    onChange={e => handleSettingChange('topic', e.target.value)}
-                                    placeholder="Örn: Mutfak, Terzi, Manav"
-                                    className="pr-10"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handleRandomTopic}
-                                    className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
-                                    title="Rastgele Konu Öner"
-                                >
-                                    <ShuffleIcon className="w-5 h-5" />
-                                </button>
-                            </div>
-                             <Checkbox
-                                label="Görsel Destek Ekle (Emoji)"
-                                id="use-visuals-measurement"
-                                checked={settings.useVisuals ?? false}
-                                onChange={e => handleSettingChange('useVisuals', e.target.checked)}
+            <div className="space-y-1.5">
+                <details className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg" open={settings.useWordProblems}>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Gerçek Hayat Problemleri (AI)</summary>
+                    <div className="mt-2 pl-4 space-y-1.5">
+                        <Checkbox
+                            label="Yapay Zeka ile Problem Oluştur"
+                            id="use-word-problems-measurement"
+                            checked={!!settings.useWordProblems}
+                            onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
+                        />
+                        <div className="relative">
+                            <TextInput
+                                label="Problem Konusu (İsteğe bağlı)"
+                                id="measurement-topic"
+                                value={settings.topic || ''}
+                                onChange={e => handleSettingChange('topic', e.target.value)}
+                                placeholder="Örn: Mutfak, Terzi, Manav"
+                                className="pr-9"
                             />
+                            <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700" title="Rastgele Konu Öner" >
+                                <ShuffleIcon className="w-4 h-4" />
+                            </button>
                         </div>
-                    )}
-                </div>
-                <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <Checkbox
-                        label="Otomatik Sığdır"
-                        id="auto-fit-measurement"
-                        checked={settings.autoFit}
-                        onChange={e => handleSettingChange('autoFit', e.target.checked)}
-                        disabled={isTableLayout}
-                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
+                            <Checkbox
+                            label="Görsel Destek Ekle (Emoji)"
+                            id="use-visuals-measurement"
+                            checked={settings.useVisuals ?? false}
+                            onChange={e => handleSettingChange('useVisuals', e.target.checked)}
+                        />
+                    </div>
+                </details>
+                
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                    <Select
+                        label="Sınıf Düzeyi"
+                        id="measurement-grade-level"
+                        value={settings.gradeLevel}
+                        onChange={handleGradeLevelChange}
+                        options={[{ value: 2, label: '2. Sınıf' },{ value: 3, label: '3. Sınıf' },{ value: 4, label: '4. Sınıf' },{ value: 5, label: '5. Sınıf' }]}
+                    />
+                     <Select
+                        label="Zorluk"
+                        id="measurement-difficulty"
+                        value={settings.difficulty}
+                        onChange={e => handleSettingChange('difficulty', e.target.value as Difficulty)}
+                        options={[
+                            { value: 'easy', label: 'Kolay (Tam Sayılar)' },
+                            { value: 'medium', label: 'Orta (Ondalıklı Sayılar)' },
+                            { value: 'hard', label: 'Zor (Karışık Birimler)' },
+                            { value: 'mixed', label: 'Karışık (Tümü)' },
+                        ]}
+                    />
+                    <Select
+                        label="Problem Türü"
+                        id="measurement-type"
+                        value={settings.type}
+                        onChange={e => handleSettingChange('type', e.target.value as MeasurementProblemType)}
+                        options={[
+                            { value: MeasurementProblemType.Mixed, label: 'Karışık (Tümü)' },
+                            { value: MeasurementProblemType.LengthConversion, label: 'Uzunluk (km, m, cm)' },
+                            { value: MeasurementProblemType.WeightConversion, label: 'Ağırlık (t, kg, g)' },
+                            { value: MeasurementProblemType.VolumeConversion, label: 'Hacim (L, mL)' },
+                        ]}
                     />
                 </div>
+                 <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
+                    <div className="mt-2 space-y-2">
+                        <Checkbox label="Otomatik Sığdır" id="auto-fit-measurement" checked={settings.autoFit ?? true} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
+                        <div className="grid grid-cols-2 gap-x-2">
+                            <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={isTableLayout || settings.autoFit} />
+                            <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={isTableLayout} />
+                        </div>
+                    </div>
+                </details>
             </div>
-
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                <Select
-                    label="Sınıf Düzeyi"
-                    id="measurement-grade-level"
-                    value={settings.gradeLevel}
-                    onChange={handleGradeLevelChange}
-                    options={[
-                        { value: 2, label: '2. Sınıf' },
-                        { value: 3, label: '3. Sınıf' },
-                        { value: 4, label: '4. Sınıf' },
-                        { value: 5, label: '5. Sınıf' },
-                    ]}
-                />
-                 <Select
-                    label="Zorluk"
-                    id="measurement-difficulty"
-                    value={settings.difficulty}
-                    onChange={e => handleSettingChange('difficulty', e.target.value as Difficulty)}
-                    options={[
-                        { value: 'easy', label: 'Kolay (Tam Sayılar)' },
-                        { value: 'medium', label: 'Orta (Ondalıklı Sayılar)' },
-                        { value: 'hard', label: 'Zor (Karışık Birimler)' },
-                        { value: 'mixed', label: 'Karışık (Tümü)' },
-                    ]}
-                />
-                <Select
-                    label="Problem Türü"
-                    id="measurement-type"
-                    value={settings.type}
-                    onChange={e => handleSettingChange('type', e.target.value as MeasurementProblemType)}
-                    options={[
-                        { value: MeasurementProblemType.Mixed, label: 'Karışık (Tümü)' },
-                        { value: MeasurementProblemType.LengthConversion, label: 'Uzunluk (km, m, cm)' },
-                        { value: MeasurementProblemType.WeightConversion, label: 'Ağırlık (t, kg, g)' },
-                        { value: MeasurementProblemType.VolumeConversion, label: 'Hacim (L, mL)' },
-                    ]}
-                />
-                <NumberInput 
-                    label="Sayfa Başına Problem Sayısı"
-                    id="problems-per-page"
-                    min={1} max={100}
-                    value={settings.problemsPerPage}
-                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={settings.autoFit || isTableLayout}
-                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
-                />
-                <NumberInput 
-                    label="Sayfa Sayısı"
-                    id="page-count"
-                    min={1} max={20}
-                    value={settings.pageCount}
-                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                    disabled={isTableLayout}
-                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
-                />
-            </div>
-             <SettingsPresetManager 
-                moduleKey="measurement"
-                currentSettings={settings}
-                onLoadSettings={setSettings}
-            />
+             <SettingsPresetManager moduleKey="measurement" currentSettings={settings} onLoadSettings={setSettings} />
             <div className="flex flex-wrap gap-2 pt-2">
-                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
-                    <ShuffleIcon className="w-4 h-4" />
-                    Yenile
-                </Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+                <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
+                <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
             </div>
         </div>
     );

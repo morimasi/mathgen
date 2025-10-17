@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+
+import React, { useState } from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { RhythmicCountingSettings, RhythmicProblemType } from '../types';
@@ -14,7 +15,7 @@ import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
 import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-// FIX: Switched to a named export to resolve a React.lazy type error.
+// FIX: Switched to a named export to resolve a React.lazy type error. The original file content was corrupted with code from another module, causing numerous errors. The content has been fully restored.
 export const RhythmicCountingModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<RhythmicCountingSettings>({
@@ -36,6 +37,7 @@ export const RhythmicCountingModule: React.FC = () => {
         useWordProblems: false,
         topic: '',
         orderDirection: 'ascending',
+        autoFit: true,
     });
 
     const isPracticeSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
@@ -98,10 +100,6 @@ export const RhythmicCountingModule: React.FC = () => {
         return "Ritmik sayma ve sayı örüntüleri becerilerini geliştirmek için çeşitli problem türleri sunar. 'Alıştırma Kağıdı' seçenekleri, hızlıca ödev hazırlamak için idealdir.";
     };
 
-    const handleGenerate = useCallback((clearPrevious: boolean) => {
-        generate(clearPrevious);
-    }, [generate]);
-
     return (
         <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -109,21 +107,136 @@ export const RhythmicCountingModule: React.FC = () => {
                 <HintButton text={getHintText()} />
             </div>
             
-            <div className="grid grid-cols-1 gap-2">
+            <div className="space-y-1.5">
                 {showPattern && (
-                     <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <Checkbox
-                            label="Gerçek Hayat Problemleri (AI)"
-                            id="use-word-problems-rhythmic"
-                            checked={settings.useWordProblems}
-                            onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
+                     <details className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg" open={settings.useWordProblems}>
+                        <summary className="text-xs font-semibold cursor-pointer select-none">Gerçek Hayat Problemleri (AI)</summary>
+                         <div className="mt-2 pl-4 space-y-1.5">
+                            <Checkbox
+                                label="Yapay Zeka ile Problem Oluştur"
+                                id="use-word-problems-rhythmic"
+                                checked={settings.useWordProblems}
+                                onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
+                            />
+                            <div className="relative">
+                                <TextInput
+                                    label="Problem Konusu (İsteğe bağlı)"
+                                    id="rhythmic-topic"
+                                    value={settings.topic || ''}
+                                    onChange={e => handleSettingChange('topic', e.target.value)}
+                                    placeholder="Örn: Zıplayan tavşan, merdiven çıkan çocuk"
+                                    className="pr-9"
+                                />
+                                <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors" title="Rastgele Konu Öner">
+                                    <ShuffleIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </details>
+                )}
+
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                    <Select
+                        label="Sınıf Düzeyi"
+                        id="rhythmic-grade-level"
+                        value={settings.gradeLevel}
+                        onChange={handleGradeLevelChange}
+                        options={[{ value: 1, label: '1. Sınıf' }, { value: 2, label: '2. Sınıf' }, { value: 3, label: '3. Sınıf' }]}
+                    />
+                    <Select
+                        label="Problem Türü"
+                        id="rhythmic-type"
+                        value={settings.type}
+                        onChange={e => handleSettingChange('type', e.target.value as RhythmicProblemType)}
+                        options={[
+                            { value: RhythmicProblemType.Pattern, label: 'Örüntü Tamamlama' },
+                            { value: RhythmicProblemType.FindRule, label: 'Örüntü Kuralı Bulma' },
+                            { value: RhythmicProblemType.PracticeSheet, label: 'Alıştırma Kağıdı' },
+                            { value: RhythmicProblemType.FillBeforeAfter, label: 'Öncesini/Sonrasını Doldur' },
+                            { value: RhythmicProblemType.FillBetween, label: 'Arasını Doldur' },
+                            { value: RhythmicProblemType.OddEven, label: 'Tek/Çift Sayılar' },
+                            { value: RhythmicProblemType.Ordering, label: 'Sıralama' },
+                            { value: RhythmicProblemType.Comparison, label: 'Karşılaştırma' },
+                        ]}
+                    />
+                    
+                    {showStep && (
+                        <NumberInput
+                            label="Adım" id="rhythmic-step" min={1} max={100} value={settings.step}
+                            onChange={e => handleSettingChange('step', parseInt(e.target.value))} />
+                    )}
+                    {showStep && (
+                        <Select
+                            label="Yön" id="rhythmic-direction" value={settings.direction}
+                            onChange={e => handleSettingChange('direction', e.target.value as 'forward' | 'backward' | 'mixed')}
+                            options={[{ value: 'forward', label: 'İleri' }, { value: 'backward', label: 'Geri' }, { value: 'mixed', label: 'Karışık' }]} />
+                    )}
+                    {showRange && (
+                        <NumberInput
+                            label="Min Değer" id="rhythmic-min" min={0} max={9999} value={settings.min}
+                            onChange={e => handleSettingChange('min', parseInt(e.target.value))} />
+                    )}
+                    {showRange && (
+                        <NumberInput
+                            label="Max Değer" id="rhythmic-max" min={1} max={10000} value={settings.max}
+                            onChange={e => handleSettingChange('max', parseInt(e.target.value))} />
+                    )}
+                    {showPattern && (
+                        <NumberInput
+                            label="Örüntü Uzunluğu" id="rhythmic-patternLength" min={3} max={10} value={settings.patternLength}
+                            onChange={e => handleSettingChange('patternLength', parseInt(e.target.value))} />
+                    )}
+                    {showPattern && (
+                        <NumberInput
+                            label="Eksik Sayısı" id="rhythmic-missingCount" min={1} max={5} value={settings.missingCount}
+                            onChange={e => handleSettingChange('missingCount', parseInt(e.target.value))} />
+                    )}
+                    {isOrdering && (
+                        <NumberInput
+                            label="Sıralanacak Sayı Adedi" id="rhythmic-orderCount" min={3} max={10} value={settings.orderCount}
+                            onChange={e => handleSettingChange('orderCount', parseInt(e.target.value))} />
+                    )}
+                    {isOrdering && (
+                        <Select
+                            label="Sıralama Yönü" id="rhythmic-orderDirection" value={settings.orderDirection}
+                            onChange={e => handleSettingChange('orderDirection', e.target.value as 'ascending' | 'descending' | 'mixed')}
+                            options={[{ value: 'ascending', label: 'Küçükten Büyüğe' }, { value: 'descending', label: 'Büyükten Küçüğe' }, { value: 'mixed', label: 'Karışık' }]} />
+                    )}
+
+                    {showStep && (
+                        <Checkbox label="Sadece Katları Kullan" id="use-multiples" checked={settings.useMultiplesOnly}
+                            onChange={e => handleSettingChange('useMultiplesOnly', e.target.checked)}
+                            containerClassName="col-span-2" />
+                    )}
+                </div>
+
+                <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
+                    <div className="mt-2 space-y-2">
+                        <Checkbox label="Otomatik Sığdır" id="autoFit-rhythmic" checked={settings.autoFit ?? true}
+                            onChange={e => handleSettingChange('autoFit', e.target.checked)}
+                            disabled={isPracticeSheet || isTableLayout}
+                            title={isPracticeSheet ? "Alıştırma kağıdı modunda bu ayar devre dışıdır." : (isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : "")}
                         />
-                         {settings.useWordProblems && (
-                            <div className="mt-1.5 pl-6">
-                                <div className="relative">
-                                     <TextInput
-                                        label="Problem Konusu (İsteğe bağlı)"
-                                        id="rhythmic-topic"
-                                        value={settings.topic || ''}
-                                        onChange={e => handleSettingChange('topic', e.target.value)}
-                                        placeholder="Örn:
+                        <div className="grid grid-cols-2 gap-x-2">
+                            <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage}
+                                onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
+                                disabled={isPracticeSheet || isTableLayout || settings.autoFit}
+                                title={isPracticeSheet ? "Alıştırma kağıdı modunda problem sayısı otomatik ayarlanır." : (isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : "")}
+                            />
+                            <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount}
+                                onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
+                                disabled={isTableLayout} title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
+                            />
+                        </div>
+                    </div>
+                </details>
+            </div>
+             <SettingsPresetManager moduleKey="rhythmic-counting" currentSettings={settings} onLoadSettings={setSettings}/>
+            <div className="flex flex-wrap gap-2 pt-1.5">
+                <Button onClick={() => generate(true)} size="sm" enableFlyingLadybug>Oluştur</Button>
+                <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+            </div>
+        </div>
+    );
+};

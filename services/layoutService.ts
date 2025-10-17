@@ -40,6 +40,12 @@ export const calculateMaxProblems = (
         const titleStyle = getComputedStyle(titleEl);
         occupiedHeight += titleEl.offsetHeight + parseFloat(titleStyle.marginBottom);
     }
+
+    const preambleEl = container.querySelector('.worksheet-preamble') as HTMLElement;
+    if (preambleEl) {
+        const preambleStyle = getComputedStyle(preambleEl);
+        occupiedHeight += preambleEl.offsetHeight + parseFloat(preambleStyle.marginBottom);
+    }
     
     const availableHeight = containerHeight - occupiedHeight;
 
@@ -49,56 +55,36 @@ export const calculateMaxProblems = (
     if (!problemList) return 0;
 
     const tempItem = document.createElement('div');
-    tempItem.className = 'problem-item';
+    tempItem.className = 'problem-item'; // Use the same class as real problems
+    // Style it to be invisible but measurable
     tempItem.style.position = 'absolute';
     tempItem.style.visibility = 'hidden';
+    tempItem.style.left = '-9999px';
+    // The width should be constrained by the number of columns
+    tempItem.style.width = `calc((100% - ${remToPx(printSettings.columnGap) * (printSettings.columns - 1)}px) / ${printSettings.columns})`;
+    tempItem.innerHTML = sampleProblem?.question || '<div>Test Problem</div><div>Answer line</div>'; // Use sample or a generic placeholder
 
-    const problemListWidth = problemList.clientWidth;
-    const gapWidth = (printSettings.columns - 1) * remToPx(printSettings.columnGap);
-    const columnWidth = (problemListWidth - gapWidth) / printSettings.columns;
-    tempItem.style.width = `${columnWidth}px`;
-
-    const tempNumber = document.createElement('span');
-    tempNumber.className = 'problem-number';
-    tempNumber.textContent = '99.';
+    problemList.appendChild(tempItem);
     
-    const tempContent = document.createElement('div');
-    tempContent.className = 'problem-content';
+    const problemStyle = getComputedStyle(tempItem);
+    const problemHeight = tempItem.offsetHeight + parseFloat(problemStyle.marginTop) + parseFloat(problemStyle.marginBottom);
 
-    // Use a representative sample content for measurement
-    if (sampleProblem) {
-        tempContent.innerHTML = sampleProblem.question || 'Örnek Soru';
-    } else {
-        tempContent.innerHTML = `
-            <div style="display: inline-block; font-family: monospace; white-space: pre; text-align: right; line-height: 1.5rem; font-size: 1.25em;">
-                <div>9999</div>
-                <div>+9999</div>
-                <hr style="width: 100%; border-top: 2px solid black; margin: 4px 0;">
-            </div>`;
+    problemList.removeChild(tempItem);
+
+    if (problemHeight <= 0) {
+        return 20; // Fallback if measurement fails
     }
 
-    tempItem.appendChild(tempNumber);
-    tempItem.appendChild(tempContent);
+    // --- 3. Calculate how many fit ---
+    const spacing = remToPx(printSettings.problemSpacing);
+    const problemsPerColumn = Math.floor((availableHeight + spacing) / (problemHeight + spacing));
     
-    // Apply relevant styles from printSettings
-    tempItem.style.fontSize = `${printSettings.fontSize}px`;
-    tempItem.style.lineHeight = String(printSettings.lineHeight);
-    
-    document.body.appendChild(tempItem);
-    const problemHeight = tempItem.offsetHeight;
-    document.body.removeChild(tempItem);
+    const totalProblems = problemsPerColumn * printSettings.columns;
 
-    const problemSpacing = remToPx(printSettings.problemSpacing);
-    const totalProblemHeight = problemHeight + problemSpacing;
+    // A safety check to avoid infinite loops or ridiculously high numbers
+    if (!isFinite(totalProblems) || totalProblems > 200) {
+        return 20; 
+    }
 
-    if (totalProblemHeight <= 0) return 0;
-    
-    // --- 3. Calculate Final Count ---
-    const problemsPerColumn = Math.floor(availableHeight / totalProblemHeight);
-    const totalProblemsForPage = problemsPerColumn * printSettings.columns;
-
-    // Return a slightly smaller number to be safe, especially for word problems
-    const safetyMargin = (sampleProblem ? 0.95 : 1.0);
-
-    return Math.max(1, Math.floor(totalProblemsForPage * safetyMargin));
+    return Math.max(1, totalProblems);
 };

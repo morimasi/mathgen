@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { generatePlaceValueProblem } from '../services/placeValueService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types';
@@ -25,6 +25,7 @@ const PlaceValueModule: React.FC = () => {
         pageCount: 1,
         useWordProblems: false,
         topic: '',
+        autoFit: true,
     });
 
     const { generate } = useProblemGenerator({
@@ -111,10 +112,6 @@ const PlaceValueModule: React.FC = () => {
         }
     };
 
-    const handleGenerate = useCallback((clearPrevious: boolean) => {
-        generate(clearPrevious);
-    }, [generate]);
-
     return (
         <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -122,119 +119,91 @@ const PlaceValueModule: React.FC = () => {
                 <HintButton text={getHintText()} />
             </div>
             
-            <div className="grid grid-cols-1 gap-2">
+            <div className="space-y-1.5">
                 {isWordProblemCompatible && (
-                     <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <Checkbox
-                            label="Gerçek Hayat Problemleri (AI)"
-                            id="use-word-problems-place-value"
-                            checked={settings.useWordProblems}
-                            onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
-                        />
-                         {settings.useWordProblems && (
-                            <div className="mt-1.5 pl-6">
-                                <div className="relative">
-                                     <TextInput
-                                        label="Problem Konusu (İsteğe Bağlı)"
-                                        id="place-value-topic"
-                                        value={settings.topic || ''}
-                                        onChange={e => handleSettingChange('topic', e.target.value)}
-                                        placeholder="Örn: Nüfus, Uzaklık, Fiyat"
-                                        className="pr-10"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={handleRandomTopic}
-                                        className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
-                                        title="Rastgele Konu Öner"
-                                    >
-                                        <ShuffleIcon className="w-5 h-5" />
-                                    </button>
-                                </div>
+                     <details className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg" open={settings.useWordProblems}>
+                        <summary className="text-xs font-semibold cursor-pointer select-none">Gerçek Hayat Problemleri (AI)</summary>
+                         <div className="mt-2 pl-4 space-y-1.5">
+                            <Checkbox
+                                label="Yapay Zeka ile Problem Oluştur"
+                                id="use-word-problems-place-value"
+                                checked={settings.useWordProblems}
+                                onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
+                            />
+                            <div className="relative">
+                                <TextInput
+                                    label="Problem Konusu (İsteğe Bağlı)"
+                                    id="place-value-topic"
+                                    value={settings.topic || ''}
+                                    onChange={e => handleSettingChange('topic', e.target.value)}
+                                    placeholder="Örn: Nüfus, Uzaklık, Fiyat"
+                                    className="pr-9"
+                                />
+                                <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700" title="Rastgele Konu Öner">
+                                    <ShuffleIcon className="w-4 h-4" />
+                                </button>
                             </div>
-                         )}
-                    </div>
+                         </div>
+                    </details>
                 )}
-            </div>
 
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                 <Select
-                    label="Sınıf Düzeyi"
-                    id="place-value-grade-level"
-                    value={settings.gradeLevel}
-                    onChange={handleGradeLevelChange}
-                    options={[
-                        { value: 1, label: '1. Sınıf' },
-                        { value: 2, label: '2. Sınıf' },
-                        { value: 3, label: '3. Sınıf' },
-                        { value: 4, label: '4. Sınıf' },
-                        { value: 5, label: '5. Sınıf' },
-                    ]}
-                />
-                <Select
-                    label="Problem Türü"
-                    id="placevalue-type"
-                    value={settings.type}
-                    onChange={e => handleSettingChange('type', e.target.value as PlaceValueProblemType)}
-                    options={[
-                        { value: PlaceValueProblemType.Identification, label: 'Basamak Değeri Bulma' },
-                        { value: PlaceValueProblemType.Rounding, label: 'Yuvarlama' },
-                        { value: PlaceValueProblemType.ExpandedForm, label: 'Çözümleme' },
-                        { value: PlaceValueProblemType.FromExpanded, label: 'Çözümlenmiş Sayıyı Bulma' },
-                        { value: PlaceValueProblemType.WriteInWords, label: 'Yazıyla Yazma' },
-                        { value: PlaceValueProblemType.WordsToNumber, label: 'Okunuşu Verilen Sayıyı Yazma' },
-                        { value: PlaceValueProblemType.Comparison, label: 'Karşılaştırma' },
-                        { value: PlaceValueProblemType.ResultAsWords, label: 'İşlem Sonucunu Yazıyla Yazma' },
-                    ]}
-                />
-                <NumberInput
-                    label="Basamak Sayısı"
-                    id="placevalue-digits"
-                    min={2}
-                    max={7}
-                    value={settings.digits}
-                    onChange={e => handleSettingChange('digits', parseInt(e.target.value))}
-                />
-                 {settings.type === PlaceValueProblemType.Rounding && (
-                    <Select
-                        label="Yuvarlama Yeri"
-                        id="rounding-place"
-                        value={settings.roundingPlace}
-                        onChange={e => handleSettingChange('roundingPlace', e.target.value as RoundingPlace)}
-                        options={roundingOptions}
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                     <Select
+                        label="Sınıf Düzeyi"
+                        id="place-value-grade-level"
+                        value={settings.gradeLevel}
+                        onChange={handleGradeLevelChange}
+                        options={[{ value: 1, label: '1. Sınıf' },{ value: 2, label: '2. Sınıf' },{ value: 3, label: '3. Sınıf' },{ value: 4, label: '4. Sınıf' },{ value: 5, label: '5. Sınıf' }]}
                     />
-                 )}
-                <NumberInput 
-                    label="Sayfa Başına Problem Sayısı"
-                    id="problems-per-page"
-                    min={1} max={100}
-                    value={settings.problemsPerPage}
-                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={isTableLayout}
-                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
-                />
-                 <NumberInput 
-                    label="Sayfa Sayısı"
-                    id="page-count"
-                    min={1} max={20}
-                    value={settings.pageCount}
-                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                    disabled={isTableLayout}
-                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
-                />
+                    <Select
+                        label="Problem Türü"
+                        id="placevalue-type"
+                        value={settings.type}
+                        onChange={e => handleSettingChange('type', e.target.value as PlaceValueProblemType)}
+                        options={[
+                            { value: PlaceValueProblemType.Identification, label: 'Basamak Değeri Bulma' },
+                            { value: PlaceValueProblemType.Rounding, label: 'Yuvarlama' },
+                            { value: PlaceValueProblemType.ExpandedForm, label: 'Çözümleme' },
+                            { value: PlaceValueProblemType.FromExpanded, label: 'Çözümlenmiş Sayıyı Bulma' },
+                            { value: PlaceValueProblemType.WriteInWords, label: 'Yazıyla Yazma' },
+                            { value: PlaceValueProblemType.WordsToNumber, label: 'Okunuşu Verilen Sayıyı Yazma' },
+                            { value: PlaceValueProblemType.Comparison, label: 'Karşılaştırma' },
+                            { value: PlaceValueProblemType.ResultAsWords, label: 'İşlem Sonucunu Yazıyla Yazma' },
+                        ]}
+                    />
+                    <NumberInput
+                        label="Basamak Sayısı"
+                        id="placevalue-digits"
+                        min={2}
+                        max={7}
+                        value={settings.digits}
+                        onChange={e => handleSettingChange('digits', parseInt(e.target.value))}
+                    />
+                     {settings.type === PlaceValueProblemType.Rounding && (
+                        <Select
+                            label="Yuvarlama Yeri"
+                            id="rounding-place"
+                            value={settings.roundingPlace}
+                            onChange={e => handleSettingChange('roundingPlace', e.target.value as RoundingPlace)}
+                            options={roundingOptions}
+                        />
+                     )}
+                </div>
+                 <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
+                    <div className="mt-2 space-y-2">
+                        <Checkbox label="Otomatik Sığdır" id="autoFit-placevalue" checked={settings.autoFit ?? true} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
+                        <div className="grid grid-cols-2 gap-x-2">
+                            <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={isTableLayout || settings.autoFit} />
+                            <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={isTableLayout} />
+                        </div>
+                    </div>
+                </details>
             </div>
-             <SettingsPresetManager 
-                moduleKey="place-value"
-                currentSettings={settings}
-                onLoadSettings={setSettings}
-            />
+             <SettingsPresetManager moduleKey="place-value" currentSettings={settings} onLoadSettings={setSettings} />
             <div className="flex flex-wrap gap-2 pt-2">
-                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
-                    <ShuffleIcon className="w-4 h-4" />
-                    Yenile
-                </Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+                <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
+                <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
             </div>
         </div>
     );

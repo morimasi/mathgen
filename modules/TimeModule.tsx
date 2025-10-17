@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { generateTimeProblem } from '../services/timeService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { TimeSettings, TimeProblemType, Difficulty } from '../types';
@@ -30,6 +30,7 @@ const TimeModule: React.FC = () => {
         showDigitalTime: true,
         showMinuteMarkers: true,
         topic: '',
+        autoFit: true,
     });
 
     const { generate } = useProblemGenerator({
@@ -90,10 +91,6 @@ const TimeModule: React.FC = () => {
         return "'Zorluk' ayarı, saat problemlerinin hassasiyetini belirler: Kolay (tam saatler), Orta (çeyrek/yarım saatler), Zor (tüm dakikalar).";
     };
 
-    const handleGenerate = useCallback((clearPrevious: boolean) => {
-        generate(clearPrevious);
-    }, [generate]);
-
     return (
         <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -101,161 +98,99 @@ const TimeModule: React.FC = () => {
                 <HintButton text={getHintText()} />
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
+            <div className="space-y-1.5">
                 {isWordProblemCompatible && (
-                    <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <Checkbox
-                            label="Gerçek Hayat Problemleri (AI)"
-                            id="use-word-problems-time"
-                            checked={settings.useWordProblems}
-                            onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
-                        />
-                         {settings.useWordProblems && (
-                             <div className="mt-1.5 pl-6">
-                                <div className="relative">
-                                    <TextInput
-                                        label="Problem Konusu (İsteğe bağlı)"
-                                        id="time-topic"
-                                        value={settings.topic || ''}
-                                        onChange={e => handleSettingChange('topic', e.target.value)}
-                                        placeholder="Örn: Yolculuk, Film, Fırın"
-                                        className="pr-10"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={handleRandomTopic}
-                                        className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
-                                        title="Rastgele Konu Öner"
-                                    >
-                                        <ShuffleIcon className="w-5 h-5" />
-                                    </button>
-                                </div>
-                             </div>
-                         )}
-                    </div>
+                    <details className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg" open={settings.useWordProblems}>
+                         <summary className="text-xs font-semibold cursor-pointer select-none">Gerçek Hayat Problemleri (AI)</summary>
+                         <div className="mt-2 pl-4 space-y-1.5">
+                            <Checkbox
+                                label="Yapay Zeka ile Problem Oluştur"
+                                id="use-word-problems-time"
+                                checked={settings.useWordProblems}
+                                onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
+                            />
+                            <div className="relative">
+                                <TextInput
+                                    label="Problem Konusu (İsteğe bağlı)"
+                                    id="time-topic"
+                                    value={settings.topic || ''}
+                                    onChange={e => handleSettingChange('topic', e.target.value)}
+                                    placeholder="Örn: Yolculuk, Film, Fırın"
+                                    className="pr-9"
+                                />
+                                <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700" title="Rastgele Konu Öner">
+                                    <ShuffleIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+                         </div>
+                    </details>
                 )}
-            </div>
 
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                 <Select
-                    label="Sınıf Düzeyi"
-                    id="time-grade-level"
-                    value={settings.gradeLevel}
-                    onChange={handleGradeLevelChange}
-                    options={[
-                        { value: 1, label: '1. Sınıf' },
-                        { value: 2, label: '2. Sınıf' },
-                        { value: 3, label: '3. Sınıf' },
-                        { value: 4, label: '4. Sınıf' },
-                        { value: 5, label: '5. Sınıf' },
-                    ]}
-                />
-                 <Select
-                    label="Zorluk"
-                    id="time-difficulty"
-                    value={settings.difficulty}
-                    onChange={e => handleSettingChange('difficulty', e.target.value as Difficulty)}
-                    options={[
-                        { value: 'easy', label: 'Kolay (Tam Saatler)' },
-                        { value: 'medium', label: 'Orta (Çeyrek/Yarım Saatler)' },
-                        { value: 'hard', label: 'Zor (Dakikalar)' },
-                        { value: 'mixed', label: 'Karışık' },
-                    ]}
-                />
-                <Select
-                    label="Problem Türü"
-                    id="time-type"
-                    value={settings.type}
-                    onChange={e => handleSettingChange('type', e.target.value as TimeProblemType)}
-                    options={[
-                        { value: TimeProblemType.ReadClock, label: 'Saat Okuma (Analog)' },
-                        { value: TimeProblemType.CalculateDuration, label: 'Süre Hesaplama' },
-                        { value: TimeProblemType.CalculateEndTime, label: 'Bitiş Zamanını Bulma' },
-                        { value: TimeProblemType.FindStartTime, label: 'Başlangıç Zamanını Bulma' },
-                        { value: TimeProblemType.ConvertUnits, label: 'Birim Dönüştürme' },
-                        { value: TimeProblemType.Calendar, label: 'Takvim Problemleri' },
-                    ]}
-                />
-                 <Select
-                    label="Saat Formatı"
-                    id="time-format"
-                    value={settings.format}
-                    disabled={settings.useWordProblems}
-                    onChange={e => handleSettingChange('format', e.target.value as '12h' | '24h')}
-                    options={[
-                        { value: '24h', label: '24 Saat' },
-                        { value: '12h', label: '12 Saat (ÖÖ/ÖS)' },
-                    ]}
-                />
-                <NumberInput 
-                    label="Sayfa Başına Problem Sayısı"
-                    id="problems-per-page"
-                    min={1} max={100}
-                    value={settings.problemsPerPage}
-                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={isTableLayout}
-                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
-                />
-                <NumberInput 
-                    label="Sayfa Sayısı"
-                    id="page-count"
-                    min={1} max={20}
-                    value={settings.pageCount}
-                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                    disabled={isTableLayout}
-                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
-                />
-            </div>
-
-            {isReadClock && (
-                <div className="pt-2 mt-2 border-t border-stone-200 dark:border-stone-700">
-                     <h3 className="text-xs font-semibold mb-2">Analog Saat Özelleştirme</h3>
-                     <div className="flex flex-wrap gap-x-4 gap-y-2">
-                        <Checkbox 
-                            label="Sayıları Gizle"
-                            id="showClockNumbers"
-                            checked={!settings.showClockNumbers}
-                            onChange={e => handleSettingChange('showClockNumbers', !e.target.checked)}
-                        />
-                        <Checkbox 
-                            label="Akrebi Gizle"
-                            id="showHourHand"
-                            checked={!settings.showHourHand}
-                            onChange={e => handleSettingChange('showHourHand', !e.target.checked)}
-                        />
-                         <Checkbox 
-                            label="Yelkovanı Gizle"
-                            id="showMinuteHand"
-                            checked={!settings.showMinuteHand}
-                            onChange={e => handleSettingChange('showMinuteHand', !e.target.checked)}
-                        />
-                        <Checkbox 
-                            label="Dijital Saati Göster"
-                            id="showDigitalTime"
-                            checked={settings.showDigitalTime}
-                            onChange={e => handleSettingChange('showDigitalTime', e.target.checked)}
-                        />
-                         <Checkbox 
-                            label="5'er Dakikaları Göster"
-                            id="showMinuteMarkers"
-                            checked={settings.showMinuteMarkers}
-                            onChange={e => handleSettingChange('showMinuteMarkers', e.target.checked)}
-                        />
-                     </div>
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                     <Select
+                        label="Sınıf Düzeyi"
+                        id="time-grade-level"
+                        value={settings.gradeLevel}
+                        onChange={handleGradeLevelChange}
+                        options={[{ value: 1, label: '1. Sınıf' },{ value: 2, label: '2. Sınıf' },{ value: 3, label: '3. Sınıf' },{ value: 4, label: '4. Sınıf' },{ value: 5, label: '5. Sınıf' }]}
+                    />
+                     <Select
+                        label="Zorluk"
+                        id="time-difficulty"
+                        value={settings.difficulty}
+                        onChange={e => handleSettingChange('difficulty', e.target.value as Difficulty)}
+                        options={[{ value: 'easy', label: 'Kolay (Tam Saatler)' },{ value: 'medium', label: 'Orta (Çeyrek/Yarım Saatler)' },{ value: 'hard', label: 'Zor (Dakikalar)' },{ value: 'mixed', label: 'Karışık' }]}
+                    />
+                    <Select
+                        label="Problem Türü"
+                        id="time-type"
+                        value={settings.type}
+                        onChange={e => handleSettingChange('type', e.target.value as TimeProblemType)}
+                        options={[
+                            { value: TimeProblemType.ReadClock, label: 'Saat Okuma (Analog)' },
+                            { value: TimeProblemType.CalculateDuration, label: 'Süre Hesaplama' },
+                            { value: TimeProblemType.CalculateEndTime, label: 'Bitiş Zamanını Bulma' },
+                            { value: TimeProblemType.FindStartTime, label: 'Başlangıç Zamanını Bulma' },
+                            { value: TimeProblemType.ConvertUnits, label: 'Birim Dönüştürme' },
+                            { value: TimeProblemType.Calendar, label: 'Takvim Problemleri' },
+                        ]}
+                    />
+                     <Select
+                        label="Saat Formatı"
+                        id="time-format"
+                        value={settings.format}
+                        disabled={settings.useWordProblems}
+                        onChange={e => handleSettingChange('format', e.target.value as '12h' | '24h')}
+                        options={[{ value: '24h', label: '24 Saat' },{ value: '12h', label: '12 Saat (ÖÖ/ÖS)' }]}
+                    />
                 </div>
-            )}
-             <SettingsPresetManager 
-                moduleKey="time"
-                currentSettings={settings}
-                onLoadSettings={setSettings}
-            />
+                {isReadClock && (
+                    <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                        <summary className="text-xs font-semibold cursor-pointer select-none">Analog Saat Özelleştirme</summary>
+                         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+                            <Checkbox label="Sayıları Gizle" id="showClockNumbers" checked={!settings.showClockNumbers} onChange={e => handleSettingChange('showClockNumbers', !e.target.checked)} />
+                            <Checkbox label="Akrebi Gizle" id="showHourHand" checked={!settings.showHourHand} onChange={e => handleSettingChange('showHourHand', !e.target.checked)} />
+                             <Checkbox label="Yelkovanı Gizle" id="showMinuteHand" checked={!settings.showMinuteHand} onChange={e => handleSettingChange('showMinuteHand', !e.target.checked)} />
+                            <Checkbox label="Dijital Saati Göster" id="showDigitalTime" checked={settings.showDigitalTime} onChange={e => handleSettingChange('showDigitalTime', e.target.checked)} />
+                             <Checkbox label="5'er Dakikaları Göster" id="showMinuteMarkers" checked={settings.showMinuteMarkers} onChange={e => handleSettingChange('showMinuteMarkers', e.target.checked)} />
+                         </div>
+                    </details>
+                )}
+                 <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
+                    <div className="mt-2 space-y-2">
+                        <Checkbox label="Otomatik Sığdır" id="autoFit-time" checked={settings.autoFit ?? true} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
+                        <div className="grid grid-cols-2 gap-x-2">
+                            <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={isTableLayout || settings.autoFit} />
+                            <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={isTableLayout} />
+                        </div>
+                    </div>
+                </details>
+            </div>
+             <SettingsPresetManager moduleKey="time" currentSettings={settings} onLoadSettings={setSettings} />
             <div className="flex flex-wrap gap-2 pt-2">
-                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
-                    <ShuffleIcon className="w-4 h-4" />
-                    Yenile
-                </Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+                <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
+                <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
             </div>
         </div>
     );

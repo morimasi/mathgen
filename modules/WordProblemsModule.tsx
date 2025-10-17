@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { WordProblemSettings, Problem } from '../types';
 import Button from '../components/form/Button';
@@ -12,14 +12,6 @@ import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TABS, TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
 import { useProblemGenerator } from '../hooks/useProblemGenerator';
-
-interface ModuleProps {
-    onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
-    setIsLoading: (loading: boolean) => void;
-    contentRef: React.RefObject<HTMLDivElement>;
-    autoRefreshTrigger: number;
-    lastGeneratorModule: string | null;
-}
 
 const moduleOptions = [
     { value: 'none', label: 'Genel Konu' },
@@ -91,10 +83,6 @@ const WordProblemsModule: React.FC = () => {
         }
         return "Bu modül, Google Gemini AI kullanarak tamamen size özel problemler üretir. 'Problem Modülü' seçerek belirli bir konuya odaklanabilir veya 'Özel Talimat' alanına hayalinizdeki problemi yazarak yaratıcılığınızı kullanabilirsiniz.";
     };
-    
-    const handleGenerate = useCallback((clearPrevious: boolean) => {
-        generate(clearPrevious);
-    }, [generate]);
 
     return (
         <div className="space-y-2">
@@ -106,117 +94,91 @@ const WordProblemsModule: React.FC = () => {
                 Bu modül, Google Gemini AI kullanarak özel matematik problemleri oluşturur. Lütfen API anahtarınızın doğru yapılandırıldığından emin olun.
             </p>
             
-            <div className="grid grid-cols-1 gap-2">
-                <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <Checkbox
-                        label="Otomatik Sığdır"
-                        id="auto-fit-word-problems"
-                        checked={settings.autoFit}
-                        onChange={e => handleSettingChange('autoFit', e.target.checked)}
-                        disabled={isTableLayout}
-                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
-                    />
-                </div>
-                 <div className="p-1.5 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                    <Checkbox
-                        label="Görsel Destek Ekle (Emoji)"
-                        id="use-visuals-word-problems"
-                        checked={settings.useVisuals ?? false}
-                        onChange={e => handleSettingChange('useVisuals', e.target.checked)}
-                    />
-                     <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 pl-6">
-                        Yapay zekanın oluşturduğu problemlere konuyla ilgili emojiler eklemesini sağlar.
-                    </p>
-                </div>
-            </div>
-
-
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                <Select
-                    label="Sınıf Seviyesi"
-                    id="gradeLevel"
-                    value={settings.gradeLevel}
-                    onChange={e => handleSettingChange('gradeLevel', e.target.value)}
-                    options={[
-                        { value: '1', label: '1. Sınıf' },
-                        { value: '2', label: '2. Sınıf' },
-                        { value: '3', label: '3. Sınıf' },
-                        { value: '4', label: '4. Sınıf' },
-                        { value: '5', label: '5. Sınıf' },
-                        { value: '6', label: '6. Sınıf' },
-                        { value: '7', label: '7. Sınıf' },
-                        { value: '8', label: '8. Sınıf' },
-                    ]}
-                />
-                <Select
-                    label="İşlem Sayısı"
-                    id="operationCount"
-                    value={settings.operationCount}
-                    onChange={e => handleSettingChange('operationCount', parseInt(e.target.value, 10))}
-                    options={[
-                        { value: 1, label: '1 İşlemli' },
-                        { value: 2, label: '2 İşlemli' },
-                        { value: 3, label: '3 İşlemli' },
-                    ]}
-                />
-                 <Select
-                    label="Problem Formatı"
-                    id="problem-layout"
-                    value={settings.layout || 'default'}
-                    onChange={e => handleSettingChange('layout', e.target.value)}
-                    options={[
-                        { value: 'default', label: 'Standart' },
-                        { value: 'with-visual-space', label: 'Çizim Alanı Ekle' },
-                        { value: 'given-wanted', label: 'Verilen/İstenen/Çözüm' },
-                    ]}
-                    containerClassName="col-span-2"
-                />
-                <div className="col-span-2 grid grid-cols-2 gap-2">
-                    <Select
-                        label="Problem Modülü"
-                        id="sourceModule"
-                        value={settings.sourceModule}
-                        onChange={e => handleSettingChange('sourceModule', e.target.value)}
-                        options={moduleOptions}
-                    />
-                    <div className="relative">
-                        <TextInput
-                            label={topicLabel}
-                            id="topic"
-                            value={settings.topic}
-                            onChange={e => handleSettingChange('topic', e.target.value)}
-                            placeholder="Örn: Mutfak, Hayvanlar"
-                            className="pr-10"
+             <div className="space-y-1.5">
+                <details className="p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg" open>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Görünüm ve Format</summary>
+                     <div className="mt-2 pl-4 space-y-2">
+                        <Checkbox
+                            label="Görsel Destek Ekle (Emoji)"
+                            id="use-visuals-word-problems"
+                            checked={settings.useVisuals ?? false}
+                            onChange={e => handleSettingChange('useVisuals', e.target.checked)}
                         />
-                        <button
-                            type="button"
-                            onClick={handleRandomTopic}
-                            className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
-                            title="Rastgele Konu Öner"
-                        >
-                            <ShuffleIcon className="w-5 h-5" />
-                        </button>
+                        <Select
+                            label="Problem Formatı"
+                            id="problem-layout"
+                            value={settings.layout || 'default'}
+                            onChange={e => handleSettingChange('layout', e.target.value)}
+                            options={[
+                                { value: 'default', label: 'Standart' },
+                                { value: 'with-visual-space', label: 'Çizim Alanı Ekle' },
+                                { value: 'given-wanted', label: 'Verilen/İstenen/Çözüm' },
+                            ]}
+                        />
+                    </div>
+                </details>
+
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                    <Select
+                        label="Sınıf Seviyesi"
+                        id="gradeLevel"
+                        value={settings.gradeLevel}
+                        onChange={e => handleSettingChange('gradeLevel', e.target.value)}
+                        options={[
+                            { value: '1', label: '1. Sınıf' },
+                            { value: '2', label: '2. Sınıf' },
+                            { value: '3', label: '3. Sınıf' },
+                            { value: '4', label: '4. Sınıf' },
+                            { value: '5', label: '5. Sınıf' },
+                            { value: '6', label: '6. Sınıf' },
+                            { value: '7', label: '7. Sınıf' },
+                            { value: '8', label: '8. Sınıf' },
+                        ]}
+                    />
+                    <Select
+                        label="İşlem Sayısı"
+                        id="operationCount"
+                        value={settings.operationCount}
+                        onChange={e => handleSettingChange('operationCount', parseInt(e.target.value, 10))}
+                        options={[
+                            { value: 1, label: '1 İşlemli' },
+                            { value: 2, label: '2 İşlemli' },
+                            { value: 3, label: '3 İşlemli' },
+                        ]}
+                    />
+                    <div className="col-span-2 grid grid-cols-2 gap-2">
+                        <Select
+                            label="Problem Modülü"
+                            id="sourceModule"
+                            value={settings.sourceModule}
+                            onChange={e => handleSettingChange('sourceModule', e.target.value)}
+                            options={moduleOptions}
+                        />
+                        <div className="relative">
+                            <TextInput
+                                label={topicLabel}
+                                id="topic"
+                                value={settings.topic}
+                                onChange={e => handleSettingChange('topic', e.target.value)}
+                                placeholder="Örn: Mutfak, Hayvanlar"
+                                className="pr-9"
+                            />
+                            <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700" title="Rastgele Konu Öner" >
+                                <ShuffleIcon className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <NumberInput
-                    label="Sayfa Başına Problem Sayısı"
-                    id="problems-per-page"
-                    min={1} max={20}
-                    value={settings.problemsPerPage}
-                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))}
-                    disabled={settings.autoFit || isTableLayout}
-                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
-                />
-                 <NumberInput
-                    label="Sayfa Sayısı"
-                    id="page-count"
-                    min={1} max={20}
-                    value={settings.pageCount}
-                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))}
-                    disabled={isTableLayout}
-                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
-                />
+                 <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
+                    <div className="mt-2 space-y-2">
+                        <Checkbox label="Otomatik Sığdır" id="auto-fit-word-problems" checked={settings.autoFit ?? true} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
+                        <div className="grid grid-cols-2 gap-x-2">
+                            <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={20} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={isTableLayout || settings.autoFit} />
+                            <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} disabled={isTableLayout} />
+                        </div>
+                    </div>
+                </details>
                 <div className="col-span-2 pt-1">
                      <label htmlFor="custom-prompt" className="font-medium text-xs text-stone-700 dark:text-stone-300 mb-1 block">Veya Özel Talimat Girin</label>
                      <textarea
@@ -229,18 +191,10 @@ const WordProblemsModule: React.FC = () => {
                      />
                 </div>
             </div>
-            <SettingsPresetManager 
-                moduleKey="word-problems"
-                currentSettings={settings}
-                onLoadSettings={setSettings}
-            />
+            <SettingsPresetManager moduleKey="word-problems" currentSettings={settings} onLoadSettings={setSettings} />
             <div className="flex flex-wrap gap-2 pt-2">
-                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
-                    <ShuffleIcon className="w-4 h-4" />
-                    Yenile
-                </Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+                <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
+                <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
             </div>
         </div>
     );
