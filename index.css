@@ -1,1 +1,476 @@
-full contents of index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --theme-primary: 234 88% 52%; /* Default, will be overridden */
+    --theme-primary-fg: 0 0% 100%;
+
+    --theme-orange-primary: 24 95% 53%; /* #ea580c */
+    --theme-orange-primary-fg: 0 0% 100%;
+    
+    --theme-mint-primary: 145 63% 42%; /* #228B22 */
+    --theme-mint-primary-fg: 0 0% 100%;
+    
+    --theme-rose-primary: 347 87% 55%; /* #e11d48 */
+    --theme-rose-primary-fg: 0 0% 100%;
+    
+    --theme-sky-primary: 199 89% 48%; /* #0ea5e9 */
+    --theme-sky-primary-fg: 0 0% 100%;
+}
+
+.theme-orange { --theme-primary: var(--theme-orange-primary); --theme-primary-fg: var(--theme-orange-primary-fg); }
+.theme-mint { --theme-primary: var(--theme-mint-primary); --theme-primary-fg: var(--theme-mint-primary-fg); }
+.theme-rose { --theme-primary: var(--theme-rose-primary); --theme-primary-fg: var(--theme-rose-primary-fg); }
+.theme-sky { --theme-primary: var(--theme-sky-primary); --theme-primary-fg: var(--theme-sky-primary-fg); }
+
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Font Themes */
+.font-theme-klasik { font-family: 'Lora', serif; }
+.font-theme-modern { font-family: 'Nunito Sans', sans-serif; }
+.font-theme-disleksi1 { font-family: 'Lexend', sans-serif; }
+.font-theme-disleksi2 { font-family: 'Atkinson Hyperlegible', sans-serif; }
+.font-theme-eglenceli { font-family: 'Caveat', cursive; }
+.font-theme-yumusak { font-family: 'Comfortaa', cursive; }
+.font-theme-blok { font-family: 'Roboto Slab', serif; }
+.font-theme-net { font-family: 'Montserrat', sans-serif; }
+
+
+/* Custom Accent Color */
+.accent-orange-700 {
+    accent-color: hsl(var(--theme-primary));
+}
+
+/* Header Constellation Animation */
+.header-constellation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.15;
+}
+.constellation-line {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 0.5;
+    opacity: 0.5;
+}
+.star {
+    fill: #fff;
+    animation: twinkle 4s infinite ease-in-out;
+}
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Make header items above constellation but below dropdowns */
+.header-interactive-item {
+    position: relative;
+    z-index: 5;
+}
+
+/* Main Layout Grid */
+.main-layout-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 1.5rem;
+    align-items: flex-start;
+    transition: grid-template-columns 0.3s ease-in-out;
+}
+@media (max-width: 1024px) {
+    .main-layout-grid {
+        grid-template-columns: 280px 1fr;
+    }
+}
+@media (max-width: 768px) {
+    .main-layout-grid {
+        grid-template-columns: 1fr;
+    }
+    .settings-panel {
+        order: 1; /* Moves settings panel below worksheet on mobile */
+    }
+    .worksheet-area {
+        order: 0;
+    }
+}
+.main-layout-grid.sidebar-collapsed {
+    grid-template-columns: 20px 1fr;
+}
+.settings-panel {
+    transition: all 0.3s ease-in-out;
+}
+.settings-panel-content {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+.sidebar-collapsed .settings-panel-content {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-20px);
+}
+
+/* Worksheet Area */
+.worksheet-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.worksheet-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 4.5rem;
+    z-index: 10;
+}
+.dark .worksheet-toolbar {
+    background-color: #292524; /* stone-800/80ish */
+}
+.worksheet-viewport {
+    flex-grow: 1;
+    overflow: auto;
+    background-color: #f5f5f4; /* stone-100 */
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+}
+.dark .worksheet-viewport {
+    background-color: #1c1917; /* stone-900 */
+}
+
+/* Worksheet Container (The A4 page) */
+.worksheet-container {
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform-origin: top center;
+    transition: transform 0.2s ease-out;
+    break-after: page;
+    page-break-after: always;
+    transform: scale(var(--view-scale, 0.5));
+    margin-bottom: calc(1rem * var(--view-scale, 0.5));
+}
+.worksheet-container[data-orientation="portrait"] {
+    width: 210mm;
+    min-height: 297mm;
+}
+.worksheet-container[data-orientation="landscape"] {
+    width: 297mm;
+    min-height: 210mm;
+}
+
+.worksheet-content {
+    color: var(--text-color, #1e293b);
+    padding: calc(1rem * var(--page-margin, 2));
+    font-size: var(--font-size, 16px);
+    line-height: var(--line-height, 1.5);
+    position: relative;
+    min-height: inherit; /* Ensure content area fills the page */
+}
+
+/* Notebook Styles */
+.notebook-lines {
+    background-image: repeating-linear-gradient(var(--notebook-color) 0 1px, transparent 1px 100%);
+    background-size: 100% calc(1em * var(--line-height, 1.5));
+}
+.notebook-grid {
+    background-image: 
+        linear-gradient(var(--notebook-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--notebook-color) 1px, transparent 1px);
+    background-size: 1rem 1rem;
+}
+.notebook-dotted {
+    background-image: radial-gradient(var(--notebook-color) 1.5px, transparent 1.5px);
+    background-size: 1rem 1rem;
+}
+
+
+/* Worksheet Header */
+.worksheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--text-color, #1e293b);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+.worksheet-title {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.worksheet-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9em;
+}
+
+/* Problem List */
+.problem-list {
+    display: grid;
+    grid-template-columns: repeat(var(--table-cols, 1), 1fr);
+    gap: var(--problem-spacing, 2rem) var(--column-gap, 2rem);
+}
+.problem-list[data-layout-mode="table"] {
+    grid-template-rows: repeat(var(--table-rows-count, 10), min-content);
+    grid-auto-flow: column;
+}
+
+.problem-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5em;
+    break-inside: avoid;
+    text-align: var(--problem-text-align, left);
+    justify-content: var(--problem-justify-content, flex-start);
+}
+
+.problem-number {
+    font-weight: bold;
+    color: #6b7280;
+    white-space: nowrap;
+}
+.problem-content {
+    flex-grow: 1;
+}
+
+/* Problem Item Border Styles */
+.problem-item-card {
+    background-color: #f8fafc;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid #e5e7eb;
+}
+.dark .problem-item-card { background-color: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
+
+.problem-item-bordered { padding: 0.75rem; }
+.border-solid { border: 1px solid #d4d4d8; }
+.border-dashed { border: 1px dashed #d4d4d8; }
+.border-shadow-lift { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); padding: 0.75rem; }
+.border-top-bar-color { border-top: 4px solid hsl(var(--theme-primary)); padding: 0.75rem; }
+
+
+/* Ladybug Loader */
+.ladybug-loader-container {
+    margin-top: 3rem;
+    padding: 2rem;
+    text-align: center;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+.dark .ladybug-loader-container { background-color: #292524; }
+.ladybug-loader-animation {
+    width: 200px;
+    height: 50px;
+    position: relative;
+}
+.ladybug-loader-track {
+    stroke: #d4d4d8;
+    stroke-width: 2px;
+    stroke-dasharray: 4 4;
+}
+.dark .ladybug-loader-track { stroke: #57534e; }
+.ladybug-loader-bug {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 5px;
+    left: -25px;
+    animation: crawl 4s infinite linear;
+}
+@keyframes crawl {
+    0% { transform: translateX(0) scale(1); }
+    10% { transform: translateX(20px) scale(1.05); }
+    45% { transform: translateX(175px) scale(1); }
+    50% { transform: translateX(200px) scale(1) rotateY(0deg); }
+    50.1% { transform: translateX(200px) scale(1) rotateY(180deg); }
+    60% { transform: translateX(180px) scale(1.05); }
+    95% { transform: translateX(25px) scale(1); }
+    100% { transform: translateX(0) scale(1) rotateY(180deg); }
+}
+
+/* Animated Logo */
+.daisy-sway {
+    animation: sway 8s infinite ease-in-out;
+    transform-origin: 75px 140px;
+}
+@keyframes sway {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg); }
+    75% { transform: rotate(5deg); }
+}
+
+.crawling-bug {
+    position: absolute;
+    animation: crawl-logo 15s infinite linear;
+    transform-origin: center center;
+}
+@keyframes crawl-logo {
+    0% { transform: translate(-20px, 15px) rotate(90deg); }
+    20% { transform: translate(15px, 20px) rotate(0deg); } /* Crawls up the stem */
+    40% { transform: translate(5px, -15px) rotate(-45deg); } /* Crawls onto a petal */
+    60% { transform: translate(-15px, -10px) rotate(-160deg); } /* Crawls around */
+    80% { transform: translate(-25px, 5px) rotate(-220deg); } /* Crawls to another petal */
+    100% { transform: translate(-20px, 15px) rotate(-270deg); } /* Back to stem */
+}
+
+/* Flying Ladybug on Hover */
+.flying-ladybug-container {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    will-change: transform, opacity, top, left;
+}
+.wings {
+    transform-origin: 30px 30px;
+    animation: flap 0.1s infinite linear;
+}
+.left-wing { transform-origin: 30px 30px; animation: flap-left 0.1s infinite linear; }
+.right-wing { transform-origin: 30px 30px; animation: flap-right 0.1s infinite linear; }
+@keyframes flap-left {
+    0%, 100% { transform: rotate(-20deg) scale(1.1, 1); }
+    50% { transform: rotate(5deg) scale(1, 1.1); }
+}
+@keyframes flap-right {
+    0%, 100% { transform: rotate(20deg) scale(1.1, 1); }
+    50% { transform: rotate(-5deg) scale(1, 1.1); }
+}
+
+/* Table Selector */
+.table-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    gap: 4px;
+    width: 200px;
+    height: 200px;
+    cursor: pointer;
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 4px;
+}
+.dark .table-selector-grid { background-color: #3f3f46; border-color: #52525b; }
+.table-selector-cell {
+    background-color: #cbd5e1;
+    border-radius: 2px;
+    transition: background-color 0.1s ease-in-out;
+}
+.dark .table-selector-cell { background-color: #71717a; }
+.table-selector-cell.selected {
+    background-color: hsl(var(--theme-primary));
+}
+
+/* Hint Button */
+.hint-popover {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+.hint-button:hover .hint-popover {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Toast Container */
+.toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 350px;
+}
+.toast-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-width: 1px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+}
+.toast-item-enter { animation-name: slideIn; }
+.toast-item-exit { animation-name: slideOut; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
+
+/* Print Styles */
+@media print {
+    body {
+        background-color: white !important;
+    }
+    .print\:hidden {
+        display: none !important;
+    }
+    .worksheet-area {
+        display: block;
+    }
+    .worksheet-viewport {
+        padding: 0;
+        overflow: visible;
+    }
+    .worksheet-container {
+        box-shadow: none;
+        margin: 0;
+        transform: scale(var(--print-scale, 1));
+        transform-origin: top left;
+    }
+    .worksheet-container[data-orientation="portrait"] {
+        width: 100%;
+        min-height: auto;
+        height: 297mm;
+    }
+    .worksheet-container[data-orientation="landscape"] {
+        width: 100%;
+        min-height: auto;
+        height: 210mm;
+    }
+    .problem-item {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+}
+
+/* Special class for PDF export to mimic print styles on screen */
+.pdf-export-mode body {
+    background-color: #6b7280 !important;
+}
+.pdf-export-mode .worksheet-area {
+    display: block;
+}
+.pdf-export-mode .worksheet-viewport {
+    padding: 2rem 0;
+    overflow: visible;
+}
+.pdf-export-mode .worksheet-container {
+    margin: 0 auto 2rem auto;
+    transform: scale(var(--print-scale, 1));
+}
+.pdf-export-mode .print\:hidden {
+    display: none !important;
+}
