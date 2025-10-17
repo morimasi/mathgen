@@ -453,58 +453,21 @@ export type DyslexiaSubModuleType =
     | 'auditory-writing'
     | 'interactive-story';
 
-export interface SoundWizardSettings {
-    type: 'rhyme' | 'syllable' | 'blend';
-    difficulty: 'easy' | 'medium';
-    wordLength: number;
-}
-export interface LetterDetectiveSettings {
-    letterGroup: 'vowels' | 'common_consonants' | 'tricky_consonants' | 'mixed';
-    difficulty: 'easy' | 'medium';
-}
-export interface ReadingFluencyCoachSettings {
-    gradeLevel: string;
-    topic: string;
-}
-export interface ComprehensionExplorerSettings {
-    textLength: 'short' | 'medium' | 'long';
-    questionType: 'main_idea' | 'inference' | 'vocabulary' | 'mixed';
-    gradeLevel: string;
-}
-export interface VocabularyExplorerSettings {
-    difficulty: 'easy' | 'medium' | 'hard';
-    gradeLevel: string;
-}
-export interface VisualMasterSettings {
-    type: 'letter' | 'word';
-    pair: 'b-d' | 'p-q' | 'm-n' | 'ev-ve' | 'yok-koy' | 'kar-rak' | 'mixed';
-}
-export interface WordHunterSettings {
-    focus: 'prefix' | 'suffix' | 'root';
-    difficulty: 'easy' | 'medium';
-}
-export interface SpellingChampionSettings {
-    difficulty: 'easy' | 'medium' | 'hard';
-    category: 'common_errors' | 'homophones' | 'mixed';
-}
-export interface MemoryGamerSettings {
-    type: 'digit_span' | 'word_sequence' | 'sentence_repeat';
-    sequenceLength: number;
-}
-export interface AuditoryWritingSettings {
-    type: 'single_words' | 'short_sentences';
-    difficulty: 'easy' | 'medium' | 'hard';
-}
-export interface InteractiveStorySettings {
-    genre: 'adventure' | 'mystery' | 'fantasy' | 'sci-fi';
-    gradeLevel: string;
-}
+export interface SoundWizardSettings { type: 'rhyme' | 'syllable' | 'blend'; difficulty: 'easy' | 'medium'; wordLength: number; }
+export interface LetterDetectiveSettings { letterGroup: 'vowels' | 'common_consonants' | 'tricky_consonants' | 'mixed'; difficulty: 'easy' | 'medium'; }
+export interface ReadingFluencyCoachSettings { gradeLevel: string; topic: string; }
+export interface ComprehensionExplorerSettings { textLength: 'short' | 'medium' | 'long'; questionType: 'main_idea' | 'inference' | 'vocabulary' | 'mixed'; gradeLevel: string; }
+export interface VocabularyExplorerSettings { difficulty: 'easy' | 'medium' | 'hard'; gradeLevel: string; }
+export interface VisualMasterSettings { type: 'letter' | 'word'; pair: 'b-d' | 'p-q' | 'm-n' | 'ev-ve' | 'yok-koy' | 'kar-rak' | 'mixed'; }
+export interface WordHunterSettings { focus: 'prefix' | 'suffix' | 'root'; difficulty: 'easy' | 'medium'; }
+export interface SpellingChampionSettings { difficulty: 'easy' | 'medium' | 'hard'; category: 'common_errors' | 'homophones' | 'mixed'; }
+export interface MemoryGamerSettings { type: 'digit_span' | 'word_sequence' | 'sentence_repeat'; sequenceLength: number; }
+export interface AuditoryWritingSettings { type: 'single_words' | 'short_sentences'; difficulty: 'easy' | 'medium' | 'hard'; }
+export interface InteractiveStorySettings { genre: 'adventure' | 'mystery' | 'fantasy' | 'sci-fi'; gradeLevel: string; }
 
 export interface DyslexiaSettings {
     activeSubModule: DyslexiaSubModuleType;
-    problemsPerPage: number;
-    pageCount: number;
-    autoFit: boolean;
+    problemsPerPage: number; pageCount: number; autoFit: boolean;
     soundWizard: SoundWizardSettings;
     letterDetective: LetterDetectiveSettings;
     readingFluencyCoach: ReadingFluencyCoachSettings;
@@ -516,4 +479,76 @@ export interface DyslexiaSettings {
     memoryGamer: MemoryGamerSettings;
     auditoryWriting: AuditoryWritingSettings;
     interactiveStory: InteractiveStorySettings;
+}
+
+// DYSCALCULIA
+export type DyscalculiaSubModuleType =
+    | 'number-sense' | 'arithmetic-fluency' | 'number-grouping' | 'problem-solving' | 'math-language'
+    | 'time-measurement-geometry' | 'spatial-reasoning' | 'estimation-skills' | 'fractions-decimals-intro'
+    | 'visual-number-representation' | 'visual-arithmetic' | 'interactive-story-dc';
+
+export interface NumberSenseSettings { type: 'compare' | 'order' | 'number-line'; maxNumber: number; }
+export interface ArithmeticFluencySettings { operation: 'addition' | 'subtraction' | 'mixed'; difficulty: 'easy' | 'medium'; }
+export interface NumberGroupingSettings { maxNumber: number; }
+export interface ProblemSolvingSettings { gradeLevel: string; topic: string; }
+export interface MathLanguageSettings { type: 'symbol-match' | 'word-to-symbol'; }
+export interface TimeMeasurementGeometrySettings { category: 'time' | 'measurement' | 'geometry'; }
+export interface SpatialReasoningSettings { type: 'pattern-copy' | 'mental-rotation'; }
+export interface EstimationSkillsSettings { type: 'quantity' | 'result'; }
+export interface FractionsDecimalsIntroSettings { type: 'visual-match' | 'compare'; }
+export interface VisualNumberRepresentationSettings { maxNumber: number; representation: 'dots' | 'blocks' | 'fingers'; }
+export interface VisualArithmeticSettings { operation: 'addition' | 'subtraction'; maxNumber: number; }
+export interface InteractiveStoryDcSettings { genre: 'market' | 'playground' | 'space'; gradeLevel: string; }
+
+export interface DyscalculiaSettings {
+    activeSubModule: DyscalculiaSubModuleType;
+    problemsPerPage: number; pageCount: number; autoFit: boolean;
+    numberSense: NumberSenseSettings;
+    arithmeticFluency: ArithmeticFluencySettings;
+    numberGrouping: NumberGroupingSettings;
+    problemSolving: ProblemSolvingSettings;
+    mathLanguage: MathLanguageSettings;
+    timeMeasurementGeometry: TimeMeasurementGeometrySettings;
+    spatialReasoning: SpatialReasoningSettings;
+    estimationSkills: EstimationSkillsSettings;
+    fractionsDecimalsIntro: FractionsDecimalsIntroSettings;
+    visualNumberRepresentation: VisualNumberRepresentationSettings;
+    visualArithmetic: VisualArithmeticSettings;
+    interactiveStoryDc: InteractiveStoryDcSettings;
+}
+
+// DYSGRAPHIA
+export type DysgraphiaSubModuleType =
+    | 'fine-motor-skills' | 'letter-formation' | 'letter-form-recognition' | 'legible-writing' | 'picture-sequencing'
+    | 'writing-speed' | 'sentence-construction' | 'punctuation' | 'writing-planning' | 'creative-writing'
+    | 'keyboard-skills' | 'interactive-story-dg';
+
+export interface FineMotorSkillsSettings { type: 'line-trace' | 'shape-trace' | 'maze'; }
+export interface LetterFormationSettings { letter: string; case: 'lower' | 'upper' | 'mixed'; }
+export interface LetterFormRecognitionSettings { targetLetter: string; difficulty: 'easy' | 'medium'; }
+export interface LegibleWritingSettings { type: 'spacing' | 'sizing'; }
+export interface PictureSequencingSettings { storyLength: 3 | 4 | 5; topic: string; }
+export interface WritingSpeedSettings { duration: 1 | 2 | 5; }
+export interface SentenceConstructionSettings { wordCount: number; }
+export interface PunctuationSettings { type: 'end-of-sentence' | 'commas'; }
+export interface WritingPlanningSettings { topic: string; }
+export interface CreativeWritingSettings { promptType: 'story-starter' | 'what-if'; topic: string; }
+export interface KeyboardSkillsSettings { level: 'home-row' | 'top-row' | 'full'; }
+export interface InteractiveStoryDgSettings { genre: 'journal' | 'adventure' | 'fantasy'; gradeLevel: string; }
+
+export interface DysgraphiaSettings {
+    activeSubModule: DysgraphiaSubModuleType;
+    problemsPerPage: number; pageCount: number; autoFit: boolean;
+    fineMotorSkills: FineMotorSkillsSettings;
+    letterFormation: LetterFormationSettings;
+    letterFormRecognition: LetterFormRecognitionSettings;
+    legibleWriting: LegibleWritingSettings;
+    pictureSequencing: PictureSequencingSettings;
+    writingSpeed: WritingSpeedSettings;
+    sentenceConstruction: SentenceConstructionSettings;
+    punctuation: PunctuationSettings;
+    writingPlanning: WritingPlanningSettings;
+    creativeWriting: CreativeWritingSettings;
+    keyboardSkills: KeyboardSkillsSettings;
+    interactiveStoryDg: InteractiveStoryDgSettings;
 }

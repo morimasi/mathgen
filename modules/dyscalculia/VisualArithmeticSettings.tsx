@@ -1,9 +1,43 @@
 import React from 'react';
+import { VisualArithmeticSettings } from '../../types';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import HintButton from '../../components/HintButton';
 
-// The parent module is a placeholder, so these settings are not currently used.
-// This component is created to resolve build errors.
-const VisualArithmeticSettings: React.FC = () => {
-    return null;
+interface Props {
+    settings: VisualArithmeticSettings;
+    onChange: (settings: Partial<VisualArithmeticSettings>) => void;
+}
+
+const VisualArithmeticSettingsComponent: React.FC<Props> = ({ settings, onChange }) => {
+    return (
+        <div className="space-y-2">
+            <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold">Görsel Aritmetik Ayarları</h3>
+                <HintButton text="Sayılar yerine resimler ve emojiler kullanarak temel toplama ve çıkarma işlemlerini somut ve eğlenceli hale getirir." />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+                <Select
+                    label="İşlem Türü"
+                    id="va-operation"
+                    value={settings.operation}
+                    onChange={e => onChange({ operation: e.target.value as VisualArithmeticSettings['operation'] })}
+                    options={[
+                        { value: 'addition', label: 'Toplama' },
+                        { value: 'subtraction', label: 'Çıkarma' },
+                    ]}
+                />
+                <NumberInput
+                    label="En Büyük Sayı"
+                    id="va-maxNumber"
+                    min={5}
+                    max={20}
+                    value={settings.maxNumber}
+                    onChange={e => onChange({ maxNumber: parseInt(e.target.value, 10) })}
+                />
+            </div>
+        </div>
+    );
 };
 
-export default VisualArithmeticSettings;
+export default VisualArithmeticSettingsComponent;

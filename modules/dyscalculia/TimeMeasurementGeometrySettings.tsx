@@ -1,9 +1,33 @@
 import React from 'react';
+import { TimeMeasurementGeometrySettings } from '../../types';
+import Select from '../../components/form/Select';
+import HintButton from '../../components/HintButton';
 
-// The parent module is a placeholder, so these settings are not currently used.
-// This component is created to resolve build errors.
-const TimeMeasurementGeometrySettings: React.FC = () => {
-    return null;
+interface Props {
+    settings: TimeMeasurementGeometrySettings;
+    onChange: (settings: Partial<TimeMeasurementGeometrySettings>) => void;
+}
+
+const TimeMeasurementGeometrySettingsComponent: React.FC<Props> = ({ settings, onChange }) => {
+    return (
+        <div className="space-y-2">
+            <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold">Zaman, Ölçme, Geometri Ayarları</h3>
+                <HintButton text="Bu alanlardaki temel kavramları (örn: saat okuma, uzunluk karşılaştırma, şekil tanıma) basitleştirilmiş görsellerle öğretir." />
+            </div>
+            <Select
+                label="Kategori"
+                id="tmg-category"
+                value={settings.category}
+                onChange={e => onChange({ category: e.target.value as TimeMeasurementGeometrySettings['category'] })}
+                options={[
+                    { value: 'time', label: 'Zaman (Saat Okuma)' },
+                    { value: 'measurement', label: 'Ölçme (Uzun/Kısa)' },
+                    { value: 'geometry', label: 'Geometri (Şekil Tanıma)' },
+                ]}
+            />
+        </div>
+    );
 };
 
-export default TimeMeasurementGeometrySettings;
+export default TimeMeasurementGeometrySettingsComponent;

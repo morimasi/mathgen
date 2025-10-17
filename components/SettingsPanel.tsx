@@ -88,11 +88,9 @@ const SettingsPanel: React.FC<SettingsPanelProps> = (props) => {
             case 'dyslexia':
                 return <DyslexiaModule {...moduleProps} />;
             case 'dyscalculia':
-// FIX: Removed {...moduleProps} as the DyscalculiaModule component is a placeholder and does not accept props.
-                return <DyscalculiaModule />;
+                return <DyscalculiaModule {...moduleProps} />;
             case 'dysgraphia':
-// FIX: Removed {...moduleProps} as the DysgraphiaModule component is a placeholder and does not accept props.
-                return <DysgraphiaModule />;
+                return <DysgraphiaModule {...moduleProps} />;
             default:
                 return <div>Please select a module from the top menu.</div>;
         }

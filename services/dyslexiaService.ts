@@ -1,6 +1,8 @@
 // services/dyslexiaService.ts
 import { Problem, DyslexiaSubModuleType, DyslexiaSettings } from '../types';
-import { generateDyslexiaAIProblem } from './geminiService';
+// FIX: The imported function 'generateDyslexiaAIProblem' does not exist.
+// The error hint suggests 'generateSpecialAIProblem', which is correct.
+import { generateSpecialAIProblem } from './geminiService';
 
 // --- HELPER FUNCTIONS & DATA ---
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -187,7 +189,8 @@ export const generateDyslexiaProblem = async (
             };
         }
         try {
-            const problems = await generateDyslexiaAIProblem(subModule, settings, count);
+            // FIX: The function call was incorrect. Changed to use the correctly imported 'generateSpecialAIProblem'.
+            const problems = await generateSpecialAIProblem(subModule, settings, count);
             const titleMap: { [key: string]: string } = {
                 'comprehension-explorer': 'Anlam Kâşifi (AI)',
                 'vocabulary-explorer': 'Kelime Kâşifi (AI)',

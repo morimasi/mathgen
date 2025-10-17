@@ -1,9 +1,32 @@
 import React from 'react';
+import { PunctuationSettings } from '../../types';
+import Select from '../../components/form/Select';
+import HintButton from '../../components/HintButton';
 
-// The parent module is a placeholder, so these settings are not currently used.
-// This component is created to resolve build errors.
-const PunctuationSettings: React.FC = () => {
-    return null;
+interface Props {
+    settings: PunctuationSettings;
+    onChange: (settings: Partial<PunctuationSettings>) => void;
+}
+
+const PunctuationSettingsComponent: React.FC<Props> = ({ settings, onChange }) => {
+    return (
+        <div className="space-y-2">
+            <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold">Noktalama İşaretleri Ayarları</h3>
+                <HintButton text="Cümle sonlarına doğru noktalama işaretini (nokta, soru işareti, ünlem) koyma veya cümle içinde virgül kullanımı gibi temel becerileri öğretir." />
+            </div>
+            <Select
+                label="Odak Alanı"
+                id="p-type"
+                value={settings.type}
+                onChange={e => onChange({ type: e.target.value as PunctuationSettings['type'] })}
+                options={[
+                    { value: 'end-of-sentence', label: 'Cümle Sonu İşaretleri' },
+                    { value: 'commas', label: 'Virgül Kullanımı' },
+                ]}
+            />
+        </div>
+    );
 };
 
-export default PunctuationSettings;
+export default PunctuationSettingsComponent;
