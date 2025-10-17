@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateDecimalProblem } from '../services/mathService';
-// FIX: Import 'generateContextualWordProblems' from the newly created 'geminiService'.
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, DecimalsSettings, DecimalsProblemType, DecimalsOperation, Difficulty } from '../types';
 import Button from '../components/form/Button';

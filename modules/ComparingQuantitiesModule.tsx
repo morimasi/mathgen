@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateReadinessProblem } from '../services/readinessService';
-// FIX: Import 'generateContextualWordProblems' from the newly created 'geminiService'.
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, ComparingQuantitiesSettings, ComparisonType, MathReadinessTheme } from '../types';
 import Button from '../components/form/Button';
@@ -118,7 +117,7 @@ const ComparingQuantitiesModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoa
                     <div className="mt-1.5 pl-6">
                          <div className="relative">
                             <TextInput
-                                label="Problem Konusu (İsteğe bağlı)"
+                                label="Problem Konusu (İsteğe Bağlı)"
                                 id="comparing-topic"
                                 value={settings.topic || ''}
                                 onChange={e => handleSettingChange('topic', e.target.value)}

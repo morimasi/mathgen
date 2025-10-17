@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateGeometryProblem } from '../services/geometryService';
-// FIX: Import 'generateContextualWordProblems' from the newly created 'geminiService'.
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, GeometrySettings, GeometryProblemType, ShapeType } from '../types';
 import Button from '../components/form/Button';

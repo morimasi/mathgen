@@ -1,6 +1,4 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-// FIX: The imported function 'generateWordProblems' does not exist.
-// Changed to 'generateContextualWordProblems' and updated the call to pass the required 'sourceModule' argument.
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, WordProblemSettings } from '../types';
 import Button from '../components/form/Button';
@@ -65,7 +63,6 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
                  totalCount = settings.problemsPerPage * settings.pageCount;
             }
             const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
-            // FIX: The function call was incorrect. Changed to use 'generateContextualWordProblems' with the correct arguments.
             const problems = await generateContextualWordProblems(settings.sourceModule, adjustedSettings);
             const title = `Yapay Zeka Destekli Problemler (${settings.customPrompt ? 'Özel' : settings.topic})`;
             onGenerate(problems, clearPrevious, title, 'word-problems', isTableLayout ? 1 : settings.pageCount);

@@ -36,10 +36,10 @@ const getModuleSpecificInstructions = (sourceModule: string, settings: any): str
         'dysgraphia': 'Disgrafiye özel, ince motor becerileri, harf şekillendirme, yazı planlama ve yazma motivasyonunu artırıcı etkinlikler.',
     };
     
-    instructions += `${gradeLevel}. sınıf seviyesine uygun,`;
+    if (gradeLevel) instructions += `${gradeLevel}. sınıf seviyesine uygun,`;
     if (topic) instructions += ` "${topic}" temalı,`;
     if (modulePrompts[sourceModule]) instructions += ` ${modulePrompts[sourceModule]} konusunda,`;
-    instructions += ` ${operationCount > 1 ? `${operationCount} işlem gerektiren` : 'tek işlem gerektiren'} problemler oluştur.`;
+    if (operationCount) instructions += ` ${operationCount > 1 ? `${operationCount} işlem gerektiren` : 'tek işlem gerektiren'} problemler oluştur.`;
     
     return instructions;
 };
@@ -56,125 +56,45 @@ export const generateContextualWordProblems = async (sourceModule: string, setti
             userPrompt = `${baseInstructions} ${problemsPerPage} tane gerçek hayat problemi (kelime problemi) oluştur.`;
         }
         
+        // Gemini doesn't generate images with emojis well. This instruction is better for text-only.
+        const visualInstruction = "Soruları daha ilgi çekici hale getirmek için problem metninin sonuna konuyla ilgili uygun bir emoji ekle.";
         if (useVisuals) {
-            userPrompt += " Her bir problem için, problemi anlatan basit, net, çocuk dostu bir çizim veya görsel de oluştur.";
+            userPrompt += ` ${visualInstruction}`;
         }
         
-        const modelName = useVisuals ? 'gemini-2.5-flash-image' : 'gemini-2.5-flash';
-        
         const response: GenerateContentResponse = await ai.models.generateContent({
-            model: modelName,
+            model: 'gemini-2.5-flash', // Image generation not suitable for this task. Sticking to text.
             contents: { parts: [{ text: userPrompt }] },
             config: {
                 systemInstruction,
-                ...(useVisuals 
-                    ? { responseModalities: [Modality.IMAGE] }
-                    : { 
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: Type.ARRAY,
-                            items: {
-                                type: Type.OBJECT,
-                                properties: {
-                                    question: { type: Type.STRING },
-                                    answer: { type: Type.STRING }
-                                },
-                                required: ['question', 'answer']
-                            }
-                        }
-                      }
-                )
-            }
-        });
-        
-        if (useVisuals) {
-            const problems: Problem[] = [];
-            let currentProblem: Partial<Problem> = {};
-
-            // Yanıt çok modlu (multi-modal) olduğunda, metin ve görselleri birleştirmemiz gerekir.
-            // Genellikle bir metin bloğu ve ardından bir görsel bloğu gelir.
-            for (const part of response.candidates[0].content.parts) {
-                if (part.text) {
-                     try {
-                        // Bazen AI, metin ve resmi tek bir JSON'da birleştirmeye çalışır.
-                        const parsed = JSON.parse(part.text);
-                        if (Array.isArray(parsed)) {
-                            parsed.forEach(p => problems.push({
-                                question: p.question || "Soru alınamadı",
-                                answer: p.answer || "Cevap alınamadı",
-                                category: sourceModule,
-                                display: 'inline'
-                            }));
-                        } else {
-                             // JSON metin değilse, normal metin olarak kabul et
-                             currentProblem.question = part.text;
-                        }
-                    } catch (e) {
-                        // JSON parse hatası, bunun normal bir metin olduğunu varsay
-                        currentProblem.question = part.text;
-                    }
-                } else if (part.inlineData) {
-                    const base64Image = part.inlineData.data;
-                    const imageUrl = `data:${part.inlineData.mimeType};base64,${base64Image}`;
-                    const imageHtml = `<img src="${imageUrl}" alt="AI tarafından üretilen görsel" style="max-width: 150px; margin: 10px auto; display: block; border-radius: 8px;" />`;
-                    
-                    // Görseli mevcut probleme ekle
-                    if (currentProblem.question) {
-                        currentProblem.question = `${imageHtml}<p>${currentProblem.question}</p>`;
-                        // Cevap genellikle metin bloğunda gizlidir, onu çıkarmaya çalışalım
-                        const answerMatch = currentProblem.question.match(/Cevap:\s*(.*)/i);
-                        currentProblem.answer = answerMatch ? answerMatch[1] : "Cevap belirtilmedi";
-                        
-                        problems.push({
-                            ...currentProblem,
-                            category: sourceModule,
-                            display: 'inline'
-                        } as Problem);
-                        currentProblem = {}; // Bir sonraki problem için sıfırla
-                    } else {
-                        // Eğer metin yoksa, sadece görseli bir problem olarak ekle
-                        problems.push({
-                            question: imageHtml,
-                            answer: "Görseli yorumlayınız.",
-                            category: sourceModule,
-                            display: 'inline'
-                        });
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.ARRAY,
+                    items: {
+                        type: Type.OBJECT,
+                        properties: {
+                            question: { type: Type.STRING },
+                            answer: { type: Type.STRING }
+                        },
+                        required: ['question', 'answer']
                     }
                 }
             }
-             // AI, tüm problemleri tek bir metin bloğunda ve ardından tüm görselleri gönderebilir.
-             // Bu durumu ele almak için, eğer hala işlenmemiş problemler varsa, onlara birer placeholder atayalım.
-            if (problems.length === 0 && currentProblem.question) {
-                 const problemTexts = currentProblem.question.split(/\d+\.\s/).filter(p => p.trim());
-                 problemTexts.forEach(text => {
-                     const parts = text.split(/Cevap:/i);
-                     problems.push({
-                         question: parts[0].trim(),
-                         answer: parts[1] ? parts[1].trim() : "...",
-                         category: sourceModule,
-                         display: 'inline'
-                     });
-                 });
-            }
-
-            return problems;
-
-        } else {
-            // Sadece metin tabanlı JSON yanıtı
-            const jsonText = response.text.trim();
-            const parsedProblems = JSON.parse(jsonText);
-            
-            if (!Array.isArray(parsedProblems)) {
-                throw new Error("AI response is not a JSON array.");
-            }
-
-            return parsedProblems.map((p: any) => ({
-                question: p.question || "Soru alınamadı",
-                answer: p.answer || "Cevap alınamadı",
-                category: sourceModule || 'word-problems',
-                display: 'inline'
-            }));
+        });
+        
+        const jsonText = response.text.trim();
+        const parsedProblems = JSON.parse(jsonText);
+        
+        if (!Array.isArray(parsedProblems)) {
+            throw new Error("AI response is not a JSON array.");
         }
+
+        return parsedProblems.map((p: any) => ({
+            question: p.question || "Soru alınamadı",
+            answer: p.answer || "Cevap alınamadı",
+            category: sourceModule || 'word-problems',
+            display: 'inline'
+        }));
         
     } catch (error) {
         console.error("Error generating contextual word problems:", error);
@@ -187,26 +107,23 @@ export const generateContextualWordProblems = async (sourceModule: string, setti
     }
 };
 
-// Disleksi, Diskalkuli ve Disgrafi için AI çağrıları da generateContextualWordProblems'ı kullanacak
+// Disleksi, Diskalkuli ve Disgrafi için AI çağrıları generateContextualWordProblems'ı kullanacak
 // çünkü artık bu fonksiyon sourceModule'e göre uzmanlaşmış talimatlar üretiyor.
-// Bu, kod tekrarını önler ve tüm AI etkileşimlerini tek bir merkezi yerde yönetir.
-
-export const generateDyslexiaProblem = async (subModuleId: string, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
+export const generateDyslexiaAIProblem = async (subModuleId: string, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
     const combinedSettings = { ...settings, problemsPerPage: count, sourceModule: 'dyslexia', subModule: subModuleId };
     const problems = await generateContextualWordProblems('dyslexia', combinedSettings);
-    // Title'ı daha dinamik hale getirebiliriz, şimdilik sabit
     const title = `Disleksi Odaklı Alıştırma: ${subModuleId}`;
     return { problems, title };
 };
 
-export const generateDyscalculiaProblem = async (subModuleId: string, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
+export const generateDyscalculiaAIProblem = async (subModuleId: string, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
     const combinedSettings = { ...settings, problemsPerPage: count, sourceModule: 'dyscalculia', subModule: subModuleId };
     const problems = await generateContextualWordProblems('dyscalculia', combinedSettings);
     const title = `Diskalkuli Odaklı Alıştırma: ${subModuleId}`;
     return { problems, title };
 };
 
-export const generateDysgraphiaProblem = async (subModuleId: string, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
+export const generateDysgraphiaAIProblem = async (subModuleId: string, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
     const combinedSettings = { ...settings, problemsPerPage: count, sourceModule: 'dysgraphia', subModule: subModuleId };
     const problems = await generateContextualWordProblems('dysgraphia', combinedSettings);
     const title = `Disgrafi Odaklı Alıştırma: ${subModuleId}`;

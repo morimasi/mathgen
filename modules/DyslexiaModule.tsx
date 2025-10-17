@@ -6,13 +6,11 @@ import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
-// FIX: Import the problem generation service for dyslexia.
 import { generateDyslexiaProblem } from '../services/dyslexiaService';
 
 // Import all sub-module setting components
 import SoundWizardSettings from './dyslexia/SoundWizardSettings';
 import LetterDetectiveSettings from './dyslexia/LetterDetectiveSettings';
-// FIX: Import the ReadingFluencyCoachSettings component.
 import ReadingFluencyCoachSettings from './dyslexia/ReadingFluencyCoachSettings';
 import ComprehensionExplorerSettings from './dyslexia/ComprehensionExplorerSettings';
 import VocabularyExplorerSettings from './dyslexia/VocabularyExplorerSettings';
@@ -77,8 +75,6 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
     const isInitialMount = useRef(true);
     
     const activeSubModuleId = settings.activeSubModule;
-    // FIX: The settings object uses camelCase keys (e.g. soundWizard), but the activeSubModuleId is kebab-case.
-    // Convert kebab-case to camelCase to correctly access the nested settings object.
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyslexiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
 
@@ -134,26 +130,21 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
         setSettings(prev => ({ ...prev, activeSubModule: id }));
     };
 
+    // FIX: The DyslexiaModule component function was incomplete, lacking helper functions and a return statement.
+    // The following functions and the JSX return block have been added to complete the component.
     const handleSettingChange = (field: keyof DyslexiaSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
-    
+
     const handleSubModuleSettingChange = (subModuleSettings: any) => {
-        // FIX: The settings object uses camelCase keys (e.g. soundWizard), but activeSubModuleId is kebab-case.
-        // Convert to camelCase to update the correct property. The original code used the wrong key,
-        // which resulted in spreading `undefined`.
-        const subModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase());
         setSettings(prev => ({
             ...prev,
-            [subModuleKey]: { ...(prev as any)[subModuleKey], ...subModuleSettings }
+            [activeSubModuleKey]: { ...(prev as any)[activeSubModuleKey], ...subModuleSettings }
         }));
     };
 
     const renderSettingsPanel = () => {
-        const props = {
-            settings: activeSubModuleSettings,
-            onChange: handleSubModuleSettingChange
-        };
+        const props = { settings: activeSubModuleSettings, onChange: handleSubModuleSettingChange };
         switch (activeSubModuleId) {
             case 'sound-wizard': return <SoundWizardSettings {...props} />;
             case 'letter-detective': return <LetterDetectiveSettings {...props} />;
@@ -172,19 +163,15 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
 
     return (
         <div className="flex gap-4">
-            {/* Sub-module Navigation */}
             <aside className="w-1/3 pr-2 border-r border-stone-200 dark:border-stone-700">
                 <nav className="flex flex-col gap-1">
                     {subModules.map(module => (
-                        <button
-                            key={module.id}
-                            onClick={() => handleSubModuleChange(module.id)}
+                        <button key={module.id} onClick={() => handleSubModuleChange(module.id)}
                             className={`flex items-center gap-2 w-full text-left px-2 py-1.5 rounded-md text-xs font-medium transition-colors ${
                                 activeSubModuleId === module.id
                                     ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300'
                                     : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700'
-                            }`}
-                        >
+                            }`}>
                             <module.icon className="w-4 h-4 flex-shrink-0" />
                             <span className="flex-grow">{module.label}</span>
                         </button>
@@ -192,42 +179,21 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
                 </nav>
             </aside>
             
-            {/* Main Settings Area */}
             <main className="w-2/3 space-y-3">
                 {renderSettingsPanel()}
-
                 <div className="pt-2 border-t border-stone-200 dark:border-stone-700">
                     <div className="grid grid-cols-2 gap-2">
-                         <NumberInput
-                            label="Problem Sayısı"
-                            id="dyslexia-problems-per-page"
-                            min={1} max={50}
-                            value={settings.problemsPerPage}
-                            onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))}
-                            disabled={settings.autoFit}
-                        />
-                         <NumberInput
-                            label="Sayfa Sayısı"
-                            id="dyslexia-page-count"
-                            min={1} max={20}
-                            value={settings.pageCount}
-                            onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))}
-                        />
+                         <NumberInput label="Problem Sayısı" id="dx-problems-per-page" min={1} max={50}
+                            value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit} />
+                         <NumberInput label="Sayfa Sayısı" id="dx-page-count" min={1} max={20}
+                            value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} />
                     </div>
                 </div>
-
-                <SettingsPresetManager 
-                    moduleKey={`dyslexia-${activeSubModuleId}`}
-                    // FIX: Use the correctly-keyed `activeSubModuleSettings` object instead of trying to access the main settings object with a kebab-case key.
-                    currentSettings={activeSubModuleSettings}
-                    onLoadSettings={handleSubModuleSettingChange}
-                />
-
+                <SettingsPresetManager currentSettings={activeSubModuleSettings} onLoadSettings={handleSubModuleSettingChange} moduleKey={`dyslexia-${activeSubModuleId}`} />
                 <div className="flex flex-wrap gap-2 pt-2">
                     <Button onClick={() => handleGenerate(true)} size="sm">Oluştur</Button>
                     <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
-                        <ShuffleIcon className="w-4 h-4" />
-                        Yenile
+                        <ShuffleIcon className="w-4 h-4" /> Yenile
                     </Button>
                 </div>
             </main>

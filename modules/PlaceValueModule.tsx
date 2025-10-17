@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { generatePlaceValueProblem } from '../services/placeValueService';
-// FIX: Import 'generateContextualWordProblems' from the newly created 'geminiService'.
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types';
 import Button from '../components/form/Button';
@@ -195,7 +194,7 @@ const PlaceValueModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                             <div className="mt-1.5 pl-6">
                                 <div className="relative">
                                      <TextInput
-                                        label="Problem Konusu (İsteğe bağlı)"
+                                        label="Problem Konusu (İsteğe Bağlı)"
                                         id="place-value-topic"
                                         value={settings.topic || ''}
                                         onChange={e => handleSettingChange('topic', e.target.value)}
