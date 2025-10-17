@@ -1,15 +1,15 @@
 
 import React, { useEffect } from 'react';
-import { useWorksheet } from '../services/WorksheetContext';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
-import { generateVisualProblem } from '../services/mathService';
-import { ArithmeticOperation, VisualSupportSettings } from '../types';
-import Select from '../components/form/Select';
-import NumberInput from '../components/form/NumberInput';
-import Checkbox from '../components/form/Checkbox';
-import Button from '../components/form/Button';
-import SettingsPresetManager from '../components/SettingsPresetManager';
-import { usePrintSettings } from '../services/PrintSettingsContext';
+import { useWorksheet } from '../../services/WorksheetContext';
+import { useProblemGenerator } from '../../hooks/useProblemGenerator';
+import { generateVisualProblem } from '../../services/mathService';
+import { ArithmeticOperation, VisualSupportSettings } from '../../types';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import Checkbox from '../../components/form/Checkbox';
+import Button from '../../components/form/Button';
+import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { usePrintSettings } from '../../services/PrintSettingsContext';
 
 const VisualSupportModule: React.FC = () => {
     const { visualSupportSettings, setVisualSupportSettings, resetWorksheet } = useWorksheet();

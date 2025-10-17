@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { DysgraphiaSettings, DysgraphiaSubModuleType } from '../types';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
-import { generateDysgraphiaProblem } from '../services/dysgraphiaService';
-import Select from '../components/form/Select';
-import NumberInput from '../components/form/NumberInput';
-import Button from '../components/form/Button';
-import SettingsPresetManager from '../components/SettingsPresetManager';
+import { useProblemGenerator } from '../../hooks/useProblemGenerator';
+import { generateDysgraphiaProblem } from '../../services/dysgraphiaService';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import Button from '../../components/form/Button';
+import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 import FineMotorSkillsSettings from './dysgraphia/FineMotorSkillsSettings';
 import LetterFormationSettings from './dysgraphia/LetterFormationSettings';

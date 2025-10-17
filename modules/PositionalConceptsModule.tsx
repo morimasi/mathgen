@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 // FIX: Imported PositionalConceptType enum to use for initial settings.
 import { PositionalConceptsSettings, PositionalConceptType } from '../types';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
-import { generateReadinessProblem } from '../services/readinessService';
-import Select from '../components/form/Select';
-import NumberInput from '../components/form/NumberInput';
-import Checkbox from '../components/form/Checkbox';
-import Button from '../components/form/Button';
-import SettingsPresetManager from '../components/SettingsPresetManager';
+import { useProblemGenerator } from '../../hooks/useProblemGenerator';
+import { generateReadinessProblem } from '../../services/readinessService';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import Checkbox from '../../components/form/Checkbox';
+import Button from '../../components/form/Button';
+import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: PositionalConceptsSettings = {
     // FIX: Changed string literal to enum member to fix type error.

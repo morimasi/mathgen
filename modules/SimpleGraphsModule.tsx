@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 // FIX: Imported SimpleGraphType enum to use for initial settings.
 import { SimpleGraphsSettings, SimpleGraphType } from '../types';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
-import { generateReadinessProblem } from '../services/readinessService';
-import Select from '../components/form/Select';
-import NumberInput from '../components/form/NumberInput';
-import Button from '../components/form/Button';
-import SettingsPresetManager from '../components/SettingsPresetManager';
+import { useProblemGenerator } from '../../hooks/useProblemGenerator';
+import { generateReadinessProblem } from '../../services/readinessService';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import Button from '../../components/form/Button';
+import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: SimpleGraphsSettings = {
     // FIX: Changed string literal to enum member to fix type error.

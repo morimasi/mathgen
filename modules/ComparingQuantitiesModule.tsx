@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 // FIX: Imported ComparisonType enum to use for initial settings.
 import { ComparingQuantitiesSettings, ComparisonType } from '../types';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
-import { generateReadinessProblem } from '../services/readinessService';
-import Select from '../components/form/Select';
-import NumberInput from '../components/form/NumberInput';
-import Checkbox from '../components/form/Checkbox';
-import Button from '../components/form/Button';
-import SettingsPresetManager from '../components/SettingsPresetManager';
+import { useProblemGenerator } from '../../hooks/useProblemGenerator';
+import { generateReadinessProblem } from '../../services/readinessService';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import Checkbox from '../../components/form/Checkbox';
+import Button from '../../components/form/Button';
+import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: ComparingQuantitiesSettings = {
     // FIX: Changed string literal to enum member to fix type error.

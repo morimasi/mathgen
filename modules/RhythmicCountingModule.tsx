@@ -1,14 +1,13 @@
-
 import React, { useState } from 'react';
 import { RhythmicCountingSettings, RhythmicProblemType } from '../types';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
-import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
-import Select from '../components/form/Select';
-import NumberInput from '../components/form/NumberInput';
-import Checkbox from '../components/form/Checkbox';
-import Button from '../components/form/Button';
-import SettingsPresetManager from '../components/SettingsPresetManager';
-import { TOPIC_SUGGESTIONS } from '../constants';
+import { useProblemGenerator } from '../../hooks/useProblemGenerator';
+import { generateRhythmicCountingProblem } from '../../services/rhythmicCountingService';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import Checkbox from '../../components/form/Checkbox';
+import Button from '../../components/form/Button';
+import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { TOPIC_SUGGESTIONS } from '../../constants';
 
 const initialSettings: RhythmicCountingSettings = {
     digits: 2,
