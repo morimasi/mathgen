@@ -435,3 +435,83 @@ export interface ToastMessage {
     message: string;
     type: ToastType;
 }
+
+// --- DYSLEXIA MODULE ---
+export type DyslexiaSubModuleType = 
+    | 'sound-wizard'
+    | 'letter-detective'
+    | 'reading-fluency-coach'
+    | 'comprehension-explorer'
+    | 'vocabulary-explorer'
+    | 'visual-master'
+    | 'word-hunter'
+    | 'spelling-champion'
+    | 'memory-gamer'
+    | 'auditory-writing'
+    | 'interactive-story';
+
+export interface SoundWizardSettings {
+    type: 'rhyme' | 'syllable' | 'blend';
+    difficulty: 'easy' | 'medium';
+    wordLength: number;
+}
+export interface LetterDetectiveSettings {
+    letterGroup: 'vowels' | 'common_consonants' | 'tricky_consonants' | 'mixed';
+    difficulty: 'easy' | 'medium';
+}
+export interface ReadingFluencyCoachSettings {
+    gradeLevel: string;
+    topic: string;
+}
+export interface ComprehensionExplorerSettings {
+    textLength: 'short' | 'medium' | 'long';
+    questionType: 'main_idea' | 'inference' | 'vocabulary' | 'mixed';
+    gradeLevel: string;
+}
+export interface VocabularyExplorerSettings {
+    difficulty: 'easy' | 'medium' | 'hard';
+    gradeLevel: string;
+}
+export interface VisualMasterSettings {
+    type: 'letter' | 'word';
+    pair: 'b-d' | 'p-q' | 'm-n' | 'ev-ve' | 'yok-koy' | 'kar-rak' | 'mixed';
+}
+export interface WordHunterSettings {
+    focus: 'prefix' | 'suffix' | 'root';
+    difficulty: 'easy' | 'medium';
+}
+export interface SpellingChampionSettings {
+    difficulty: 'easy' | 'medium' | 'hard';
+    category: 'common_errors' | 'homophones' | 'mixed';
+}
+export interface MemoryGamerSettings {
+    type: 'digit_span' | 'word_sequence' | 'sentence_repeat';
+    sequenceLength: number;
+}
+export interface AuditoryWritingSettings {
+    type: 'single_words' | 'short_sentences';
+    difficulty: 'easy' | 'medium' | 'hard';
+}
+export interface InteractiveStorySettings {
+    genre: 'adventure' | 'mystery' | 'fantasy' | 'sci-fi';
+    gradeLevel: string;
+}
+
+export interface DyslexiaSettings {
+    activeSubModule: DyslexiaSubModuleType;
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    
+    soundWizard: SoundWizardSettings;
+    letterDetective: LetterDetectiveSettings;
+    readingFluencyCoach: ReadingFluencyCoachSettings;
+    comprehensionExplorer: ComprehensionExplorerSettings;
+    vocabularyExplorer: VocabularyExplorerSettings;
+    visualMaster: VisualMasterSettings;
+    wordHunter: WordHunterSettings;
+    spellingChampion: SpellingChampionSettings;
+    memoryGamer: MemoryGamerSettings;
+    auditoryWriting: AuditoryWritingSettings;
+    interactiveStory: InteractiveStorySettings;
+}

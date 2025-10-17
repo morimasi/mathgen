@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { Problem, WordProblemSettings } from '../types';
+import { Problem, WordProblemSettings, DyslexiaSubModuleType } from '../types';
 import { TABS } from '../constants';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -192,6 +192,47 @@ export const generateContextualWordProblems = async (category: string, settings:
     }
 
     prompt += ` Her problem için bir "question" ve bir "answer" alanı olan bir JSON nesnesi döndür. "answer" alanı, önce sayısal sonucu ve birimini (örneğin "15 elma", "120 TL"), ardından parantez içinde kısa bir çözüm açıklaması içermelidir (örneğin "83 (Çözüm: 45 + 38 = 83)"). Cevaplar net, anlaşılır ve Türkçe olmalıdır.`;
+    const problems = await generateProblemsWithPrompt(prompt);
+    return problems.map(p => ({ ...p, category }));
+};
+
+
+export const generateDyslexiaAIProblem = async (subModule: DyslexiaSubModuleType, settings: any, count: number): Promise<Problem[]> => {
+    let prompt = '';
+    const category = `dyslexia-${subModule}`;
+
+    switch (subModule) {
+        case 'comprehension-explorer': {
+            const { gradeLevel, textLength, questionType } = settings;
+            const lengthMap = { short: '1-2 paragraflık', medium: '3-4 paragraflık', long: '5-6 paragraflık' };
+            const questionMap = { main_idea: 'ana fikrini', inference: 'çıkarım yapılabilecek yönlerini', vocabulary: 'içindeki zor bir kelimeyi', mixed: 'ana fikir, çıkarım ve kelime anlamını' };
+            prompt = `Disleksisi olan ${gradeLevel}. sınıf öğrencileri için, okunaklı ve basit bir dil kullanarak ${lengthMap[textLength]} bir metin oluştur. Metnin sonunda, metnin ${questionMap[questionType]} sorgulayan ${count} tane soru hazırla.`;
+            break;
+        }
+        case 'vocabulary-explorer': {
+            const { gradeLevel, difficulty } = settings;
+            prompt = `${gradeLevel}. sınıf seviyesindeki disleksili bir öğrencinin kelime dağarcığını geliştirmek için, zorluk seviyesi '${difficulty}' olan ${count} tane kelime seç.`;
+            break;
+        }
+        case 'interactive-story': {
+            const { gradeLevel, genre } = settings;
+            prompt = `Disleksili ${gradeLevel}. sınıf öğrencileri için, ${genre} türünde, okuması kolay ve ilgi çekici bir interaktif hikayenin başlangıcını yaz. Hikayenin sonunda, okuyucunun hikayenin devamı için iki farklı seçenekten birini seçmesini iste.`;
+            // For this module, we expect a slightly different format, so we won't use generateProblemsWithPrompt directly.
+             try {
+                const response = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: prompt });
+                return [{ question: response.text, answer: "Hikaye devam ediyor...", category }];
+            } catch (error) {
+                 console.error("Error generating interactive story:", error);
+                 return [{ question: "Hikaye oluşturulamadı.", answer: "Hata", category: 'error' }];
+            }
+        }
+        default:
+            return [];
+    }
+    
+    // For comprehension and vocabulary, use the standard JSON problem generator.
+    prompt += ` Her bir problem için, 'question' alanında metin veya kelime, 'answer' alanında ise sorunun cevabı olacak şekilde bir JSON listesi döndür. Cevaplar disleksili öğrenciler için açık ve anlaşılır olmalıdır.`;
+
     const problems = await generateProblemsWithPrompt(prompt);
     return problems.map(p => ({ ...p, category }));
 };
