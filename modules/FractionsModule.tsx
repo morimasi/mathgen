@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -139,9 +140,26 @@ const FractionsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, cont
     const isWordProblemMode = settings.useWordProblems;
     const isTableLayout = printSettings.layoutMode === 'table';
 
+    const getHintText = () => {
+        switch (settings.type) {
+            case FractionsProblemType.FourOperations:
+                if (settings.difficulty === 'hard') return "'Zor' seviyesi, tam sayılı ve bileşik kesirler içerir. 'Tam Sayılı Kesir Kullan' seçeneğini kapatarak sadece bileşik kesirlerle problem üretebilirsiniz.";
+                return "'Zorluk' ayarı, kesirlerin paydalarını kontrol eder: Kolay (eşit payda), Orta (farklı payda), Zor (tam sayılı/bileşik). Öğrencinin seviyesine göre ayarlayın.";
+            case FractionsProblemType.Recognition:
+                return "Bu etkinlik, öğrencilerin kesirlerin görsel temsillerini (daire dilimleri) anlamalarına yardımcı olur. Somut öğrenme için harikadır.";
+            case FractionsProblemType.FractionOfSet:
+                return "'Bir Bütünün Kesrini Bulma' etkinlikleri, '30'un 2/3'ü kaçtır?' gibi problemler üretir. 'En Büyük Bütün Değeri' ayarı, problemdeki ilk sayının maksimum değerini belirler.";
+            default:
+                return "Kesirlerle ilgili farklı becerileri geliştirmek için 'Problem Türü' menüsündeki seçenekleri keşfedin.";
+        }
+    };
+
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Kesirler Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Kesirler Ayarları</h2>
+                <HintButton text={getHintText()} />
+            </div>
             
             <div className="grid grid-cols-1 gap-2">
                  {isFourOps && (

@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -101,7 +102,10 @@ const NumberRecognitionModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadi
 
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Rakam Tanıma ve Sayma Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Rakam Tanıma ve Sayma Ayarları</h2>
+                <HintButton text="'Say ve Yaz' ile rakam yazma, 'Say ve Boya' ile sayı-nesne eşleştirmesi, 'Noktaları Birleştir' ile de rakam sırasını ve el-göz koordinasyonunu geliştirebilirsiniz." />
+            </div>
             <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Checkbox
                     label="Gerçek Hayat Problemleri (AI)"
@@ -176,7 +180,7 @@ const NumberRecognitionModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadi
                     value={settings.problemsPerPage}
                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
                     disabled={settings.autoFit || isTableLayout}
-                    title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
+                    title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
                 />
                 <NumberInput 
                     label="Sayfa Sayısı"

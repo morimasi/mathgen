@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -160,10 +161,25 @@ const PlaceValueModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
     
     const isTableLayout = printSettings.layoutMode === 'table';
 
+    const getHintText = () => {
+        switch (settings.type) {
+            case PlaceValueProblemType.Rounding:
+                return "'Yuvarlama Yeri' seçeneği, 'Basamak Sayısı' ayarına göre dinamik olarak güncellenir. Örneğin, 3 basamaklı bir sayı için en fazla yüzlüğe yuvarlama seçeneği görünür.";
+            case PlaceValueProblemType.FromExpanded:
+                return "Bu etkinlikte, çözümlemesi verilmiş bir sayının kendisini bulma istenir. Sayıların basamak değerlerini pekiştirmek için etkilidir.";
+            case PlaceValueProblemType.Identification:
+                return "Bu etkinlikte, sayının içinden rastgele bir rakamın altı çizilir ve bu rakamın basamak değeri sorulur. Örneğin, 456 sayısında 5'in basamak değeri 50'dir.";
+            default:
+                return "'Sınıf Düzeyi' ayarı, basamak sayısı ve problem türü gibi özellikleri ilgili sınıf seviyesi için otomatik olarak ayarlar. Hızlı bir başlangıç için idealdir.";
+        }
+    };
 
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Basamak Değeri Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Basamak Değeri Ayarları</h2>
+                <HintButton text={getHintText()} />
+            </div>
             
             <div className="grid grid-cols-1 gap-2">
                 {isWordProblemCompatible && (

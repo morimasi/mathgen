@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -127,9 +128,28 @@ const DecimalsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
     const isFourOps = settings.type === DecimalsProblemType.FourOperations;
     const isTableLayout = printSettings.layoutMode === 'table';
 
+    const getHintText = () => {
+        if (settings.useWordProblems) {
+            return "AI ile ondalık sayı problemleri oluştururken 'Problem Konusu' olarak 'para (TL)', 'market alışverişi', 'uzunluk ölçümü (metre)' gibi konular belirleyerek daha gerçekçi senaryolar elde edebilirsiniz.";
+        }
+        switch (settings.type) {
+            case DecimalsProblemType.FourOperations:
+                return "'Zorluk' ayarı ondalık basamak sayısını belirler: Kolay (onda birler), Orta (yüzde birler), Zor (binde birler). 'Alt Alta' formatı, öğrencilerin virgülleri hizalama pratiği yapması için idealdir.";
+            case DecimalsProblemType.ReadWrite:
+                return "Bu etkinlik, ondalık sayıların sözel ve rakamsal gösterimi arasındaki ilişkiyi kurmayı hedefler. Öğrencilerin kavramsal anlayışını güçlendirir.";
+            case DecimalsProblemType.ToFraction:
+                return "Ondalık sayıları kesre çevirme alıştırmaları, bu iki sayı türü arasındaki bağlantıyı somutlaştırır. Üretilen cevaplar en sade halde verilir.";
+            default:
+                return "Ondalık sayılarla ilgili farklı becerileri geliştirmek için 'Problem Türü' menüsündeki seçenekleri keşfedin.";
+        }
+    };
+
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Ondalık Sayılar Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Ondalık Sayılar Ayarları</h2>
+                <HintButton text={getHintText()} />
+            </div>
 
             <div className="grid grid-cols-1 gap-2">
                 {isFourOps && (

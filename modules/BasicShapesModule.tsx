@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -103,7 +104,10 @@ const BasicShapesModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
 
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Temel Geometrik Şekiller Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Temel Geometrik Şekiller Ayarları</h2>
+                <HintButton text="'Şekil Boyama' belirli şekilleri tanımayı, 'Nesne-Şekil Eşleştirme' gerçek dünya nesneleriyle ilişki kurmayı, 'Şekil Sayma' ise dikkat ve sayma becerisini hedefler." />
+            </div>
             <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Checkbox
                     label="Gerçek Hayat Problemleri (AI)"

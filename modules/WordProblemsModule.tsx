@@ -11,6 +11,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TABS, TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -120,10 +121,24 @@ const WordProblemsModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, c
     }, [settings.topic, settings.gradeLevel, settings.operationCount, settings.problemsPerPage, settings.pageCount, settings.autoFit, settings.sourceModule, isTableLayout, printSettings.rows, printSettings.columns]);
 
     const topicLabel = settings.sourceModule && settings.sourceModule !== 'none' ? 'Konu Detayı (İsteğe Bağlı)' : 'Konu';
+    
+    const getHintText = () => {
+        if (settings.customPrompt) {
+            return "Özel talimatınız, diğer tüm ayarları geçersiz kılar. Yapay zekaya tam olarak ne istediğinizi (sınıf seviyesi, konu, problem sayısı vb.) açıkça belirttiğinizden emin olun.";
+        }
+        if (settings.sourceModule && settings.sourceModule !== 'none') {
+             const moduleName = TABS.find(tab => tab.id === settings.sourceModule)?.label || 'seçili modül';
+             return `'${moduleName}' modülünü seçtiniz. Yapay zeka, bu modülün konusuyla ilgili problemler üretecektir. 'Konu Detayı' alanına ek anahtar kelimeler girerek (örn: 'pasta dilimleri') senaryoları daha da özelleştirebilirsiniz.`;
+        }
+        return "Bu modül, Google Gemini AI kullanarak tamamen size özel problemler üretir. 'Problem Modülü' seçerek belirli bir konuya odaklanabilir veya 'Özel Talimat' alanına hayalinizdeki problemi yazarak yaratıcılığınızı kullanabilirsiniz.";
+    };
 
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Problemler (AI)</h2>
+             <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Problemler (AI)</h2>
+                <HintButton text={getHintText()} />
+            </div>
             <p className="text-xs text-stone-600 dark:text-stone-400">
                 Bu modül, Google Gemini AI kullanarak özel matematik problemleri oluşturur. Lütfen API anahtarınızın doğru yapılandırıldığından emin olun.
             </p>

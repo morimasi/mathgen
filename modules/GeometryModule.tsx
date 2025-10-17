@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -151,9 +152,25 @@ const GeometryModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
     const shapeOptions = (settings.type === GeometryProblemType.Area ? areaShapes : perimeterShapes).map(s => ({value: s, label: shapeTurkishNames[s]}));
     const isTableLayout = printSettings.layoutMode === 'table';
 
+    const getHintText = () => {
+        if (showShapeSelector) {
+            return "Alan ve çevre hesaplamaları için, problemde kullanılacak geometrik şekli buradan seçebilirsiniz. Seçilen şekle göre rastgele boyutlarda görseller oluşturulacaktır. Daire problemleri için π=3 alınır.";
+        }
+        if (settings.type === GeometryProblemType.SolidElements) {
+            return "Bu etkinlik, küp, silindir, piramit gibi üç boyutlu cisimlerin köşe, ayrıt (kenar) ve yüz sayılarını sorarak öğrencilerin uzamsal düşünme becerilerini geliştirir.";
+        }
+        if (settings.type === GeometryProblemType.ShapeRecognition || settings.type === GeometryProblemType.SolidRecognition) {
+            return "Bu etkinlikler, şekillerin veya cisimlerin görselini değil, sözel tanımını verir (örn: '4 eşit kenarı ve 4 dik açısı olan şekil'). Bu, öğrencilerin geometrik terimleri ve özellikleri öğrenmesini sağlar.";
+        }
+        return "Geometri modülü, 2D ve 3D şekillerle ilgili çeşitli alıştırmalar sunar. 'Sınıf Düzeyi' seçimi, o seviyeye uygun bir problem türünü otomatik olarak ayarlar.";
+    };
+
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Geometri Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Geometri Ayarları</h2>
+                <HintButton text={getHintText()} />
+            </div>
 
             <div className="grid grid-cols-1 gap-2">
                 {showShapeSelector && (

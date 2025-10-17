@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -123,9 +124,19 @@ const MeasurementModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
     
     const isTableLayout = printSettings.layoutMode === 'table';
 
+    const getHintText = () => {
+        if (settings.useWordProblems) {
+            return "AI ile ölçü problemleri oluştururken, 'Problem Konusu' alanına 'mutfak tarifi', 'terzi' veya 'yolculuk' gibi temalar girerek daha bağlamsal ve ilgi çekici senaryolar yaratabilirsiniz.";
+        }
+        return "'Zorluk' ayarı, dönüşümlerin karmaşıklığını belirler. 'Kolay' tam sayılarla, 'Orta' ondalıklı sayılarla, 'Zor' ise kesirli ifadeler ve birden fazla birim içeren (örn: 3 km 250 m = ? m) problemler üretir.";
+    };
+
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Ölçüler Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Ölçüler Ayarları</h2>
+                <HintButton text={getHintText()} />
+            </div>
 
             <div className="grid grid-cols-1 gap-2">
                 <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">

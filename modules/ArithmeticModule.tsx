@@ -12,6 +12,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { generateArithmeticProblem } from '../services/mathService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -149,10 +150,26 @@ const ArithmeticModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
     const isAddSub = [ArithmeticOperation.Addition, ArithmeticOperation.Subtraction, ArithmeticOperation.MixedAdditionSubtraction].includes(settings.operation);
     const isLongDivision = settings.format === 'long-division-html';
     const isTableLayout = printSettings.layoutMode === 'table';
+    
+    const getHintText = () => {
+        if (settings.useWordProblems) {
+            return "Yapay zeka ile daha yaratıcı problemler için 'Problem Konusu' alanını kullanın (örn: 'parkta geçen', 'uzay macerası'). 'Görsel Destek' seçeneği, problemlere konuyla ilgili emojiler ekler.";
+        }
+        if (settings.operation === ArithmeticOperation.Division) {
+            return "'Bölme Çatısı' formatı, öğrencilerin bölme işlemini adım adım yapmaları için klasik bir görünüm sunar. 'Bölme Türü' ile sadece kalanlı veya kalansız problemler üretebilirsiniz.";
+        }
+        if (isAddSub) {
+             return "'Sınıf Düzeyi' seçimi, basamak sayısı ve eldeli/onluk bozma gibi ayarları o sınıf seviyesine uygun olarak otomatik düzenler. Daha hassas kontrol için bu ayarları manuel olarak da değiştirebilirsiniz.";
+        }
+        return "Bu modül, temel dört işlem alıştırmaları oluşturur. 'Sınıf Düzeyi' seçerek hızlıca başlayabilir veya tüm ayarları manuel olarak düzenleyebilirsiniz.";
+    };
 
     return (
         <div className="space-y-1.5">
-            <h2 className="text-sm font-semibold">Dört İşlem Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Dört İşlem Ayarları</h2>
+                <HintButton text={getHintText()} />
+            </div>
             
             <div className="grid grid-cols-1 gap-1.5">
                 <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">

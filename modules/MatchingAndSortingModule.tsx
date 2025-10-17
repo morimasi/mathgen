@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -102,7 +103,10 @@ const MatchingAndSortingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoad
 
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Eşleştirme ve Gruplama Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Eşleştirme ve Gruplama Ayarları</h2>
+                <HintButton text="'Bire Bir Eşleştirme' görsel algıyı, 'Gölge Eşleştirme' form tanımayı, 'Özelliğe Göre Gruplama' ise kategorizasyon becerisini geliştirir." />
+            </div>
             <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Checkbox
                     label="Gerçek Hayat Problemleri (AI)"

@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -146,9 +147,25 @@ const RhythmicCountingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoadin
     const isOrdering = settings.type === RhythmicProblemType.Ordering;
     const isTableLayout = printSettings.layoutMode === 'table';
 
+    const getHintText = () => {
+        if (isPracticeSheet) {
+            return "'Alıştırma Kağıdı' türleri, tüm sayfayı kaplayan pratik sayfaları oluşturur. 'Otomatik Sığdır' bu modda devre dışıdır. 'Sayfa Sayısı' ile doğrudan kaç sayfa oluşturacağınızı belirlersiniz.";
+        }
+        if (isOrdering) {
+            return "'Sıralama' etkinliği, karışık olarak verilen sayıların küçükten büyüğe veya büyükten küçüğe sıralanmasını ister. Sayıların basamak sayısını 'Sınıf Düzeyi' ile ayarlayabilirsiniz.";
+        }
+        if (showPattern) {
+             return "'Örüntü Tamamlama' için 'Adım' sayısını (örn: 5'er), 'Yön'ü (ileri/geri) ve sayıların 'Min/Max' aralığını belirleyebilirsiniz. 'Sadece Katları Kullan' seçeneği, örüntünün her zaman adımın bir katıyla başlamasını sağlar.";
+        }
+        return "Ritmik sayma ve sayı örüntüleri becerilerini geliştirmek için çeşitli problem türleri sunar. 'Alıştırma Kağıdı' seçenekleri, hızlıca ödev hazırlamak için idealdir.";
+    };
+
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Ritmik Sayma Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Ritmik Sayma Ayarları</h2>
+                <HintButton text={getHintText()} />
+            </div>
             
             <div className="grid grid-cols-1 gap-2">
                 {showPattern && (

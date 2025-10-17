@@ -12,6 +12,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -136,10 +137,25 @@ const TimeModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRe
     ].includes(settings.type);
     const isTableLayout = printSettings.layoutMode === 'table';
 
+    const getHintText = () => {
+        if (isReadClock) {
+            return "'Analog Saat Özelleştirme' bölümü ile saat üzerindeki sayıları, akrebi veya yelkovanı gizleyerek farklı zorluk seviyelerinde okuma alıştırmaları oluşturabilirsiniz.";
+        }
+        if (isWordProblemCompatible) {
+            return "AI destekli gerçek hayat problemleri, öğrencilerin zaman hesaplamalarını (süre, bitiş/başlangıç zamanı) günlük yaşam senaryoları üzerinden anlamalarına yardımcı olur.";
+        }
+        if (settings.type === TimeProblemType.ConvertUnits) {
+            return "Bu etkinlik, saat-dakika, gün-hafta gibi zaman birimleri arasında dönüşüm alıştırmaları üretir. Farklı sınıf seviyeleri için uygundur.";
+        }
+        return "'Zorluk' ayarı, saat problemlerinin hassasiyetini belirler: Kolay (tam saatler), Orta (çeyrek/yarım saatler), Zor (tüm dakikalar).";
+    };
 
     return (
         <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Zaman Ölçme Ayarları</h2>
+            <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold">Zaman Ölçme Ayarları</h2>
+                <HintButton text={getHintText()} />
+            </div>
 
             <div className="grid grid-cols-1 gap-2">
                 {isWordProblemCompatible && (
