@@ -20,6 +20,10 @@ import {
     PositionalConceptsIcon,
     IntroToMeasurementIcon,
     SimpleGraphsIcon,
+    SpecialLearningIcon,
+    DyslexiaIcon,
+    DyscalculiaIcon,
+    DysgraphiaIcon,
 } from './icons/Icons';
 
 interface Tab {
@@ -57,6 +61,9 @@ const itemIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = 
     'positional-concepts': PositionalConceptsIcon,
     'intro-to-measurement': IntroToMeasurementIcon,
     'simple-graphs': SimpleGraphsIcon,
+    'dyslexia': DyslexiaIcon,
+    'dyscalculia': DyscalculiaIcon,
+    'dysgraphia': DysgraphiaIcon,
 };
 
 const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
@@ -64,6 +71,7 @@ const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } =
     'İşlemler': ArithmeticIcon,
     'Sayılar': RhythmicIcon,
     'Ölçümler': MeasurementIcon,
+    'Özel Öğrenme': SpecialLearningIcon,
 };
 
 const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {

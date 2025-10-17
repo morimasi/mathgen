@@ -317,3 +317,42 @@ export const BorderStyleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) 
         <rect x="3" y="3" width="18" height="18" rx="1" ry="1"></rect>
     </svg>
 );
+
+// --- NEW SPECIAL LEARNING ICONS ---
+
+export const SpecialLearningIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M12 2a5.5 5.5 0 0 0-5.45 4.58 6 6 0 0 0-4.05 4.92 6 6 0 0 0 9.5 4.92 5.5 5.5 0 0 0 4.5 -4.92 6.5 6.5 0 0 0-4.5 -6.42A5.5 5.5 0 0 0 12 2z"/>
+        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+        <path d="M12 22v-3"/>
+        <path d="M20 16l-2-2"/>
+        <path d="m4 16 2-2"/>
+    </svg>
+);
+
+export const DyslexiaIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 1 4 14.5v-10A2.5 2.5 0 0 1 6.5 2z"/>
+        <path d="m14 6-2 8 2 2 2-3-2-2"/>
+        <path d="m10 12 2-3"/>
+    </svg>
+);
+
+export const DyscalculiaIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <rect x="4" y="4" width="16" height="16" rx="2"/>
+        <path d="m9 13 2-2 2 2"/>
+        <path d="m13 15-2-2-2 2"/>
+        <line x1="12" y1="11" x2="12" y2="9"/>
+        <line x1="12" y1="17" x2="12" y2="15"/>
+    </svg>
+);
+
+export const DysgraphiaIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21.17 4.83a2.82 2.82 0 0 0-4-4L5 13V5H3v16h16v-2H11l10.17-10.17z"/>
+        <path d="M12.5 15.5 14 14"/>
+        <path d="M15 12.5 16.5 11"/>
+    </svg>
+);

@@ -17,6 +17,9 @@ import BasicShapesModule from '../modules/BasicShapesModule';
 import PositionalConceptsModule from '../modules/PositionalConceptsModule';
 import IntroToMeasurementModule from '../modules/IntroToMeasurementModule';
 import SimpleGraphsModule from '../modules/SimpleGraphsModule';
+import DyslexiaModule from '../modules/DyslexiaModule';
+import DyscalculiaModule from '../modules/DyscalculiaModule';
+import DysgraphiaModule from '../modules/DysgraphiaModule';
 import { Problem, VisualSupportSettings } from '../types';
 
 interface SettingsPanelProps {
@@ -87,6 +90,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
             case 'measurement':
                 return <MeasurementModule {...commonProps} />;
             
+            // Special Learning
+            case 'dyslexia':
+                return <DyslexiaModule {...commonProps} />;
+            case 'dyscalculia':
+                return <DyscalculiaModule {...commonProps} />;
+            case 'dysgraphia':
+                return <DysgraphiaModule {...commonProps} />;
+
             default:
                 return null;
         }

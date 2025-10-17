@@ -38,6 +38,14 @@ export const TAB_GROUPS = [
             { id: 'geometry', label: 'Geometri' },
             { id: 'measurement', label: 'Ölçüler' },
         ]
+    },
+    {
+        title: 'Özel Öğrenme',
+        tabs: [
+            { id: 'dyslexia', label: 'Disleksi Odaklı' },
+            { id: 'dyscalculia', label: 'Diskalkuli Odaklı' },
+            { id: 'dysgraphia', label: 'Disgrafi Odaklı' },
+        ]
     }
 ];
 
