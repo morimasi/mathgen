@@ -1,17 +1,14 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { generateReadinessProblem } from '../services/readinessService';
-import { generateContextualWordProblems } from '../services/geminiService';
+import React, { useState, useEffect, useCallback } from 'react';
+import { generateMatchingAndSortingProblem } from '../services/readinessService';
 import { Problem, MatchingAndSortingSettings, MatchingType, MathReadinessTheme } from '../types';
-import Button from '../components/form/Button';
-import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
-import TextInput from '../components/form/TextInput';
-import { ShuffleIcon } from '../components/icons/Icons';
+import Button from '../components/form/Button';
+import NumberInput from '../components/form/NumberInput';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
-import { TOPIC_SUGGESTIONS } from '../constants';
+import { LoadingIcon } from '../components/icons/Icons';
 
 interface ModuleProps {
     onGenerate: (problems: Problem[], clearPrevious: boolean, title: string, generatorModule: string, pageCount: number) => void;
@@ -22,55 +19,39 @@ interface ModuleProps {
 }
 
 const MatchingAndSortingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
-    const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<MatchingAndSortingSettings>({
         type: MatchingType.OneToOne,
         theme: 'mixed',
         itemCount: 4,
         difficulty: 'easy',
-        problemsPerPage: 4,
+        problemsPerPage: 2,
         pageCount: 1,
         autoFit: true,
         useWordProblems: false,
-        topic: '',
     });
-    const isInitialMount = useRef(true);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const { settings: printSettings } = usePrintSettings();
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
+        setIsGenerating(true);
         setIsLoading(true);
         try {
-            let totalCount;
-            const isTableLayout = printSettings.layoutMode === 'table';
+            const problemCount = settings.autoFit
+                ? calculateMaxProblems(contentRef, printSettings, { question: '<svg height="150"></svg>' })
+                : settings.problemsPerPage * settings.pageCount;
+            
+            const results = Array.from({ length: problemCount }, () => generateMatchingAndSortingProblem(settings));
+            const problems = results.map(r => r.problem);
+            const title = results.length > 0 ? results[0].title : '';
 
-            if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (settings.autoFit) {
-                const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
-                totalCount = problemsPerPage * settings.pageCount;
-            } else {
-                totalCount = settings.problemsPerPage * settings.pageCount;
-            }
-
-            if (settings.useWordProblems) {
-                const problems = await generateContextualWordProblems('matching-and-sorting', { ...settings, problemsPerPage: totalCount, pageCount: 1 });
-                onGenerate(problems, clearPrevious, "Yapay Zeka Destekli Eşleştirme Problemleri", 'matching-and-sorting', settings.pageCount);
-            } else {
-                const results = Array.from({ length: totalCount }, () => generateReadinessProblem('matching-and-sorting', settings));
-                
-                const firstResultWithError = results.find(r => (r as any).error);
-                if (firstResultWithError) {
-                    console.error((firstResultWithError as any).error);
-                } else if (results.length > 0) {
-                    const problems = results.map(r => r.problem);
-                    const title = results[0].title;
-                    onGenerate(problems, clearPrevious, title, 'matching-and-sorting', isTableLayout ? 1 : settings.pageCount);
-                }
-            }
+            onGenerate(problems, clearPrevious, title, 'matching-and-sorting', settings.pageCount);
         } catch (error: any) {
+            alert(error.message);
             console.error(error);
         }
         setIsLoading(false);
-    }, [settings, printSettings, contentRef, onGenerate, setIsLoading]);
+        setIsGenerating(false);
+    }, [settings, onGenerate, setIsLoading, contentRef, printSettings]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === 'matching-and-sorting') {
@@ -78,121 +59,54 @@ const MatchingAndSortingModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoad
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate]);
 
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-        if (lastGeneratorModule === 'matching-and-sorting') {
-            const handler = setTimeout(() => handleGenerate(true), 300);
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate]);
-
     const handleSettingChange = (field: keyof MatchingAndSortingSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
-
-    const handleRandomTopic = () => {
-        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
-        handleSettingChange('topic', randomTopic);
-    };
-
-    const isTableLayout = printSettings.layoutMode === 'table';
-
+    
     return (
-        <div className="space-y-2">
-            <h2 className="text-sm font-semibold">Eşleştirme ve Gruplama Ayarları</h2>
-            <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <Checkbox
-                    label="Gerçek Hayat Problemleri (AI)"
-                    id="use-word-problems-matching"
-                    checked={settings.useWordProblems}
-                    onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
-                />
-                 {settings.useWordProblems && (
-                    <div className="mt-1.5 pl-6">
-                         <div className="relative">
-                            <TextInput
-                                label="Problem Konusu (İsteğe bağlı)"
-                                id="matching-topic"
-                                value={settings.topic || ''}
-                                onChange={e => handleSettingChange('topic', e.target.value)}
-                                placeholder="Örn: Çiftlik Hayvanları, Giysiler"
-                                className="pr-10"
-                            />
-                            <button
-                                type="button"
-                                onClick={handleRandomTopic}
-                                className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
-                                title="Rastgele Konu Öner"
-                            >
-                                <ShuffleIcon className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </div>
-                )}
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Eşleştirme ve Gruplama</h2>
+            <Select
+                label="Eşleştirme Türü"
+                id="matching-type"
+                value={settings.type}
+                onChange={e => handleSettingChange('type', e.target.value as MatchingType)}
+                options={[
+                    { value: MatchingType.OneToOne, label: 'Bire Bir Eşleştirme' },
+                    { value: MatchingType.Shadow, label: 'Gölge Eşleştirme' },
+                    { value: MatchingType.ByProperty, label: 'Özelliğe Göre Gruplama' },
+                ]}
+            />
+            <Select
+                label="Tema"
+                id="matching-theme"
+                value={settings.theme}
+                onChange={e => handleSettingChange('theme', e.target.value as MathReadinessTheme)}
+                options={[
+                    { value: 'mixed', label: 'Karışık' },
+                    { value: 'animals', label: 'Hayvanlar' },
+                    { value: 'vehicles', label: 'Taşıtlar' },
+                    { value: 'fruits', label: 'Meyveler' },
+                    { value: 'shapes', label: 'Şekiller' },
+                ]}
+            />
+            <NumberInput label="Nesne Sayısı" id="item-count" min={3} max={8} value={settings.itemCount} onChange={e => handleSettingChange('itemCount', parseInt(e.target.value))} />
+            
+             <div className="grid grid-cols-2 gap-4">
+                <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={settings.autoFit} />
+                <NumberInput label="Problem Sayısı / Sayfa" id="problems-per-page" min={1} max={10} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={settings.autoFit} />
             </div>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                <Select
-                    label="Etkinlik Türü"
-                    id="matching-type"
-                    value={settings.type}
-                    onChange={e => handleSettingChange('type', e.target.value as MatchingType)}
-                    options={[
-                        { value: MatchingType.OneToOne, label: 'Bire Bir Eşleştirme' },
-                        { value: MatchingType.Shadow, label: 'Gölge Eşleştirme' },
-                        { value: MatchingType.ByProperty, label: 'Özelliğe Göre Gruplama' },
-                    ]}
-                />
-                <Select
-                    label="Tema"
-                    id="matching-theme"
-                    value={settings.theme}
-                    onChange={e => handleSettingChange('theme', e.target.value as MathReadinessTheme)}
-                    options={[
-                        { value: 'mixed', label: 'Karışık' },
-                        { value: 'animals', label: 'Hayvanlar' },
-                        { value: 'vehicles', label: 'Taşıtlar' },
-                        { value: 'fruits', label: 'Meyveler' },
-                        { value: 'shapes', label: 'Şekiller' },
-                    ]}
-                />
-                 <NumberInput 
-                    label="Nesne Sayısı"
-                    id="item-count"
-                    min={3} max={8}
-                    value={settings.itemCount}
-                    onChange={e => handleSettingChange('itemCount', parseInt(e.target.value))}
-                />
-                <NumberInput 
-                    label="Sayfa Başına Problem"
-                    id="problems-per-page"
-                    min={1} max={10}
-                    value={settings.problemsPerPage}
-                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={settings.autoFit || isTableLayout}
-                    title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
-                />
-                <NumberInput 
-                    label="Sayfa Sayısı"
-                    id="page-count"
-                    min={1} max={20}
-                    value={settings.pageCount}
-                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                    disabled={isTableLayout}
-                    title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
-                />
-            </div>
-            <SettingsPresetManager 
+            <Checkbox label="Otomatik Sığdır" id="auto-fit" checked={settings.autoFit} onChange={e => handleSettingChange('autoFit', e.target.checked)} />
+
+            <Button onClick={() => handleGenerate(true)} className="w-full" disabled={isGenerating}>
+                 {isGenerating && <LoadingIcon className="w-5 h-5" />}
+                Oluştur
+            </Button>
+            <SettingsPresetManager
                 moduleKey="matching-and-sorting"
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
-            <div className="flex flex-wrap gap-2 pt-2">
-                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
-            </div>
         </div>
     );
 };
