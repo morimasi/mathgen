@@ -9,6 +9,11 @@ import GeometryModule from '../modules/GeometryModule';
 import MeasurementModule from '../modules/MeasurementModule';
 import WordProblemsModule from '../modules/WordProblemsModule';
 import VisualSupportModule from '../modules/VisualSupportModule';
+import MatchingAndSortingModule from '../modules/MatchingAndSortingModule';
+import ComparingQuantitiesModule from '../modules/ComparingQuantitiesModule';
+import NumberRecognitionModule from '../modules/NumberRecognitionModule';
+import PatternsModule from '../modules/PatternsModule';
+import BasicShapesModule from '../modules/BasicShapesModule';
 import { Problem, VisualSupportSettings } from '../types';
 
 interface SettingsPanelProps {
@@ -35,10 +40,27 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     const renderModule = () => {
         const commonProps = { onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule };
         switch (activeTab) {
+            // Math Readiness
+            case 'matching-and-sorting':
+                return <MatchingAndSortingModule {...commonProps} />;
+            case 'comparing-quantities':
+                return <ComparingQuantitiesModule {...commonProps} />;
+            case 'number-recognition':
+                return <NumberRecognitionModule {...commonProps} />;
+            case 'patterns':
+                return <PatternsModule {...commonProps} />;
+            case 'basic-shapes':
+                return <BasicShapesModule {...commonProps} />;
+            
+            // Operations
             case 'arithmetic':
                 return <ArithmeticModule {...commonProps} />;
             case 'visual-support':
                 return <VisualSupportModule {...commonProps} settings={visualSupportSettings} setSettings={setVisualSupportSettings} />;
+            case 'word-problems':
+                return <WordProblemsModule {...commonProps} />;
+
+            // Numbers
             case 'fractions':
                 return <FractionsModule {...commonProps} />;
             case 'decimals':
@@ -47,14 +69,15 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 return <PlaceValueModule {...commonProps} />;
             case 'rhythmic-counting':
                 return <RhythmicCountingModule {...commonProps} />;
+
+            // Measurements
             case 'time':
                 return <TimeModule {...commonProps} />;
             case 'geometry':
                 return <GeometryModule {...commonProps} />;
             case 'measurement':
                 return <MeasurementModule {...commonProps} />;
-            case 'word-problems':
-                return <WordProblemsModule {...commonProps} />;
+            
             default:
                 return null;
         }

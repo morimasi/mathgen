@@ -54,6 +54,90 @@ export interface VisualSupportSettings {
     boxSize: number;
 }
 
+// --- MATH READINESS ---
+export type MathReadinessTheme = 'animals' | 'vehicles' | 'fruits' | 'shapes' | 'mixed';
+
+export enum MatchingType {
+    OneToOne = 'one-to-one',
+    Shadow = 'shadow',
+    ByProperty = 'by-property',
+}
+export interface MatchingAndSortingSettings {
+    type: MatchingType;
+    theme: MathReadinessTheme;
+    itemCount: number;
+    difficulty: 'easy' | 'medium';
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic?: string;
+}
+
+export enum ComparisonType {
+    MoreLess = 'more-less',
+    BiggerSmaller = 'bigger-smaller',
+    TallerShorter = 'taller-shorter',
+}
+export interface ComparingQuantitiesSettings {
+    type: ComparisonType;
+    theme: MathReadinessTheme;
+    maxObjectCount: number;
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic?: string;
+}
+
+export enum NumberRecognitionType {
+    CountAndWrite = 'count-and-write',
+    CountAndColor = 'count-and-color',
+    ConnectTheDots = 'connect-the-dots',
+}
+export interface NumberRecognitionSettings {
+    type: NumberRecognitionType;
+    theme: MathReadinessTheme;
+    numberRange: '1-5' | '1-10' | '1-20';
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic?: string;
+}
+
+export enum PatternType {
+    RepeatingAB = 'repeating-ab',
+    RepeatingABC = 'repeating-abc',
+    Growing = 'growing',
+}
+export interface PatternsSettings {
+    type: PatternType;
+    theme: MathReadinessTheme;
+    difficulty: 'easy' | 'medium' | 'hard';
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic?: string;
+}
+
+export enum ShapeRecognitionType {
+    ColorShape = 'color-shape',
+    MatchObjectShape = 'match-object-shape',
+    CountShapes = 'count-shapes',
+}
+export interface BasicShapesSettings {
+    type: ShapeRecognitionType;
+    shapes: ShapeType[];
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic?: string;
+}
+
+
 // --- FRACTIONS ---
 export enum FractionsProblemType {
     FourOperations = 'four-operations',

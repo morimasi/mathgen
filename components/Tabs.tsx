@@ -11,6 +11,12 @@ import {
     WordProblemsIcon,
     VisualSupportIcon,
     ChevronDownIcon,
+    ReadinessIcon,
+    MatchingIcon,
+    ComparingIcon,
+    NumberRecognitionIcon,
+    PatternsIcon,
+    BasicShapesIcon,
 } from './icons/Icons';
 
 interface Tab {
@@ -40,9 +46,15 @@ const itemIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = 
     'geometry': GeometryIcon,
     'measurement': MeasurementIcon,
     'word-problems': WordProblemsIcon,
+    'matching-and-sorting': MatchingIcon,
+    'comparing-quantities': ComparingIcon,
+    'number-recognition': NumberRecognitionIcon,
+    'patterns': PatternsIcon,
+    'basic-shapes': BasicShapesIcon,
 };
 
 const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
+    'Matematiğe Hazırlık': ReadinessIcon,
     'İşlemler': ArithmeticIcon,
     'Sayılar': RhythmicIcon,
     'Ölçümler': MeasurementIcon,

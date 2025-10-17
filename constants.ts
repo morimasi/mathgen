@@ -2,6 +2,16 @@
 
 export const TAB_GROUPS = [
     {
+        title: 'Matematiğe Hazırlık',
+        tabs: [
+            { id: 'matching-and-sorting', label: 'Eşleştirme ve Gruplama' },
+            { id: 'comparing-quantities', label: 'Miktarları Karşılaştırma' },
+            { id: 'number-recognition', label: 'Rakam Tanıma ve Sayma' },
+            { id: 'patterns', label: 'Örüntüler' },
+            { id: 'basic-shapes', label: 'Temel Geometrik Şekiller' },
+        ]
+    },
+    {
         title: 'İşlemler',
         tabs: [
             { id: 'arithmetic', label: 'Dört İşlem' },

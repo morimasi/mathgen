@@ -114,7 +114,7 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
 
 
 const AppContent: React.FC = () => {
-    const [activeTab, setActiveTab] = useState('arithmetic');
+    const [activeTab, setActiveTab] = useState('matching-and-sorting');
     const [problems, setProblems] = useState<Problem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [worksheetTitle, setWorksheetTitle] = useState('');
@@ -225,7 +225,7 @@ const AppContent: React.FC = () => {
     };
 
     const handleResetApp = () => {
-        setActiveTab('arithmetic');
+        setActiveTab('matching-and-sorting');
         setProblems([]);
         setIsLoading(false);
         setWorksheetTitle('');
