@@ -1,12 +1,15 @@
+
+
 import React, { useState } from 'react';
 import { VerbalArithmeticSettings } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateVerbalArithmeticProblem } from '../../services/readinessService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Checkbox from '../../components/form/Checkbox';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+// FIX: Changed import to `generateReadinessProblem` to match its usage in the component and fix the error.
+import { generateReadinessProblem } from '../services/readinessService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Checkbox from '../components/form/Checkbox';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
 
 const initialSettings: VerbalArithmeticSettings = {
     operation: 'addition',
@@ -22,7 +25,7 @@ const VerbalArithmeticModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'verbal-arithmetic',
         settings,
-        generatorFn: generateVerbalArithmeticProblem,
+        generatorFn: (settings) => generateReadinessProblem('verbal-arithmetic', settings),
     });
 
     const handleGenerateClick = () => {

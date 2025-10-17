@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
 import { DyslexiaSettings, DyslexiaSubModuleType } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateDyslexiaProblem } from '../../services/dyslexiaService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Checkbox from '../../components/form/Checkbox';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { generateDyslexiaProblem } from '../services/dyslexiaService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Checkbox from '../components/form/Checkbox';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
 
 // Import sub-module settings components
 import AttentionQuestionSettings from './dyslexia/AttentionQuestionSettings';

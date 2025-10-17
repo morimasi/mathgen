@@ -1,12 +1,15 @@
+
+
 import React, { useState } from 'react';
 import { SymbolicArithmeticSettings } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateSymbolicArithmeticProblem } from '../../services/readinessService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Checkbox from '../../components/form/Checkbox';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+// FIX: Changed import to `generateReadinessProblem` to match its usage in the component and fix the error.
+import { generateReadinessProblem } from '../services/readinessService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Checkbox from '../components/form/Checkbox';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
 
 const initialSettings: SymbolicArithmeticSettings = {
     operation: 'addition',
@@ -23,7 +26,7 @@ const SymbolicArithmeticModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'symbolic-arithmetic',
         settings,
-        generatorFn: generateSymbolicArithmeticProblem,
+        generatorFn: (settings) => generateReadinessProblem('symbolic-arithmetic', settings),
     });
 
     const handleGenerateClick = () => {

@@ -1,12 +1,15 @@
+
+
 import React, { useState } from 'react';
 import { ProblemCreationSettings } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateProblemCreationProblem } from '../../services/readinessService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Checkbox from '../../components/form/Checkbox';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+// FIX: Changed import to `generateReadinessProblem` to match its usage in the component and fix the error.
+import { generateReadinessProblem } from '../services/readinessService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Checkbox from '../components/form/Checkbox';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
 
 const initialSettings: ProblemCreationSettings = {
     operation: 'addition',
@@ -23,7 +26,7 @@ const ProblemCreationModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'problem-creation',
         settings,
-        generatorFn: generateProblemCreationProblem,
+        generatorFn: (settings) => generateReadinessProblem('problem-creation', settings),
     });
 
     const handleGenerateClick = () => {

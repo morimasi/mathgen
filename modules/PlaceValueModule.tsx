@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
 import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generatePlaceValueProblem } from '../../services/placeValueService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Checkbox from '../../components/form/Checkbox';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { generatePlaceValueProblem } from '../services/placeValueService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Checkbox from '../components/form/Checkbox';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
 
 const initialSettings: PlaceValueSettings = {
     gradeLevel: 2,

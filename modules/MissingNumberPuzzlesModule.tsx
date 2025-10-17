@@ -1,12 +1,15 @@
+
+
 import React, { useState } from 'react';
 import { MissingNumberPuzzlesSettings } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateMissingNumberPuzzlesProblem } from '../../services/readinessService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Checkbox from '../../components/form/Checkbox';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+// FIX: Changed import to `generateReadinessProblem` to match its usage in the component and fix the error.
+import { generateReadinessProblem } from '../services/readinessService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Checkbox from '../components/form/Checkbox';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
 
 const initialSettings: MissingNumberPuzzlesSettings = {
     operation: 'addition',
@@ -23,7 +26,7 @@ const MissingNumberPuzzlesModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'missing-number-puzzles',
         settings,
-        generatorFn: generateMissingNumberPuzzlesProblem,
+        generatorFn: (settings) => generateReadinessProblem('missing-number-puzzles', settings),
     });
 
     const handleGenerateClick = () => {

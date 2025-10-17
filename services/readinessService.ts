@@ -335,7 +335,7 @@ const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: 
 export const generateReadinessProblem = (
     module: string,
     settings: any
-): { problem: Problem, title: string, error?: string } => {
+): { problem: Problem, title: string, error?: string, preamble?: string } => {
     switch (module) {
         case 'matching-and-sorting':
             return generateMatchingProblem(settings as MatchingAndSortingSettings);
@@ -353,6 +353,17 @@ export const generateReadinessProblem = (
             return generateMeasurementIntroProblem(settings as IntroToMeasurementSettings);
         case 'simple-graphs':
             return generateSimpleGraphProblem(settings as SimpleGraphsSettings);
+        // FIX: Added new readiness modules to the dispatcher function.
+        case 'visual-addition-subtraction':
+            return generateVisualAdditionSubtractionProblem(settings as VisualAdditionSubtractionSettings);
+        case 'verbal-arithmetic':
+            return generateVerbalArithmeticProblem(settings as VerbalArithmeticSettings);
+        case 'missing-number-puzzles':
+            return generateMissingNumberPuzzlesProblem(settings as MissingNumberPuzzlesSettings);
+        case 'symbolic-arithmetic':
+            return generateSymbolicArithmeticProblem(settings as SymbolicArithmeticSettings);
+        case 'problem-creation':
+            return generateProblemCreationProblem(settings as ProblemCreationSettings);
         default:
             return {
                 problem: { question: "Hata", answer: "Hata", category: 'error' },

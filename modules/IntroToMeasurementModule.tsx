@@ -1,15 +1,14 @@
 
-
 import React, { useState } from 'react';
 // FIX: Imported IntroMeasurementType enum to use for initial settings.
 import { IntroToMeasurementSettings, IntroMeasurementType } from '../types';
-import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateReadinessProblem } from '../../services/readinessService';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import Checkbox from '../../components/form/Checkbox';
-import Button from '../../components/form/Button';
-import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { generateReadinessProblem } from '../services/readinessService';
+import Select from '../components/form/Select';
+import NumberInput from '../components/form/NumberInput';
+import Checkbox from '../components/form/Checkbox';
+import Button from '../components/form/Button';
+import SettingsPresetManager from '../components/SettingsPresetManager';
 
 const initialSettings: IntroToMeasurementSettings = {
     // FIX: Changed string literal to enum member to fix type error.
