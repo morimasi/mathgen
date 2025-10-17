@@ -61,7 +61,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                 tabIndex={-1} // Make it focusable
             >
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-lg font-semibold">Yazdırma Ayarları</h2>
+                    <h2 className="text-lg font-semibold">Gelişmiş Yazdırma Ayarları</h2>
                     <button 
                         onClick={onClose} 
                         className="p-2 -mr-2 rounded-md hover:bg-stone-100 dark:hover:bg-stone-700 text-2xl leading-none"
@@ -98,7 +98,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                             
                             {isTableMode ? (
                                 <div>
-                                    <label className="font-medium text-sm text-stone-700 dark:text-stone-300 mb-2 block">Tablo Boyutu</label>
+                                    <label className="font-medium text-xs text-stone-700 dark:text-stone-300 mb-2 block">Tablo Boyutu</label>
                                     <TableSelector 
                                         rows={settings.rows} 
                                         cols={settings.columns}
@@ -154,7 +154,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                             </div>
                             <div className="space-y-1">
                                 <label htmlFor="print-scale" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
-                                   <span>İçerik Ölçeği</span>
+                                   <span>İçerik Ölçeği (Yazdırma)</span>
                                    <span className="text-stone-500 dark:text-stone-400 font-normal">{`${Math.round(settings.scale * 100)}%`}</span>
                                 </label>
                                 <input
@@ -167,20 +167,8 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                     </div>
                      <div>
                         <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">Görünüm</h3>
-                        <div className="space-y-3">
-                            <div className="space-y-1">
-                                <label htmlFor="print-font-size" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
-                                   <span>Yazı Tipi Boyutu</span>
-                                   <span className="text-stone-500 dark:text-stone-400 font-normal">{`${settings.fontSize}px`}</span>
-                                </label>
-                                <input
-                                    type="range" id="print-font-size" value={settings.fontSize} min={10} max={50} step={1}
-                                    onChange={e => handleChange('fontSize', parseInt(e.target.value, 10))}
-                                    className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Select
+                         <div className="space-y-3">
+                              <Select
                                     label="Problem Hizalama"
                                     id="print-text-align"
                                     value={settings.textAlign || 'left'}
@@ -191,34 +179,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                         { value: 'right', label: 'Sağa Hizalı' }
                                     ]}
                                 />
-                                <Select
-                                    label="Renk Teması" id="print-color-theme" value={settings.colorTheme}
-                                    onChange={e => handleChange('colorTheme', e.target.value as 'black' | 'blue' | 'sepia')}
-                                    options={[{ value: 'sepia', label: 'Kahverengi (Sepya)' }, { value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }]}
-                                />
-                                <Select
-                                    label="Defter Stili" id="notebook-style" value={settings.notebookStyle}
-                                    onChange={e => handleChange('notebookStyle', e.target.value as 'none' | 'lines' | 'grid' | 'dotted')}
-                                    options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili (İnce)' }, { value: 'grid', label: 'Kareli (İnce)' }, { value: 'dotted', label: 'Noktalı' }]}
-                                />
-                                <Select
-                                    label="Kenarlık Stili" id="border-style" value={settings.borderStyle} onChange={e => handleChange('borderStyle', e.target.value)}
-                                    options={[
-                                        { value: 'none', label: 'Yok' },
-                                        { value: 'card', label: 'Kart Görünümü' },
-                                        { value: 'solid', label: 'Düz Çizgi (İnce)' },
-                                        { value: 'dashed', label: 'Kesik Çizgili (İnce)' },
-                                        { value: 'dotted', label: 'Noktalı (İnce)' },
-                                        { value: 'double', label: 'Çift Çizgi (İnce)' },
-                                        { value: 'shadow-lift', label: 'Gölge Efekti' },
-                                        { value: 'corner-accent', label: 'Köşe Vurgusu' },
-                                        { value: 'top-bar-color', label: 'Renkli Üst Çizgi' },
-                                        { value: 'stitched-edge', label: 'Dikişli Kenar' },
-                                        { value: 'double-frame', label: 'Çift Çerçeve' },
-                                    ]}
-                                />
-                            </div>
-                        </div>
+                         </div>
                     </div>
                      <div>
                         <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">İçerik</h3>

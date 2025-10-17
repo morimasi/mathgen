@@ -15,8 +15,10 @@ import ContactModal from './components/ContactModal';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { TAB_GROUPS } from './constants';
 import { Problem, PrintSettings, VisualSupportSettings, ArithmeticOperation } from './types';
-import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon } from './components/icons/Icons';
+import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon, FontSizeIcon, PaletteIcon, GridIcon, BorderStyleIcon } from './components/icons/Icons';
 import AnimatedLogo from './components/AnimatedLogo';
+import Select from './components/form/Select';
+
 
 /**
  * Generates a jsPDF document instance from the provided HTML element.
@@ -65,19 +67,26 @@ interface WorksheetToolbarProps {
     scale: number;
     setScale: (scale: number) => void;
     worksheetParentRef: React.RefObject<HTMLElement>;
-    orientation: 'portrait' | 'landscape';
+    printSettings: PrintSettings;
+    setPrintSettings: React.Dispatch<React.SetStateAction<PrintSettings>>;
 }
 
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 
-const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, worksheetParentRef, orientation }) => {
+const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ 
+    scale, 
+    setScale, 
+    worksheetParentRef, 
+    printSettings, 
+    setPrintSettings 
+}) => {
 
     const handleFitToPage = () => {
         if (!worksheetParentRef.current) return;
 
         const containerWidth = worksheetParentRef.current.clientWidth;
-        const worksheetWidth = orientation === 'portrait' ? A4_WIDTH_PX : A4_HEIGHT_PX;
+        const worksheetWidth = printSettings.orientation === 'portrait' ? A4_WIDTH_PX : A4_HEIGHT_PX;
         
         // Subtract some padding (e.g., 2rem) for better visual fit
         const newScale = (containerWidth - 32) / worksheetWidth;
@@ -85,29 +94,87 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
         setScale(Math.min(1.5, Math.max(0.1, newScale))); // Clamp the scale to reasonable values
     };
 
+    const handleSettingChange = (field: keyof PrintSettings, value: any) => {
+        setPrintSettings(prev => ({ ...prev, [field]: value }));
+    };
+
     return (
         <div className="worksheet-toolbar">
-            <div className="flex items-center gap-4">
-                <label htmlFor="scale-slider" className="text-sm font-medium">Ölçek:</label>
-                <input
-                    type="range"
-                    id="scale-slider"
-                    min="0.2"
-                    max="1.5"
-                    step="0.01"
-                    value={scale}
-                    onChange={(e) => setScale(parseFloat(e.target.value))}
-                    className="w-32 sm:w-48 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
-                />
-                <span className="text-sm font-semibold w-12 text-center">{Math.round(scale * 100)}%</span>
+            <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                    <label htmlFor="scale-slider" className="text-xs font-medium text-stone-600 dark:text-stone-400">Ölçek:</label>
+                    <input
+                        type="range"
+                        id="scale-slider"
+                        min="0.2"
+                        max="1.5"
+                        step="0.01"
+                        value={scale}
+                        onChange={(e) => setScale(parseFloat(e.target.value))}
+                        className="w-24 sm:w-32 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
+                    />
+                    <span className="text-sm font-semibold w-12 text-center">{Math.round(scale * 100)}%</span>
+                </div>
+                <button 
+                    onClick={handleFitToPage} 
+                    className="p-2 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors" 
+                    title="Ekrana Sığdır"
+                >
+                    <FitToScreenIcon className="w-5 h-5" />
+                </button>
             </div>
-            <button 
-                onClick={handleFitToPage} 
-                className="p-2 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors" 
-                title="Ekrana Sığdır"
-            >
-                <FitToScreenIcon className="w-5 h-5" />
-            </button>
+            
+            <div className="flex items-center gap-x-4 gap-y-2 flex-wrap justify-end">
+                 <div className="flex items-center gap-1.5" title="Yazı Tipi Boyutu">
+                    <FontSizeIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                    <Select 
+                        id="toolbar-font-size"
+                        value={printSettings.fontSize}
+                        onChange={(e) => handleSettingChange('fontSize', parseInt(e.target.value))}
+                        options={[
+                            { value: 12, label: 'Çok Küçük' },
+                            { value: 14, label: 'Küçük' },
+                            { value: 16, label: 'Normal' },
+                            { value: 20, label: 'Büyük' },
+                            { value: 26, label: 'Çok Büyük' }
+                        ]}
+                        className="w-28"
+                    />
+                </div>
+                <div className="flex items-center gap-1.5" title="Renk Teması">
+                    <PaletteIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                    <Select
+                        id="toolbar-color-theme" value={printSettings.colorTheme}
+                        onChange={e => handleSettingChange('colorTheme', e.target.value as 'black' | 'blue' | 'sepia')}
+                        options={[{ value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }, { value: 'sepia', label: 'Kahverengi' }]}
+                        className="w-28"
+                    />
+                </div>
+                 <div className="flex items-center gap-1.5" title="Defter Stili">
+                    <GridIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                     <Select
+                        id="toolbar-notebook-style" value={printSettings.notebookStyle}
+                        onChange={e => handleSettingChange('notebookStyle', e.target.value as 'none' | 'lines' | 'grid' | 'dotted')}
+                        options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }]}
+                        className="w-28"
+                    />
+                </div>
+                <div className="flex items-center gap-1.5" title="Problem Kenarlığı">
+                    <BorderStyleIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                     <Select
+                        id="toolbar-border-style" value={printSettings.borderStyle} onChange={e => handleSettingChange('borderStyle', e.target.value)}
+                        options={[
+                            { value: 'none', label: 'Yok' },
+                            { value: 'card', label: 'Kart Görünümü' },
+                            { value: 'solid', label: 'Düz Çizgi' },
+                            { value: 'dashed', label: 'Kesik Çizgili' },
+                            { value: 'shadow-lift', label: 'Gölge Efekti' },
+                            { value: 'top-bar-color', label: 'Renkli Üst Çizgi' },
+                        ]}
+                         className="w-32"
+                    />
+                </div>
+            </div>
         </div>
     );
 };
@@ -138,7 +205,7 @@ const AppContent: React.FC = () => {
         boxSize: 60,
     });
 
-    const { settings: printSettings } = usePrintSettings();
+    const { settings: printSettings, setSettings: setPrintSettings } = usePrintSettings();
     const contentRef = useRef<HTMLDivElement>(null);
     const worksheetParentRef = useRef<HTMLDivElement>(null);
 
@@ -337,7 +404,8 @@ const AppContent: React.FC = () => {
                             scale={worksheetScale}
                             setScale={setWorksheetScale}
                             worksheetParentRef={worksheetParentRef}
-                            orientation={printSettings.orientation}
+                            printSettings={printSettings}
+                            setPrintSettings={setPrintSettings}
                         />
                         <div className="worksheet-viewport">
                             <ProblemSheet 
