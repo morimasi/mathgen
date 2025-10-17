@@ -56,7 +56,8 @@ export const useProblemGenerator = <T,>({
             } else if (isTableLayout) {
                 totalCount = printSettings.rows * printSettings.columns;
             } else if (autoFit) {
-                const calculatedProblems = calculateMaxProblems(contentRef, printSettings);
+                const sampleResult = generatorFn(settings);
+                const calculatedProblems = calculateMaxProblems(contentRef, printSettings, sampleResult.problem);
                 totalCount = (calculatedProblems > 0 ? calculatedProblems : problemsPerPage) * pageCount;
             } else {
                 totalCount = problemsPerPage * pageCount;

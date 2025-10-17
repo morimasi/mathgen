@@ -104,7 +104,7 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
                         step="0.01"
                         value={scale}
                         onChange={(e) => setScale(parseFloat(e.target.value))}
-                        className="w-24 sm:w-32 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
+                        className="w-20 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
                     />
                     <span className="text-sm font-semibold w-12 text-center">{Math.round(scale * 100)}%</span>
                 </div>
@@ -126,7 +126,7 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
                         min="1" max="7" step="1"
                         value={printSettings.columns}
                         onChange={(e) => handleSettingChange('columns', parseInt(e.target.value))}
-                        className="w-20 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
+                        className="w-16 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
                         disabled={printSettings.layoutMode === 'table'}
                     />
                     <span className="text-sm font-semibold w-6 text-center">{printSettings.columns}</span>
@@ -137,7 +137,7 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
                         id="toolbar-text-align" value={printSettings.textAlign}
                         onChange={e => handleSettingChange('textAlign', e.target.value as 'left' | 'center' | 'right')}
                         options={[{ value: 'left', label: 'Sol' }, { value: 'center', label: 'Orta' }, { value: 'right', label: 'Sağ' }]}
-                        className="w-24"
+                        className="w-20"
                     />
                 </div>
                  <div className="flex items-center gap-1.5" title="Yazı Tipi Boyutu">
@@ -162,7 +162,7 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
                         id="toolbar-color-theme" value={printSettings.colorTheme}
                         onChange={e => handleSettingChange('colorTheme', e.target.value as 'black' | 'blue' | 'sepia')}
                         options={[{ value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }, { value: 'sepia', label: 'Kahverengi' }]}
-                        className="w-28"
+                        className="w-24"
                     />
                 </div>
                  <div className="flex items-center gap-1.5" title="Defter Stili">
@@ -171,7 +171,7 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
                         id="toolbar-notebook-style" value={printSettings.notebookStyle}
                         onChange={e => handleSettingChange('notebookStyle', e.target.value as 'none' | 'lines' | 'grid' | 'dotted')}
                         options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }]}
-                        className="w-28"
+                        className="w-24"
                     />
                 </div>
                 <div className="flex items-center gap-1.5" title="Problem Kenarlığı">
@@ -186,7 +186,7 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
                             { value: 'shadow-lift', label: 'Gölge Efekti' },
                             { value: 'top-bar-color', label: 'Renkli Üst Çizgi' },
                         ]}
-                         className="w-32"
+                         className="w-28"
                     />
                 </div>
             </div>

@@ -1,4 +1,5 @@
 
+
 import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types';
 
 const getRandomInt = (min: number, max: number): number => {
@@ -11,8 +12,8 @@ const SEPARATOR = '<span style="margin: 0 2px; font-weight: bold;">-</span>';
 const ROW_STYLE = "display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 1.25rem; line-height: 1.75rem;";
 const ROWS = 18;
 
-const generatePracticeSheetHTML = (settings: RhythmicCountingSettings): string => {
-    const { step = 2, direction = 'forward', useMultiplesOnly = false, min = 1, max = 100 } = settings;
+const generatePracticeSheetHTML = (settings: RhythmicCountingSettings, min: number, max: number): string => {
+    const { step = 2, direction = 'forward', useMultiplesOnly = false } = settings;
     
     const BOXES_PER_ROW = 6;
     const sequenceLength = 3 + BOXES_PER_ROW;
@@ -65,8 +66,8 @@ const generatePracticeSheetHTML = (settings: RhythmicCountingSettings): string =
     return `<div class="practice-sheet" style="display: flex; flex-direction: column; gap: 1rem;">${htmlRows.join('')}</div>`;
 };
 
-const generateFillBeforeAfterSheetHTML = (settings: RhythmicCountingSettings): string => {
-    const { step = 1, direction = 'forward', min = 1, max = 100, beforeCount = 3, afterCount = 3 } = settings;
+const generateFillBeforeAfterSheetHTML = (settings: RhythmicCountingSettings, min: number, max: number): string => {
+    const { step = 1, direction = 'forward', beforeCount = 3, afterCount = 3 } = settings;
     let htmlRows = [];
 
     for (let i = 0; i < ROWS; i++) {
@@ -93,8 +94,8 @@ const generateFillBeforeAfterSheetHTML = (settings: RhythmicCountingSettings): s
 };
 
 
-const generateFillBetweenSheetHTML = (settings: RhythmicCountingSettings): string => {
-    const { step = 1, direction = 'forward', min = 1, max = 100, useMultiplesOnly = false, beforeCount = 0, afterCount = 0 } = settings;
+const generateFillBetweenSheetHTML = (settings: RhythmicCountingSettings, min: number, max: number): string => {
+    const { step = 1, direction = 'forward', useMultiplesOnly = false, beforeCount = 0, afterCount = 0 } = settings;
     let htmlRows = [];
     const BOXES_PER_ROW = 9;
 
@@ -149,7 +150,10 @@ const generateFillBetweenSheetHTML = (settings: RhythmicCountingSettings): strin
 
 
 export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettings): { problem: Problem, title: string, error?: string } => {
-    const { type } = settings;
+    const { type, digits = 2 } = settings;
+    const min = digits === 1 ? 0 : Math.pow(10, digits - 1);
+    const max = Math.pow(10, digits) - 1;
+
     let problem: Problem;
     let title: string;
     const problemBase = { category: 'rhythmic-counting' };
@@ -168,25 +172,26 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
         [RhythmicProblemType.FillBetween]: `Verilen sayılar arasındaki boşlukları ${settings.step}'er ritmik sayarak doldurunuz.`,
         [RhythmicProblemType.OddEven]: "Verilen sayıların tek mi çift mi olduğunu belirtiniz.",
         [RhythmicProblemType.Ordering]: `Sayıları ${orderText} doğru sıralayınız.`,
+        [RhythmicProblemType.Comparison]: "Sayıların arasına <, > veya = işaretlerinden uygun olanı koyunuz.",
     };
     title = titles[type] || "Ritmik Sayma Alıştırmaları";
 
     switch (type) {
         case RhythmicProblemType.PracticeSheet:
-            problem = { ...problemBase, question: generatePracticeSheetHTML(settings), answer: 'PRACTICE_SHEET' };
+            problem = { ...problemBase, question: generatePracticeSheetHTML(settings, min, max), answer: 'PRACTICE_SHEET' };
             break;
         
         case RhythmicProblemType.FillBeforeAfter:
-            problem = { ...problemBase, question: generateFillBeforeAfterSheetHTML(settings), answer: 'PRACTICE_SHEET' };
+            problem = { ...problemBase, question: generateFillBeforeAfterSheetHTML(settings, min, max), answer: 'PRACTICE_SHEET' };
             break;
 
         case RhythmicProblemType.FillBetween:
-            problem = { ...problemBase, question: generateFillBetweenSheetHTML(settings), answer: 'PRACTICE_SHEET' };
+            problem = { ...problemBase, question: generateFillBetweenSheetHTML(settings, min, max), answer: 'PRACTICE_SHEET' };
             break;
 
         case RhythmicProblemType.Pattern:
         case RhythmicProblemType.FindRule: {
-            const { step: definedStep = 2, direction = 'forward', useMultiplesOnly = false, min = 1, max = 100, patternLength = 5, missingCount = 1 } = settings;
+            const { step: definedStep = 2, direction = 'forward', useMultiplesOnly = false, patternLength = 5, missingCount = 1 } = settings;
             const currentDirection = direction === 'mixed' ? (getRandomInt(0, 1) === 0 ? 'forward' : 'backward') : direction;
             const step = Math.abs(definedStep);
             const effectiveStep = currentDirection === 'backward' ? -step : step;
@@ -258,7 +263,6 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
         }
         
         case RhythmicProblemType.OddEven: {
-            const { min = 1, max = 100 } = settings;
             const num = getRandomInt(min, max);
             const question = `<span style="font-size: 1.25em; font-family: monospace;">${num}</span>`;
             const answer = num % 2 === 0 ? 'Çift' : 'Tek';
@@ -267,9 +271,9 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
         }
 
         case RhythmicProblemType.Comparison: {
-            const num1 = getRandomInt(10, 1000);
-            let num2 = getRandomInt(10, 1000);
-            while (num1 === num2) num2 = getRandomInt(10, 1000);
+            const num1 = getRandomInt(min, max);
+            let num2 = getRandomInt(min, max);
+            while (num1 === num2) num2 = getRandomInt(min, max);
             const answer = num1 > num2 ? '>' : (num1 < num2 ? '<' : '=');
             const question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} ___ ${num2}</span>`;
             problem = { ...problemBase, question, answer };
@@ -277,10 +281,10 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
         }
         
         case RhythmicProblemType.Ordering: {
-            const { orderCount = 5, orderDigits = 3 } = settings;
+            const { orderCount = 5 } = settings;
             const getRandomByDigits = (d: number) => d === 1 ? getRandomInt(0, 9) : getRandomInt(Math.pow(10, d - 1), Math.pow(10, d) - 1);
             const numbers = new Set<number>();
-            while(numbers.size < orderCount) numbers.add(getRandomByDigits(orderDigits));
+            while(numbers.size < orderCount) numbers.add(getRandomByDigits(digits));
             
             const numArray = Array.from(numbers);
             const sorted = [...numArray].sort((a, b) => a - b);

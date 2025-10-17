@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
 import { generateContextualWordProblems } from '../services/geminiService';
@@ -19,17 +20,14 @@ import { useProblemGenerator } from '../hooks/useProblemGenerator';
 export const RhythmicCountingModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<RhythmicCountingSettings>({
-        gradeLevel: 1,
         type: RhythmicProblemType.Pattern,
         step: 2,
         direction: 'forward',
         useMultiplesOnly: false,
-        min: 1,
-        max: 100,
+        digits: 2,
         patternLength: 5,
         missingCount: 1,
         orderCount: 5,
-        orderDigits: 3,
         beforeCount: 3,
         afterCount: 3,
         problemsPerPage: 20,
@@ -60,29 +58,7 @@ export const RhythmicCountingModule: React.FC = () => {
         handleSettingChange('topic', randomTopic);
     };
 
-    const handleGradeLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const grade = parseInt(e.target.value, 10);
-        let newSettings: Partial<RhythmicCountingSettings> = { gradeLevel: grade };
-
-        switch (grade) {
-            case 1:
-                newSettings.max = 100;
-                newSettings.step = 2;
-                break;
-            case 2:
-                newSettings.max = 1000;
-                newSettings.step = 3;
-                break;
-            default:
-                newSettings.max = 1000;
-                newSettings.step = 5;
-                break;
-        }
-        setSettings(prev => ({ ...prev, ...newSettings }));
-    };
-
     const showStep = [RhythmicProblemType.Pattern, RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
-    const showRange = [RhythmicProblemType.Pattern, RhythmicProblemType.PracticeSheet, RhythmicProblemType.OddEven, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
     const showPattern = settings.type === RhythmicProblemType.Pattern;
     const isOrdering = settings.type === RhythmicProblemType.Ordering;
     const isTableLayout = printSettings.layoutMode === 'table';
@@ -92,10 +68,10 @@ export const RhythmicCountingModule: React.FC = () => {
             return "'Alıştırma Kağıdı' türleri, tüm sayfayı kaplayan pratik sayfaları oluşturur. 'Otomatik Sığdır' bu modda devre dışıdır. 'Sayfa Sayısı' ile doğrudan kaç sayfa oluşturacağınızı belirlersiniz.";
         }
         if (isOrdering) {
-            return "'Sıralama' etkinliği, karışık olarak verilen sayıların küçükten büyüğe veya büyükten küçüğe sıralanmasını ister. Sayıların basamak sayısını 'Sınıf Düzeyi' ile ayarlayabilirsiniz.";
+            return "'Sıralama' etkinliği, karışık olarak verilen sayıların küçükten büyüğe veya büyükten küçüğe sıralanmasını ister. Sayıların basamak sayısını 'Basamak Sayısı' ayarı ile belirleyebilirsiniz.";
         }
         if (showPattern) {
-             return "'Örüntü Tamamlama' için 'Adım' sayısını (örn: 5'er), 'Yön'ü (ileri/geri) ve sayıların 'Min/Max' aralığını belirleyebilirsiniz. 'Sadece Katları Kullan' seçeneği, örüntünün her zaman adımın bir katıyla başlamasını sağlar.";
+             return "'Örüntü Tamamlama' için 'Adım' sayısını (örn: 5'er), 'Yön'ü (ileri/geri) ve sayıların 'Basamak Sayısı'nı belirleyebilirsiniz. 'Sadece Katları Kullan' seçeneği, örüntünün her zaman adımın bir katıyla başlamasını sağlar.";
         }
         return "Ritmik sayma ve sayı örüntüleri becerilerini geliştirmek için çeşitli problem türleri sunar. 'Alıştırma Kağıdı' seçenekleri, hızlıca ödev hazırlamak için idealdir.";
     };
@@ -136,14 +112,7 @@ export const RhythmicCountingModule: React.FC = () => {
                 )}
 
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                    <Select
-                        label="Sınıf Düzeyi"
-                        id="rhythmic-grade-level"
-                        value={settings.gradeLevel}
-                        onChange={handleGradeLevelChange}
-                        options={[{ value: 1, label: '1. Sınıf' }, { value: 2, label: '2. Sınıf' }, { value: 3, label: '3. Sınıf' }]}
-                    />
-                    <Select
+                     <Select
                         label="Problem Türü"
                         id="rhythmic-type"
                         value={settings.type}
@@ -159,6 +128,10 @@ export const RhythmicCountingModule: React.FC = () => {
                             { value: RhythmicProblemType.Comparison, label: 'Karşılaştırma' },
                         ]}
                     />
+                     <NumberInput
+                        label="Basamak Sayısı" id="rhythmic-digits" min={1} max={7} value={settings.digits}
+                        onChange={e => handleSettingChange('digits', parseInt(e.target.value))} 
+                    />
                     
                     {showStep && (
                         <NumberInput
@@ -170,16 +143,6 @@ export const RhythmicCountingModule: React.FC = () => {
                             label="Yön" id="rhythmic-direction" value={settings.direction}
                             onChange={e => handleSettingChange('direction', e.target.value as 'forward' | 'backward' | 'mixed')}
                             options={[{ value: 'forward', label: 'İleri' }, { value: 'backward', label: 'Geri' }, { value: 'mixed', label: 'Karışık' }]} />
-                    )}
-                    {showRange && (
-                        <NumberInput
-                            label="Min Değer" id="rhythmic-min" min={0} max={9999} value={settings.min}
-                            onChange={e => handleSettingChange('min', parseInt(e.target.value))} />
-                    )}
-                    {showRange && (
-                        <NumberInput
-                            label="Max Değer" id="rhythmic-max" min={1} max={10000} value={settings.max}
-                            onChange={e => handleSettingChange('max', parseInt(e.target.value))} />
                     )}
                     {showPattern && (
                         <NumberInput
