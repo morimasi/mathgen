@@ -207,6 +207,33 @@ export const BasicShapesIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) 
     </svg>
 );
 
+export const PositionalConceptsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <circle cx="12" cy="8" r="2"/>
+        <path d="M5 16h14"/>
+        <path d="M17 12h3V6"/>
+    </svg>
+);
+
+export const IntroToMeasurementIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M7 21h10"/>
+        <path d="M12 3v18"/>
+        <path d="M7 12H2"/>
+        <path d="M17 12h5"/>
+        <path d="M20.4 6.4 12 12 3.6 6.4"/>
+    </svg>
+);
+
+export const SimpleGraphsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M3 3v18h18"/>
+        <path d="M7 12h3v6H7z"/>
+        <path d="M12 7h3v11h-3z"/>
+        <path d="M17 14h3v4h-3z"/>
+    </svg>
+);
+
 
 export const ContactIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>

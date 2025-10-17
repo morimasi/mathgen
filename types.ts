@@ -137,6 +137,55 @@ export interface BasicShapesSettings {
     topic?: string;
 }
 
+export enum PositionalConceptType {
+    AboveBelow = 'above-below',
+    InsideOutside = 'inside-outside',
+    LeftRight = 'left-right',
+}
+export interface PositionalConceptsSettings {
+    type: PositionalConceptType;
+    theme: MathReadinessTheme;
+    itemCount: number;
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic?: string;
+}
+
+export enum IntroMeasurementType {
+    CompareLength = 'compare-length',
+    CompareWeight = 'compare-weight',
+    CompareCapacity = 'compare-capacity',
+    NonStandardLength = 'non-standard-length',
+}
+export interface IntroToMeasurementSettings {
+    type: IntroMeasurementType;
+    theme: MathReadinessTheme;
+    difficulty: 'easy' | 'medium';
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic?: string;
+}
+
+export enum SimpleGraphType {
+    Pictograph = 'pictograph',
+    BarChart = 'bar-chart',
+}
+export interface SimpleGraphsSettings {
+    graphType: SimpleGraphType;
+    theme: MathReadinessTheme;
+    categoryCount: number;
+    maxItemCount: number;
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    useWordProblems: boolean;
+    topic?: string;
+}
+
 
 // --- FRACTIONS ---
 export enum FractionsProblemType {

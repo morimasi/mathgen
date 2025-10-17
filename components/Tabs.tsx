@@ -17,6 +17,9 @@ import {
     NumberRecognitionIcon,
     PatternsIcon,
     BasicShapesIcon,
+    PositionalConceptsIcon,
+    IntroToMeasurementIcon,
+    SimpleGraphsIcon,
 } from './icons/Icons';
 
 interface Tab {
@@ -51,6 +54,9 @@ const itemIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = 
     'number-recognition': NumberRecognitionIcon,
     'patterns': PatternsIcon,
     'basic-shapes': BasicShapesIcon,
+    'positional-concepts': PositionalConceptsIcon,
+    'intro-to-measurement': IntroToMeasurementIcon,
+    'simple-graphs': SimpleGraphsIcon,
 };
 
 const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {

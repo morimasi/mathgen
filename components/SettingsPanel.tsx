@@ -14,6 +14,9 @@ import ComparingQuantitiesModule from '../modules/ComparingQuantitiesModule';
 import NumberRecognitionModule from '../modules/NumberRecognitionModule';
 import PatternsModule from '../modules/PatternsModule';
 import BasicShapesModule from '../modules/BasicShapesModule';
+import PositionalConceptsModule from '../modules/PositionalConceptsModule';
+import IntroToMeasurementModule from '../modules/IntroToMeasurementModule';
+import SimpleGraphsModule from '../modules/SimpleGraphsModule';
 import { Problem, VisualSupportSettings } from '../types';
 
 interface SettingsPanelProps {
@@ -51,6 +54,12 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 return <PatternsModule {...commonProps} />;
             case 'basic-shapes':
                 return <BasicShapesModule {...commonProps} />;
+            case 'positional-concepts':
+                return <PositionalConceptsModule {...commonProps} />;
+            case 'intro-to-measurement':
+                return <IntroToMeasurementModule {...commonProps} />;
+            case 'simple-graphs':
+                return <SimpleGraphsModule {...commonProps} />;
             
             // Operations
             case 'arithmetic':

@@ -9,6 +9,9 @@ export const TAB_GROUPS = [
             { id: 'number-recognition', label: 'Rakam Tanıma ve Sayma' },
             { id: 'patterns', label: 'Örüntüler' },
             { id: 'basic-shapes', label: 'Temel Geometrik Şekiller' },
+            { id: 'positional-concepts', label: 'Konum ve Yön' },
+            { id: 'intro-to-measurement', label: 'Ölçmeye Giriş' },
+            { id: 'simple-graphs', label: 'Basit Grafikler' },
         ]
     },
     {

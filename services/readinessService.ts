@@ -1,4 +1,4 @@
-import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType } from '../types';
+import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType } from '../types';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -155,6 +155,59 @@ const generateBasicShapesProblem = (settings: BasicShapesSettings): { problem: P
     return { problem: { question, answer: "Görsel", category: 'basic-shapes' }, title };
 };
 
+const generatePositionalProblem = (settings: PositionalConceptsSettings): { problem: Problem, title: string } => {
+    const { type, theme, itemCount } = settings;
+    const title = "Konum ve Yön Kavramları";
+    const items = getRandomItems(theme, itemCount);
+    const targetItem = items[0];
+    
+    let question = '';
+    let answer = '';
+    let instruction = '';
+
+    const FONT_SIZE = 30;
+
+    switch(type) {
+        case PositionalConceptType.AboveBelow: {
+            const isAbove = Math.random() < 0.5;
+            instruction = isAbove ? `Mas_anın üstündeki_ ${targetItem} nesnesini daire içine al.` : `Mas_anın altındaki_ ${targetItem} nesnesini daire içine al.`;
+            answer = isAbove ? 'Üstteki' : 'Alttaki';
+
+            let itemsSVG = `<rect x="50" y="150" width="300" height="20" fill="#a16207" /><rect x="80" y="170" width="10" height="60" fill="#a16207" /><rect x="280" y="170" width="10" height="60" fill="#a16207" />`; // table
+            
+            const targetY = isAbove ? 130 : 210;
+            itemsSVG += `<text x="${getRandomInt(80, 280)}" y="${targetY}" font-size="${FONT_SIZE}" text-anchor="middle">${targetItem}</text>`;
+            
+            for(let i = 1; i < itemCount; i++) {
+                 const otherY = !isAbove ? 130 : 210;
+                 itemsSVG += `<text x="${getRandomInt(80, 280)}" y="${otherY}" font-size="${FONT_SIZE}" text-anchor="middle">${items[i]}</text>`;
+            }
+
+            question = `<div><p style="font-size: 1.2rem; text-align: center;">${instruction}</p><svg viewBox="0 0 400 250">${itemsSVG}</svg></div>`;
+            break;
+        }
+        // ... other cases
+        default:
+             question = "Hata";
+             answer = "Hata";
+    }
+
+    return { problem: { question, answer, category: 'positional-concepts' }, title };
+};
+
+const generateMeasurementIntroProblem = (settings: IntroToMeasurementSettings): { problem: Problem, title: string } => {
+    const title = "Ölçmeye Giriş";
+    let question = "Ölçme problemi";
+    let answer = "cevap";
+    return { problem: { question, answer, category: 'intro-to-measurement' }, title };
+};
+
+const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: Problem, title: string } => {
+    const title = "Basit Grafikler";
+    let question = "Grafik problemi";
+    let answer = "cevap";
+    return { problem: { question, answer, category: 'simple-graphs' }, title };
+};
 
 export const generateReadinessProblem = (
     module: string,
@@ -171,6 +224,12 @@ export const generateReadinessProblem = (
             return generatePatternsProblem(settings as PatternsSettings);
         case 'basic-shapes':
             return generateBasicShapesProblem(settings as BasicShapesSettings);
+        case 'positional-concepts':
+            return generatePositionalProblem(settings as PositionalConceptsSettings);
+        case 'intro-to-measurement':
+            return generateMeasurementIntroProblem(settings as IntroToMeasurementSettings);
+        case 'simple-graphs':
+            return generateSimpleGraphProblem(settings as SimpleGraphsSettings);
         default:
             return {
                 problem: { question: "Hata", answer: "Hata", category: 'error' },
