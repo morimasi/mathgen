@@ -1,18 +1,47 @@
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+type TabId = string;
 
 interface UIContextType {
-    activeTab: string;
-    setActiveTab: (tabId: string) => void;
+    activeTab: TabId;
+    setActiveTab: (tabId: TabId) => void;
+    isPrintSettingsVisible: boolean;
+    openPrintSettings: () => void;
+    closePrintSettings: () => void;
+    isHowToUseVisible: boolean;
+    openHowToUse: () => void;
+    closeHowToUse: () => void;
+    isContactModalVisible: boolean;
+    openContactModal: () => void;
+    closeContactModal: () => void;
+    isSettingsPanelCollapsed: boolean;
+    setIsSettingsPanelCollapsed: (collapsed: boolean) => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
 
 export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [activeTab, setActiveTab] = useState<string>('arithmetic');
+    const [activeTab, setActiveTab] = useState('matching-and-sorting');
+    const [isPrintSettingsVisible, setPrintSettingsVisible] = useState(false);
+    const [isHowToUseVisible, setHowToUseVisible] = useState(false);
+    const [isContactModalVisible, setContactModalVisible] = useState(false);
+    const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(false);
+    
+    const openPrintSettings = useCallback(() => setPrintSettingsVisible(true), []);
+    const closePrintSettings = useCallback(() => setPrintSettingsVisible(false), []);
+    const openHowToUse = useCallback(() => setHowToUseVisible(true), []);
+    const closeHowToUse = useCallback(() => setHowToUseVisible(false), []);
+    const openContactModal = useCallback(() => setContactModalVisible(true), []);
+    const closeContactModal = useCallback(() => setContactModalVisible(false), []);
 
     return (
-        <UIContext.Provider value={{ activeTab, setActiveTab }}>
+        <UIContext.Provider value={{
+            activeTab, setActiveTab,
+            isPrintSettingsVisible, openPrintSettings, closePrintSettings,
+            isHowToUseVisible, openHowToUse, closeHowToUse,
+            isContactModalVisible, openContactModal, closeContactModal,
+            isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
+        }}>
             {children}
         </UIContext.Provider>
     );

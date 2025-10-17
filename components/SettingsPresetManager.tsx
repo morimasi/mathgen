@@ -1,84 +1,103 @@
-
 import React, { useState, useEffect } from 'react';
-import { saveSettingsPreset, loadSettingsPresets, deleteSettingsPreset } from '../services/settingsManager';
+import { useSettingsManager } from '../services/settingsManager';
+import TextInput from './form/TextInput';
 import Select from './form/Select';
 import Button from './form/Button';
-import TextInput from './form/TextInput';
+import { SaveIcon, LoadIcon, DeleteIcon } from './icons/Icons';
 
 interface SettingsPresetManagerProps<T> {
     moduleKey: string;
     currentSettings: T;
     onLoadSettings: (settings: T) => void;
-    initialSettings?: T;
 }
 
-const SettingsPresetManager = <T,>({ moduleKey, currentSettings, onLoadSettings, initialSettings }: SettingsPresetManagerProps<T>) => {
-    const [presets, setPresets] = useState<Record<string, T>>({});
-    const [presetName, setPresetName] = useState('');
+const SettingsPresetManager = <T,>({ moduleKey, currentSettings, onLoadSettings }: SettingsPresetManagerProps<T>) => {
+    const { presets, savePreset, loadPreset, deletePreset } = useSettingsManager<T>(moduleKey);
+    const [newPresetName, setNewPresetName] = useState('');
     const [selectedPreset, setSelectedPreset] = useState('');
 
+    // When presets change (e.g., after delete), if the selected one is gone, reset selection.
     useEffect(() => {
-        setPresets(loadSettingsPresets<T>(moduleKey));
-    }, [moduleKey]);
+        if (!presets.includes(selectedPreset)) {
+            setSelectedPreset('');
+        }
+    }, [presets, selectedPreset]);
 
     const handleSave = () => {
-        if (!presetName) return;
-        saveSettingsPreset(moduleKey, presetName, currentSettings);
-        setPresets(loadSettingsPresets<T>(moduleKey));
-        setSelectedPreset(presetName);
-        setPresetName('');
+        const name = newPresetName.trim();
+        if (name) {
+            if (presets.includes(name) && !window.confirm(`'${name}' adında bir set zaten mevcut. Üzerine yazmak istiyor musunuz?`)) {
+                return;
+            }
+            savePreset(name, currentSettings);
+            setNewPresetName('');
+            setSelectedPreset(name);
+        }
     };
 
     const handleLoad = () => {
-        if (!selectedPreset) return;
-        const loadedSettings = presets[selectedPreset];
-        if (loadedSettings) {
-            onLoadSettings(loadedSettings);
+        if (selectedPreset) {
+            const loaded = loadPreset(selectedPreset);
+            if (loaded) {
+                onLoadSettings(loaded);
+            }
         }
     };
-    
+
     const handleDelete = () => {
-        if (!selectedPreset) return;
-        deleteSettingsPreset(moduleKey, selectedPreset);
-        setPresets(loadSettingsPresets<T>(moduleKey));
-        setSelectedPreset('');
-    };
-
-    const handleReset = () => {
-        if(initialSettings) {
-            onLoadSettings(initialSettings);
+        if (selectedPreset) {
+            if (window.confirm(`'${selectedPreset}' adlı ayar setini silmek istediğinizden emin misiniz?`)) {
+                deletePreset(selectedPreset);
+                setSelectedPreset('');
+            }
         }
     };
-
-    const presetOptions = Object.keys(presets).map(name => ({ value: name, label: name }));
 
     return (
-        <div className="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 space-y-3">
-            <h3 className="text-sm font-semibold">Ayar Setleri</h3>
-            <div className="space-y-2">
+        <div className="pt-3 mt-3 border-t border-stone-200 dark:border-stone-700 space-y-2">
+            <h3 className="text-base font-bold text-stone-800 dark:text-stone-200">Ayar Setleri</h3>
+            
+            <div className="space-y-1.5 p-3 bg-stone-50 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
+                <label htmlFor={`preset-name-${moduleKey}`} className="font-medium text-xs text-stone-700 dark:text-stone-300">Yeni Ayar Seti Kaydet</label>
                 <div className="flex gap-2">
-                    <TextInput
+                    <TextInput 
+                        id={`preset-name-${moduleKey}`}
+                        value={newPresetName}
+                        onChange={(e) => setNewPresetName(e.target.value)}
+                        placeholder="Örn: Günlük Çarpma Alıştırması"
                         containerClassName="flex-grow"
-                        placeholder="Yeni ayar seti adı..."
-                        value={presetName}
-                        onChange={(e) => setPresetName(e.target.value)}
                     />
-                    <Button onClick={handleSave} size="md" disabled={!presetName}>Kaydet</Button>
+                    <Button onClick={handleSave} disabled={!newPresetName.trim()} size="md" variant="secondary" title="Mevcut ayarları kaydet">
+                        <SaveIcon className="w-5 h-5" />
+                        Kaydet
+                    </Button>
                 </div>
-                 {presetOptions.length > 0 && (
-                    <div className="flex gap-2 items-end">
-                        <Select
-                            containerClassName="flex-grow"
-                            options={[{ value: '', label: 'Yüklemek için seçin...' }, ...presetOptions]}
-                            value={selectedPreset}
-                            onChange={(e) => setSelectedPreset(e.target.value)}
-                        />
-                        <Button onClick={handleLoad} variant="secondary" size="md" disabled={!selectedPreset}>Yükle</Button>
-                        <Button onClick={handleDelete} variant="danger" size="md" disabled={!selectedPreset}>Sil</Button>
-                    </div>
-                 )}
-                 {initialSettings && <Button onClick={handleReset} variant="secondary" size="md" className="w-full">Varsayılan Ayarlara Dön</Button>}
             </div>
+
+            {presets.length > 0 && (
+                <div className="space-y-1.5 p-3 bg-stone-50 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
+                     <Select 
+                        id={`select-preset-${moduleKey}`}
+                        label="Kayıtlı Ayar Setini Yönet"
+                        value={selectedPreset}
+                        onChange={(e) => setSelectedPreset(e.target.value)}
+                        options={[
+                            { value: '', label: 'Bir ayar seti seçin...' },
+                            ...presets.map(p => ({ value: p, label: p }))
+                        ]}
+                    />
+                    <div className="flex gap-2">
+                        <Button onClick={handleLoad} disabled={!selectedPreset} size="md">
+                            <LoadIcon className="w-5 h-5" />
+                            Yükle
+                        </Button>
+                        <Button onClick={handleDelete} disabled={!selectedPreset} size="md" variant="danger">
+                            <DeleteIcon className="w-5 h-5" />
+                            Sil
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
