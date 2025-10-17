@@ -6,11 +6,13 @@ import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
+// FIX: Import the problem generation service for dyslexia.
 import { generateDyslexiaProblem } from '../services/dyslexiaService';
 
 // Import all sub-module setting components
 import SoundWizardSettings from './dyslexia/SoundWizardSettings';
 import LetterDetectiveSettings from './dyslexia/LetterDetectiveSettings';
+// FIX: Import the ReadingFluencyCoachSettings component.
 import ReadingFluencyCoachSettings from './dyslexia/ReadingFluencyCoachSettings';
 import ComprehensionExplorerSettings from './dyslexia/ComprehensionExplorerSettings';
 import VocabularyExplorerSettings from './dyslexia/VocabularyExplorerSettings';
@@ -77,7 +79,7 @@ const DyslexiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, conte
     const activeSubModuleId = settings.activeSubModule;
     // FIX: The settings object uses camelCase keys (e.g. soundWizard), but the activeSubModuleId is kebab-case.
     // Convert kebab-case to camelCase to correctly access the nested settings object.
-    const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+    const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyslexiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {

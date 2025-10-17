@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateMeasurementProblem } from '../services/measurementService';
+// FIX: Import 'generateContextualWordProblems' from the newly created 'geminiService'.
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, MeasurementSettings, MeasurementProblemType, Difficulty } from '../types';
 import Button from '../components/form/Button';

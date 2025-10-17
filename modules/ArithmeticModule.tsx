@@ -10,6 +10,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { generateArithmeticProblem } from '../services/mathService';
+// FIX: Import 'generateContextualWordProblems' from the newly created 'geminiService'.
 import { generateContextualWordProblems } from '../services/geminiService';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';

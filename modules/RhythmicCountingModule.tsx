@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
+// FIX: Import 'generateContextualWordProblems' from the newly created 'geminiService'.
 import { generateContextualWordProblems } from '../services/geminiService';
 import { Problem, RhythmicCountingSettings, RhythmicProblemType } from '../types';
 import Button from '../components/form/Button';

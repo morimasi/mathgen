@@ -54,37 +54,37 @@ const subModules: { id: DysgraphiaSubModuleType; label: string; icon: React.FC<R
 
 const defaultSettings: DysgraphiaSettings = {
     activeSubModule: 'fine-motor-skills',
-    problemsPerPage: 5, pageCount: 1, autoFit: true,
+    problemsPerPage: 10, pageCount: 1, autoFit: true,
     fineMotorSkills: { type: 'line-trace' },
     letterFormation: { letter: 'a', case: 'lower' },
     letterFormRecognition: { targetLetter: 'b', difficulty: 'easy' },
     legibleWriting: { type: 'spacing' },
-    pictureSequencing: { storyLength: 3, topic: 'Sabah Rutini' },
+    pictureSequencing: { storyLength: 3, topic: 'Parkta bir gün' },
     writingSpeed: { duration: 1 },
-    sentenceConstruction: { wordCount: 4 },
+    sentenceConstruction: { wordCount: 5 },
     punctuation: { type: 'end-of-sentence' },
     writingPlanning: { topic: 'Tatil anılarım' },
-    creativeWriting: { promptType: 'story-starter', topic: 'Kayıp hazine' },
+    creativeWriting: { promptType: 'story-starter', topic: 'Gizemli bir anahtar' },
     keyboardSkills: { level: 'home-row' },
-    interactiveStoryDg: { genre: 'journal', gradeLevel: '3' },
+    interactiveStoryDg: { genre: 'adventure', gradeLevel: '3' },
 };
 
 const DysgraphiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, contentRef, autoRefreshTrigger, lastGeneratorModule }) => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<DysgraphiaSettings>(defaultSettings);
     const isInitialMount = useRef(true);
-
+    
     const activeSubModuleId = settings.activeSubModule;
-    const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof DysgraphiaSettings;
+    const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DysgraphiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            let totalCount = settings.autoFit
+            let totalCount = settings.autoFit 
                 ? (calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage) * settings.pageCount
                 : settings.problemsPerPage * settings.pageCount;
-
+            
             const result = await generateDysgraphiaProblem(activeSubModuleId, activeSubModuleSettings, totalCount);
 
             if (result.error) {
@@ -104,12 +104,14 @@ const DysgraphiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
+    // Live update for non-AI modules
     useEffect(() => {
         const isAIModule = ['picture-sequencing', 'writing-planning', 'creative-writing', 'interactive-story-dg'].includes(activeSubModuleId);
         if (isInitialMount.current || isAIModule) {
             isInitialMount.current = false;
             return;
         }
+
         if (lastGeneratorModule === `dysgraphia-${activeSubModuleId}`) {
             const handler = setTimeout(() => handleGenerate(true), 300);
             return () => clearTimeout(handler);
@@ -123,7 +125,7 @@ const DysgraphiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
     const handleSettingChange = (field: keyof DysgraphiaSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
-
+    
     const handleSubModuleSettingChange = (subModuleSettings: any) => {
         setSettings(prev => ({
             ...prev,
@@ -167,14 +169,14 @@ const DysgraphiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, con
                     ))}
                 </nav>
             </aside>
-
+            
             <main className="w-2/3 space-y-3">
                 {renderSettingsPanel()}
                 <div className="pt-2 border-t border-stone-200 dark:border-stone-700">
                     <div className="grid grid-cols-2 gap-2">
-                        <NumberInput label="Problem Sayısı" id="dg-problems-per-page" min={1} max={50}
+                         <NumberInput label="Problem Sayısı" id="dg-problems-per-page" min={1} max={50}
                             value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit} />
-                        <NumberInput label="Sayfa Sayısı" id="dg-page-count" min={1} max={20}
+                         <NumberInput label="Sayfa Sayısı" id="dg-page-count" min={1} max={20}
                             value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} />
                     </div>
                 </div>

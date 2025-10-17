@@ -6,6 +6,7 @@ import { ShuffleIcon } from '../components/icons/Icons';
 import { usePrintSettings } from '../services/PrintSettingsContext';
 import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
+// FIX: Import the problem generation service for dyscalculia.
 import { generateDyscalculiaProblem } from '../services/dyscalculiaService';
 
 // Import all sub-module setting components
@@ -77,7 +78,7 @@ const DyscalculiaModule: React.FC<ModuleProps> = ({ onGenerate, setIsLoading, co
     const isInitialMount = useRef(true);
     
     const activeSubModuleId = settings.activeSubModule;
-    const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof DyscalculiaSettings;
+    const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyscalculiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
 
     const handleGenerate = useCallback(async (clearPrevious: boolean) => {
