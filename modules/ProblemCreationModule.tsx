@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ProblemCreationSettings } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateReadinessProblem } from '../../services/readinessService';
+import { generateProblemCreationProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
 import NumberInput from '../../components/form/NumberInput';
 import Checkbox from '../../components/form/Checkbox';
@@ -23,7 +23,7 @@ const ProblemCreationModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'problem-creation',
         settings,
-        generatorFn: (settings) => generateReadinessProblem('problem-creation', settings),
+        generatorFn: generateProblemCreationProblem,
     });
 
     const handleGenerateClick = () => {

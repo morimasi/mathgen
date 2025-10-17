@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MissingNumberPuzzlesSettings } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateReadinessProblem } from '../../services/readinessService';
+import { generateMissingNumberPuzzlesProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
 import NumberInput from '../../components/form/NumberInput';
 import Checkbox from '../../components/form/Checkbox';
@@ -23,7 +23,7 @@ const MissingNumberPuzzlesModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'missing-number-puzzles',
         settings,
-        generatorFn: (settings) => generateReadinessProblem('missing-number-puzzles', settings),
+        generatorFn: generateMissingNumberPuzzlesProblem,
     });
 
     const handleGenerateClick = () => {

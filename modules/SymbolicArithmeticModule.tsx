@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SymbolicArithmeticSettings } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateReadinessProblem } from '../../services/readinessService';
+import { generateSymbolicArithmeticProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
 import NumberInput from '../../components/form/NumberInput';
 import Checkbox from '../../components/form/Checkbox';
@@ -23,7 +23,7 @@ const SymbolicArithmeticModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'symbolic-arithmetic',
         settings,
-        generatorFn: (settings) => generateReadinessProblem('symbolic-arithmetic', settings),
+        generatorFn: generateSymbolicArithmeticProblem,
     });
 
     const handleGenerateClick = () => {

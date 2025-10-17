@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { VerbalArithmeticSettings } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
-import { generateReadinessProblem } from '../../services/readinessService';
+import { generateVerbalArithmeticProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
 import NumberInput from '../../components/form/NumberInput';
 import Checkbox from '../../components/form/Checkbox';
@@ -22,7 +22,7 @@ const VerbalArithmeticModule: React.FC = () => {
     const { generate } = useProblemGenerator({
         moduleKey: 'verbal-arithmetic',
         settings,
-        generatorFn: (settings) => generateReadinessProblem('verbal-arithmetic', settings),
+        generatorFn: generateVerbalArithmeticProblem,
     });
 
     const handleGenerateClick = () => {
