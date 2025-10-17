@@ -381,17 +381,6 @@ body {
     background-color: hsl(var(--theme-primary));
 }
 
-/* Hint Button */
-.hint-popover {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.2s, visibility 0.2s;
-}
-.hint-button:hover .hint-popover {
-    visibility: visible;
-    opacity: 1;
-}
-
 /* Toast Container */
 .toast-container {
     position: fixed;
