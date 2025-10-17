@@ -170,7 +170,7 @@ const generatePositionalProblem = (settings: PositionalConceptsSettings): { prob
     switch(type) {
         case PositionalConceptType.AboveBelow: {
             const isAbove = Math.random() < 0.5;
-            instruction = isAbove ? `Mas_anın üstündeki_ ${targetItem} nesnesini daire içine al.` : `Mas_anın altındaki_ ${targetItem} nesnesini daire içine al.`;
+            instruction = isAbove ? `Masanın üstündeki ${targetItem} nesnesini daire içine al.` : `Masanın altındaki ${targetItem} nesnesini daire içine al.`;
             answer = isAbove ? 'Üstteki' : 'Alttaki';
 
             let itemsSVG = `<rect x="50" y="150" width="300" height="20" fill="#a16207" /><rect x="80" y="170" width="10" height="60" fill="#a16207" /><rect x="280" y="170" width="10" height="60" fill="#a16207" />`; // table
