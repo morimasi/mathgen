@@ -208,6 +208,7 @@ const AppContent: React.FC = () => {
     const { settings: printSettings, setSettings: setPrintSettings } = usePrintSettings();
     const contentRef = useRef<HTMLDivElement>(null);
     const worksheetParentRef = useRef<HTMLDivElement>(null);
+    const collapseTimerRef = useRef<number | null>(null);
 
     const handleGenerate = useCallback((
         newProblems: Problem[], 
@@ -302,6 +303,29 @@ const AppContent: React.FC = () => {
         setPageCount(1);
     };
 
+    const handleSettingsPanelEnter = () => {
+        if (collapseTimerRef.current) {
+            clearTimeout(collapseTimerRef.current);
+        }
+        setIsSettingsPanelCollapsed(false);
+    };
+
+    const handleWorksheetAreaEnter = () => {
+        if (collapseTimerRef.current) {
+            clearTimeout(collapseTimerRef.current);
+        }
+        collapseTimerRef.current = window.setTimeout(() => {
+            setIsSettingsPanelCollapsed(true);
+        }, 250); 
+    };
+
+    const handleWorksheetAreaLeave = () => {
+        if (collapseTimerRef.current) {
+            clearTimeout(collapseTimerRef.current);
+        }
+    };
+
+
     return (
         <div className="bg-stone-50 dark:bg-stone-900 min-h-screen text-stone-800 dark:text-stone-200">
             <header className="bg-orange-800 dark:bg-stone-950/70 text-amber-50 shadow-md sticky top-0 z-20 print:hidden">
@@ -380,7 +404,7 @@ const AppContent: React.FC = () => {
                 <div className={`main-layout-grid ${isSettingsPanelCollapsed ? 'sidebar-collapsed' : ''}`}>
                     <aside 
                         className="print:hidden settings-panel"
-                        onMouseEnter={() => setIsSettingsPanelCollapsed(false)}
+                        onMouseEnter={handleSettingsPanelEnter}
                     >
                          <div className="settings-panel-content bg-white dark:bg-stone-800/80 p-4 rounded-lg shadow-sm sticky top-[7rem]">
                             <SettingsPanel 
@@ -398,7 +422,8 @@ const AppContent: React.FC = () => {
                     <div 
                         className="worksheet-area" 
                         ref={worksheetParentRef}
-                        onMouseEnter={() => setIsSettingsPanelCollapsed(true)}
+                        onMouseEnter={handleWorksheetAreaEnter}
+                        onMouseLeave={handleWorksheetAreaLeave}
                     >
                         <WorksheetToolbar
                             scale={worksheetScale}
