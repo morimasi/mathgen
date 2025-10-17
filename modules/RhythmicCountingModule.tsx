@@ -1,242 +1,217 @@
 
 import React, { useState } from 'react';
-import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
-import { generateContextualWordProblems } from '../services/geminiService';
 import { RhythmicCountingSettings, RhythmicProblemType } from '../types';
-import Button from '../components/form/Button';
-import NumberInput from '../components/form/NumberInput';
-import Select from '../components/form/Select';
-import Checkbox from '../components/form/Checkbox';
-import TextInput from '../components/form/TextInput';
-import { ShuffleIcon } from '../components/icons/Icons';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import SettingsPresetManager from '../components/SettingsPresetManager';
-import { TOPIC_SUGGESTIONS } from '../constants';
-import HintButton from '../components/HintButton';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { useProblemGenerator } from '../../hooks/useProblemGenerator';
+import { generateRhythmicCountingProblem } from '../../services/rhythmicCountingService';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import Checkbox from '../../components/form/Checkbox';
+import Button from '../../components/form/Button';
+import SettingsPresetManager from '../../components/SettingsPresetManager';
+import { TOPIC_SUGGESTIONS } from '../../constants';
 
-// FIX: Switched to a named export to resolve a React.lazy type error. The original file content was corrupted with code from another module, causing numerous errors. The content has been fully restored.
+const initialSettings: RhythmicCountingSettings = {
+    gradeLevel: 1,
+    type: RhythmicProblemType.Pattern,
+    step: 2,
+    direction: 'forward',
+    useMultiplesOnly: false,
+    min: 1,
+    max: 100,
+    patternLength: 5,
+    missingCount: 1,
+    orderCount: 5,
+    orderDigits: 2,
+    beforeCount: 3,
+    afterCount: 3,
+    problemsPerPage: 20,
+    pageCount: 1,
+    useWordProblems: false,
+    topic: '',
+    orderDirection: 'ascending',
+    autoFit: true,
+};
+
 export const RhythmicCountingModule: React.FC = () => {
-    const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<RhythmicCountingSettings>({
-        gradeLevel: 1,
-        type: RhythmicProblemType.Pattern,
-        step: 2,
-        direction: 'forward',
-        useMultiplesOnly: false,
-        min: 1,
-        max: 100,
-        patternLength: 5,
-        missingCount: 1,
-        orderCount: 5,
-        orderDigits: 3,
-        beforeCount: 3,
-        afterCount: 3,
-        problemsPerPage: 20,
-        pageCount: 1,
-        useWordProblems: false,
-        topic: '',
-        orderDirection: 'ascending',
-        autoFit: true,
-    });
+    const [settings, setSettings] = useState<RhythmicCountingSettings>(initialSettings);
 
-    const isPracticeSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
-
+    const isPracticeSheet = [
+        RhythmicProblemType.PracticeSheet,
+        RhythmicProblemType.FillBeforeAfter,
+        RhythmicProblemType.FillBetween
+    ].includes(settings.type);
+    
     const { generate } = useProblemGenerator({
         moduleKey: 'rhythmic-counting',
         settings,
         generatorFn: generateRhythmicCountingProblem,
-        aiGeneratorFn: generateContextualWordProblems,
-        aiGeneratorTitle: 'Gerçek Hayat Problemleri - Ritmik Sayma',
         isPracticeSheet,
     });
 
-    const handleSettingChange = (field: keyof RhythmicCountingSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+    const handleGenerateClick = () => {
+        generate(true);
     };
 
-    const handleRandomTopic = () => {
-        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
-        handleSettingChange('topic', randomTopic);
-    };
-
-    const handleGradeLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const grade = parseInt(e.target.value, 10);
-        let newSettings: Partial<RhythmicCountingSettings> = { gradeLevel: grade };
-
-        switch (grade) {
-            case 1:
-                newSettings.max = 100;
-                newSettings.step = 2;
-                break;
-            case 2:
-                newSettings.max = 1000;
-                newSettings.step = 3;
-                break;
-            default:
-                newSettings.max = 1000;
-                newSettings.step = 5;
-                break;
-        }
-        setSettings(prev => ({ ...prev, ...newSettings }));
-    };
-
-    const showStep = [RhythmicProblemType.Pattern, RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
-    const showRange = [RhythmicProblemType.Pattern, RhythmicProblemType.PracticeSheet, RhythmicProblemType.OddEven, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
-    const showPattern = settings.type === RhythmicProblemType.Pattern;
     const isOrdering = settings.type === RhythmicProblemType.Ordering;
-    const isTableLayout = printSettings.layoutMode === 'table';
-
-    const getHintText = () => {
-        if (isPracticeSheet) {
-            return "'Alıştırma Kağıdı' türleri, tüm sayfayı kaplayan pratik sayfaları oluşturur. 'Otomatik Sığdır' bu modda devre dışıdır. 'Sayfa Sayısı' ile doğrudan kaç sayfa oluşturacağınızı belirlersiniz.";
-        }
-        if (isOrdering) {
-            return "'Sıralama' etkinliği, karışık olarak verilen sayıların küçükten büyüğe veya büyükten küçüğe sıralanmasını ister. Sayıların basamak sayısını 'Sınıf Düzeyi' ile ayarlayabilirsiniz.";
-        }
-        if (showPattern) {
-             return "'Örüntü Tamamlama' için 'Adım' sayısını (örn: 5'er), 'Yön'ü (ileri/geri) ve sayıların 'Min/Max' aralığını belirleyebilirsiniz. 'Sadece Katları Kullan' seçeneği, örüntünün her zaman adımın bir katıyla başlamasını sağlar.";
-        }
-        return "Ritmik sayma ve sayı örüntüleri becerilerini geliştirmek için çeşitli problem türleri sunar. 'Alıştırma Kağıdı' seçenekleri, hızlıca ödev hazırlamak için idealdir.";
-    };
+    const isPattern = settings.type === RhythmicProblemType.Pattern;
 
     return (
-        <div className="space-y-2">
-            <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold">Ritmik Sayma Ayarları</h2>
-                <HintButton text={getHintText()} />
-            </div>
-            
-            <div className="space-y-1.5">
-                {showPattern && (
-                     <details className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg" open={settings.useWordProblems}>
-                        <summary className="text-xs font-semibold cursor-pointer select-none">Gerçek Hayat Problemleri (AI)</summary>
-                         <div className="mt-2 pl-4 space-y-1.5">
-                            <Checkbox
-                                label="Yapay Zeka ile Problem Oluştur"
-                                id="use-word-problems-rhythmic"
-                                checked={settings.useWordProblems}
-                                onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
-                            />
-                            <div className="relative">
-                                <TextInput
-                                    label="Problem Konusu (İsteğe bağlı)"
-                                    id="rhythmic-topic"
-                                    value={settings.topic || ''}
-                                    onChange={e => handleSettingChange('topic', e.target.value)}
-                                    placeholder="Örn: Zıplayan tavşan, merdiven çıkan çocuk"
-                                    className="pr-9"
-                                />
-                                <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors" title="Rastgele Konu Öner">
-                                    <ShuffleIcon className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    </details>
+        <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+                <Select
+                    label="Problem Türü"
+                    id="rc-type"
+                    value={settings.type}
+                    onChange={e => setSettings({ ...settings, type: e.target.value as RhythmicProblemType })}
+                    options={[
+                        { value: RhythmicProblemType.Pattern, label: 'Örüntü Tamamlama' },
+                        { value: RhythmicProblemType.FindRule, label: 'Örüntü Kuralı Bulma' },
+                        { value: RhythmicProblemType.PracticeSheet, label: 'Alıştırma Kağıdı' },
+                        { value: RhythmicProblemType.FillBeforeAfter, label: 'Önceki/Sonraki Sayılar' },
+                        { value: RhythmicProblemType.FillBetween, label: 'Aradaki Sayılar' },
+                        { value: RhythmicProblemType.OddEven, label: 'Tek/Çift Sayılar' },
+                        { value: RhythmicProblemType.Ordering, label: 'Sıralama' },
+                        { value: RhythmicProblemType.Comparison, label: 'Karşılaştırma' },
+                    ]}
+                    containerClassName="col-span-2"
+                />
+                
+                {!isOrdering && (
+                    <>
+                        <NumberInput
+                            label="Adım (Kaçar kaçar?)"
+                            id="rc-step"
+                            value={settings.step}
+                            onChange={e => setSettings({ ...settings, step: parseInt(e.target.value, 10) })}
+                            min={1}
+                            max={100}
+                        />
+                         <Select
+                            label="Yön"
+                            id="rc-direction"
+                            value={settings.direction}
+                            onChange={e => setSettings({ ...settings, direction: e.target.value as any })}
+                            options={[
+                                { value: 'forward', label: 'İleri' },
+                                { value: 'backward', label: 'Geri' },
+                                { value: 'mixed', label: 'Karışık' },
+                            ]}
+                        />
+                    </>
                 )}
 
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-                    <Select
-                        label="Sınıf Düzeyi"
-                        id="rhythmic-grade-level"
-                        value={settings.gradeLevel}
-                        onChange={handleGradeLevelChange}
-                        options={[{ value: 1, label: '1. Sınıf' }, { value: 2, label: '2. Sınıf' }, { value: 3, label: '3. Sınıf' }]}
-                    />
-                    <Select
-                        label="Problem Türü"
-                        id="rhythmic-type"
-                        value={settings.type}
-                        onChange={e => handleSettingChange('type', e.target.value as RhythmicProblemType)}
-                        options={[
-                            { value: RhythmicProblemType.Pattern, label: 'Örüntü Tamamlama' },
-                            { value: RhythmicProblemType.FindRule, label: 'Örüntü Kuralı Bulma' },
-                            { value: RhythmicProblemType.PracticeSheet, label: 'Alıştırma Kağıdı' },
-                            { value: RhythmicProblemType.FillBeforeAfter, label: 'Öncesini/Sonrasını Doldur' },
-                            { value: RhythmicProblemType.FillBetween, label: 'Arasını Doldur' },
-                            { value: RhythmicProblemType.OddEven, label: 'Tek/Çift Sayılar' },
-                            { value: RhythmicProblemType.Ordering, label: 'Sıralama' },
-                            { value: RhythmicProblemType.Comparison, label: 'Karşılaştırma' },
-                        ]}
-                    />
-                    
-                    {showStep && (
+                <NumberInput
+                    label="Min Değer"
+                    id="rc-min"
+                    value={settings.min}
+                    onChange={e => setSettings({ ...settings, min: parseInt(e.target.value, 10) })}
+                />
+                 <NumberInput
+                    label="Max Değer"
+                    id="rc-max"
+                    value={settings.max}
+                    onChange={e => setSettings({ ...settings, max: parseInt(e.target.value, 10) })}
+                />
+                
+                {isPattern && (
+                     <>
                         <NumberInput
-                            label="Adım" id="rhythmic-step" min={1} max={100} value={settings.step}
-                            onChange={e => handleSettingChange('step', parseInt(e.target.value))} />
-                    )}
-                    {showStep && (
-                        <Select
-                            label="Yön" id="rhythmic-direction" value={settings.direction}
-                            onChange={e => handleSettingChange('direction', e.target.value as 'forward' | 'backward' | 'mixed')}
-                            options={[{ value: 'forward', label: 'İleri' }, { value: 'backward', label: 'Geri' }, { value: 'mixed', label: 'Karışık' }]} />
-                    )}
-                    {showRange && (
-                        <NumberInput
-                            label="Min Değer" id="rhythmic-min" min={0} max={9999} value={settings.min}
-                            onChange={e => handleSettingChange('min', parseInt(e.target.value))} />
-                    )}
-                    {showRange && (
-                        <NumberInput
-                            label="Max Değer" id="rhythmic-max" min={1} max={10000} value={settings.max}
-                            onChange={e => handleSettingChange('max', parseInt(e.target.value))} />
-                    )}
-                    {showPattern && (
-                        <NumberInput
-                            label="Örüntü Uzunluğu" id="rhythmic-patternLength" min={3} max={10} value={settings.patternLength}
-                            onChange={e => handleSettingChange('patternLength', parseInt(e.target.value))} />
-                    )}
-                    {showPattern && (
-                        <NumberInput
-                            label="Eksik Sayısı" id="rhythmic-missingCount" min={1} max={5} value={settings.missingCount}
-                            onChange={e => handleSettingChange('missingCount', parseInt(e.target.value))} />
-                    )}
-                    {isOrdering && (
-                        <NumberInput
-                            label="Sıralanacak Sayı Adedi" id="rhythmic-orderCount" min={3} max={10} value={settings.orderCount}
-                            onChange={e => handleSettingChange('orderCount', parseInt(e.target.value))} />
-                    )}
-                    {isOrdering && (
-                        <Select
-                            label="Sıralama Yönü" id="rhythmic-orderDirection" value={settings.orderDirection}
-                            onChange={e => handleSettingChange('orderDirection', e.target.value as 'ascending' | 'descending' | 'mixed')}
-                            options={[{ value: 'ascending', label: 'Küçükten Büyüğe' }, { value: 'descending', label: 'Büyükten Küçüğe' }, { value: 'mixed', label: 'Karışık' }]} />
-                    )}
-
-                    {showStep && (
-                        <Checkbox label="Sadece Katları Kullan" id="use-multiples" checked={settings.useMultiplesOnly}
-                            onChange={e => handleSettingChange('useMultiplesOnly', e.target.checked)}
-                            containerClassName="col-span-2" />
-                    )}
-                </div>
-
-                <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
-                    <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
-                    <div className="mt-2 space-y-2">
-                        <Checkbox label="Otomatik Sığdır" id="autoFit-rhythmic" checked={settings.autoFit ?? true}
-                            onChange={e => handleSettingChange('autoFit', e.target.checked)}
-                            disabled={isPracticeSheet || isTableLayout}
-                            title={isPracticeSheet ? "Alıştırma kağıdı modunda bu ayar devre dışıdır." : (isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : "")}
+                            label="Örüntü Uzunluğu"
+                            id="rc-patternLength"
+                            value={settings.patternLength}
+                            onChange={e => setSettings({ ...settings, patternLength: parseInt(e.target.value, 10) })}
+                             min={3} max={10}
                         />
-                        <div className="grid grid-cols-2 gap-x-2">
-                            <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage}
-                                onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                                disabled={isPracticeSheet || isTableLayout || settings.autoFit}
-                                title={isPracticeSheet ? "Alıştırma kağıdı modunda problem sayısı otomatik ayarlanır." : (isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : "")}
-                            />
-                            <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount}
-                                onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                                disabled={isTableLayout} title={isTableLayout ? "Tablo modunda sayfa sayısı 1'dir." : ""}
-                            />
-                        </div>
-                    </div>
-                </details>
+                         <NumberInput
+                            label="Eksik Sayısı"
+                            id="rc-missingCount"
+                            value={settings.missingCount}
+                            onChange={e => setSettings({ ...settings, missingCount: parseInt(e.target.value, 10) })}
+                             min={1} max={5}
+                        />
+                    </>
+                )}
+                
+                {isOrdering && (
+                     <>
+                        <NumberInput
+                            label="Sıralanacak Sayı Adedi"
+                            id="rc-orderCount"
+                            value={settings.orderCount}
+                            onChange={e => setSettings({ ...settings, orderCount: parseInt(e.target.value, 10) })}
+                             min={3} max={10}
+                        />
+                        <NumberInput
+                            label="Basamak Sayısı"
+                            id="rc-orderDigits"
+                            value={settings.orderDigits}
+                            onChange={e => setSettings({ ...settings, orderDigits: parseInt(e.target.value, 10) })}
+                             min={1} max={7}
+                        />
+                         <Select
+                            label="Sıralama Yönü"
+                            id="rc-orderDirection"
+                            value={settings.orderDirection}
+                            onChange={e => setSettings({ ...settings, orderDirection: e.target.value as any })}
+                            options={[
+                                { value: 'ascending', label: 'Küçükten Büyüğe' },
+                                { value: 'descending', label: 'Büyükten Küçüğe' },
+                                { value: 'mixed', label: 'Karışık' },
+                            ]}
+                            containerClassName="col-span-2"
+                        />
+                    </>
+                )}
+                
+                <Checkbox
+                    label="Sadece katları kullan"
+                    id="rc-useMultiples"
+                    checked={settings.useMultiplesOnly}
+                    onChange={e => setSettings({ ...settings, useMultiplesOnly: e.target.checked })}
+                    containerClassName="col-span-2"
+                />
+                 {!isPracticeSheet && (
+                     <Checkbox
+                        label="Otomatik Sığdır"
+                        id="rc-autofit"
+                        checked={settings.autoFit}
+                        onChange={e => setSettings({ ...settings, autoFit: e.target.checked })}
+                        containerClassName="col-span-2"
+                    />
+                 )}
             </div>
-             <SettingsPresetManager moduleKey="rhythmic-counting" currentSettings={settings} onLoadSettings={setSettings}/>
-            <div className="flex flex-wrap gap-2 pt-1.5">
-                <Button onClick={() => generate(true)} size="sm" enableFlyingLadybug>Oluştur</Button>
-                <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
-            </div>
+
+            {!settings.autoFit && !isPracticeSheet && (
+                <div className="grid grid-cols-2 gap-4">
+                    <NumberInput
+                        label="Sayfa Başına Problem"
+                        id="rc-problemsPerPage"
+                        value={settings.problemsPerPage}
+                        onChange={e => setSettings({ ...settings, problemsPerPage: parseInt(e.target.value, 10) })}
+                        min={1}
+                        max={100}
+                    />
+                    <NumberInput
+                        label="Sayfa Sayısı"
+                        id="rc-pageCount"
+                        value={settings.pageCount}
+                        onChange={e => setSettings({ ...settings, pageCount: parseInt(e.target.value, 10) })}
+                        min={1}
+                        max={20}
+                    />
+                </div>
+            )}
+            
+            <SettingsPresetManager<RhythmicCountingSettings>
+                moduleKey="rhythmicCounting"
+                currentSettings={settings}
+                onLoadSettings={setSettings}
+                initialSettings={initialSettings}
+            />
+
+            <Button onClick={handleGenerateClick} className="w-full" enableFlyingLadybug>
+                Çalışma Kağıdı Oluştur
+            </Button>
         </div>
     );
 };

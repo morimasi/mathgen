@@ -1,60 +1,42 @@
-import { useState, useCallback } from 'react';
 
-const STORAGE_KEY = 'mathGenPresets';
+const PRESETS_STORAGE_KEY = 'mathgen_presets';
 
-const getStoredPresets = () => {
+const getAllPresets = <T>(): Record<string, Record<string, T>> => {
     try {
-        const item = window.localStorage.getItem(STORAGE_KEY);
-        return item ? JSON.parse(item) : {};
+        const stored = localStorage.getItem(PRESETS_STORAGE_KEY);
+        return stored ? JSON.parse(stored) : {};
     } catch (error) {
-        console.error("Error reading presets from localStorage", error);
+        console.error("Failed to parse presets from localStorage", error);
         return {};
     }
 };
 
-const setStoredPresets = (presets: Record<string, any>) => {
+export const loadSettingsPresets = <T,>(moduleKey: string): Record<string, T> => {
+    const allPresets = getAllPresets<T>();
+    return allPresets[moduleKey] || {};
+};
+
+export const saveSettingsPreset = <T,>(moduleKey: string, presetName: string, settings: T): void => {
+    const allPresets = getAllPresets<T>();
+    if (!allPresets[moduleKey]) {
+        allPresets[moduleKey] = {};
+    }
+    allPresets[moduleKey][presetName] = settings;
     try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+        localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(allPresets));
     } catch (error) {
-        console.error("Error saving presets to localStorage", error);
+        console.error("Failed to save preset to localStorage", error);
     }
 };
 
-export const useSettingsManager = <T,>(moduleKey: string) => {
-    const [presets, setPresets] = useState<string[]>(() => {
-        const allPresets = getStoredPresets();
-        return Object.keys(allPresets[moduleKey] || {});
-    });
-
-    const refreshPresets = useCallback(() => {
-        const allPresets = getStoredPresets();
-        setPresets(Object.keys(allPresets[moduleKey] || {}));
-    }, [moduleKey]);
-
-    const savePreset = useCallback((name: string, settings: T) => {
-        if (!name) return;
-        const allPresets = getStoredPresets();
-        if (!allPresets[moduleKey]) {
-            allPresets[moduleKey] = {};
+export const deleteSettingsPreset = (moduleKey: string, presetName: string): void => {
+    const allPresets = getAllPresets();
+    if (allPresets[moduleKey] && allPresets[moduleKey][presetName]) {
+        delete allPresets[moduleKey][presetName];
+        try {
+            localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(allPresets));
+        } catch (error) {
+            console.error("Failed to delete preset from localStorage", error);
         }
-        allPresets[moduleKey][name] = settings;
-        setStoredPresets(allPresets);
-        refreshPresets();
-    }, [moduleKey, refreshPresets]);
-
-    const loadPreset = useCallback((name: string): T | null => {
-        const allPresets = getStoredPresets();
-        return allPresets[moduleKey]?.[name] || null;
-    }, [moduleKey]);
-
-    const deletePreset = useCallback((name: string) => {
-        const allPresets = getStoredPresets();
-        if (allPresets[moduleKey]?.[name]) {
-            delete allPresets[moduleKey][name];
-            setStoredPresets(allPresets);
-            refreshPresets();
-        }
-    }, [moduleKey, refreshPresets]);
-
-    return { presets, savePreset, loadPreset, deletePreset };
+    }
 };
