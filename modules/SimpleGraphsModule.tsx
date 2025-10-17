@@ -1,6 +1,8 @@
 
+
 import React, { useState } from 'react';
-import { SimpleGraphsSettings } from '../types';
+// FIX: Imported SimpleGraphType enum to use for initial settings.
+import { SimpleGraphsSettings, SimpleGraphType } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
 import { generateReadinessProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
@@ -9,7 +11,8 @@ import Button from '../../components/form/Button';
 import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: SimpleGraphsSettings = {
-    graphType: 'pictograph',
+    // FIX: Changed string literal to enum member to fix type error.
+    graphType: SimpleGraphType.Pictograph,
     theme: 'fruits',
     categoryCount: 3,
     maxItemCount: 5,

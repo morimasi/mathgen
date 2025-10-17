@@ -1,6 +1,8 @@
 
+
 import React, { useState } from 'react';
-import { PositionalConceptsSettings } from '../types';
+// FIX: Imported PositionalConceptType enum to use for initial settings.
+import { PositionalConceptsSettings, PositionalConceptType } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
 import { generateReadinessProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
@@ -10,7 +12,8 @@ import Button from '../../components/form/Button';
 import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: PositionalConceptsSettings = {
-    type: 'above-below',
+    // FIX: Changed string literal to enum member to fix type error.
+    type: PositionalConceptType.AboveBelow,
     theme: 'fruits',
     itemCount: 4,
     problemsPerPage: 6,

@@ -1,6 +1,8 @@
 
+
 import React, { useState } from 'react';
-import { MatchingAndSortingSettings } from '../types';
+// FIX: Imported MatchingType enum to use for initial settings.
+import { MatchingAndSortingSettings, MatchingType } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
 import { generateReadinessProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
@@ -10,7 +12,8 @@ import Button from '../../components/form/Button';
 import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: MatchingAndSortingSettings = {
-    type: 'one-to-one',
+    // FIX: Changed string literal to enum member to fix type error.
+    type: MatchingType.OneToOne,
     theme: 'animals',
     itemCount: 5,
     difficulty: 'easy',

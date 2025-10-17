@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { RhythmicCountingSettings, RhythmicProblemType } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
@@ -11,17 +10,14 @@ import SettingsPresetManager from '../../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../../constants';
 
 const initialSettings: RhythmicCountingSettings = {
-    gradeLevel: 1,
+    digits: 2,
     type: RhythmicProblemType.Pattern,
     step: 2,
     direction: 'forward',
     useMultiplesOnly: false,
-    min: 1,
-    max: 100,
     patternLength: 5,
     missingCount: 1,
     orderCount: 5,
-    orderDigits: 2,
     beforeCount: 3,
     afterCount: 3,
     problemsPerPage: 20,
@@ -75,6 +71,16 @@ export const RhythmicCountingModule: React.FC = () => {
                     ]}
                     containerClassName="col-span-2"
                 />
+
+                <NumberInput
+                    label="Basamak Sayısı"
+                    id="rc-digits"
+                    value={settings.digits}
+                    onChange={e => setSettings({ ...settings, digits: parseInt(e.target.value, 10) })}
+                    min={1}
+                    max={7}
+                    containerClassName="col-span-2"
+                />
                 
                 {!isOrdering && (
                     <>
@@ -99,19 +105,6 @@ export const RhythmicCountingModule: React.FC = () => {
                         />
                     </>
                 )}
-
-                <NumberInput
-                    label="Min Değer"
-                    id="rc-min"
-                    value={settings.min}
-                    onChange={e => setSettings({ ...settings, min: parseInt(e.target.value, 10) })}
-                />
-                 <NumberInput
-                    label="Max Değer"
-                    id="rc-max"
-                    value={settings.max}
-                    onChange={e => setSettings({ ...settings, max: parseInt(e.target.value, 10) })}
-                />
                 
                 {isPattern && (
                      <>
@@ -140,13 +133,6 @@ export const RhythmicCountingModule: React.FC = () => {
                             value={settings.orderCount}
                             onChange={e => setSettings({ ...settings, orderCount: parseInt(e.target.value, 10) })}
                              min={3} max={10}
-                        />
-                        <NumberInput
-                            label="Basamak Sayısı"
-                            id="rc-orderDigits"
-                            value={settings.orderDigits}
-                            onChange={e => setSettings({ ...settings, orderDigits: parseInt(e.target.value, 10) })}
-                             min={1} max={7}
                         />
                          <Select
                             label="Sıralama Yönü"

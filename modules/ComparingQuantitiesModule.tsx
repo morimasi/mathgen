@@ -1,6 +1,8 @@
 
+
 import React, { useState } from 'react';
-import { ComparingQuantitiesSettings } from '../types';
+// FIX: Imported ComparisonType enum to use for initial settings.
+import { ComparingQuantitiesSettings, ComparisonType } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
 import { generateReadinessProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
@@ -10,7 +12,8 @@ import Button from '../../components/form/Button';
 import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: ComparingQuantitiesSettings = {
-    type: 'more-less',
+    // FIX: Changed string literal to enum member to fix type error.
+    type: ComparisonType.MoreLess,
     theme: 'fruits',
     maxObjectCount: 10,
     problemsPerPage: 10,

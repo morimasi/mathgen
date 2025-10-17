@@ -1,6 +1,8 @@
 
+
 import React, { useState } from 'react';
-import { NumberRecognitionSettings } from '../types';
+// FIX: Imported NumberRecognitionType enum to use for initial settings.
+import { NumberRecognitionSettings, NumberRecognitionType } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
 import { generateReadinessProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
@@ -10,7 +12,8 @@ import Button from '../../components/form/Button';
 import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: NumberRecognitionSettings = {
-    type: 'count-and-write',
+    // FIX: Changed string literal to enum member to fix type error.
+    type: NumberRecognitionType.CountAndWrite,
     theme: 'animals',
     numberRange: '1-10',
     problemsPerPage: 10,

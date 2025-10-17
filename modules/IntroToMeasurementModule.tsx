@@ -1,6 +1,8 @@
 
+
 import React, { useState } from 'react';
-import { IntroToMeasurementSettings } from '../types';
+// FIX: Imported IntroMeasurementType enum to use for initial settings.
+import { IntroToMeasurementSettings, IntroMeasurementType } from '../types';
 import { useProblemGenerator } from '../../hooks/useProblemGenerator';
 import { generateReadinessProblem } from '../../services/readinessService';
 import Select from '../../components/form/Select';
@@ -10,7 +12,8 @@ import Button from '../../components/form/Button';
 import SettingsPresetManager from '../../components/SettingsPresetManager';
 
 const initialSettings: IntroToMeasurementSettings = {
-    type: 'compare-length',
+    // FIX: Changed string literal to enum member to fix type error.
+    type: IntroMeasurementType.CompareLength,
     theme: 'measurement',
     difficulty: 'easy',
     problemsPerPage: 6,
