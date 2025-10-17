@@ -31,6 +31,121 @@ const wordLists = {
     }
 };
 
+// --- NEW ATTENTION QUESTION GENERATOR ---
+
+type Clue = {
+    text: string;
+    test: (num: number, box: number[], allBoxes: number[][]) => boolean;
+};
+
+const generateAttentionQuestionLocal = (settings: any): { problem: Problem, title: string } => {
+    const { difficulty, numberRange } = settings;
+    const [min, max] = numberRange.split('-').map(Number);
+    const clueCount = difficulty === 'easy' ? 2 : 3;
+    const title = "Dikkat Soruları";
+
+    let puzzleGenerated = false;
+    let attempts = 0;
+
+    while (!puzzleGenerated && attempts < 200) {
+        attempts++;
+
+        const box1 = Array.from({ length: 4 }, () => getRandomInt(min, max));
+        const box2 = Array.from({ length: 4 }, () => getRandomInt(min, max));
+        const allNumbers = [...box1, ...box2];
+
+        const answerBoxIndex = getRandomInt(0, 1);
+        const answerBox = answerBoxIndex === 0 ? box1 : box2;
+        const correctAnswer = answerBox[getRandomInt(0, answerBox.length - 1)];
+
+        const cluesPool: Clue[] = [];
+
+        // Clue 1: Position
+        cluesPool.push({
+            text: `Aradığımız sayı <b>${answerBoxIndex === 0 ? 'sol' : 'sağ'} kutudadır</b>.`,
+            test: (num, box) => (answerBoxIndex === 0 ? box1.includes(num) : box2.includes(num))
+        });
+        cluesPool.push({
+            text: `Aradığımız sayı <b>${answerBoxIndex === 0 ? 'sağ' : 'sol'} kutuda değildir</b>.`,
+            test: (num, box) => (answerBoxIndex === 0 ? !box2.includes(num) : !box1.includes(num))
+        });
+        
+        // Clue 2: Parity
+        if (correctAnswer % 2 === 0) {
+            cluesPool.push({ text: 'Aradığımız sayı bir <b>çift sayıdır</b>.', test: num => num % 2 === 0 });
+        } else {
+            cluesPool.push({ text: 'Aradığımız sayı bir <b>tek sayıdır</b>.', test: num => num % 2 !== 0 });
+        }
+
+        // Clue 3: Magnitude in box
+        const maxInBox = Math.max(...answerBox);
+        const minInBox = Math.min(...answerBox);
+        if (correctAnswer === maxInBox && answerBox.filter(n => n === maxInBox).length === 1) {
+            cluesPool.push({ text: 'Bulunduğu kutudaki <b>en büyük sayıdır</b>.', test: (num, box) => num === Math.max(...box) });
+        }
+        if (correctAnswer === minInBox && answerBox.filter(n => n === minInBox).length === 1) {
+            cluesPool.push({ text: 'Bulunduğu kutudaki <b>en küçük sayıdır</b>.', test: (num, box) => num === Math.min(...box) });
+        }
+
+        // Clue 4: Digits
+        const digits = String(correctAnswer).length;
+        cluesPool.push({ text: `Aradığımız sayı <b>${digits} basamaklıdır</b>.`, test: num => String(num).length === digits });
+
+        // Clue 5: Comparison
+        const comparisonOffset = Math.ceil(max * 0.1);
+        const greaterThan = correctAnswer - getRandomInt(1, comparisonOffset);
+        cluesPool.push({ text: `Aradığımız sayı <b>${greaterThan}'den büyüktür</b>.`, test: num => num > greaterThan });
+        const lessThan = correctAnswer + getRandomInt(1, comparisonOffset);
+        cluesPool.push({ text: `Aradığımız sayı <b>${lessThan}'den küçüktür</b>.`, test: num => num < lessThan });
+        
+        // Clue 6: Multiples
+        if (difficulty !== 'easy') {
+            const divisors = [2, 3, 5, 10].filter(d => correctAnswer > d && correctAnswer % d === 0);
+            if (divisors.length > 0) {
+                const divisor = divisors[getRandomInt(0, divisors.length - 1)];
+                cluesPool.push({ text: `Aradığımız sayı <b>${divisor}'in katlarından birisidir</b>.`, test: num => num % divisor === 0 });
+            }
+        }
+        
+        const selectedClues = shuffleArray(cluesPool).slice(0, clueCount);
+
+        // Verify uniqueness
+        const possibleAnswers = allNumbers.filter(num => {
+            const numBox = box1.includes(num) ? box1 : box2;
+            return selectedClues.every(clue => clue.test(num, numBox, [box1, box2]));
+        });
+
+        if (possibleAnswers.length === 1 && possibleAnswers[0] === correctAnswer) {
+            // Generate distractors
+            const distractors = allNumbers.filter(n => n !== correctAnswer);
+            const options = shuffleArray([correctAnswer, ...shuffleArray(distractors).slice(0, 4)]);
+
+            const cluesHTML = selectedClues.map(c => `<p>${c.text}</p>`).join('');
+            const boxesHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #ccc; font-family: monospace; text-align: center; margin: 0.5rem 0;">
+                    <div style="padding: 0.5rem; border-right: 1px solid #ccc;">${box1.join(', ')}</div>
+                    <div style="padding: 0.5rem;">${box2.join(', ')}</div>
+                </div>
+            `;
+            const optionsHTML = `<ol type="a" style="display: grid; grid-template-columns: repeat(5, 1fr); list-style-position: inside; padding: 0;">${options.map(o => `<li>${o}</li>`).join('')}</ol>`;
+
+            const question = `<div style="font-size: 0.9rem; line-height: 1.4;">${cluesHTML}${boxesHTML}${optionsHTML}</div>`;
+            
+            return {
+                problem: { question, answer: correctAnswer, category: 'dyslexia' },
+                title
+            };
+        }
+    }
+
+    // Fallback if no unique puzzle could be generated
+    return {
+        problem: { question: 'Benzersiz bir dikkat sorusu oluşturulamadı. Lütfen ayarları değiştirip tekrar deneyin.', answer: 'Hata', category: 'dyslexia' },
+        title
+    };
+};
+
+
 const generateSoundWizardLocal = (settings: any): { problem: Problem, title: string } => {
     const { type } = settings;
     let question = "", answer = "", title = "Ses Büyücüsü";
@@ -107,6 +222,9 @@ export const generateDyslexiaProblem = async (subModuleId: DyslexiaSubModuleType
     for(let i=0; i < count; i++) {
         let result: { problem: Problem; title: string; };
         switch(subModuleId) {
+            case 'attention-questions':
+                result = generateAttentionQuestionLocal(settings);
+                break;
             case 'sound-wizard':
                 result = generateSoundWizardLocal(settings);
                 break;

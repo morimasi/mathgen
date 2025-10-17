@@ -21,15 +21,17 @@ import SpellingChampionSettings from './dyslexia/SpellingChampionSettings';
 import MemoryGamerSettings from './dyslexia/MemoryGamerSettings';
 import AuditoryWritingSettings from './dyslexia/AuditoryWritingSettings';
 import InteractiveStorySettings from './dyslexia/InteractiveStorySettings';
+import AttentionQuestionSettings from './dyslexia/AttentionQuestionSettings';
 
 // Import all sub-module icons
 import {
     SoundWizardIcon, LetterDetectiveIcon, ReadingFluencyCoachIcon, ComprehensionExplorerIcon,
     VocabularyExplorerIcon, VisualMasterIcon, WordHunterIcon, SpellingChampionIcon, MemoryGamerIcon,
-    AuditoryWritingIcon, InteractiveStoryIcon
+    AuditoryWritingIcon, InteractiveStoryIcon, AttentionIcon
 } from '../components/icons/Icons';
 
 const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
+    { id: 'attention-questions', label: 'Dikkat Soruları', icon: AttentionIcon },
     { id: 'sound-wizard', label: 'Ses Büyücüsü', icon: SoundWizardIcon },
     { id: 'letter-detective', label: 'Harf Dedektifi', icon: LetterDetectiveIcon },
     { id: 'reading-fluency-coach', label: 'Sesli Okuma Koçu', icon: ReadingFluencyCoachIcon },
@@ -44,10 +46,11 @@ const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<Rea
 ];
 
 const defaultSettings: DyslexiaSettings = {
-    activeSubModule: 'sound-wizard',
+    activeSubModule: 'attention-questions',
     problemsPerPage: 10,
     pageCount: 1,
     autoFit: true,
+    attentionQuestions: { difficulty: 'easy', numberRange: '1-50' },
     soundWizard: { type: 'rhyme', difficulty: 'easy', wordLength: 4 },
     letterDetective: { letterGroup: 'vowels', difficulty: 'easy' },
     readingFluencyCoach: { gradeLevel: '2', topic: 'Hayvanlar' },
@@ -151,6 +154,7 @@ const DyslexiaModule: React.FC = () => {
     const renderSettingsPanel = () => {
         const props = { settings: activeSubModuleSettings, onChange: handleSubModuleSettingChange };
         switch (activeSubModuleId) {
+            case 'attention-questions': return <AttentionQuestionSettings {...props} />;
             case 'sound-wizard': return <SoundWizardSettings {...props} />;
             case 'letter-detective': return <LetterDetectiveSettings {...props} />;
             case 'reading-fluency-coach': return <ReadingFluencyCoachSettings {...props} />;
