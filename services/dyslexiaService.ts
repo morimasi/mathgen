@@ -31,18 +31,30 @@ const wordLists = {
     }
 };
 
+const wordPools = {
+    hayvanlar: ['kedi', 'köpek', 'at', 'kuş', 'balık', 'aslan', 'fil', 'yılan', 'ayı', 'kurt', 'tilki'],
+    meyveler: ['elma', 'armut', 'çilek', 'muz', 'kiraz', 'erik', 'üzüm', 'kavun', 'karpuz', 'ayva'],
+    eşyalar: ['masa', 'kalem', 'silgi', 'saat', 'top', 'bardak', 'kapı', 'ev', 'okul', 'kitap', 'defter'],
+    renkler: ['sarı', 'mavi', 'yeşil', 'pembe', 'siyah', 'beyaz', 'gri', 'mor', 'turuncu'],
+};
+
 // --- NEW ATTENTION QUESTION GENERATOR ---
 
-type Clue = {
+type NumericalClue = {
     text: string;
     test: (num: number, box: number[], allBoxes: number[][]) => boolean;
 };
 
-const generateAttentionQuestionLocal = (settings: any): { problem: Problem, title: string } => {
+type VerbalClue = {
+    text: string;
+    test: (word: string, box: string[], allBoxes: string[][]) => boolean;
+};
+
+const generateNumericalAttentionQuestion = (settings: any): { problem: Problem, title: string } => {
     const { difficulty, numberRange } = settings;
     const [min, max] = numberRange.split('-').map(Number);
     const clueCount = difficulty === 'easy' ? 2 : 3;
-    const title = "Dikkat Soruları";
+    const title = "Dikkat Soruları (Sayısal)";
 
     let puzzleGenerated = false;
     let attempts = 0;
@@ -58,7 +70,7 @@ const generateAttentionQuestionLocal = (settings: any): { problem: Problem, titl
         const answerBox = answerBoxIndex === 0 ? box1 : box2;
         const correctAnswer = answerBox[getRandomInt(0, answerBox.length - 1)];
 
-        const cluesPool: Clue[] = [];
+        const cluesPool: NumericalClue[] = [];
 
         // Clue 1: Position
         cluesPool.push({
@@ -137,14 +149,118 @@ const generateAttentionQuestionLocal = (settings: any): { problem: Problem, titl
             };
         }
     }
-
-    // Fallback if no unique puzzle could be generated
+    // Fallback...
     return {
-        problem: { question: 'Benzersiz bir dikkat sorusu oluşturulamadı. Lütfen ayarları değiştirip tekrar deneyin.', answer: 'Hata', category: 'dyslexia' },
+        problem: { question: 'Benzersiz bir sayısal dikkat sorusu oluşturulamadı.', answer: 'Hata', category: 'dyslexia' },
         title
     };
 };
 
+const generateVerbalAttentionQuestion = (settings: any): { problem: Problem, title: string } => {
+    const { difficulty } = settings;
+    const clueCount = difficulty === 'easy' ? 2 : 3;
+    const title = "Dikkat Soruları (Sözel)";
+    const vowels = "aeıioöuü";
+
+    let puzzleGenerated = false;
+    let attempts = 0;
+
+    while (!puzzleGenerated && attempts < 200) {
+        attempts++;
+        const allWordsPool = Object.values(wordPools).flat();
+        const box1 = shuffleArray(allWordsPool).slice(0, 5);
+        const box2 = shuffleArray(allWordsPool).slice(0, 5);
+        const allWords = [...box1, ...box2];
+
+        const answerBoxIndex = getRandomInt(0, 1);
+        const answerBox = answerBoxIndex === 0 ? box1 : box2;
+        const correctAnswer = answerBox[getRandomInt(0, answerBox.length - 1)];
+
+        const cluesPool: VerbalClue[] = [];
+
+        // Clue 1: Position
+        cluesPool.push({
+            text: `Aradığımız kelime <b>${answerBoxIndex === 0 ? 'sol' : 'sağ'} kutudadır</b>.`,
+            test: (word) => (answerBoxIndex === 0 ? box1.includes(word) : box2.includes(word))
+        });
+        cluesPool.push({
+            text: `Aradığımız kelime <b>${answerBoxIndex === 0 ? 'sağ' : 'sol'} kutuda değildir</b>.`,
+            test: (word) => (answerBoxIndex === 0 ? !box2.includes(word) : !box1.includes(word))
+        });
+
+        // Clue 2: Length
+        const length = correctAnswer.length;
+        cluesPool.push({ text: `Aradığımız kelime <b>${length} harflidir</b>.`, test: word => word.length === length });
+
+        const longestInBox = answerBox.reduce((a, b) => a.length > b.length ? a : b);
+        const shortestInBox = answerBox.reduce((a, b) => a.length < b.length ? a : b);
+        if (correctAnswer.length === longestInBox.length && answerBox.filter(w => w.length === longestInBox.length).length === 1) {
+            cluesPool.push({ text: 'Bulunduğu kutudaki <b>en uzun kelimedir</b>.', test: (word, box) => word.length === Math.max(...box.map(w => w.length)) });
+        }
+        if (correctAnswer.length === shortestInBox.length && answerBox.filter(w => w.length === shortestInBox.length).length === 1) {
+            cluesPool.push({ text: 'Bulunduğu kutudaki <b>en kısa kelimedir</b>.', test: (word, box) => word.length === Math.min(...box.map(w => w.length)) });
+        }
+
+        // Clue 3: Letter content
+        const firstLetter = correctAnswer[0];
+        cluesPool.push({ text: `Aradığımız kelime <b>'${firstLetter}' harfi ile başlar</b>.`, test: word => word.startsWith(firstLetter) });
+        const lastLetter = correctAnswer[correctAnswer.length - 1];
+        cluesPool.push({ text: `Aradığımız kelime <b>'${lastLetter}' harfi ile biter</b>.`, test: word => word.endsWith(lastLetter) });
+        
+        const randomLetter = correctAnswer[getRandomInt(1, correctAnswer.length - 2)];
+        if(randomLetter) {
+            cluesPool.push({ text: `Aradığımız kelimenin içinde <b>'${randomLetter}' harfi vardır</b>.`, test: word => word.includes(randomLetter) });
+        }
+
+        // Clue 4: Category
+        for (const category in wordPools) {
+            if ((wordPools as any)[category].includes(correctAnswer)) {
+                cluesPool.push({ text: `Aradığımız kelime bir <b>${category} adıdır</b>.`, test: word => (wordPools as any)[category].includes(word) });
+            }
+        }
+
+        const selectedClues = shuffleArray(cluesPool).slice(0, clueCount);
+
+        // Verify uniqueness
+        const possibleAnswers = allWords.filter(word => {
+            const wordBox = box1.includes(word) ? box1 : box2;
+            return selectedClues.every(clue => clue.test(word, wordBox, [box1, box2]));
+        });
+
+        if (possibleAnswers.length === 1 && possibleAnswers[0] === correctAnswer) {
+            const distractors = allWords.filter(w => w !== correctAnswer);
+            const options = shuffleArray([correctAnswer, ...shuffleArray(distractors).slice(0, 4)]);
+
+            const cluesHTML = selectedClues.map(c => `<p>${c.text}</p>`).join('');
+            const boxesHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #ccc; font-family: monospace; text-align: center; margin: 0.5rem 0; font-size: 0.8rem;">
+                    <div style="padding: 0.5rem; border-right: 1px solid #ccc;">${box1.join(', ')}</div>
+                    <div style="padding: 0.5rem;">${box2.join(', ')}</div>
+                </div>
+            `;
+            const optionsHTML = `<ol type="a" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); list-style-position: inside; padding: 0;">${options.map(o => `<li>${o}</li>`).join('')}</ol>`;
+
+            const question = `<div style="font-size: 0.9rem; line-height: 1.4;">${cluesHTML}${boxesHTML}${optionsHTML}</div>`;
+            
+            return {
+                problem: { question, answer: correctAnswer, category: 'dyslexia' },
+                title
+            };
+        }
+    }
+     // Fallback...
+    return {
+        problem: { question: 'Benzersiz bir sözel dikkat sorusu oluşturulamadı.', answer: 'Hata', category: 'dyslexia' },
+        title
+    };
+};
+
+const generateAttentionQuestionLocal = (settings: any): { problem: Problem, title: string } => {
+    if (settings.questionType === 'verbal') {
+        return generateVerbalAttentionQuestion(settings);
+    }
+    return generateNumericalAttentionQuestion(settings);
+};
 
 const generateSoundWizardLocal = (settings: any): { problem: Problem, title: string } => {
     const { type } = settings;

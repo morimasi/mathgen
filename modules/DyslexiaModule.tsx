@@ -50,7 +50,7 @@ const defaultSettings: DyslexiaSettings = {
     problemsPerPage: 10,
     pageCount: 1,
     autoFit: true,
-    attentionQuestions: { difficulty: 'easy', numberRange: '1-50' },
+    attentionQuestions: { questionType: 'numerical', difficulty: 'easy', numberRange: '1-50' },
     soundWizard: { type: 'rhyme', difficulty: 'easy', wordLength: 4 },
     letterDetective: { letterGroup: 'vowels', difficulty: 'easy' },
     readingFluencyCoach: { gradeLevel: '2', topic: 'Hayvanlar' },

@@ -13,9 +13,19 @@ const AttentionQuestionSettingsComponent: React.FC<Props> = ({ settings, onChang
         <div className="space-y-2">
             <div className="flex items-center gap-2">
                 <h3 className="text-sm font-semibold">Dikkat Soruları Ayarları</h3>
-                <HintButton text="Bu etkinlik, verilen ipuçlarını kullanarak doğru sayıyı bulmayı hedefler. Mantıksal düşünme ve dikkat becerilerini geliştirir." />
+                <HintButton text="Bu etkinlik, verilen ipuçlarını kullanarak doğru sayıyı veya kelimeyi bulmayı hedefler. Mantıksal düşünme ve dikkat becerilerini geliştirir." />
             </div>
             <div className="grid grid-cols-2 gap-2">
+                <Select
+                    label="Soru Tipi"
+                    id="aq-questionType"
+                    value={settings.questionType}
+                    onChange={e => onChange({ questionType: e.target.value as AttentionQuestionSettings['questionType'] })}
+                    options={[
+                        { value: 'numerical', label: 'Sayısal' },
+                        { value: 'verbal', label: 'Sözel' },
+                    ]}
+                />
                 <Select
                     label="Zorluk Seviyesi"
                     id="aq-difficulty"
@@ -37,6 +47,8 @@ const AttentionQuestionSettingsComponent: React.FC<Props> = ({ settings, onChang
                         { value: '1-100', label: '1 - 100 Arası' },
                         { value: '100-999', label: '100 - 999 Arası' },
                     ]}
+                    disabled={settings.questionType === 'verbal'}
+                    containerClassName="col-span-2"
                 />
             </div>
         </div>

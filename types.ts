@@ -444,7 +444,11 @@ export interface SimpleGraphsSettings {
 
 // --- DYSLEXIA ---
 export type DyslexiaSubModuleType = 'attention-questions' | 'sound-wizard' | 'letter-detective' | 'reading-fluency-coach' | 'comprehension-explorer' | 'vocabulary-explorer' | 'visual-master' | 'word-hunter' | 'spelling-champion' | 'memory-gamer' | 'auditory-writing' | 'interactive-story';
-export interface AttentionQuestionSettings { difficulty: 'easy' | 'medium' | 'hard'; numberRange: '1-50' | '1-100' | '100-999'; }
+export interface AttentionQuestionSettings { 
+    questionType: 'numerical' | 'verbal';
+    difficulty: 'easy' | 'medium' | 'hard'; 
+    numberRange: '1-50' | '1-100' | '100-999'; 
+}
 export interface SoundWizardSettings { type: 'rhyme' | 'syllable' | 'blend'; difficulty: 'easy' | 'medium'; wordLength: number; }
 export interface LetterDetectiveSettings { letterGroup: 'vowels' | 'common_consonants' | 'tricky_consonants' | 'mixed'; difficulty: 'easy' | 'medium'; }
 export interface ReadingFluencyCoachSettings { gradeLevel: string; topic: string; }
