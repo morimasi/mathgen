@@ -7,7 +7,8 @@ const ArithmeticModule = React.lazy(() => import('../modules/ArithmeticModule'))
 const FractionsModule = React.lazy(() => import('../modules/FractionsModule'));
 const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule'));
 const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule'));
-const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule'));
+// FIX: Changed to a named import to resolve a type error with React.lazy.
+const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule').then(module => ({ default: module.RhythmicCountingModule })));
 const TimeModule = React.lazy(() => import('../modules/TimeModule'));
 const GeometryModule = React.lazy(() => import('../modules/GeometryModule'));
 const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule'));

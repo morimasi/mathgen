@@ -96,25 +96,13 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                 ]}
                             />
                             
-                            {isTableMode ? (
+                            {isTableMode && (
                                 <div>
                                     <label className="font-medium text-xs text-stone-700 dark:text-stone-300 mb-2 block">Tablo Boyutu</label>
                                     <TableSelector 
                                         rows={settings.rows} 
                                         cols={settings.columns}
                                         onSelect={handleTableSelect} 
-                                    />
-                                </div>
-                            ) : (
-                                <div className="space-y-1">
-                                    <label htmlFor="print-columns" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
-                                       <span>Sütun Sayısı</span>
-                                       <span className="text-stone-500 dark:text-stone-400 font-normal">{settings.columns}</span>
-                                    </label>
-                                    <input
-                                        type="range" id="print-columns" value={settings.columns} min={1} max={7} step={1}
-                                        onChange={e => handleChange('columns', parseInt(e.target.value, 10))}
-                                        className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
                                     />
                                 </div>
                             )}
@@ -168,17 +156,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                      <div>
                         <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">Görünüm</h3>
                          <div className="space-y-3">
-                              <Select
-                                    label="Problem Hizalama"
-                                    id="print-text-align"
-                                    value={settings.textAlign || 'left'}
-                                    onChange={e => handleChange('textAlign', e.target.value as 'left' | 'center' | 'right')}
-                                    options={[
-                                        { value: 'left', label: 'Sola Hizalı' },
-                                        { value: 'center', label: 'Ortalanmış' },
-                                        { value: 'right', label: 'Sağa Hizalı' }
-                                    ]}
-                                />
+                              {/* This control has been moved to WorksheetToolbar */}
                          </div>
                     </div>
                      <div>

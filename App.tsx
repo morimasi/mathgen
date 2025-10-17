@@ -19,7 +19,7 @@ import ToastContainer from './components/ToastContainer';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { TAB_GROUPS } from './constants';
 import { PrintSettings } from './types';
-import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon, FontSizeIcon, PaletteIcon, GridIcon, BorderStyleIcon } from './components/icons/Icons';
+import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon, FontSizeIcon, PaletteIcon, GridIcon, BorderStyleIcon, ColumnsIcon, TextAlignLeftIcon } from './components/icons/Icons';
 import AnimatedLogo from './components/AnimatedLogo';
 import Select from './components/form/Select';
 
@@ -117,6 +117,28 @@ const WorksheetToolbar: React.FC<WorksheetToolbarProps> = ({ scale, setScale, wo
             </div>
             
             <div className="flex items-center gap-x-4 gap-y-2 flex-wrap justify-end">
+                <div className="flex items-center gap-1.5" title="Sütun Sayısı">
+                    <ColumnsIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                    <input 
+                        type="range"
+                        id="toolbar-columns"
+                        min="1" max="7" step="1"
+                        value={printSettings.columns}
+                        onChange={(e) => handleSettingChange('columns', parseInt(e.target.value))}
+                        className="w-20 h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
+                        disabled={printSettings.layoutMode === 'table'}
+                    />
+                    <span className="text-sm font-semibold w-6 text-center">{printSettings.columns}</span>
+                </div>
+                <div className="flex items-center gap-1.5" title="Problem Hizalama">
+                    <TextAlignLeftIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
+                    <Select
+                        id="toolbar-text-align" value={printSettings.textAlign}
+                        onChange={e => handleSettingChange('textAlign', e.target.value as 'left' | 'center' | 'right')}
+                        options={[{ value: 'left', label: 'Sol' }, { value: 'center', label: 'Orta' }, { value: 'right', label: 'Sağ' }]}
+                        className="w-24"
+                    />
+                </div>
                  <div className="flex items-center gap-1.5" title="Yazı Tipi Boyutu">
                     <FontSizeIcon className="w-5 h-5 text-stone-600 dark:text-stone-400" />
                     <Select 
@@ -187,7 +209,78 @@ const AppContent: React.FC = () => {
     
     const contentRef = useRef<HTMLDivElement>(null);
     const worksheetParentRef = useRef<HTMLDivElement>(null);
+    const viewportRef = useRef<HTMLDivElement>(null);
     const collapseTimerRef = useRef<number | null>(null);
+    const [isPanning, setIsPanning] = useState(false);
+    const panState = useRef({ isGrabbing: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) {
+                return;
+            }
+            if (e.code === 'Space' && !e.repeat) {
+                e.preventDefault();
+                setIsPanning(true);
+                document.body.classList.add('is-panning');
+            }
+        };
+        const handleKeyUp = (e: KeyboardEvent) => {
+            if (e.code === 'Space') {
+                setIsPanning(false);
+                panState.current.isGrabbing = false;
+                document.body.classList.remove('is-panning', 'is-grabbing');
+            }
+        };
+        
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+            document.body.classList.remove('is-panning', 'is-grabbing');
+        };
+    }, []);
+
+    const handleViewportMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (isPanning && viewportRef.current) {
+            e.preventDefault();
+            panState.current = {
+                isGrabbing: true,
+                startX: e.pageX - viewportRef.current.offsetLeft,
+                startY: e.pageY - viewportRef.current.offsetTop,
+                scrollLeft: viewportRef.current.scrollLeft,
+                scrollTop: viewportRef.current.scrollTop,
+            };
+            document.body.classList.add('is-grabbing');
+        }
+    };
+
+    const handleViewportMouseUpAndLeave = () => {
+        panState.current.isGrabbing = false;
+        document.body.classList.remove('is-grabbing');
+    };
+
+    const handleViewportMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!panState.current.isGrabbing || !viewportRef.current) return;
+        e.preventDefault();
+        const x = e.pageX - viewportRef.current.offsetLeft;
+        const y = e.pageY - viewportRef.current.offsetTop;
+        const walkX = (x - panState.current.startX);
+        const walkY = (y - panState.current.startY);
+        viewportRef.current.scrollLeft = panState.current.scrollLeft - walkX;
+        viewportRef.current.scrollTop = panState.current.scrollTop - walkY;
+    };
+
+    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+        if (e.ctrlKey) { // Allow default browser zoom with Ctrl
+            return;
+        }
+        e.preventDefault();
+        const newScale = worksheetScale - e.deltaY * 0.001;
+        setWorksheetScale(Math.min(1.5, Math.max(0.1, newScale)));
+    };
 
     const handlePdfAction = useCallback(async (action: 'print' | 'save') => {
         const contentElement = contentRef.current;
@@ -239,6 +332,7 @@ const AppContent: React.FC = () => {
 
     const handleWorksheetAreaLeave = () => {
         if (collapseTimerRef.current) clearTimeout(collapseTimerRef.current);
+        handleViewportMouseUpAndLeave(); // Also stop panning if mouse leaves area
     };
 
     return (
@@ -275,7 +369,14 @@ const AppContent: React.FC = () => {
                     </aside>
                     <div className="worksheet-area" ref={worksheetParentRef} onMouseEnter={handleWorksheetAreaEnter} onMouseLeave={handleWorksheetAreaLeave}>
                         <WorksheetToolbar scale={worksheetScale} setScale={setWorksheetScale} worksheetParentRef={worksheetParentRef} />
-                        <div className="worksheet-viewport">
+                        <div 
+                            className="worksheet-viewport" 
+                            ref={viewportRef}
+                            onWheel={handleWheel}
+                            onMouseDown={handleViewportMouseDown}
+                            onMouseUp={handleViewportMouseUpAndLeave}
+                            onMouseMove={handleViewportMouseMove}
+                        >
                             <ProblemSheet contentRef={contentRef} viewScale={worksheetScale} />
                         </div>
                     </div>

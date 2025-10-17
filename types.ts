@@ -39,7 +39,6 @@ export interface ArithmeticSettings {
     pageCount: number;
     useWordProblems: boolean;
     operationCount: number;
-    autoFit: boolean;
     useVisuals: boolean;
     topic: string;
 }
@@ -86,7 +85,6 @@ export interface FractionsSettings {
     representation: 'number' | 'word' | 'mixed';
     useWordProblems: boolean;
     operationCount: number;
-    autoFit: boolean;
     useVisuals: boolean;
     topic: string;
     useMixedNumbers: boolean;
@@ -119,7 +117,6 @@ export interface DecimalsSettings {
     representation: 'number' | 'word' | 'mixed';
     useWordProblems: boolean;
     operationCount: number;
-    autoFit: boolean;
     useVisuals: boolean;
     topic: string;
 }
@@ -146,7 +143,6 @@ export interface PlaceValueSettings {
     problemsPerPage: number;
     pageCount: number;
     useWordProblems: boolean;
-    autoFit: boolean;
     topic: string;
 }
 
@@ -179,7 +175,6 @@ export interface RhythmicCountingSettings {
     problemsPerPage: number;
     pageCount: number;
     useWordProblems: boolean;
-    autoFit: boolean;
     topic: string;
     orderDirection: 'ascending' | 'descending' | 'mixed';
 }
@@ -205,7 +200,6 @@ export interface TimeSettings {
     showHourHand: boolean;
     showMinuteHand: boolean;
     useWordProblems: boolean;
-    autoFit: boolean;
     showDigitalTime: boolean;
     showMinuteMarkers: boolean;
     topic: string;
@@ -240,8 +234,9 @@ export interface GeometrySettings {
     problemsPerPage: number;
     pageCount: number;
     useWordProblems: boolean;
-    autoFit: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- WORD PROBLEMS ---
@@ -252,9 +247,10 @@ export interface WordProblemSettings {
     pageCount: number;
     operationCount: number;
     customPrompt: string;
-    autoFit: boolean;
     sourceModule: string;
     useVisuals: boolean;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
     // FIX: Added optional layout property to support different problem layouts from the AI module.
     layout?: 'default' | 'with-visual-space' | 'given-wanted';
 }
@@ -273,9 +269,10 @@ export interface MeasurementSettings {
     problemsPerPage: number;
     pageCount: number;
     useWordProblems: boolean;
-    autoFit: boolean;
     useVisuals: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- PRINT SETTINGS ---
@@ -322,9 +319,10 @@ export interface MatchingAndSortingSettings {
     difficulty: 'easy' | 'hard';
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- Comparing Quantities ---
@@ -339,9 +337,10 @@ export interface ComparingQuantitiesSettings {
     maxObjectCount: number;
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- Number Recognition ---
@@ -356,9 +355,10 @@ export interface NumberRecognitionSettings {
     numberRange: '1-5' | '1-10' | '1-20';
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- Patterns ---
@@ -373,9 +373,10 @@ export interface PatternsSettings {
     difficulty: 'easy' | 'hard';
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- Basic Shapes ---
@@ -389,9 +390,10 @@ export interface BasicShapesSettings {
     shapes: ShapeType[];
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- Positional Concepts ---
@@ -406,9 +408,10 @@ export interface PositionalConceptsSettings {
     itemCount: number;
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- Intro to Measurement ---
@@ -424,9 +427,10 @@ export interface IntroToMeasurementSettings {
     difficulty: 'easy' | 'hard';
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // --- Simple Graphs ---
@@ -441,9 +445,10 @@ export interface SimpleGraphsSettings {
     maxItemCount: number;
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
 }
 
 // FIX: Added missing type definitions for new readiness modules to resolve import errors.
@@ -514,7 +519,8 @@ export interface DyslexiaSettings {
     activeSubModule: DyslexiaSubModuleType;
     problemsPerPage: number;
     pageCount: number;
-    autoFit: boolean;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
     attentionQuestions: AttentionQuestionSettings;
     soundWizard: SoundWizardSettings;
     letterDetective: LetterDetectiveSettings;
@@ -545,7 +551,9 @@ export interface VisualArithmeticSettings { operation: 'addition' | 'subtraction
 export interface InteractiveStoryDcSettings { genre: 'market' | 'playground' | 'space'; gradeLevel: string; }
 export interface DyscalculiaSettings {
     activeSubModule: DyscalculiaSubModuleType;
-    problemsPerPage: number; pageCount: number; autoFit: boolean;
+    problemsPerPage: number; pageCount: number;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
     numberSense: NumberSenseSettings;
     arithmeticFluency: ArithmeticFluencySettings;
     numberGrouping: NumberGroupingSettings;
@@ -576,7 +584,9 @@ export interface KeyboardSkillsSettings { level: 'home-row' | 'top-row' | 'full'
 export interface InteractiveStoryDgSettings { genre: 'journal' | 'adventure' | 'fantasy'; gradeLevel: string; }
 export interface DysgraphiaSettings {
     activeSubModule: DysgraphiaSubModuleType;
-    problemsPerPage: number; pageCount: number; autoFit: boolean;
+    problemsPerPage: number; pageCount: number;
+    // FIX: Added missing autoFit property
+    autoFit?: boolean;
     fineMotorSkills: FineMotorSkillsSettings;
     letterFormation: LetterFormationSettings;
     letterFormRecognition: LetterFormRecognitionSettings;

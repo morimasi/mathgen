@@ -28,7 +28,6 @@ const FractionsModule: React.FC = () => {
         representation: 'number',
         useWordProblems: false,
         operationCount: 1,
-        autoFit: true,
         useVisuals: false,
         topic: '',
         useMixedNumbers: true,
@@ -155,16 +154,6 @@ const FractionsModule: React.FC = () => {
                         )}
                     </div>
                 )}
-                 <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <Checkbox
-                        label="Otomatik Sığdır"
-                        id="auto-fit-fractions"
-                        checked={settings.autoFit}
-                        onChange={e => handleSettingChange('autoFit', e.target.checked)}
-                        disabled={isTableLayout}
-                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
-                    />
-                </div>
             </div>
 
 
@@ -273,7 +262,7 @@ const FractionsModule: React.FC = () => {
                     min={1} max={100}
                     value={settings.problemsPerPage}
                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={settings.autoFit || isTableLayout}
+                    disabled={isTableLayout}
                     title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
                 />
                 <NumberInput 

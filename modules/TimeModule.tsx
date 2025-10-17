@@ -27,7 +27,6 @@ const TimeModule: React.FC = () => {
         showHourHand: true,
         showMinuteHand: true,
         useWordProblems: false,
-        autoFit: true,
         showDigitalTime: true,
         showMinuteMarkers: true,
         topic: '',
@@ -135,16 +134,6 @@ const TimeModule: React.FC = () => {
                          )}
                     </div>
                 )}
-                 <div className="p-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <Checkbox
-                        label="Otomatik Sığdır"
-                        id="auto-fit-time"
-                        checked={settings.autoFit}
-                        onChange={e => handleSettingChange('autoFit', e.target.checked)}
-                        disabled={isTableLayout}
-                        title={isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : ""}
-                    />
-                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
@@ -204,7 +193,7 @@ const TimeModule: React.FC = () => {
                     min={1} max={100}
                     value={settings.problemsPerPage}
                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={settings.autoFit || isTableLayout}
+                    disabled={isTableLayout}
                     title={isTableLayout ? "Tablo modunda problem sayısı satır ve sütun sayısına göre belirlenir." : ""}
                 />
                 <NumberInput 
