@@ -10,6 +10,11 @@ interface UpdateWorksheetPayload {
     preamble?: string;
 }
 
+interface PresetToLoad {
+    moduleKey: string;
+    presetName: string;
+}
+
 interface WorksheetContextType {
     problems: Problem[];
     isLoading: boolean;
@@ -19,11 +24,13 @@ interface WorksheetContextType {
     lastGeneratorModule: string | null;
     autoRefreshTrigger: number;
     visualSupportSettings: VisualSupportSettings;
+    presetToLoad: PresetToLoad | null;
     setIsLoading: (loading: boolean) => void;
     updateWorksheet: (payload: UpdateWorksheetPayload) => void;
     triggerAutoRefresh: () => void;
     setVisualSupportSettings: (settings: VisualSupportSettings) => void;
     resetWorksheet: () => void;
+    setPresetToLoad: (preset: PresetToLoad | null) => void;
 }
 
 const WorksheetContext = createContext<WorksheetContextType | undefined>(undefined);
@@ -48,6 +55,7 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
     const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>(initialVisualSupportSettings);
+    const [presetToLoad, setPresetToLoad] = useState<PresetToLoad | null>(null);
 
     const updateWorksheet = useCallback((payload: UpdateWorksheetPayload) => {
         const { newProblems, clearPrevious, title, generatorModule, pageCount, preamble: newPreamble } = payload;
@@ -57,7 +65,6 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             setPreamble(newPreamble || null);
         } else {
             setProblems(prev => [...prev, ...newProblems]);
-            // Don't change preamble when adding to existing sheet
         }
 
         setWorksheetTitle(title);
@@ -79,6 +86,7 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
         setAutoRefreshTrigger(0);
         setLastGeneratorModule(null);
         setPageCount(1);
+        setPresetToLoad(null);
     }, []);
 
     return (
@@ -91,11 +99,13 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             lastGeneratorModule,
             autoRefreshTrigger,
             visualSupportSettings,
+            presetToLoad,
             setIsLoading,
             updateWorksheet,
             triggerAutoRefresh,
             setVisualSupportSettings,
-            resetWorksheet
+            resetWorksheet,
+            setPresetToLoad
         }}>
             {children}
         </WorksheetContext.Provider>

@@ -17,9 +17,10 @@ import HowToUseModal from './components/HowToUseModal';
 import ContactModal from './components/ContactModal';
 import ToastContainer from './components/ToastContainer';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import FavoritesPanel from './components/FavoritesPanel';
 import { TAB_GROUPS } from './constants';
 import { PrintSettings } from './types';
-import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon, FontSizeIcon, PaletteIcon, GridIcon, BorderStyleIcon, ColumnsIcon, TextAlignLeftIcon } from './components/icons/Icons';
+import { LoadingIcon, PrintIcon, PdfIcon, HelpIcon, PrintSettingsIcon, ShuffleIcon, ContactIcon, FitToScreenIcon, FontSizeIcon, PaletteIcon, GridIcon, BorderStyleIcon, ColumnsIcon, TextAlignLeftIcon, FavoriteIcon } from './components/icons/Icons';
 import AnimatedLogo from './components/AnimatedLogo';
 import Select from './components/form/Select';
 
@@ -198,7 +199,8 @@ const AppContent: React.FC = () => {
     const { 
         activeTab, setActiveTab, isPrintSettingsVisible, openPrintSettings, closePrintSettings,
         isHowToUseVisible, openHowToUse, closeHowToUse, isContactModalVisible, openContactModal,
-        closeContactModal, isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
+        closeContactModal, isSettingsPanelCollapsed, setIsSettingsPanelCollapsed,
+        isFavoritesPanelVisible, openFavoritesPanel, closeFavoritesPanel
     } = useUI();
 
     const { problems, lastGeneratorModule, worksheetTitle, triggerAutoRefresh, resetWorksheet } = useWorksheet();
@@ -350,6 +352,7 @@ const AppContent: React.FC = () => {
                             <button onClick={openContactModal} className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item" title="İletişim"><ContactIcon /></button>
                             <div className="header-interactive-item"><ThemeSwitcher /></div>
                             <div className="h-6 w-px bg-white/20 mx-1"></div>
+                            <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item" title="Favori Ayarlarım"><FavoriteIcon /></button>
                             <button onClick={triggerAutoRefresh} disabled={!lastGeneratorModule || problems.length === 0} className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item disabled:opacity-50 disabled:cursor-not-allowed" title="Yenile"><ShuffleIcon /></button>
                             <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item" title="Yazdırma Ayarları"><PrintSettingsIcon /></button>
                             <button onClick={() => handlePdfAction('save')} disabled={isPdfLoading || problems.length === 0} className="p-2 rounded-md hover:bg-white/20 transition-colors header-interactive-item disabled:opacity-50 disabled:cursor-not-allowed" title="PDF olarak indir">{isPdfLoading ? <LoadingIcon className="w-6 h-6" /> : <PdfIcon />}</button>
@@ -392,6 +395,7 @@ const AppContent: React.FC = () => {
             )}
             
             <PrintSettingsPanel isVisible={isPrintSettingsVisible} onClose={closePrintSettings} />
+            <FavoritesPanel isVisible={isFavoritesPanelVisible} onClose={closeFavoritesPanel} />
             <HowToUseModal isVisible={isHowToUseVisible} onClose={closeHowToUse} />
             <ContactModal isVisible={isContactModalVisible} onClose={closeContactModal} />
             <ToastContainer />

@@ -3,7 +3,7 @@ import { useSettingsManager } from '../services/settingsManager';
 import TextInput from './form/TextInput';
 import Select from './form/Select';
 import Button from './form/Button';
-import { SaveIcon, LoadIcon, DeleteIcon } from './icons/Icons';
+import { SaveIcon, LoadIcon, DeleteIcon, FavoriteIcon } from './icons/Icons';
 
 interface SettingsPresetManagerProps<T> {
     moduleKey: string;
@@ -12,11 +12,10 @@ interface SettingsPresetManagerProps<T> {
 }
 
 const SettingsPresetManager = <T,>({ moduleKey, currentSettings, onLoadSettings }: SettingsPresetManagerProps<T>) => {
-    const { presets, savePreset, loadPreset, deletePreset } = useSettingsManager<T>(moduleKey);
+    const { presets, favorites, savePreset, loadPreset, deletePreset, toggleFavorite } = useSettingsManager<T>(moduleKey);
     const [newPresetName, setNewPresetName] = useState('');
     const [selectedPreset, setSelectedPreset] = useState('');
 
-    // When presets change (e.g., after delete), if the selected one is gone, reset selection.
     useEffect(() => {
         if (!presets.includes(selectedPreset)) {
             setSelectedPreset('');
@@ -48,8 +47,13 @@ const SettingsPresetManager = <T,>({ moduleKey, currentSettings, onLoadSettings 
         if (selectedPreset) {
             if (window.confirm(`'${selectedPreset}' adlı ayar setini silmek istediğinizden emin misiniz?`)) {
                 deletePreset(selectedPreset);
-                setSelectedPreset('');
             }
+        }
+    };
+    
+    const handleToggleFavorite = () => {
+        if (selectedPreset) {
+            toggleFavorite(selectedPreset);
         }
     };
 
@@ -76,16 +80,22 @@ const SettingsPresetManager = <T,>({ moduleKey, currentSettings, onLoadSettings 
 
             {presets.length > 0 && (
                 <div className="space-y-1.5 p-3 bg-stone-50 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700">
-                     <Select 
-                        id={`select-preset-${moduleKey}`}
-                        label="Kayıtlı Ayar Setini Yönet"
-                        value={selectedPreset}
-                        onChange={(e) => setSelectedPreset(e.target.value)}
-                        options={[
-                            { value: '', label: 'Bir ayar seti seçin...' },
-                            ...presets.map(p => ({ value: p, label: p }))
-                        ]}
-                    />
+                     <label htmlFor={`select-preset-${moduleKey}`} className="font-medium text-xs text-stone-700 dark:text-stone-300">Kayıtlı Ayar Setini Yönet</label>
+                    <div className="flex gap-2 items-center">
+                        <Select 
+                            id={`select-preset-${moduleKey}`}
+                            value={selectedPreset}
+                            onChange={(e) => setSelectedPreset(e.target.value)}
+                            options={[
+                                { value: '', label: 'Bir ayar seti seçin...' },
+                                ...presets.map(p => ({ value: p, label: p }))
+                            ]}
+                            containerClassName="flex-grow"
+                        />
+                         <button onClick={handleToggleFavorite} disabled={!selectedPreset} className="p-2 rounded-full hover:bg-stone-200 dark:hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" title="Favorilere Ekle/Çıkar">
+                            <FavoriteIcon className={`w-5 h-5 transition-colors ${favorites.includes(selectedPreset) ? 'fill-rose-500 text-rose-500' : 'text-stone-400'}`} />
+                        </button>
+                    </div>
                     <div className="flex gap-2">
                         <Button onClick={handleLoad} disabled={!selectedPreset} size="md">
                             <LoadIcon className="w-5 h-5" />

@@ -14,6 +14,9 @@ interface UIContextType {
     isContactModalVisible: boolean;
     openContactModal: () => void;
     closeContactModal: () => void;
+    isFavoritesPanelVisible: boolean;
+    openFavoritesPanel: () => void;
+    closeFavoritesPanel: () => void;
     isSettingsPanelCollapsed: boolean;
     setIsSettingsPanelCollapsed: (collapsed: boolean) => void;
 }
@@ -25,6 +28,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isPrintSettingsVisible, setPrintSettingsVisible] = useState(false);
     const [isHowToUseVisible, setHowToUseVisible] = useState(false);
     const [isContactModalVisible, setContactModalVisible] = useState(false);
+    const [isFavoritesPanelVisible, setFavoritesPanelVisible] = useState(false);
     const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(false);
     
     const openPrintSettings = useCallback(() => setPrintSettingsVisible(true), []);
@@ -33,6 +37,8 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const closeHowToUse = useCallback(() => setHowToUseVisible(false), []);
     const openContactModal = useCallback(() => setContactModalVisible(true), []);
     const closeContactModal = useCallback(() => setContactModalVisible(false), []);
+    const openFavoritesPanel = useCallback(() => setFavoritesPanelVisible(true), []);
+    const closeFavoritesPanel = useCallback(() => setFavoritesPanelVisible(false), []);
 
     return (
         <UIContext.Provider value={{
@@ -40,6 +46,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             isPrintSettingsVisible, openPrintSettings, closePrintSettings,
             isHowToUseVisible, openHowToUse, closeHowToUse,
             isContactModalVisible, openContactModal, closeContactModal,
+            isFavoritesPanelVisible, openFavoritesPanel, closeFavoritesPanel,
             isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
         }}>
             {children}
