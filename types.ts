@@ -493,7 +493,7 @@ export interface ProblemCreationSettings {
 
 
 // --- DYSLEXIA ---
-export type DyslexiaSubModuleType = 'attention-questions' | 'sound-wizard' | 'letter-detective' | 'reading-fluency-coach' | 'comprehension-explorer' | 'vocabulary-explorer' | 'visual-master' | 'word-hunter' | 'spelling-champion' | 'memory-gamer' | 'auditory-writing' | 'interactive-story';
+export type DyslexiaSubModuleType = 'attention-questions' | 'sound-wizard' | 'letter-detective' | 'reading-fluency-coach' | 'comprehension-explorer' | 'vocabulary-explorer' | 'visual-master' | 'word-hunter' | 'spelling-champion' | 'memory-gamer' | 'auditory-writing' | 'interactive-story' | 'map-reading';
 export interface AttentionQuestionSettings { 
     questionType: 'numerical' | 'verbal';
     difficulty: 'easy' | 'medium' | 'hard'; 
@@ -510,6 +510,7 @@ export interface SpellingChampionSettings { difficulty: 'easy' | 'medium' | 'har
 export interface MemoryGamerSettings { type: 'digit_span' | 'word_sequence' | 'sentence_repeat'; sequenceLength: number; }
 export interface AuditoryWritingSettings { type: 'single_words' | 'short_sentences'; difficulty: 'easy' | 'medium' | 'hard'; }
 export interface InteractiveStorySettings { genre: 'adventure' | 'mystery' | 'fantasy' | 'sci-fi'; gradeLevel: string; }
+export interface MapReadingSettings { difficulty: 'easy' | 'medium' | 'hard'; questionCount: number; }
 export interface DyslexiaSettings {
     activeSubModule: DyslexiaSubModuleType;
     problemsPerPage: number;
@@ -527,6 +528,7 @@ export interface DyslexiaSettings {
     memoryGamer: MemoryGamerSettings;
     auditoryWriting: AuditoryWritingSettings;
     interactiveStory: InteractiveStorySettings;
+    mapReading: MapReadingSettings;
 }
 
 // --- DYSCALCULIA ---

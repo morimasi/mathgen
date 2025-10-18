@@ -22,12 +22,13 @@ import MemoryGamerSettings from './dyslexia/MemoryGamerSettings';
 import AuditoryWritingSettings from './dyslexia/AuditoryWritingSettings';
 import InteractiveStorySettings from './dyslexia/InteractiveStorySettings';
 import AttentionQuestionSettings from './dyslexia/AttentionQuestionSettings';
+import MapReadingSettings from './dyslexia/MapReadingSettings';
 
 // Import all sub-module icons
 import {
     SoundWizardIcon, LetterDetectiveIcon, ReadingFluencyCoachIcon, ComprehensionExplorerIcon,
     VocabularyExplorerIcon, VisualMasterIcon, WordHunterIcon, SpellingChampionIcon, MemoryGamerIcon,
-    AuditoryWritingIcon, InteractiveStoryIcon, AttentionIcon
+    AuditoryWritingIcon, InteractiveStoryIcon, AttentionIcon, MapIcon
 } from '../components/icons/Icons';
 
 const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
@@ -43,6 +44,7 @@ const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<Rea
     { id: 'memory-gamer', label: 'Hafıza Oyuncusu', icon: MemoryGamerIcon },
     { id: 'auditory-writing', label: 'İşitsel Yazma (Dikte)', icon: AuditoryWritingIcon },
     { id: 'interactive-story', label: 'Uygulamalı Hikaye Macerası', icon: InteractiveStoryIcon },
+    { id: 'map-reading', label: 'Harita Okuma', icon: MapIcon },
 ];
 
 const defaultSettings: DyslexiaSettings = {
@@ -62,6 +64,7 @@ const defaultSettings: DyslexiaSettings = {
     memoryGamer: { type: 'digit_span', sequenceLength: 3 },
     auditoryWriting: { type: 'single_words', difficulty: 'easy' },
     interactiveStory: { genre: 'adventure', gradeLevel: '2' },
+    mapReading: { difficulty: 'easy', questionCount: 5 },
 };
 
 
@@ -76,6 +79,8 @@ const DyslexiaModule: React.FC = () => {
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyslexiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
 
+    const isPracticeSheet = activeSubModuleId === 'map-reading';
+
     useEffect(() => {
         if (!contentRef.current) {
             (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = document.getElementById('worksheet-container-0') as HTMLDivElement;
@@ -88,7 +93,9 @@ const DyslexiaModule: React.FC = () => {
             let totalCount;
             const isTableLayout = printSettings.layoutMode === 'table';
 
-            if (isTableLayout) {
+            if (isPracticeSheet) {
+                totalCount = settings.pageCount;
+            } else if (isTableLayout) {
                 totalCount = printSettings.rows * printSettings.columns;
             } else if (settings.autoFit) {
                 const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
@@ -107,14 +114,14 @@ const DyslexiaModule: React.FC = () => {
                     clearPrevious, 
                     title: result.title, 
                     generatorModule: `dyslexia-${activeSubModuleId}`, 
-                    pageCount: isTableLayout ? 1 : settings.pageCount
+                    pageCount: isTableLayout || isPracticeSheet ? 1 : settings.pageCount
                 });
             }
         } catch (error: any) {
             console.error(error);
         }
         setIsLoading(false);
-    }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
+    }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings, isPracticeSheet]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === `dyslexia-${activeSubModuleId}`) {
@@ -124,7 +131,7 @@ const DyslexiaModule: React.FC = () => {
 
     // Live update for non-AI modules
     useEffect(() => {
-        const isAIModule = ['comprehension-explorer', 'vocabulary-explorer', 'interactive-story', 'reading-fluency-coach'].includes(activeSubModuleId);
+        const isAIModule = ['comprehension-explorer', 'vocabulary-explorer', 'interactive-story', 'reading-fluency-coach', 'map-reading'].includes(activeSubModuleId);
         if (isInitialMount.current || isAIModule) {
             isInitialMount.current = false;
             return;
@@ -166,6 +173,7 @@ const DyslexiaModule: React.FC = () => {
             case 'memory-gamer': return <MemoryGamerSettings {...props} />;
             case 'auditory-writing': return <AuditoryWritingSettings {...props} />;
             case 'interactive-story': return <InteractiveStorySettings {...props} />;
+            case 'map-reading': return <MapReadingSettings {...props} />;
             default: return null;
         }
     };
@@ -193,7 +201,7 @@ const DyslexiaModule: React.FC = () => {
                 <div className="pt-2 border-t border-stone-200 dark:border-stone-700">
                     <div className="grid grid-cols-2 gap-2">
                          <NumberInput label="Problem Sayısı" id="dx-problems-per-page" min={1} max={50}
-                            value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit} />
+                            value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit || isPracticeSheet} />
                          <NumberInput label="Sayfa Sayısı" id="dx-page-count" min={1} max={20}
                             value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} />
                     </div>
