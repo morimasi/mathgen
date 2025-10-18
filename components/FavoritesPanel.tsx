@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { useFavorites } from '../services/settingsManager.ts';
+// FIX: Added .tsx extension to resolve module resolution error.
 import { useUI } from '../services/UIContext.tsx';
+// FIX: Added .tsx extension to resolve module resolution error.
 import { useWorksheet } from '../services/WorksheetContext.tsx';
 import { TAB_GROUPS } from '../constants.ts';
 import { LoadIcon, FavoriteIcon } from './icons/Icons.tsx';

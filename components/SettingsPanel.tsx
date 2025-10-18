@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
-import { useUI } from '../services/UIContext';
+// FIX: Added .tsx extension to resolve module resolution error.
+import { useUI } from '../services/UIContext.tsx';
 import { LoadingIcon } from './icons/Icons.tsx';
 
 // Lazily import all module components for code-splitting
