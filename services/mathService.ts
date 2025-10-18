@@ -194,7 +194,7 @@ const generateLongDivisionHTML = (dividend: number, divisor: number): string => 
 }
 
 export const generateArithmeticProblem = (settings: ArithmeticSettings): { problem: Problem, title: string, error?: string } => {
-    const { operation, format = 'inline', representation = 'number' } = settings;
+    const { operation, format = 'inline', representation = 'number', n1: n1Override, n2: n2Override, operationOverride } = settings;
     let attempts = 0;
     
     const operationNames: { [key in ArithmeticOperation]: string } = {
@@ -206,23 +206,23 @@ export const generateArithmeticProblem = (settings: ArithmeticSettings): { probl
         [ArithmeticOperation.MixedAll]: 'Dört İşlem'
     };
     
-    let currentOperation = operation;
-    if (operation === ArithmeticOperation.MixedAll) {
+    let currentOperation = operationOverride || operation;
+    if (operation === ArithmeticOperation.MixedAll && !operationOverride) {
         const allOps = [ArithmeticOperation.Addition, ArithmeticOperation.Subtraction, ArithmeticOperation.Multiplication, ArithmeticOperation.Division];
         currentOperation = allOps[getRandomInt(0, 3)];
-    } else if (operation === ArithmeticOperation.MixedAdditionSubtraction) {
+    } else if (operation === ArithmeticOperation.MixedAdditionSubtraction && !operationOverride) {
         currentOperation = (Math.random() < 0.5 ? ArithmeticOperation.Addition : ArithmeticOperation.Subtraction);
     }
 
-    const title = `Aşağıdaki ${operationNames[operation].toLowerCase()} işlemlerini yapınız.`;
+    const title = `Aşağıdaki ${operationNames[currentOperation].toLowerCase()} işlemlerini yapınız.`;
     
     const problemBase = { category: 'arithmetic', display: format };
 
     // --- STANDARD MODE LOGIC ---
     while(attempts < 100){
         attempts++;
-        let n1 = getRandomByDigits(settings.digits1);
-        let n2 = getRandomByDigits(settings.digits2);
+        let n1 = n1Override ?? getRandomByDigits(settings.digits1);
+        let n2 = n2Override ?? getRandomByDigits(settings.digits2);
         let n3 = settings.hasThirdNumber ? getRandomByDigits(settings.digits3) : 0;
         
         const useWords = (representation === 'word' || (representation === 'mixed' && Math.random() < 0.5));
@@ -262,7 +262,7 @@ export const generateArithmeticProblem = (settings: ArithmeticSettings): { probl
             }
             case ArithmeticOperation.Subtraction: {
                 if (n1 < n2) [n1, n2] = [n2, n1];
-                if (n1 === n2) continue;
+                if (n1 === n2 && !n1Override) continue; // Allow same numbers for voice command, e.g. "5 - 5"
                 if(settings.hasThirdNumber) {
                     if (n1 < n2 + n3) continue;
                     const question = format === 'vertical-html'
@@ -297,14 +297,15 @@ export const generateArithmeticProblem = (settings: ArithmeticSettings): { probl
                 return { problem: { ...problemBase, question, answer: n1 * n2 }, title };
             }
             case ArithmeticOperation.Division: {
-                if (n2 === 0 || n2 === 1) continue;
-                if (n1 < n2) [n1, n2] = [n2, n1];
+                if (n2 === 0) continue;
+                if (n2 === 1 && !n2Override) continue;
+                if (n1 < n2 && !n1Override) [n1, n2] = [n2, n1];
                 
                 const remainder = n1 % n2;
                 const quotient = Math.floor(n1 / n2);
 
-                if (settings.divisionType === 'without-remainder' && remainder !== 0) continue;
-                if (settings.divisionType === 'with-remainder' && remainder === 0 && n1 !== n2) continue;
+                if (settings.divisionType === 'without-remainder' && remainder !== 0 && !n1Override) continue;
+                if (settings.divisionType === 'with-remainder' && remainder === 0 && n1 !== n2 && !n1Override) continue;
 
                 let question: string;
                  if (useWords && format === 'inline') {

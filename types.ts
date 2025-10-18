@@ -61,6 +61,10 @@ export interface ArithmeticSettings {
     useVisuals: boolean;
     topic: string;
     autoFit: boolean;
+    // Voice command overrides
+    n1?: number;
+    n2?: number;
+    operationOverride?: ArithmeticOperation;
 }
 
 // Visual Support

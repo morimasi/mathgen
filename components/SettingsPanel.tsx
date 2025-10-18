@@ -22,7 +22,8 @@ const NumberRecognitionModule = React.lazy(() => import('../modules/NumberRecogn
 const PatternsModule = React.lazy(() => import('../modules/PatternsModule.tsx'));
 const BasicShapesModule = React.lazy(() => import('../modules/BasicShapesModule.tsx'));
 const PositionalConceptsModule = React.lazy(() => import('../modules/PositionalConceptsModule.tsx'));
-const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule.tsx'));
+// FIX: Changed to a named import for IntroToMeasurementModule to resolve a type error with React.lazy, similar to the fix for RhythmicCountingModule.
+const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule.tsx').then(module => ({ default: module.IntroToMeasurementModule })));
 const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule.tsx'));
 const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
 const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule.tsx'));

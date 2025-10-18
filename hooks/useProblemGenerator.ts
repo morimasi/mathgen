@@ -1,9 +1,9 @@
 import { useCallback, useRef, useEffect } from 'react';
-import { useWorksheet } from '../services/WorksheetContext';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
-import { useToast } from '../services/ToastContext';
-import { Problem } from '../types';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import { calculateMaxProblems } from '../services/layoutService.ts';
+import { useToast } from '../services/ToastContext.tsx';
+import { Problem } from '../types.ts';
 
 interface GeneratorOptions<S> {
     moduleKey: string;
@@ -37,30 +37,35 @@ export const useProblemGenerator = <S,>({
         }
     }, []);
 
-    const generate = useCallback(async (clearPrevious: boolean) => {
+    const generate = useCallback(async (clearPrevious: boolean, overrideSettings?: Partial<S>) => {
         setIsLoading(true);
         try {
-            if (settings.useWordProblems && aiGeneratorFn) {
-                const problems = await aiGeneratorFn(moduleKey, settings);
+            const finalSettings = { ...settings, ...overrideSettings };
+
+            if (finalSettings.useWordProblems && aiGeneratorFn) {
+                const problems = await aiGeneratorFn(moduleKey, finalSettings);
                 updateWorksheet({ 
                     newProblems: problems, 
                     clearPrevious, 
                     title: aiGeneratorTitle || 'Yapay Zeka Destekli Problemler',
                     generatorModule: moduleKey,
-                    pageCount: printSettings.layoutMode === 'table' ? 1 : settings.pageCount
+                    pageCount: printSettings.layoutMode === 'table' ? 1 : finalSettings.pageCount
                 });
             } else {
                 let totalCount;
                 if (isPracticeSheet) {
-                    totalCount = settings.pageCount ?? 1;
+                    totalCount = finalSettings.pageCount ?? 1;
                 } else if (printSettings.layoutMode === 'table') {
                     totalCount = printSettings.rows * printSettings.columns;
-                } else if (settings.autoFit) {
+                } else if (finalSettings.autoFit) {
                     //FIX: contentRef can be null, provide fallback
-                    const problemsPerPage = contentRef.current ? calculateMaxProblems(contentRef, printSettings) : settings.problemsPerPage!;
-                    totalCount = (problemsPerPage || settings.problemsPerPage!) * (settings.pageCount ?? 1);
-                } else {
-                    totalCount = (settings.problemsPerPage ?? 20) * (settings.pageCount ?? 1);
+                    const problemsPerPage = contentRef.current ? calculateMaxProblems(contentRef, printSettings) : finalSettings.problemsPerPage!;
+                    totalCount = (problemsPerPage || finalSettings.problemsPerPage!) * (finalSettings.pageCount ?? 1);
+                } else if (overrideSettings) {
+                    totalCount = 1;
+                }
+                else {
+                    totalCount = (finalSettings.problemsPerPage ?? 20) * (finalSettings.pageCount ?? 1);
                 }
                 
                 const newProblems: Problem[] = [];
@@ -68,7 +73,7 @@ export const useProblemGenerator = <S,>({
                 let newPreamble: string | undefined = undefined;
 
                 for (let i = 0; i < totalCount; i++) {
-                    const { problem, title, error, preamble } = generatorFn(settings);
+                    const { problem, title, error, preamble } = generatorFn(finalSettings);
                     if (error) {
                         addToast(error, 'error');
                         break; 
@@ -86,7 +91,7 @@ export const useProblemGenerator = <S,>({
                     title: newTitle, 
                     preamble: newPreamble,
                     generatorModule: moduleKey,
-                    pageCount: printSettings.layoutMode === 'table' || isPracticeSheet ? 1 : settings.pageCount
+                    pageCount: printSettings.layoutMode === 'table' || isPracticeSheet ? 1 : finalSettings.pageCount
                 });
             }
         } catch (error: any) {

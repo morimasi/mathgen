@@ -1,4 +1,5 @@
 // --- NUMBER TO WORDS (TURKISH) ---
+import { ArithmeticOperation } from '../types';
 
 const ones = ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"];
 const tens = ["", "on", "yirmi", "otuz", "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan"];
@@ -121,3 +122,42 @@ export function formatFractionAsWords(fractionStr: string): string {
         return `${denWords}${getSuffix(denWords)} ${numberToWordsTr(num)}`;
     }
 }
+
+
+// --- SPEECH PARSING ---
+export const parseSpokenMath = (text: string): { n1: number; n2: number; operation: ArithmeticOperation } | null => {
+    const wordToNumberMap: { [key: string]: number } = {
+        'sıfır': 0, 'bir': 1, 'iki': 2, 'üç': 3, 'dört': 4, 'beş': 5,
+        'altı': 6, 'yedi': 7, 'sekiz': 8, 'dokuz': 9, 'on': 10,
+        'on bir': 11, 'on iki': 12, 'on üç': 13, 'on dört': 14, 'on beş': 15,
+        'on altı': 16, 'on yedi': 17, 'on sekiz': 18, 'on dokuz': 19, 'yirmi': 20,
+    };
+    const wordToOperationMap: { [key: string]: ArithmeticOperation } = {
+        'artı': ArithmeticOperation.Addition,
+        'topla': ArithmeticOperation.Addition,
+        'eksi': ArithmeticOperation.Subtraction,
+        'çıkar': ArithmeticOperation.Subtraction,
+        'çarpı': ArithmeticOperation.Multiplication,
+        'çarp': ArithmeticOperation.Multiplication,
+        'kere': ArithmeticOperation.Multiplication,
+        'bölü': ArithmeticOperation.Division,
+        'böl': ArithmeticOperation.Division,
+    };
+    
+    const cleanText = text.toLowerCase().trim();
+    
+    // Find operation
+    const opWord = Object.keys(wordToOperationMap).find(op => cleanText.includes(` ${op} `));
+    if (!opWord) return null;
+
+    const parts = cleanText.split(` ${opWord} `);
+    if (parts.length !== 2) return null;
+
+    const n1 = wordToNumberMap[parts[0].trim()];
+    const op = wordToOperationMap[opWord];
+    const n2 = wordToNumberMap[parts[1].trim()];
+
+    if (n1 === undefined || op === undefined || n2 === undefined) return null;
+
+    return { n1, n2, operation: op };
+};

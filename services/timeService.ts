@@ -66,6 +66,10 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
             const endTime = `${padZero(endHour)}:${padZero(endMinute)}`;
             const duration = durationMinutes < 60 ? `${durationMinutes} dakika` : `${Math.floor(durationMinutes / 60)} saat ${durationMinutes % 60 === 0 ? '' : `${durationMinutes % 60} dakika`}`.trim();
 
+            // FIX: Declare question and answer variables to resolve scope errors.
+            let question: string;
+            let answer: string;
+
             switch(type) {
                 case TimeProblemType.Duration:
                     title = "İki zaman arasındaki süreyi bulunuz.";
@@ -97,8 +101,9 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
             ];
             const conv = conversions[getRandomInt(0, conversions.length - 1)];
             const num = parseInt(conv.q);
-            question = conv.q;
-            answer = conv.a(num);
+            // FIX: Declare question and answer variables to resolve scope errors.
+            const question = conv.q;
+            const answer = conv.a(num);
             problem = { ...problemBase, question, answer, display: 'inline' };
             break;
         }
@@ -108,7 +113,8 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
             const day = getRandomInt(1, 28);
             const month = "Mayıs";
             const question = `Bugün ${day} ${month} ise, 1 hafta sonrası hangi tarihtir?`;
-            answer = `${day + 7} ${month}`;
+            // FIX: Declare answer variable to resolve scope error.
+            const answer = `${day + 7} ${month}`;
             problem = { ...problemBase, question, answer, display: 'inline' };
             break;
         }

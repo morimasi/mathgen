@@ -6,17 +6,32 @@ import Select from '../components/form/Select';
 import Checkbox from '../components/form/Checkbox';
 import TextInput from '../components/form/TextInput';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { ShuffleIcon } from '../components/icons/Icons';
+import { ShuffleIcon, MicrophoneIcon, MicrophoneOffIcon } from '../components/icons/Icons';
 import SettingsPresetManager from '../components/SettingsPresetManager';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { generateArithmeticProblem } from '../services/mathService';
 import { generateContextualWordProblems } from '../services/geminiService';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
 import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { useToast } from '../services/ToastContext';
+import { parseSpokenMath } from '../services/utils';
+
+declare global {
+    interface Window {
+        SpeechRecognition: any;
+        webkitSpeechRecognition: any;
+    }
+}
+
 
 const ArithmeticModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
+    const { addToast } = useToast();
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef<any>(null);
+    const [isSpeechApiSupported, setIsSpeechApiSupported] = useState(true);
+
     const [settings, setSettings] = useState<ArithmeticSettings>({
         gradeLevel: 2,
         operation: ArithmeticOperation.Addition,
@@ -44,6 +59,63 @@ const ArithmeticModule: React.FC = () => {
         aiGeneratorFn: generateContextualWordProblems,
         aiGeneratorTitle: `Gerçek Hayat Problemleri - ${settings.topic || 'Dört İşlem'}`,
     });
+
+    useEffect(() => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            setIsSpeechApiSupported(false);
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'tr-TR';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+
+        recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            const parsed = parseSpokenMath(transcript);
+            if (parsed) {
+                const opSymbols: {[key: string]: string} = { 'addition': '+', 'subtraction': '-', 'multiplication': '×', 'division': '÷' };
+                addToast(`Anlaşıldı: ${parsed.n1} ${opSymbols[parsed.operation]} ${parsed.n2}`, 'info');
+                generate(true, { 
+                    n1: parsed.n1, 
+                    n2: parsed.n2,
+                    operationOverride: parsed.operation,
+                    format: 'inline'
+                } as Partial<ArithmeticSettings>);
+            } else {
+                addToast(`Anlaşılamadı: "${transcript}"`, 'warning');
+            }
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error('Speech recognition error:', event.error);
+            addToast(`Ses tanıma hatası: ${event.error}`, 'error');
+        };
+        
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+    }, [generate, addToast]);
+
+    const toggleListening = () => {
+        if (!recognitionRef.current) return;
+        if (isListening) {
+            recognitionRef.current.stop();
+        } else {
+            try {
+                recognitionRef.current.start();
+                setIsListening(true);
+            } catch (e) {
+                console.error("Could not start recognition:", e);
+                addToast("Ses tanıma başlatılamadı.", "error");
+            }
+        }
+    };
+
 
     const handleSettingChange = (field: keyof ArithmeticSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -82,7 +154,7 @@ const ArithmeticModule: React.FC = () => {
         if (settings.useWordProblems) return "Yapay zeka ile daha yaratıcı problemler için 'Problem Konusu' alanını kullanın (örn: 'parkta geçen', 'uzay macerası'). 'Görsel Destek' seçeneği, problemlere konuyla ilgili emojiler ekler.";
         if (settings.operation === ArithmeticOperation.Division) return "'Bölme Çatısı' formatı, öğrencilerin bölme işlemini adım adım yapmaları için klasik bir görünüm sunar. 'Bölme Türü' ile sadece kalanlı veya kalansız problemler üretebilirsiniz.";
         if (isAddSub) return "'Sınıf Düzeyi' seçimi, basamak sayısı ve eldeli/onluk bozma gibi ayarları o sınıf seviyesine uygun olarak otomatik düzenler. Daha hassas kontrol için bu ayarları manuel olarak da değiştirebilirsiniz.";
-        return "Bu modül, temel dört işlem alıştırmaları oluşturur. 'Sınıf Düzeyi' seçerek hızlıca başlayabilir veya tüm ayarları manuel olarak da düzenleyebilirsiniz.";
+        return "Bu modül, temel dört işlem alıştırmaları oluşturur. 'Sınıf Düzeyi' seçerek hızlıca başlayabilir veya tüm ayarları manuel olarak da düzenleyebilirsiniz. 'Sesli Komut' ile hızlıca tek bir problem oluşturabilirsiniz.";
     };
 
     return (
@@ -90,7 +162,15 @@ const ArithmeticModule: React.FC = () => {
             <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold">Dört İşlem Ayarları</h2>
                 <HintButton text={getHintText()} />
+                {isSpeechApiSupported && (
+                    <Button onClick={toggleListening} variant={isListening ? 'danger' : 'secondary'} size="sm" className="ml-auto !px-2" title="Sesli Komut">
+                        {isListening ? <MicrophoneOffIcon className="w-4 h-4" /> : <MicrophoneIcon className="w-4 h-4" />}
+                        <span className="hidden sm:inline">{isListening ? 'Durdur' : 'Sesli Komut'}</span>
+                    </Button>
+                )}
             </div>
+
+            {isListening && <p className="text-sm text-accent-text animate-pulse text-center p-2 bg-accent-bg/20 rounded-md">Dinleniyor... "Beş artı üç" gibi bir komut söyleyin.</p>}
             
             <div className="space-y-2">
                 <details className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg" open={settings.useWordProblems}>
