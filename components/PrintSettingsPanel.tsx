@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import Select from './form/Select';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import { PrintSettings } from '../types';
-import Checkbox from './form/Checkbox';
-import TableSelector from './form/TableSelector';
-import SettingsPresetManager from './SettingsPresetManager';
+import Select from './form/Select.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import { PrintSettings } from '../types.ts';
+import Checkbox from './form/Checkbox.tsx';
+import TableSelector from './form/TableSelector.tsx';
+import SettingsPresetManager from './SettingsPresetManager.tsx';
 
 interface PrintSettingsPanelProps {
     isVisible: boolean;

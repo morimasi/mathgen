@@ -1,5 +1,6 @@
 import React from 'react';
-import { Problem } from '../types';
+// FIX: Add .ts extension to types import.
+import { Problem } from '../types.ts';
 
 interface AnswerKeyProps {
     problems: Problem[];

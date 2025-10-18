@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { useFavorites } from '../services/settingsManager';
-import { useUI } from '../services/UIContext';
-import { useWorksheet } from '../services/WorksheetContext';
-import { TAB_GROUPS } from '../constants';
-import { LoadIcon, FavoriteIcon } from './icons/Icons';
-import Button from './form/Button';
+import { useFavorites } from '../services/settingsManager.ts';
+import { useUI } from '../services/UIContext.tsx';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { TAB_GROUPS } from '../constants.ts';
+import { LoadIcon, FavoriteIcon } from './icons/Icons.tsx';
+import Button from './form/Button.tsx';
 
 interface FavoritesPanelProps {
     isVisible: boolean;

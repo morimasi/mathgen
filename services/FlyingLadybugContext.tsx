@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useCallback, ReactNode } from 'react';
-import FlyingLadybug from '../components/FlyingLadybug';
+import FlyingLadybug from '../components/FlyingLadybug.tsx';
 
 interface Ladybug {
     id: number;

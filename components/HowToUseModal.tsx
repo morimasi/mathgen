@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TAB_GROUPS } from '../constants';
+import { TAB_GROUPS } from '../constants.ts';
 import {
     HelpIcon,
     ArithmeticIcon,
@@ -12,7 +12,23 @@ import {
     MeasurementIcon,
     WordProblemsIcon,
     VisualSupportIcon,
-} from './icons/Icons';
+    MatchingIcon,
+    ComparingIcon,
+    NumberRecognitionIcon,
+    PatternsIcon,
+    BasicShapesIcon,
+    PositionalConceptsIcon,
+    IntroToMeasurementIcon,
+    SimpleGraphsIcon,
+    DyslexiaIcon,
+    DyscalculiaIcon,
+    DysgraphiaIcon,
+    VisualAdditionSubtractionIcon,
+    VerbalArithmeticIcon,
+    MissingNumberIcon,
+    SymbolicArithmeticIcon,
+    ProblemCreationIcon
+} from './icons/Icons.tsx';
 
 interface HowToUseModalProps {
     isVisible: boolean;
@@ -31,6 +47,22 @@ const iconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
     'geometry': GeometryIcon,
     'measurement': MeasurementIcon,
     'word-problems': WordProblemsIcon,
+    'matching-and-sorting': MatchingIcon,
+    'comparing-quantities': ComparingIcon,
+    'number-recognition': NumberRecognitionIcon,
+    'patterns': PatternsIcon,
+    'basic-shapes': BasicShapesIcon,
+    'positional-concepts': PositionalConceptsIcon,
+    'intro-to-measurement': IntroToMeasurementIcon,
+    'simple-graphs': SimpleGraphsIcon,
+    'dyslexia': DyslexiaIcon,
+    'dyscalculia': DyscalculiaIcon,
+    'dysgraphia': DysgraphiaIcon,
+    'visual-addition-subtraction': VisualAdditionSubtractionIcon,
+    'verbal-arithmetic': VerbalArithmeticIcon,
+    'missing-number-puzzles': MissingNumberIcon,
+    'symbolic-arithmetic': SymbolicArithmeticIcon,
+    'problem-creation': ProblemCreationIcon,
 };
 
 const moduleContent: { [key: string]: { title: string; content: React.ReactNode } } = {
@@ -227,7 +259,7 @@ const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => 
     }, [isVisible]);
 
     const allModules = [{ id: 'overview', label: 'Genel Bakış' }, ...TAB_GROUPS.flatMap(g => g.tabs)];
-    const { title, content } = moduleContent[activeSection];
+    const { title, content } = moduleContent[activeSection] || { title: 'Yükleniyor...', content: '' };
 
     return (
         <div

@@ -1,8 +1,8 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 // The import of App.tsx is correct without the extension for most bundlers.
-import App from './App';
+// FIX: Added .tsx extension to App import to resolve module resolution error.
+import App from './App.tsx';
 import './index.css';
 
 const rootElement = document.getElementById('root');

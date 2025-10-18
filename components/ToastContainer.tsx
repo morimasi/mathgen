@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { useToast } from '../services/ToastContext';
-import { ToastMessage } from '../types';
-import { SuccessIcon, ErrorIcon, InfoIcon, CloseIcon } from './icons/ToastIcons';
+import { useToast } from '../services/ToastContext.tsx';
+import { ToastMessage } from '../types.ts';
+import { SuccessIcon, ErrorIcon, InfoIcon, CloseIcon } from './icons/ToastIcons.tsx';
 
 const toastConfig = {
     success: { Icon: SuccessIcon, className: 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700' },
@@ -19,7 +19,7 @@ const Toast: React.FC<{ toast: ToastMessage; onRemove: (id: number) => void }> =
             setIsExiting(true);
             const removeTimer = setTimeout(() => onRemove(toast.id), 300); // match animation duration
             return () => clearTimeout(removeTimer);
-        }, 3000); // 3 seconds duration
+        }, 5000); // 5 seconds duration
 
         return () => clearTimeout(timer);
     }, [toast.id, onRemove]);

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useSettingsManager } from '../services/settingsManager';
-import TextInput from './form/TextInput';
-import Select from './form/Select';
-import Button from './form/Button';
-import { SaveIcon, LoadIcon, DeleteIcon, FavoriteIcon } from './icons/Icons';
+import { useSettingsManager } from '../services/settingsManager.ts';
+import TextInput from './form/TextInput.tsx';
+import Select from './form/Select.tsx';
+import Button from './form/Button.tsx';
+import { SaveIcon, LoadIcon, DeleteIcon, FavoriteIcon } from './icons/Icons.tsx';
 
 interface SettingsPresetManagerProps<T> {
     moduleKey: string;

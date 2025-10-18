@@ -9,6 +9,9 @@ interface StoredData {
 
 const getStoredData = (): StoredData => {
     try {
+        if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
+            return { favorites: {}, modules: {} };
+        }
         const item = window.localStorage.getItem(STORAGE_KEY);
         const parsed = item ? JSON.parse(item) : {};
         return {
@@ -23,6 +26,9 @@ const getStoredData = (): StoredData => {
 
 const setStoredData = (data: StoredData) => {
     try {
+        if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
+            return;
+        }
         const event = new Event('storage');
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         window.dispatchEvent(event);

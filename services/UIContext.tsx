@@ -29,7 +29,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isHowToUseVisible, setHowToUseVisible] = useState(false);
     const [isContactModalVisible, setContactModalVisible] = useState(false);
     const [isFavoritesPanelVisible, setFavoritesPanelVisible] = useState(false);
-    const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(false);
+    const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(window.innerWidth < 768); // Collapse on mobile by default
     
     const openPrintSettings = useCallback(() => setPrintSettingsVisible(true), []);
     const closePrintSettings = useCallback(() => setPrintSettingsVisible(false), []);

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useFontTheme, fontThemes, FontTheme } from '../services/FontThemeContext';
-import { useColorTheme, colorThemes, ColorTheme } from '../services/ColorThemeContext';
-import { useTheme } from '../services/ThemeContext';
-import { PaletteIcon, SunIcon, MoonIcon } from './icons/Icons';
+import { useFontTheme, fontThemes, FontTheme } from '../services/FontThemeContext.tsx';
+import { useColorTheme, colorThemes, ColorTheme } from '../services/ColorThemeContext.tsx';
+import { useTheme } from '../services/ThemeContext.tsx';
+import { PaletteIcon, SunIcon, MoonIcon } from './icons/Icons.tsx';
 
 const ThemeSwitcher: React.FC = () => {
     const { fontTheme, setFontTheme } = useFontTheme();

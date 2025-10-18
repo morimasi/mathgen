@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import TextInput from '../components/form/TextInput';
-import Button from '../components/form/Button';
-import { XIcon, InstagramIcon } from '../components/icons/Icons';
+import TextInput from '../components/form/TextInput.tsx';
+import Button from '../components/form/Button.tsx';
+import { XIcon, InstagramIcon } from '../components/icons/Icons.tsx';
 
 const ContactModule: React.FC = () => {
     const [formData, setFormData] = useState({

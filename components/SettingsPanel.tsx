@@ -1,35 +1,36 @@
 import React, { Suspense } from 'react';
 import { useUI } from '../services/UIContext';
-import { LoadingIcon } from './icons/Icons';
+import { LoadingIcon } from './icons/Icons.tsx';
 
 // Lazily import all module components for code-splitting
-const ArithmeticModule = React.lazy(() => import('../modules/ArithmeticModule'));
-const FractionsModule = React.lazy(() => import('../modules/FractionsModule'));
-const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule'));
-const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule'));
+// FIX: Added file extensions (.tsx) to all lazy-loaded module imports to resolve module resolution errors.
+const ArithmeticModule = React.lazy(() => import('../modules/ArithmeticModule.tsx'));
+const FractionsModule = React.lazy(() => import('../modules/FractionsModule.tsx'));
+const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule.tsx'));
+const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule.tsx'));
 // FIX: Changed to a named import to resolve a type error with React.lazy.
-const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule').then(module => ({ default: module.RhythmicCountingModule })));
-const TimeModule = React.lazy(() => import('../modules/TimeModule'));
-const GeometryModule = React.lazy(() => import('../modules/GeometryModule'));
-const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule'));
-const WordProblemsModule = React.lazy(() => import('../modules/WordProblemsModule'));
-const VisualSupportModule = React.lazy(() => import('../modules/VisualSupportModule'));
-const MatchingAndSortingModule = React.lazy(() => import('../modules/MatchingAndSortingModule'));
-const ComparingQuantitiesModule = React.lazy(() => import('../modules/ComparingQuantitiesModule'));
-const NumberRecognitionModule = React.lazy(() => import('../modules/NumberRecognitionModule'));
-const PatternsModule = React.lazy(() => import('../modules/PatternsModule'));
-const BasicShapesModule = React.lazy(() => import('../modules/BasicShapesModule'));
-const PositionalConceptsModule = React.lazy(() => import('../modules/PositionalConceptsModule'));
-const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule'));
-const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule'));
-const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule'));
-const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule'));
-const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule'));
-const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/VisualAdditionSubtractionModule'));
-const VerbalArithmeticModule = React.lazy(() => import('../modules/VerbalArithmeticModule'));
-const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNumberPuzzlesModule'));
-const SymbolicArithmeticModule = React.lazy(() => import('../modules/SymbolicArithmeticModule'));
-const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule'));
+const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule.tsx').then(module => ({ default: module.RhythmicCountingModule })));
+const TimeModule = React.lazy(() => import('../modules/TimeModule.tsx'));
+const GeometryModule = React.lazy(() => import('../modules/GeometryModule.tsx'));
+const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule.tsx'));
+const WordProblemsModule = React.lazy(() => import('../modules/WordProblemsModule.tsx'));
+const VisualSupportModule = React.lazy(() => import('../modules/VisualSupportModule.tsx'));
+const MatchingAndSortingModule = React.lazy(() => import('../modules/MatchingAndSortingModule.tsx'));
+const ComparingQuantitiesModule = React.lazy(() => import('../modules/ComparingQuantitiesModule.tsx'));
+const NumberRecognitionModule = React.lazy(() => import('../modules/NumberRecognitionModule.tsx'));
+const PatternsModule = React.lazy(() => import('../modules/PatternsModule.tsx'));
+const BasicShapesModule = React.lazy(() => import('../modules/BasicShapesModule.tsx'));
+const PositionalConceptsModule = React.lazy(() => import('../modules/PositionalConceptsModule.tsx'));
+const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule.tsx'));
+const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule.tsx'));
+const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
+const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule.tsx'));
+const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule.tsx'));
+const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/VisualAdditionSubtractionModule.tsx'));
+const VerbalArithmeticModule = React.lazy(() => import('../modules/VerbalArithmeticModule.tsx'));
+const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNumberPuzzlesModule.tsx'));
+const SymbolicArithmeticModule = React.lazy(() => import('../modules/SymbolicArithmeticModule.tsx'));
+const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx'));
 
 
 const SettingsPanel: React.FC = () => {

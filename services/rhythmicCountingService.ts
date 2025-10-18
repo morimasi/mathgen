@@ -1,6 +1,4 @@
-
-
-import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types';
+import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types.ts';
 
 const getRandomInt = (min: number, max: number): number => {
   if (min > max) [min, max] = [max, min];
@@ -286,19 +284,4 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             const numbers = new Set<number>();
             while(numbers.size < orderCount) numbers.add(getRandomByDigits(digits));
             
-            const numArray = Array.from(numbers);
-            const sorted = [...numArray].sort((a, b) => a - b);
-            
-            const answerArray = currentOrderDirection === 'descending' ? [...sorted].reverse() : sorted;
-
-            const question = `<span style="font-size: 1.25em; font-family: monospace;">${numArray.join(', ')}</span>`;
-            const answer = answerArray.join(' < ');
-            problem = { ...problemBase, question, answer };
-            break;
-        }
-
-        default:
-            problem = { ...problemBase, question: 'Hata', answer: 'Hata' };
-    }
-    return { problem, title };
-};
+            const numArray = Array

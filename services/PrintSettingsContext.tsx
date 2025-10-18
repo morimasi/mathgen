@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { PrintSettings } from '../types';
+import { PrintSettings } from '../types.ts';
 
 interface PrintSettingsContextType {
     settings: PrintSettings;
@@ -11,11 +11,11 @@ const PrintSettingsContext = createContext<PrintSettingsContextType | undefined>
 const initialPrintSettings: PrintSettings = {
     layoutMode: 'flow',
     rows: 10,
-    columns: 1,
+    columns: 2,
     columnGap: 2,
     fontSize: 16,
-    showHeader: false,
-    showProblemNumbers: false,
+    showHeader: true,
+    showProblemNumbers: true,
     notebookStyle: 'none',
     borderStyle: 'none',
     problemSpacing: 2,

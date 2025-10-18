@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import ContactModule from '../modules/ContactModule';
+import ContactModule from '../modules/ContactModule.tsx';
 
 interface ContactModalProps {
     isVisible: boolean;

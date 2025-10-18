@@ -1,7 +1,5 @@
-
-
-import { Problem, DecimalsOperation, ArithmeticOperation, CarryBorrowPreference, DivisionType, DecimalsSettings, ArithmeticSettings, VisualSupportSettings } from '../types';
-import { numberToWords } from './utils';
+import { Problem, DecimalsOperation, ArithmeticOperation, CarryBorrowPreference, DivisionType, DecimalsSettings, ArithmeticSettings, VisualSupportSettings } from '../types.ts';
+import { numberToWords } from './utils.ts';
 
 // --- UTILS ---
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;

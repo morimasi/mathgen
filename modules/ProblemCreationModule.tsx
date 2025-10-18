@@ -1,13 +1,13 @@
 import React, { useState, useCallback } from 'react';
-import { generateReadinessProblem } from '../services/readinessService';
-import { ProblemCreationSettings, MathReadinessTheme } from '../types';
-import Button from '../components/form/Button';
-import NumberInput from '../components/form/NumberInput';
-import Select from '../components/form/Select';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import SettingsPresetManager from '../components/SettingsPresetManager';
-import HintButton from '../components/HintButton';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { generateReadinessProblem } from '../services/readinessService.ts';
+import { ProblemCreationSettings, MathReadinessTheme } from '../types.ts';
+import Button from '../components/form/Button.tsx';
+import NumberInput from '../components/form/NumberInput.tsx';
+import Select from '../components/form/Select.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
+import HintButton from '../components/HintButton.tsx';
+import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
 const ProblemCreationModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();

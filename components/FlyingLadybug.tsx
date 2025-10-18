@@ -58,6 +58,7 @@ const FlyingLadybug: React.FC<FlyingLadybugProps> = ({ id, startX, startY, onEnd
         transform: 'scale(0)',
         opacity: 0,
     });
+    const hasEnded = React.useRef(false);
 
     useEffect(() => {
         // Phase 1: Appear and grow
@@ -92,12 +93,19 @@ const FlyingLadybug: React.FC<FlyingLadybugProps> = ({ id, startX, startY, onEnd
             clearTimeout(flyTimeout);
         };
     }, [startX, startY]);
+    
+    const handleTransitionEnd = () => {
+        if (!hasEnded.current) {
+            hasEnded.current = true;
+            onEnded(id);
+        }
+    }
 
     return (
         <div 
             style={style} 
             className="flying-ladybug-container"
-            onTransitionEnd={() => onEnded(id)}
+            onTransitionEnd={handleTransitionEnd}
         >
             <ShinyLadybugSVG />
         </div>

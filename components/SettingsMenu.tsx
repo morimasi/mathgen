@@ -1,5 +1,5 @@
 import React from 'react';
-import { TABS } from '../constants';
+import { TABS } from '../constants.ts';
 import {
     ArithmeticIcon,
     FractionsIcon,
@@ -9,7 +9,7 @@ import {
     TimeIcon,
     GeometryIcon,
     WordProblemsIcon,
-} from './icons/Icons';
+} from './icons/Icons.tsx';
 
 interface SettingsMenuProps {
     activeTab: string;
@@ -43,7 +43,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ activeTab, setActiveTab }) 
                             : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
                         }`}
                     >
-                        <Icon className="w-5 h-5" />
+                        {Icon && <Icon className="w-5 h-5" />}
                         <span className="font-medium">{tab.label}</span>
                     </button>
                 );

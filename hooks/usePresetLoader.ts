@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useWorksheet } from '../services/WorksheetContext';
-import { useSettingsManager } from '../services/settingsManager';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { useSettingsManager } from '../services/settingsManager.ts';
 
 export const usePresetLoader = <T,>(moduleKey: string, setSettings: (settings: T) => void) => {
     const { presetToLoad, setPresetToLoad } = useWorksheet();

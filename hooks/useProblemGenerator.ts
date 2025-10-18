@@ -1,21 +1,21 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { useWorksheet } from '../services/WorksheetContext';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import { useToast } from '../services/ToastContext';
 import { calculateMaxProblems } from '../services/layoutService';
+import { useToast } from '../services/ToastContext';
 import { Problem } from '../types';
 
-interface GeneratorOptions<T> {
+interface GeneratorOptions<S> {
     moduleKey: string;
-    settings: T & { useWordProblems?: boolean; autoFit?: boolean; problemsPerPage?: number; pageCount?: number, layout?: Problem['layout'] };
-    generatorFn: (settings: T) => { problem: Problem, title: string, error?: string, preamble?: string };
-    aiGeneratorFn?: (moduleKey: string, settings: T) => Promise<Problem[]>;
+    settings: S & { useWordProblems?: boolean, problemsPerPage?: number, pageCount?: number, autoFit?: boolean };
+    generatorFn: (settings: S) => { problem: Problem, title: string, error?: string, preamble?: string };
+    aiGeneratorFn?: (module: string, settings: S) => Promise<Problem[]>;
     aiGeneratorTitle?: string;
     isLive?: boolean;
     isPracticeSheet?: boolean;
 }
 
-export const useProblemGenerator = <T,>({
+export const useProblemGenerator = <S,>({
     moduleKey,
     settings,
     generatorFn,
@@ -23,123 +23,112 @@ export const useProblemGenerator = <T,>({
     aiGeneratorTitle,
     isLive = false,
     isPracticeSheet = false,
-}: GeneratorOptions<T>) => {
-    const { 
-        updateWorksheet, 
-        setIsLoading, 
-        autoRefreshTrigger, 
-        lastGeneratorModule 
-    } = useWorksheet();
+}: GeneratorOptions<S>) => {
+    const { updateWorksheet, setIsLoading, lastGeneratorModule, autoRefreshTrigger } = useWorksheet();
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
-    const contentRef = useRef<HTMLDivElement | null>(null); // This should be connected to the real ref
+    const contentRef = useRef<HTMLDivElement | null>(null);
     const isInitialMount = useRef(true);
 
-    // This is a bit of a hack since hooks can't access refs from other components directly.
-    // We rely on the fact that the ref is attached to the element with this ID.
     useEffect(() => {
         if (!contentRef.current) {
-            contentRef.current = document.getElementById('worksheet-container-0') as HTMLDivElement;
+            contentRef.current = document.getElementById('worksheet-container-0');
         }
     }, []);
 
     const generate = useCallback(async (clearPrevious: boolean) => {
         setIsLoading(true);
         try {
-            const { useWordProblems, autoFit, problemsPerPage = 20, pageCount = 1, layout } = settings;
-            const isTableLayout = printSettings.layoutMode === 'table';
-
-            let totalCount: number;
-
-            if (isPracticeSheet) {
-                totalCount = pageCount;
-            } else if (isTableLayout) {
-                totalCount = printSettings.rows * printSettings.columns;
-            } else if (autoFit) {
-                const sampleResult = generatorFn(settings);
-                const calculatedProblems = calculateMaxProblems(contentRef, printSettings, sampleResult.problem);
-                totalCount = (calculatedProblems > 0 ? calculatedProblems : problemsPerPage) * pageCount;
-            } else {
-                totalCount = problemsPerPage * pageCount;
-            }
-            
-            if (useWordProblems && aiGeneratorFn) {
-                const adjustedSettings = { ...settings, problemsPerPage: totalCount, pageCount: 1 };
-                const problems = await aiGeneratorFn(moduleKey, adjustedSettings);
-                // Assign layout to each problem
-                const problemsWithLayout = problems.map(p => ({ ...p, layout }));
-
-                updateWorksheet({
-                    newProblems: problemsWithLayout,
-                    clearPrevious,
-                    title: aiGeneratorTitle || `Yapay Zeka Problemleri - ${moduleKey}`,
+            if (settings.useWordProblems && aiGeneratorFn) {
+                const problems = await aiGeneratorFn(moduleKey, settings);
+                updateWorksheet({ 
+                    newProblems: problems, 
+                    clearPrevious, 
+                    title: aiGeneratorTitle || 'Yapay Zeka Destekli Problemler',
                     generatorModule: moduleKey,
-                    pageCount: isTableLayout ? 1 : pageCount
+                    pageCount: printSettings.layoutMode === 'table' ? 1 : settings.pageCount
                 });
             } else {
-                let preamble: string | undefined = undefined;
-                const results = Array.from({ length: totalCount }, (_, i) => {
-                    const result = generatorFn(settings);
-                    // Capture preamble only from the first generated problem
-                    if (i === 0 && result.preamble) {
-                        preamble = result.preamble;
-                    }
-                    // Assign layout if it exists in settings
-                    if (layout) {
-                        result.problem.layout = layout;
-                    }
-                    return result;
-                });
-
-                const firstError = results.find(r => r.error);
-
-                if (firstError?.error) {
-                    addToast(firstError.error, 'error');
-                } else if (results.length > 0) {
-                    updateWorksheet({
-                        newProblems: results.map(r => r.problem),
-                        clearPrevious,
-                        title: results[0].title,
-                        generatorModule: moduleKey,
-                        pageCount: isTableLayout || isPracticeSheet ? 1 : pageCount,
-                        preamble: preamble
-                    });
+                // FIX: Refactored problem count calculation for robustness and clarity.
+                let totalCount;
+                if (isPracticeSheet) {
+                    totalCount = settings.pageCount ?? 1;
+                } else if (printSettings.layoutMode === 'table') {
+                    totalCount = printSettings.rows * printSettings.columns;
+                } else if (settings.autoFit) {
+                    // calculateMaxProblems has a fallback if contentRef.current is null
+                    const problemsPerPage = calculateMaxProblems(contentRef, printSettings);
+                    totalCount = problemsPerPage * (settings.pageCount ?? 1);
+                } else {
+                    totalCount = (settings.problemsPerPage ?? 20) * (settings.pageCount ?? 1);
                 }
+                
+                const newProblems: Problem[] = [];
+                let newTitle = '';
+                let newPreamble: string | undefined = undefined;
+
+                for (let i = 0; i < totalCount; i++) {
+                    const { problem, title, error, preamble } = generatorFn(settings);
+                    if (error) {
+                        addToast(error, 'error');
+                        break; 
+                    }
+                    newProblems.push(problem);
+                    if (i === 0) {
+                        newTitle = title;
+                        newPreamble = preamble;
+                    }
+                }
+
+                updateWorksheet({ 
+                    newProblems, 
+                    clearPrevious, 
+                    title: newTitle, 
+                    preamble: newPreamble,
+                    generatorModule: moduleKey,
+                    pageCount: printSettings.layoutMode === 'table' || isPracticeSheet ? 1 : settings.pageCount
+                });
             }
         } catch (error: any) {
-            console.error(`Error in ${moduleKey} generator:`, error);
-            addToast(`Problem oluşturulurken bir hata oluştu: ${error.message}`, 'error');
+            console.error(`Error generating problems for ${moduleKey}:`, error);
+            addToast(`Problem oluşturulurken hata: ${error.message}`, 'error');
         } finally {
             setIsLoading(false);
         }
     }, [
-        moduleKey, settings, printSettings, generatorFn, aiGeneratorFn, aiGeneratorTitle, isPracticeSheet,
-        setIsLoading, addToast, updateWorksheet
+        settings, 
+        printSettings, 
+        moduleKey, 
+        aiGeneratorFn,
+        aiGeneratorTitle,
+        generatorFn,
+        isPracticeSheet,
+        setIsLoading, 
+        updateWorksheet, 
+        addToast,
     ]);
 
-    // Auto-refresh trigger
+    // Handle live updates
     useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === moduleKey) {
-            generate(true);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [autoRefreshTrigger]);
-
-    // Live update trigger
-    useEffect(() => {
-        if (isInitialMount.current) {
+        if (!isLive || isInitialMount.current) {
             isInitialMount.current = false;
             return;
         }
 
-        if (isLive && lastGeneratorModule === moduleKey) {
+        if (lastGeneratorModule === moduleKey) {
             const handler = setTimeout(() => {
                 generate(true);
             }, 300); // Debounce
-
             return () => clearTimeout(handler);
         }
-    }, [isLive, lastGeneratorModule, settings, printSettings, generate]);
+    }, [settings, printSettings, isLive, generate, lastGeneratorModule, moduleKey]);
+
+    // Handle auto refresh on print settings change
+    useEffect(() => {
+        if (autoRefreshTrigger > 0 && lastGeneratorModule === moduleKey) {
+            generate(true);
+        }
+    }, [autoRefreshTrigger, lastGeneratorModule, generate, moduleKey]);
 
     return { generate };
 };

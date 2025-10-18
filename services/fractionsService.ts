@@ -1,8 +1,6 @@
-
-
-import { Problem, FractionsOperation, FractionsSettings, FractionsProblemType } from '../types';
-import { drawFractionPie } from './svgService';
-import { formatFractionAsWords } from './utils';
+import { Problem, FractionsOperation, FractionsSettings, FractionsProblemType } from '../types.ts';
+import { drawFractionPie } from './svgService.ts';
+import { formatFractionAsWords } from './utils.ts';
 
 interface Fraction {
     num: number;
