@@ -1,5 +1,6 @@
-import { Problem, DyslexiaSubModuleType } from '../types';
+import { Problem, DyslexiaSubModuleType, MapReadingSettings } from '../types';
 import { generateDyslexiaAIProblem } from './geminiService';
+import { cityData, getTurkeyMapSVG } from './map/mapData';
 
 // --- LOCAL GENERATION LOGIC ---
 
@@ -322,6 +323,91 @@ const generateVisualMasterLocal = (settings: any): { problem: Problem, title: st
     return { problem: { question, answer, category: 'dyslexia' }, title };
 };
 
+const generateMapReadingLocal = (settings: MapReadingSettings): { problem: Problem; title: string } => {
+    const { difficulty, questionCount, region } = settings;
+    const title = "Harita Okuma Etkinliği";
+
+    const regionNames: { [key: string]: string } = {
+        turkey: "Türkiye",
+        marmara: "Marmara Bölgesi",
+        ege: "Ege Bölgesi",
+        akdeniz: "Akdeniz Bölgesi",
+        karadeniz: "Karadeniz Bölgesi",
+        icanadolu: "İç Anadolu Bölgesi",
+        doguanadolu: "Doğu Anadolu Bölgesi",
+        guneydoguanadolu: "Güneydoğu Anadolu Bölgesi",
+    };
+    
+    const availableCities = region === 'turkey' 
+        ? cityData 
+        : cityData.filter(c => c.region.toLowerCase().replace(/ /g, '') === region);
+
+    if (availableCities.length === 0) {
+        return { problem: { question: "Seçilen bölge için şehir bulunamadı.", answer: "Hata", category: 'dyslexia' }, title: "Hata" };
+    }
+    
+    const getRandomCity = (filterFn?: (c: typeof cityData[0]) => boolean) => {
+        const filtered = filterFn ? availableCities.filter(filterFn) : availableCities;
+        return filtered.length > 0 ? filtered[getRandomInt(0, filtered.length - 1)] : availableCities[getRandomInt(0, availableCities.length - 1)];
+    };
+
+    const colors = ['kırmızı', 'mavi', 'yeşil', 'sarı', 'pembe', 'turuncu', 'mor', 'kahverengi'];
+    const shapes = ['yıldız', 'üçgen', 'kare', 'daire'];
+
+    const templates = {
+        easy: [
+            () => { const city = getRandomCity(); return `${city.name}'yı ${shuffleArray(colors)[0]} renge boya.` },
+            () => { const city = getRandomCity(); return `${city.name}'nın üzerine bir ${shuffleArray(shapes)[0]} çiz.` },
+            () => `Başkentimizi ${shuffleArray(colors)[0]} renge boya.`,
+            () => { const city = getRandomCity(c => c.name.length > 8); return `Haritadan ${city.name} şehrini bul ve göster.`},
+        ],
+        medium: [
+            () => { const letter = "AEIOU".charAt(getRandomInt(0,4)); return `'${letter}' harfi ile başlayan bir şehri ${shuffleArray(colors)[0]} renge boya.` },
+            () => { const city = getRandomCity(c => c.neighbors.length > 0); const neighbor = cityData.find(c2 => c2.id === city.neighbors[0]); return `${city.name}'ya komşu olan ${neighbor?.name} şehrini ${shuffleArray(colors)[0]} renge boya.`},
+            () => { const coast = shuffleArray(['Ege', 'Akdeniz', 'Karadeniz', 'Marmara'])[0]; return `${coast} Denizi'ne kıyısı olan bir şehri mavi renge boya.`},
+            () => { const city = getRandomCity(); return `${city.name} şehrinin adındaki harf sayısını yaz.`},
+            () => { const city = getRandomCity(c => c.neighbors.length >= 2); return `${city.name} şehrine komşu olan iki şehir bul ve sarıya boya.`}
+        ],
+        hard: [
+             () => `Hiçbir denize kıyısı olmayan üç şehri mor renge boya.`,
+             () => { const regionName = shuffleArray(Object.values(regionNames).filter(r => r !== 'Türkiye'))[0]; return `${regionName}'nden iki şehir seç ve üzerlerine çarpı (X) işareti koy.`},
+             () => { const city1 = getRandomCity(c => c.coast !== null); let city2 = getRandomCity(c => c.coast !== null); while(city1.id === city2.id){ city2 = getRandomCity(c => c.coast !== null); } return `${city1.name}'dan ${city2.name}'a giden bir yol çiz.`; },
+             () => { const city = getRandomCity(); const letter = city.name.charAt(1); return `İkinci harfi '${letter}' olan (ama ${city.name} olmayan) başka bir şehir bul ve yeşile boya.`},
+             () => `Haritadaki en kalabalık şehri (İstanbul) kırmızıya, en doğudaki şehri (Hakkari) ise maviye boya.`,
+        ]
+    };
+
+    const selectedTemplates = templates[difficulty];
+    const generatedQuestions: string[] = [];
+    const usedQuestions = new Set<string>();
+
+    while(generatedQuestions.length < questionCount && generatedQuestions.length < 50) { // Safety break
+        const templateFn = selectedTemplates[getRandomInt(0, selectedTemplates.length - 1)];
+        const question = templateFn();
+        if(!usedQuestions.has(question)) {
+            generatedQuestions.push(question);
+            usedQuestions.add(question);
+        }
+    }
+    
+    const questionListHTML = generatedQuestions.map(q => 
+        `<li style="margin-bottom: 0.5em; display: flex; align-items: center; gap: 0.5em;"><input type="checkbox" style="width: 1.2em; height: 1.2em;" /><span>${q}</span></li>`
+    ).join('');
+
+    const mapSVG = getTurkeyMapSVG(region);
+
+    const questionHTML = `
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            ${mapSVG}
+            <ul style="list-style: none; padding: 0; columns: 2; column-gap: 2rem;">
+                ${questionListHTML}
+            </ul>
+        </div>
+    `;
+
+    return { problem: { question: questionHTML, answer: "Harita üzerinde tamamlandı", category: 'dyslexia', display: 'flow'}, title };
+};
+
 
 export const generateDyslexiaProblem = async (subModuleId: DyslexiaSubModuleType, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
     
@@ -335,7 +421,10 @@ export const generateDyslexiaProblem = async (subModuleId: DyslexiaSubModuleType
     let problems: Problem[] = [];
     let title = 'Disleksi Alıştırması';
 
-    for(let i=0; i < count; i++) {
+    // Practice sheets generate 1 problem per page count
+    const iterationCount = ['map-reading'].includes(subModuleId) ? count : count;
+
+    for(let i=0; i < iterationCount; i++) {
         let result: { problem: Problem; title: string; };
         switch(subModuleId) {
             case 'attention-questions':
@@ -346,6 +435,9 @@ export const generateDyslexiaProblem = async (subModuleId: DyslexiaSubModuleType
                 break;
             case 'visual-master':
                 result = generateVisualMasterLocal(settings);
+                break;
+            case 'map-reading':
+                result = generateMapReadingLocal(settings as MapReadingSettings);
                 break;
             // Add other local generators here
             default:

@@ -18,6 +18,23 @@ const MapReadingSettingsComponent: React.FC<Props> = ({ settings, onChange }) =>
             </div>
             <div className="grid grid-cols-2 gap-2">
                 <Select
+                    label="Bölge Seçimi"
+                    id="mr-region"
+                    value={settings.region}
+                    onChange={e => onChange({ region: e.target.value as MapReadingSettings['region'] })}
+                    options={[
+                        { value: 'turkey', label: 'Tüm Türkiye' },
+                        { value: 'marmara', label: 'Marmara Bölgesi' },
+                        { value: 'ege', label: 'Ege Bölgesi' },
+                        { value: 'akdeniz', label: 'Akdeniz Bölgesi' },
+                        { value: 'karadeniz', label: 'Karadeniz Bölgesi' },
+                        { value: 'icanadolu', label: 'İç Anadolu Bölgesi' },
+                        { value: 'doguanadolu', label: 'Doğu Anadolu Bölgesi' },
+                        { value: 'guneydoguanadolu', label: 'Güneydoğu Anadolu Bölgesi' },
+                    ]}
+                    containerClassName="col-span-2"
+                />
+                <Select
                     label="Zorluk Seviyesi"
                     id="mr-difficulty"
                     value={settings.difficulty}

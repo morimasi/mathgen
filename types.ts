@@ -510,7 +510,11 @@ export interface SpellingChampionSettings { difficulty: 'easy' | 'medium' | 'har
 export interface MemoryGamerSettings { type: 'digit_span' | 'word_sequence' | 'sentence_repeat'; sequenceLength: number; }
 export interface AuditoryWritingSettings { type: 'single_words' | 'short_sentences'; difficulty: 'easy' | 'medium' | 'hard'; }
 export interface InteractiveStorySettings { genre: 'adventure' | 'mystery' | 'fantasy' | 'sci-fi'; gradeLevel: string; }
-export interface MapReadingSettings { difficulty: 'easy' | 'medium' | 'hard'; questionCount: number; }
+export interface MapReadingSettings {
+    difficulty: 'easy' | 'medium' | 'hard';
+    questionCount: number;
+    region: 'turkey' | 'marmara' | 'ege' | 'akdeniz' | 'karadeniz' | 'icanadolu' | 'doguanadolu' | 'guneydoguanadolu';
+}
 export interface DyslexiaSettings {
     activeSubModule: DyslexiaSubModuleType;
     problemsPerPage: number;

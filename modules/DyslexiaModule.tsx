@@ -64,7 +64,7 @@ const defaultSettings: DyslexiaSettings = {
     memoryGamer: { type: 'digit_span', sequenceLength: 3 },
     auditoryWriting: { type: 'single_words', difficulty: 'easy' },
     interactiveStory: { genre: 'adventure', gradeLevel: '2' },
-    mapReading: { difficulty: 'easy', questionCount: 5 },
+    mapReading: { difficulty: 'easy', questionCount: 5, region: 'turkey' },
 };
 
 
@@ -131,7 +131,7 @@ const DyslexiaModule: React.FC = () => {
 
     // Live update for non-AI modules
     useEffect(() => {
-        const isAIModule = ['comprehension-explorer', 'vocabulary-explorer', 'interactive-story', 'reading-fluency-coach', 'map-reading'].includes(activeSubModuleId);
+        const isAIModule = ['comprehension-explorer', 'vocabulary-explorer', 'interactive-story', 'reading-fluency-coach'].includes(activeSubModuleId);
         if (isInitialMount.current || isAIModule) {
             isInitialMount.current = false;
             return;
