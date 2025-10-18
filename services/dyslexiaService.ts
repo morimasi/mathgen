@@ -1,6 +1,6 @@
 import { Problem, DyslexiaSubModuleType, MapReadingSettings } from '../types';
 import { generateDyslexiaAIProblem } from './geminiService';
-import { cityData, getTurkeyMapSVG } from './map/mapData';
+import { cityData, getTurkeyMapSVG } from './map/mapData.ts';
 
 // --- LOCAL GENERATION LOGIC ---
 
