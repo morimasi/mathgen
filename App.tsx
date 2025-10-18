@@ -19,7 +19,6 @@ import AnimatedLogo from './components/AnimatedLogo';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { TAB_GROUPS } from './constants';
 import { 
-    LoadingIcon, 
     DoubleArrowLeftIcon,
     PrintIcon,
     RefreshIcon,
@@ -37,6 +36,7 @@ import NumberInput from './components/form/NumberInput';
 import { useFlyingLadybugs } from './services/FlyingLadybugContext';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import LoadingDaisy from './components/LoadingDaisy.tsx';
 
 const Header: React.FC = memo(() => {
     const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
@@ -354,8 +354,9 @@ const AppContent: React.FC = () => {
                     className="flex-1 flex flex-col overflow-hidden relative"
                 >
                     {isLoading && (
-                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-30">
-                            <LoadingIcon className="w-12 h-12 text-white" />
+                        <div className="absolute inset-0 bg-black/40 dark:bg-stone-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-30 gap-4">
+                            <LoadingDaisy />
+                            <p className="text-white text-lg font-semibold animate-pulse">Etkinlik hazırlanıyor...</p>
                         </div>
                     )}
                     <WorksheetToolbar />

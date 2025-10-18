@@ -412,6 +412,21 @@
   .table-selector-cell.selected { @apply bg-primary; }
   .live-indicator { @apply text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 animate-pulse; }
 
+  /* Loading Daisy Animation */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .spinning-petals {
+    transform-origin: center;
+    animation: spin 1.5s linear infinite;
+  }
+
   /* Pan/Zoom Cursor */
   .is-panning { @apply cursor-grabbing; }
   .pan-area {
