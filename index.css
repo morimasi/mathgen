@@ -144,7 +144,7 @@
 
   /* Constellation Header */
   .constellation-header {
-    height: 80px;
+    height: 160px;
     position: relative;
     background: radial-gradient(ellipse at 50% -50%, #4c1d1d 0%, #1c1917 80%);
     overflow: hidden;
@@ -155,7 +155,7 @@
     position: absolute;
     width: 200px;
     height: 200px;
-    background: radial-gradient(circle, rgba(229, 215, 255, 0.08) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(229, 215, 255, 0.15) 0%, transparent 60%);
     border-radius: 50%;
     animation: spin 120s linear infinite;
   }
@@ -192,8 +192,16 @@
     to { transform: rotate(360deg); }
   }
   @keyframes twinkle {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
+    0%, 100% {
+      opacity: 0.7;
+      transform: scale(1);
+      fill: #fff;
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.3);
+      fill: #fef08a;
+    }
   }
 }
 
@@ -231,10 +239,16 @@
     min-height: 0 !important;
     height: auto;
     page-break-after: always;
+    color: var(--color);
+  }
+  
+  .worksheet-page.white-page {
+      color: black;
   }
 
+
   @page {
-    color: var(--color);
+    /* color is now applied directly to .worksheet-page for better control */
   }
 
   /* Ensure print-hidden utility works */
