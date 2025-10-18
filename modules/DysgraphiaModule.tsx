@@ -198,6 +198,7 @@ const DysgraphiaModule: React.FC = () => {
                 <SettingsPresetManager currentSettings={activeSubModuleSettings} onLoadSettings={handleSubModuleSettingChange} moduleKey={`dysgraphia-${activeSubModuleId}`} />
                 <div className="flex flex-wrap gap-2 pt-2">
                     <Button onClick={() => handleGenerate(true)} size="sm">Oluştur</Button>
+                    <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
                     <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
                         <ShuffleIcon className="w-4 h-4" /> Yenile
                     </Button>
