@@ -389,8 +389,9 @@ const generateSpellingChampionLocal = (settings: any): { problem: Problem, title
 const generateMemoryGamerLocal = (settings: any): { problem: Problem, title: string } => {
     const title = "Hafıza Oyuncusu";
     const { type, sequenceLength } = settings;
-    // FIX: Declare 'question' variable before use. Improved typing for 'sequence'.
-    let sequence: (string | number)[] = [], answer = "", question = "";
+    let question = "";
+    let sequence: (string | number)[] = [];
+    let answer = "";
     if (type === 'digit_span') {
         for (let i = 0; i < sequenceLength; i++) sequence.push(getRandomInt(0, 9));
         answer = sequence.join('-');
