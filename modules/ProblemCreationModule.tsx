@@ -8,6 +8,12 @@ import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import Checkbox from '../components/form/Checkbox.tsx';
+import TextInput from '../components/form/TextInput.tsx';
+import { ShuffleIcon } from '../components/icons/Icons.tsx';
+import { generateContextualWordProblems } from '../services/geminiService.ts';
+import { TOPIC_SUGGESTIONS } from '../constants.ts';
+
 
 const ProblemCreationModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
@@ -17,16 +23,25 @@ const ProblemCreationModule: React.FC = () => {
         theme: 'mixed',
         problemsPerPage: 4,
         pageCount: 1,
+        useWordProblems: false, 
+        topic: ''
     });
 
     const { generate } = useProblemGenerator({
         moduleKey: 'problem-creation',
-        settings: {...settings, autoFit: false},
+        settings: {...settings, autoFit: false}, // This module has a larger fixed size, autofit isn't ideal
         generatorFn: (s) => generateReadinessProblem('problem-creation', s),
+        aiGeneratorFn: generateContextualWordProblems,
+        aiGeneratorTitle: 'Yapay Zeka Destekli Problem Kurma Örnekleri'
     });
 
     const handleSettingChange = (field: keyof ProblemCreationSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
+    };
+    
+    const handleRandomTopic = () => {
+        const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
+        handleSettingChange('topic', randomTopic);
     };
 
     const isTableLayout = printSettings.layoutMode === 'table';
@@ -40,6 +55,37 @@ const ProblemCreationModule: React.FC = () => {
             <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold">Problem Kurma</h2>
                 <HintButton text="Öğrencilere hazır bir işlem (örn: 5+3=8) ve bir görsel tema verilir. Öğrenciden bu bilgileri kullanarak kendi metin problemini yazması istenir. Yaratıcılığı ve matematiksel düşünceyi birleştirir." />
+            </div>
+
+            <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <Checkbox
+                    label="AI ile Örnek Problem Oluştur"
+                    id="use-word-problems-pc"
+                    checked={settings.useWordProblems ?? false}
+                    onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
+                />
+                 {settings.useWordProblems && (
+                    <div className="mt-1.5 pl-6">
+                         <div className="relative">
+                            <TextInput
+                                label="Problem Konusu"
+                                id="pc-topic"
+                                value={settings.topic || ''}
+                                onChange={e => handleSettingChange('topic', e.target.value)}
+                                placeholder="Örn: Çiftlik Hayvanları"
+                                className="pr-10"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleRandomTopic}
+                                className="absolute right-2.5 bottom-[5px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors"
+                                title="Rastgele Konu Öner"
+                            >
+                                <ShuffleIcon className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
             
             <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">

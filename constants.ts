@@ -16,7 +16,6 @@ export const TAB_GROUPS = [
             { id: 'verbal-arithmetic', label: 'İşlemi Sözel İfade Etme' },
             { id: 'missing-number-puzzles', label: 'Eksik Sayıyı Bulma' },
             { id: 'symbolic-arithmetic', label: 'Simgelerle İşlemler' },
-            { id: 'problem-creation', label: 'Problem Kurma' },
         ]
     },
     {
@@ -33,6 +32,7 @@ export const TAB_GROUPS = [
         tabs: [
             { id: 'arithmetic', label: 'Dört İşlem' },
             { id: 'visual-support', label: 'Görsel Destek' },
+            { id: 'problem-creation', label: 'Problem Kurma' },
             { id: 'word-problems', label: 'Problemler (AI)' },
         ]
     },

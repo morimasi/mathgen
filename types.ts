@@ -492,6 +492,8 @@ export interface ProblemCreationSettings {
     problemsPerPage: number;
     pageCount: number;
     autoFit?: boolean;
+    useWordProblems?: boolean;
+    topic?: string;
 }
 
 

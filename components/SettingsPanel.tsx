@@ -41,6 +41,7 @@ const SettingsPanel: React.FC = () => {
             case 'arithmetic': return <ArithmeticModule />;
             case 'visual-support': return <VisualSupportModule />;
             case 'word-problems': return <WordProblemsModule />;
+            case 'problem-creation': return <ProblemCreationModule />;
             case 'fractions': return <FractionsModule />;
             case 'decimals': return <DecimalsModule />;
             case 'place-value': return <PlaceValueModule />;
@@ -63,7 +64,6 @@ const SettingsPanel: React.FC = () => {
             case 'verbal-arithmetic': return <VerbalArithmeticModule />;
             case 'missing-number-puzzles': return <MissingNumberPuzzlesModule />;
             case 'symbolic-arithmetic': return <SymbolicArithmeticModule />;
-            case 'problem-creation': return <ProblemCreationModule />;
             default: return <div>Lütfen yukarıdaki menüden bir modül seçin.</div>;
         }
     };
