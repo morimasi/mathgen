@@ -193,6 +193,20 @@ const AppContent: React.FC = () => {
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
+            
+            <div className="constellation-header print:hidden">
+                <svg className="constellation-svg" viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet">
+                    <polyline className="constellation-lines" points="100,30 130,45 170,50 200,40 240,35 280,20 320,10" />
+                    <circle className="star" cx="100" cy="30" r="2" style={{ animationDelay: '0.1s' }} />
+                    <circle className="star" cx="130" cy="45" r="2.5" style={{ animationDelay: '0.5s' }} />
+                    <circle className="star" cx="170" cy="50" r="2" style={{ animationDelay: '0.3s' }} />
+                    <circle className="star" cx="200" cy="40" r="1.5" style={{ animationDelay: '0.8s' }} />
+                    <circle className="star" cx="240" cy="35" r="2.5" style={{ animationDelay: '0.2s' }} />
+                    <circle className="star" cx="280" cy="20" r="2" style={{ animationDelay: '0.6s' }} />
+                    <circle className="star" cx="320" cy="10" r="2.2" style={{ animationDelay: '0.4s' }} />
+                </svg>
+            </div>
+            
             <header className="flex-shrink-0 bg-orange-700 text-white shadow-md z-20 print:hidden">
                 <Header />
             </header>
