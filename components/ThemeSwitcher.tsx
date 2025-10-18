@@ -85,6 +85,9 @@ const ThemeSwitcher: React.FC = () => {
                                 ruby: 'bg-rose-800 text-rose-800',
                                 emerald: 'bg-emerald-800 text-emerald-800',
                                 amethyst: 'bg-purple-800 text-purple-800',
+                                latte: 'bg-[#C7A17A] text-[#C7A17A]',
+                                mocha: 'bg-[#8D6947] text-[#8D6947]',
+                                espresso: 'bg-[#4E3621] text-[#4E3621]',
                             }[themeKey];
                             
                             return (

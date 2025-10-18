@@ -7,6 +7,12 @@
     @apply bg-stone-100 text-stone-900 dark:bg-stone-900 dark:text-stone-100 transition-colors duration-300;
   }
   
+  aside, main {
+    background-color: rgb(var(--theme-block-bg-rgb));
+    color: rgb(var(--theme-block-text-rgb));
+    transition: background-color 0.3s, color 0.3s;
+  }
+
   :root {
     --theme-color-black: #1c1917; /* stone-900 */
     --theme-color-blue: #1e3a8a;  /* blue-800 */
@@ -14,13 +20,14 @@
   }
 
   /* --- THEME SYSTEM --- */
-  /* Default Theme: Orange Light */
   :root, .theme-orange {
     --theme-color-primary-rgb: 234 88 12;
     --theme-color-primary-hover-rgb: 194 65 12;
     --theme-color-primary-focus-rgb: 249 115 22;
     --theme-accent-text: theme('colors.orange.700');
     --theme-accent-bg: theme('colors.orange.100');
+    --theme-block-bg-rgb: 255 237 213;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-mint {
     --theme-color-primary-rgb: 5 150 105;
@@ -28,6 +35,8 @@
     --theme-color-primary-focus-rgb: 16 185 129;
     --theme-accent-text: theme('colors.emerald.700');
     --theme-accent-bg: theme('colors.emerald.100');
+    --theme-block-bg-rgb: 209 250 229;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-rose {
     --theme-color-primary-rgb: 225 29 72;
@@ -35,6 +44,8 @@
     --theme-color-primary-focus-rgb: 244 63 94;
     --theme-accent-text: theme('colors.rose.700');
     --theme-accent-bg: theme('colors.rose.100');
+    --theme-block-bg-rgb: 255 228 231;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-sky {
     --theme-color-primary-rgb: 2 132 199;
@@ -42,6 +53,8 @@
     --theme-color-primary-focus-rgb: 14 165 233;
     --theme-accent-text: theme('colors.sky.700');
     --theme-accent-bg: theme('colors.sky.100');
+    --theme-block-bg-rgb: 224 242 254;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-lavender {
     --theme-color-primary-rgb: 139 92 246;
@@ -49,6 +62,8 @@
     --theme-color-primary-focus-rgb: 167 139 250;
     --theme-accent-text: theme('colors.violet.700');
     --theme-accent-bg: theme('colors.violet.100');
+    --theme-block-bg-rgb: 237 233 254;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-graphite {
     --theme-color-primary-rgb: 51 65 85;
@@ -56,6 +71,8 @@
     --theme-color-primary-focus-rgb: 71 85 105;
     --theme-accent-text: theme('colors.slate.700');
     --theme-accent-bg: theme('colors.slate.100');
+    --theme-block-bg-rgb: 226 232 240;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-gold {
     --theme-color-primary-rgb: 251 191 36;
@@ -63,6 +80,8 @@
     --theme-color-primary-focus-rgb: 252 211 77;
     --theme-accent-text: theme('colors.amber.700');
     --theme-accent-bg: theme('colors.amber.100');
+    --theme-block-bg-rgb: 254 249 195;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-forest {
     --theme-color-primary-rgb: 21 128 61;
@@ -70,6 +89,8 @@
     --theme-color-primary-focus-rgb: 22 163 74;
     --theme-accent-text: theme('colors.green.700');
     --theme-accent-bg: theme('colors.green.100');
+    --theme-block-bg-rgb: 220 252 231;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-coral {
     --theme-color-primary-rgb: 248 113 113;
@@ -77,36 +98,71 @@
     --theme-color-primary-focus-rgb: 252 165 165;
     --theme-accent-text: theme('colors.red.700');
     --theme-accent-bg: theme('colors.red.100');
+    --theme-block-bg-rgb: 254 226 226;
+    --theme-block-text-rgb: 15 23 42;
   }
-
-  /* --- NEW DARK THEMES (LIGHT MODE VERSION) --- */
   .theme-midnight {
-    --theme-color-primary-rgb: 30 64 175; /* blue-800 */
+    --theme-color-primary-rgb: 30 64 175;
     --theme-color-primary-hover-rgb: 30 58 138;
     --theme-color-primary-focus-rgb: 37 99 235;
     --theme-accent-text: theme('colors.blue.700');
     --theme-accent-bg: theme('colors.blue.100');
+    --theme-block-bg-rgb: 219 234 254;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-ruby {
-    --theme-color-primary-rgb: 190 18 60; /* rose-700 */
+    --theme-color-primary-rgb: 190 18 60;
     --theme-color-primary-hover-rgb: 159 18 57;
     --theme-color-primary-focus-rgb: 225 29 72;
     --theme-accent-text: theme('colors.rose.700');
     --theme-accent-bg: theme('colors.rose.100');
+    --theme-block-bg-rgb: 255 228 231;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-emerald {
-    --theme-color-primary-rgb: 4 120 87; /* emerald-700 */
+    --theme-color-primary-rgb: 4 120 87;
     --theme-color-primary-hover-rgb: 5 102 73;
     --theme-color-primary-focus-rgb: 16 185 129;
     --theme-accent-text: theme('colors.emerald.700');
     --theme-accent-bg: theme('colors.emerald.100');
+    --theme-block-bg-rgb: 209 250 229;
+    --theme-block-text-rgb: 15 23 42;
   }
   .theme-amethyst {
-    --theme-color-primary-rgb: 126 34 206; /* purple-700 */
+    --theme-color-primary-rgb: 126 34 206;
     --theme-color-primary-hover-rgb: 107 33 168;
     --theme-color-primary-focus-rgb: 147 51 234;
     --theme-accent-text: theme('colors.purple.700');
     --theme-accent-bg: theme('colors.purple.100');
+    --theme-block-bg-rgb: 243 232 255;
+    --theme-block-text-rgb: 15 23 42;
+  }
+  .theme-latte {
+    --theme-color-primary-rgb: 199 161 122;
+    --theme-color-primary-hover-rgb: 180 140 100;
+    --theme-color-primary-focus-rgb: 218 182 144;
+    --theme-accent-text: #8D6947;
+    --theme-accent-bg: #F5EFE6;
+    --theme-block-bg-rgb: 240 230 220;
+    --theme-block-text-rgb: 15 23 42;
+  }
+  .theme-mocha {
+    --theme-color-primary-rgb: 141 105 71;
+    --theme-color-primary-hover-rgb: 120 89 60;
+    --theme-color-primary-focus-rgb: 161 120 81;
+    --theme-accent-text: #704825;
+    --theme-accent-bg: #E4D5C6;
+    --theme-block-bg-rgb: 210 180 140;
+    --theme-block-text-rgb: 15 23 42;
+  }
+  .theme-espresso {
+    --theme-color-primary-rgb: 78 54 33;
+    --theme-color-primary-hover-rgb: 60 42 25;
+    --theme-color-primary-focus-rgb: 97 67 41;
+    --theme-accent-text: #4E3621;
+    --theme-accent-bg: #D4C8BC;
+    --theme-block-bg-rgb: 188 158 130;
+    --theme-block-text-rgb: 15 23 42;
   }
 
   /* Dark Mode Overrides */
@@ -118,22 +174,32 @@
   .dark.theme-orange {
     --theme-accent-text: theme('colors.orange.400');
     --theme-accent-bg: theme('colors.orange.900/50');
+    --theme-block-bg-rgb: 41 23 1;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-mint {
     --theme-accent-text: theme('colors.emerald.400');
     --theme-accent-bg: theme('colors.emerald.900/50');
+    --theme-block-bg-rgb: 6 54 41;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-rose {
     --theme-accent-text: theme('colors.rose.400');
     --theme-accent-bg: theme('colors.rose.900/50');
+    --theme-block-bg-rgb: 76 5 25;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-sky {
     --theme-accent-text: theme('colors.sky.400');
     --theme-accent-bg: theme('colors.sky.900/50');
+    --theme-block-bg-rgb: 8 48 77;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-lavender {
     --theme-accent-text: theme('colors.violet.400');
     --theme-accent-bg: theme('colors.violet.900/50');
+    --theme-block-bg-rgb: 36 17 75;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-graphite {
     --theme-color-primary-rgb: 100 116 139;
@@ -141,50 +207,90 @@
     --theme-color-primary-focus-rgb: 148 163 184;
     --theme-accent-text: theme('colors.slate.400');
     --theme-accent-bg: theme('colors.slate.800/50');
+    --theme-block-bg-rgb: 30 41 59;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-gold {
      --theme-accent-text: theme('colors.amber.400');
     --theme-accent-bg: theme('colors.amber.900/50');
+    --theme-block-bg-rgb: 71 55 8;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-forest {
     --theme-accent-text: theme('colors.green.400');
     --theme-accent-bg: theme('colors.green.900/50');
+    --theme-block-bg-rgb: 15 63 31;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-coral {
      --theme-accent-text: theme('colors.red.400');
     --theme-accent-bg: theme('colors.red.900/50');
+    --theme-block-bg-rgb: 78 14 14;
+    --theme-block-text-rgb: 229 231 235;
   }
-
-  /* --- NEW DARK THEMES (DARK MODE VERSION) --- */
   .dark.theme-midnight {
-    --theme-color-primary-rgb: 49 101 224;
-    --theme-color-primary-hover-rgb: 60 117 235;
-    --theme-color-primary-focus-rgb: 96 165 250;
+    --theme-color-primary-rgb: 96 165 250;
+    --theme-color-primary-hover-rgb: 59 130 246;
+    --theme-color-primary-focus-rgb: 147 197 253;
     --theme-accent-text: theme('colors.blue.400');
     --theme-accent-bg: theme('colors.blue.900/50');
+    --theme-block-bg-rgb: 30 58 138;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-ruby {
-    --theme-color-primary-rgb: 225 29 72;
-    --theme-color-primary-hover-rgb: 244 63 94;
+    --theme-color-primary-rgb: 244 63 94;
+    --theme-color-primary-hover-rgb: 225 29 72;
     --theme-color-primary-focus-rgb: 251 113 133;
     --theme-accent-text: theme('colors.rose.400');
     --theme-accent-bg: theme('colors.rose.900/50');
+    --theme-block-bg-rgb: 134 25 54;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-emerald {
-    --theme-color-primary-rgb: 16 185 129;
-    --theme-color-primary-hover-rgb: 52 211 153;
+    --theme-color-primary-rgb: 52 211 153;
+    --theme-color-primary-hover-rgb: 16 185 129;
     --theme-color-primary-focus-rgb: 110 231 183;
     --theme-accent-text: theme('colors.emerald.400');
     --theme-accent-bg: theme('colors.emerald.900/50');
+    --theme-block-bg-rgb: 4 78 55;
+    --theme-block-text-rgb: 229 231 235;
   }
   .dark.theme-amethyst {
-    --theme-color-primary-rgb: 147 51 234;
-    --theme-color-primary-hover-rgb: 168 85 247;
+    --theme-color-primary-rgb: 168 85 247;
+    --theme-color-primary-hover-rgb: 147 51 234;
     --theme-color-primary-focus-rgb: 192 132 252;
     --theme-accent-text: theme('colors.purple.400');
     --theme-accent-bg: theme('colors.purple.900/50');
+    --theme-block-bg-rgb: 88 28 135;
+    --theme-block-text-rgb: 229 231 235;
   }
-
+  .dark.theme-latte {
+    --theme-color-primary-rgb: 199 161 122;
+    --theme-color-primary-hover-rgb: 218 182 144;
+    --theme-color-primary-focus-rgb: 180 140 100;
+    --theme-accent-text: #E6D5C3;
+    --theme-accent-bg: #4A3A29;
+    --theme-block-bg-rgb: 94 73 52;
+    --theme-block-text-rgb: 229 231 235;
+  }
+  .dark.theme-mocha {
+    --theme-color-primary-rgb: 141 105 71;
+    --theme-color-primary-hover-rgb: 161 120 81;
+    --theme-color-primary-focus-rgb: 120 89 60;
+    --theme-accent-text: #BFA58C;
+    --theme-accent-bg: #3E2914;
+    --theme-block-bg-rgb: 69 46 20;
+    --theme-block-text-rgb: 229 231 235;
+  }
+  .dark.theme-espresso {
+    --theme-color-primary-rgb: 78 54 33;
+    --theme-color-primary-hover-rgb: 97 67 41;
+    --theme-color-primary-focus-rgb: 60 42 25;
+    --theme-accent-text: #A8917D;
+    --theme-accent-bg: #291C0F;
+    --theme-block-bg-rgb: 46 31 17;
+    --theme-block-text-rgb: 229 231 235;
+  }
 
   /* Font Themes */
   .font-theme-klasik { --font-worksheet: 'Lora', serif; }
@@ -200,7 +306,6 @@
     font-family: var(--font-worksheet);
   }
 
-  /* Fallback for components that might not be themed via Tailwind config */
   .accent-primary-color {
       accent-color: rgb(var(--theme-color-primary-rgb));
   }
@@ -214,14 +319,15 @@
     transition: transform 0.2s ease;
   }
   .worksheet-page {
-    @apply bg-white shadow-lg my-4 relative;
+    @apply shadow-lg my-4 relative;
+    background-color: rgb(var(--theme-block-bg-rgb));
     width: 210mm;
     min-height: 297mm;
     box-sizing: border-box;
     font-size: var(--font-size);
     line-height: var(--line-height);
     text-align: var(--text-align);
-    color: black;
+    color: var(--color);
   }
   .worksheet-page.landscape {
       width: 297mm;
@@ -348,6 +454,11 @@
     background-color: #fff !important;
   }
   
+  aside, main {
+    background-color: #fff !important;
+    color: #000 !important;
+  }
+
   /* Reset layout for printing, hide all UI except the worksheet area */
   body, #root, #root > div, #root > div > div.flex {
     display: block !important;
@@ -376,12 +487,12 @@
     height: auto;
     page-break-after: always;
     color: var(--color);
+    background-color: #fff !important;
   }
   
   .worksheet-page.white-page {
       color: black;
   }
-
 
   @page {
     /* color is now applied directly to .worksheet-page for better control */
