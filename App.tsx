@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UIProvider, useUI } from './services/UIContext';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext';
@@ -143,6 +143,7 @@ const AppContent: React.FC = () => {
         isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
     } = useUI();
     const { isLoading } = useWorksheet();
+    const [isWorksheetHovered, setIsWorksheetHovered] = useState(false);
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
@@ -151,7 +152,15 @@ const AppContent: React.FC = () => {
             </header>
 
             <div className="flex flex-grow overflow-hidden">
-                <aside className={`print:hidden transition-all duration-300 ease-in-out bg-white dark:bg-stone-800 shadow-lg ${isSettingsPanelCollapsed ? 'w-0 -translate-x-full opacity-0 p-0' : 'w-80 p-4'}`}>
+                <aside 
+                    className={`print:hidden transition-all duration-300 ease-in-out bg-white dark:bg-stone-800 shadow-lg ${
+                        isSettingsPanelCollapsed 
+                            ? 'w-0 -translate-x-full opacity-0 p-0' 
+                            : isWorksheetHovered 
+                                ? 'w-40 p-2' 
+                                : 'w-80 p-4'
+                    }`}
+                >
                     <div className="overflow-y-auto h-full">
                         <SettingsPanel />
                     </div>
@@ -167,7 +176,11 @@ const AppContent: React.FC = () => {
                     </button>
                 </div>
 
-                <main className="flex-1 flex flex-col overflow-hidden bg-stone-200 dark:bg-stone-900/80 relative">
+                <main 
+                    className="flex-1 flex flex-col overflow-hidden bg-stone-200 dark:bg-stone-900/80 relative"
+                    onMouseEnter={() => setIsWorksheetHovered(true)}
+                    onMouseLeave={() => setIsWorksheetHovered(false)}
+                >
                     {isLoading && (
                         <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-30">
                             <LoadingIcon className="w-12 h-12 text-white" />
