@@ -68,7 +68,7 @@ const ThemeSwitcher: React.FC = () => {
 
                     {/* Color Theme Section */}
                     <SectionTitle>Renk Paleti</SectionTitle>
-                     <div className="grid grid-cols-3 gap-3 px-3">
+                     <div className="grid grid-cols-4 gap-3 px-3">
                         {Object.entries(colorThemes).map(([key, value]) => {
                             const themeKey = key as ColorTheme;
                             const colorClass = {
@@ -81,6 +81,10 @@ const ThemeSwitcher: React.FC = () => {
                                 gold: 'bg-amber-400 text-amber-400',
                                 forest: 'bg-green-700 text-green-700',
                                 coral: 'bg-red-400 text-red-400',
+                                midnight: 'bg-blue-800 text-blue-800',
+                                ruby: 'bg-rose-800 text-rose-800',
+                                emerald: 'bg-emerald-800 text-emerald-800',
+                                amethyst: 'bg-purple-800 text-purple-800',
                             }[themeKey];
                             
                             return (

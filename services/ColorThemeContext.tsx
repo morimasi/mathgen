@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
-export type ColorTheme = 'orange' | 'mint' | 'rose' | 'sky' | 'lavender' | 'graphite' | 'gold' | 'forest' | 'coral';
+export type ColorTheme = 'orange' | 'mint' | 'rose' | 'sky' | 'lavender' | 'graphite' | 'gold' | 'forest' | 'coral' | 'midnight' | 'ruby' | 'emerald' | 'amethyst';
 
 export const colorThemes: Record<ColorTheme, { name: string; className: string }> = {
   orange: { name: 'Varsayılan (Turuncu)', className: 'theme-orange' },
@@ -12,6 +12,10 @@ export const colorThemes: Record<ColorTheme, { name: string; className: string }
   gold: { name: 'Altın', className: 'theme-gold' },
   forest: { name: 'Orman', className: 'theme-forest' },
   coral: { name: 'Mercan', className: 'theme-coral' },
+  midnight: { name: 'Gece Mavisi', className: 'theme-midnight' },
+  ruby: { name: 'Yakut Kırmızısı', className: 'theme-ruby' },
+  emerald: { name: 'Zümrüt Yeşili', className: 'theme-emerald' },
+  amethyst: { name: 'Ametist Moru', className: 'theme-amethyst' },
 };
 
 interface ColorThemeContextType {

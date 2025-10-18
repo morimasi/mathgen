@@ -1,4 +1,4 @@
-@tailwind base;
+ @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -79,6 +79,36 @@
     --theme-accent-bg: theme('colors.red.100');
   }
 
+  /* --- NEW DARK THEMES (LIGHT MODE VERSION) --- */
+  .theme-midnight {
+    --theme-color-primary-rgb: 30 64 175; /* blue-800 */
+    --theme-color-primary-hover-rgb: 30 58 138;
+    --theme-color-primary-focus-rgb: 37 99 235;
+    --theme-accent-text: theme('colors.blue.700');
+    --theme-accent-bg: theme('colors.blue.100');
+  }
+  .theme-ruby {
+    --theme-color-primary-rgb: 190 18 60; /* rose-700 */
+    --theme-color-primary-hover-rgb: 159 18 57;
+    --theme-color-primary-focus-rgb: 225 29 72;
+    --theme-accent-text: theme('colors.rose.700');
+    --theme-accent-bg: theme('colors.rose.100');
+  }
+  .theme-emerald {
+    --theme-color-primary-rgb: 4 120 87; /* emerald-700 */
+    --theme-color-primary-hover-rgb: 5 102 73;
+    --theme-color-primary-focus-rgb: 16 185 129;
+    --theme-accent-text: theme('colors.emerald.700');
+    --theme-accent-bg: theme('colors.emerald.100');
+  }
+  .theme-amethyst {
+    --theme-color-primary-rgb: 126 34 206; /* purple-700 */
+    --theme-color-primary-hover-rgb: 107 33 168;
+    --theme-color-primary-focus-rgb: 147 51 234;
+    --theme-accent-text: theme('colors.purple.700');
+    --theme-accent-bg: theme('colors.purple.100');
+  }
+
   /* Dark Mode Overrides */
   .dark {
     --theme-color-black: #f5f5f4; /* stone-100 */
@@ -124,6 +154,37 @@
      --theme-accent-text: theme('colors.red.400');
     --theme-accent-bg: theme('colors.red.900/50');
   }
+
+  /* --- NEW DARK THEMES (DARK MODE VERSION) --- */
+  .dark.theme-midnight {
+    --theme-color-primary-rgb: 49 101 224;
+    --theme-color-primary-hover-rgb: 60 117 235;
+    --theme-color-primary-focus-rgb: 96 165 250;
+    --theme-accent-text: theme('colors.blue.400');
+    --theme-accent-bg: theme('colors.blue.900/50');
+  }
+  .dark.theme-ruby {
+    --theme-color-primary-rgb: 225 29 72;
+    --theme-color-primary-hover-rgb: 244 63 94;
+    --theme-color-primary-focus-rgb: 251 113 133;
+    --theme-accent-text: theme('colors.rose.400');
+    --theme-accent-bg: theme('colors.rose.900/50');
+  }
+  .dark.theme-emerald {
+    --theme-color-primary-rgb: 16 185 129;
+    --theme-color-primary-hover-rgb: 52 211 153;
+    --theme-color-primary-focus-rgb: 110 231 183;
+    --theme-accent-text: theme('colors.emerald.400');
+    --theme-accent-bg: theme('colors.emerald.900/50');
+  }
+  .dark.theme-amethyst {
+    --theme-color-primary-rgb: 147 51 234;
+    --theme-color-primary-hover-rgb: 168 85 247;
+    --theme-color-primary-focus-rgb: 192 132 252;
+    --theme-accent-text: theme('colors.purple.400');
+    --theme-accent-bg: theme('colors.purple.900/50');
+  }
+
 
   /* Font Themes */
   .font-theme-klasik { --font-worksheet: 'Lora', serif; }
