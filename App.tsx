@@ -174,7 +174,7 @@ const WorksheetToolbar: React.FC = () => {
                     <label htmlFor="fontsize-slider" className="text-xs font-medium">Yazı Tipi</label>
                     <input id="fontsize-slider" type="range" min="10" max="24" step="1" value={settings.fontSize} onChange={(e) => setSettings(s => ({ ...s, fontSize: parseInt(e.target.value, 10) }))} className="w-20 accent-orange-700"/>
                 </div>
-                <Select label="Renk" id="color-theme" value={settings.colorTheme} onChange={e => setSettings(s => ({...s, colorTheme: e.target.value as 'black' | 'blue' | 'sepia'}))} options={[{ value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }, { value: 'sepia', label: 'Sepya' }]}/>
+                <Select label="Yazdırma Rengi" id="color-theme" value={settings.colorTheme} onChange={e => setSettings(s => ({...s, colorTheme: e.target.value as 'black' | 'blue' | 'sepia'}))} options={[{ value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }, { value: 'sepia', label: 'Sepya' }]}/>
             </div>
         </div>
     );

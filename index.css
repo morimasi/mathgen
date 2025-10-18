@@ -59,11 +59,10 @@
     transition: transform 0.2s ease;
   }
   .worksheet-page {
-    @apply bg-white shadow-lg my-4 relative;
+    @apply bg-white shadow-lg my-4 relative text-stone-900;
     width: 210mm;
     min-height: 297mm;
     box-sizing: border-box;
-    color: var(--color);
     font-size: var(--font-size);
     line-height: var(--line-height);
     text-align: var(--text-align);
@@ -177,6 +176,7 @@
     min-height: 0 !important;
     height: auto;
     page-break-after: always;
+    color: var(--color);
   }
 
   /* Ensure print-hidden utility works */
