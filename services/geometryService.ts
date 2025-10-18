@@ -1,7 +1,6 @@
-
-
-import { Problem, GeometryProblemType, ShapeType, GeometrySettings } from '../types';
-import { draw2DShape, drawAngle, drawSymmetryLine } from './svgService';
+// FIX: Add .ts extension to import paths
+import { Problem, GeometryProblemType, ShapeType, GeometrySettings } from '../types.ts';
+import { draw2DShape, drawAngle, drawSymmetryLine } from './svgService.ts';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -31,7 +30,6 @@ export const generateGeometryProblem = (settings: GeometrySettings): { problem: 
                 [ShapeType.Trapezoid]: "yamuğun",
                 [ShapeType.Pentagon]: "düzgün beşgenin",
                 [ShapeType.Hexagon]: "düzgün altıgenin",
-                // FIX: Added missing Rhombus type to satisfy the ShapeType enum.
                 [ShapeType.Rhombus]: "eşkenar dörtgenin",
             };
 
@@ -78,7 +76,7 @@ export const generateGeometryProblem = (settings: GeometrySettings): { problem: 
                 case ShapeType.Parallelogram: {
                      const b = getRandomInt(10, 40);
                      const s = getRandomInt(5, 30);
-                     const h = getRandomInt(4, s-1);
+                     const h = getRandomInt(4, s-1 > 0 ? s-1 : 4);
                      if(isPerimeter) {
                         svg = draw2DShape({ type: shape, b, s});
                         answer = `${2 * (b + s)} birim`;
@@ -104,10 +102,18 @@ export const generateGeometryProblem = (settings: GeometrySettings): { problem: 
                     break;
                 }
                 case ShapeType.Pentagon:
-                case ShapeType.Hexagon: {
+                case ShapeType.Hexagon:
+                case ShapeType.Rhombus: {
                     const s = getRandomInt(5, 50);
                     svg = draw2DShape({ type: shape, s });
-                    answer = `${(shape === ShapeType.Pentagon ? 5 : 6) * s} birim`;
+                     if (type === GeometryProblemType.Area && (shape === ShapeType.Pentagon || shape === ShapeType.Hexagon || shape === ShapeType.Rhombus)) {
+                        answer = "Bu şeklin alanı için daha fazla bilgi gereklidir.";
+                    } else if (shape === ShapeType.Rhombus) {
+                        answer = `${4 * s} birim`;
+                    }
+                    else {
+                        answer = `${(shape === ShapeType.Pentagon ? 5 : 6) * s} birim`;
+                    }
                     break;
                 }
             }
@@ -117,7 +123,7 @@ export const generateGeometryProblem = (settings: GeometrySettings): { problem: 
 
         case GeometryProblemType.ShapeRecognition: {
             title = "Tanımı verilen geometrik şeklin adını yazınız.";
-            const shapes = ["kare", "dikdörtgen", "üçgen", "daire", "paralelkenar", "yamuk", "düzgün beşgen", "düzgün altıgen"];
+            const shapes = ["kare", "dikdörtgen", "üçgen", "daire", "paralelkenar", "yamuk", "düzgün beşgen", "düzgün altıgen", "eşkenar dörtgen"];
             const props = [
                 "4 eşit kenarı ve 4 dik açısı olan şekil",
                 "karşılıklı kenarları eşit ve 4 dik açısı olan şekil",
@@ -126,7 +132,8 @@ export const generateGeometryProblem = (settings: GeometrySettings): { problem: 
                 "karşılıklı kenarları paralel olan dörtgen",
                 "sadece iki kenarı paralel olan dörtgen",
                 "5 eşit kenarı ve 5 eşit açısı olan şekil",
-                "6 eşit kenarı ve 6 eşit açısı olan şekil"
+                "6 eşit kenarı ve 6 eşit açısı olan şekil",
+                "4 eşit kenarı olan dörtgen"
             ];
             const i = getRandomInt(0, shapes.length - 1);
             const question = `<span style="font-size: 1.1em;">"${props[i]}"</span>`;

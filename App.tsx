@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import { UIProvider, useUI } from './services/UIContext';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext';
@@ -27,7 +27,9 @@ import {
     HeartIcon,
     MailIcon,
     SettingsIcon,
-    DownloadIcon
+    DownloadIcon,
+    MenuIcon,
+    MoreVerticalIcon
 } from './components/icons/Icons';
 import Button from './components/form/Button';
 import Select from './components/form/Select';
@@ -36,11 +38,29 @@ import { useFlyingLadybugs } from './services/FlyingLadybugContext';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const Header: React.FC = () => {
+const Header: React.FC = memo(() => {
     const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
     const { clearWorksheet, triggerAutoRefresh, setIsLoading } = useWorksheet();
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isActionMenuOpen, setActionMenuOpen] = useState(false);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
+    const actionMenuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+                setMobileMenuOpen(false);
+            }
+            if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
+                setActionMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
 
     const onReset = () => {
         if (window.confirm('Tüm ayarları ve çalışma kağıdını sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
@@ -52,9 +72,11 @@ const Header: React.FC = () => {
 
     const handlePrint = () => {
         window.print();
+        setActionMenuOpen(false);
     };
 
     const handleDownloadPDF = async () => {
+        setActionMenuOpen(false);
         setIsLoading(true);
         addToast('PDF oluşturuluyor, lütfen bekleyin...', 'info');
         try {
@@ -79,7 +101,7 @@ const Header: React.FC = () => {
                     pdf.addPage();
                 }
                 const canvas = await html2canvas(page, {
-                    scale: 2, // Yüksek çözünürlük için ölçeği artır
+                    scale: 2,
                     useCORS: true,
                     width: page.offsetWidth,
                     height: page.offsetHeight,
@@ -100,6 +122,18 @@ const Header: React.FC = () => {
         }
     };
     
+    const ActionButtons = () => (
+        <>
+            <button onClick={triggerAutoRefresh} className="action-button" title="Soruları Yenile"><RefreshIcon /><span>Soruları Yenile</span></button>
+            <button onClick={() => { openPrintSettings(); setActionMenuOpen(false); }} className="action-button" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /><span>Yazdırma Ayarları</span></button>
+            <button onClick={() => { openFavoritesPanel(); setActionMenuOpen(false); }} className="action-button" title="Favorilerim"><HeartIcon /><span>Favorilerim</span></button>
+            <button onClick={handlePrint} className="action-button" title="Yazdır"><PrintIcon /><span>Yazdır</span></button>
+            <button onClick={handleDownloadPDF} className="action-button" title="PDF Olarak İndir"><DownloadIcon /><span>PDF İndir</span></button>
+            <button onClick={() => { openHowToUse(); setActionMenuOpen(false); }} className="action-button" title="Nasıl Kullanılır?"><HelpIcon /><span>Nasıl Kullanılır?</span></button>
+            <button onClick={() => { openContactModal(); setActionMenuOpen(false); }} className="action-button" title="İletişim & Geri Bildirim"><MailIcon /><span>İletişim</span></button>
+        </>
+    );
+
     return (
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-14">
@@ -107,10 +141,35 @@ const Header: React.FC = () => {
                     <AnimatedLogo onReset={onReset} />
                     <span className="font-bold text-xl tracking-tight hidden sm:block">MathGen</span>
                 </div>
-                <div className="flex-1 flex justify-center">
+
+                {/* Desktop Tabs */}
+                <div className="hidden md:flex flex-1 justify-center">
                     <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={setActiveTab} />
                 </div>
-                <div className="flex items-center gap-1">
+
+                {/* Mobile Menu Buttons */}
+                <div className="md:hidden flex items-center gap-1">
+                    <ThemeSwitcher />
+                    <div ref={actionMenuRef} className="relative">
+                        <button onClick={() => setActionMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
+                         {isActionMenuOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30 py-1">
+                                <ActionButtons />
+                            </div>
+                         )}
+                    </div>
+                    <div ref={mobileMenuRef} className="relative">
+                        <button onClick={() => setMobileMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Modüller"><MenuIcon /></button>
+                        {isMobileMenuOpen && (
+                            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30">
+                                <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={(id) => { setActiveTab(id); setMobileMenuOpen(false); }} />
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Desktop Action Buttons */}
+                <div className="hidden md:flex items-center gap-1">
                     <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
                     <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
                     <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
@@ -123,9 +182,9 @@ const Header: React.FC = () => {
             </div>
         </div>
     );
-};
+});
 
-const WorksheetToolbar: React.FC = () => {
+const WorksheetToolbar: React.FC = memo(() => {
     const { settings, setSettings } = usePrintSettings();
     const { fontTheme, setFontTheme } = useFontTheme();
     const fontThemeOptions = Object.entries(fontThemes).map(([key, value]) => ({ value: key, label: value.name }));
@@ -141,11 +200,11 @@ const WorksheetToolbar: React.FC = () => {
         }
     };
     
-    const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2"></div>;
+    const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2 hidden md:block"></div>;
 
     return (
-        <div className="flex-shrink-0 p-2 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 print:hidden">
-            <div className="flex items-center gap-3">
+        <div className="flex-shrink-0 p-2 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 print:hidden flex-wrap md:flex-nowrap gap-2 md:gap-0">
+            <div className="flex items-center gap-3 flex-wrap">
                 {/* --- Scale --- */}
                 <div className="flex items-center gap-2">
                     <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
@@ -193,7 +252,7 @@ const WorksheetToolbar: React.FC = () => {
             </div>
         </div>
     );
-};
+});
 
 const AppContent: React.FC = () => {
     const { 
@@ -205,7 +264,6 @@ const AppContent: React.FC = () => {
     } = useUI();
     const { isLoading } = useWorksheet();
     const { settings, setSettings } = usePrintSettings();
-    const [isWorksheetHovered, setIsWorksheetHovered] = useState(false);
     
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
@@ -213,13 +271,12 @@ const AppContent: React.FC = () => {
     useEffect(() => {
         const el = panAreaRef.current;
         if (el) {
-            // Set initial scroll to the center to allow panning left and right
             el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
         }
-    }, []); // Run only once on mount to set the initial state
+    }, []);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.button !== 0) return; // Only pan with left-click
+        if (e.button !== 0) return;
         e.preventDefault();
         const el = panAreaRef.current;
         if (!el) return;
@@ -252,29 +309,21 @@ const AppContent: React.FC = () => {
     };
 
     const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        const scaleAmount = 0.05;
-        const newScale = e.deltaY > 0
-            ? Math.max(0.2, settings.scale - scaleAmount)
-            : Math.min(2.0, settings.scale + scaleAmount);
-        setSettings(s => ({ ...s, scale: newScale }));
+        if (e.ctrlKey || e.metaKey) { // Allow pinch-zoom on trackpads
+            e.preventDefault();
+            const scaleAmount = 0.05;
+            const newScale = e.deltaY > 0
+                ? Math.max(0.2, settings.scale - scaleAmount)
+                : Math.min(2.0, settings.scale + scaleAmount);
+            setSettings(s => ({ ...s, scale: newScale }));
+        }
+        // If no ctrl/meta key, allow normal vertical scrolling of the pan area
     };
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
             
-            <div className="constellation-header print:hidden">
-                <svg className="constellation-svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
-                    <polyline className="constellation-lines" points="30,80 80,100 140,110 190,100 250,95 310,75 380,60" />
-                    <circle className="star" cx="30" cy="80" r="3" style={{ animationDelay: '0.1s' }} />
-                    <circle className="star" cx="80" cy="100" r="3.5" style={{ animationDelay: '0.5s' }} />
-                    <circle className="star" cx="140" cy="110" r="3" style={{ animationDelay: '0.3s' }} />
-                    <circle className="star" cx="190" cy="100" r="2.8" style={{ animationDelay: '0.8s' }} />
-                    <circle className="star" cx="250" cy="95" r="3.5" style={{ animationDelay: '0.2s' }} />
-                    <circle className="star" cx="310" cy="75" r="3" style={{ animationDelay: '0.6s' }} />
-                    <circle className="star" cx="380" cy="60" r="3.2" style={{ animationDelay: '0.4s' }} />
-                </svg>
-            </div>
+            <div className="constellation-header print:hidden" />
             
             <header className="flex-shrink-0 bg-primary text-white shadow-md z-20 print:hidden">
                 <Header />
@@ -282,12 +331,10 @@ const AppContent: React.FC = () => {
 
             <div className="flex flex-grow overflow-hidden">
                 <aside 
-                    className={`print:hidden transition-all duration-300 ease-in-out shadow-lg ${
+                    className={`print:hidden transition-all duration-300 ease-in-out shadow-lg bg-white dark:bg-stone-800 ${
                         isSettingsPanelCollapsed 
                             ? 'w-0 -translate-x-full opacity-0 p-0' 
-                            : isWorksheetHovered 
-                                ? 'w-40 p-2' 
-                                : 'w-80 p-4'
+                            : 'w-80 p-4'
                     }`}
                 >
                     <div className="overflow-y-auto h-full">
@@ -307,8 +354,6 @@ const AppContent: React.FC = () => {
 
                 <main 
                     className="flex-1 flex flex-col overflow-hidden relative"
-                    onMouseEnter={() => setIsWorksheetHovered(true)}
-                    onMouseLeave={() => setIsWorksheetHovered(false)}
                 >
                     {isLoading && (
                         <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-30">

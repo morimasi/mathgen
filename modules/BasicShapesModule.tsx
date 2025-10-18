@@ -85,7 +85,7 @@ const BasicShapesModule: React.FC = () => {
                     </div>
                 )}
             </div>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
                 <Select
                     label="Etkinlik Türü"
                     id="shape-type"
@@ -96,7 +96,7 @@ const BasicShapesModule: React.FC = () => {
                         { value: ShapeRecognitionType.MatchObjectShape, label: 'Nesne-Şekil Eşleştirme' },
                         { value: ShapeRecognitionType.CountShapes, label: 'Şekil Sayma' },
                     ]}
-                    containerClassName="col-span-2"
+                    containerClassName="col-span-1 sm:col-span-2"
                 />
 
                 <NumberInput 

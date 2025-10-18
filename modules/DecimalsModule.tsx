@@ -136,7 +136,7 @@ const DecimalsModule: React.FC = () => {
                 )}
             </div>
 
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
                  <Select
                     label="Problem Türü"
                     id="decimals-type"
@@ -147,7 +147,7 @@ const DecimalsModule: React.FC = () => {
                         { value: DecimalsProblemType.ReadWrite, label: 'Okuma / Yazma' },
                         { value: DecimalsProblemType.ToFraction, label: 'Kesre Çevirme' },
                     ]}
-                    containerClassName="col-span-2"
+                    containerClassName="col-span-1 sm:col-span-2"
                 />
                 {isFourOps && (
                     <>
@@ -202,7 +202,7 @@ const DecimalsModule: React.FC = () => {
                 <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
                 <div className="mt-2 space-y-2">
                     <Checkbox label="Otomatik Sığdır" id="autoFit-decimals" checked={settings.autoFit ?? true} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
-                    <div className="grid grid-cols-2 gap-x-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2">
                         <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={isTableLayout || settings.autoFit}/>
                         <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={isTableLayout}/>
                     </div>

@@ -87,7 +87,7 @@ const MatchingAndSortingModule: React.FC = () => {
                     </div>
                 )}
             </div>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
                 <Select
                     label="Etkinlik Türü"
                     id="matching-type"

@@ -224,6 +224,7 @@ export interface TimeSettings {
     type: TimeProblemType;
     difficulty: Difficulty;
     clockFace: ClockFaceDetail;
+    digitalClockDisplay: 'show' | 'box' | 'hide';
     problemsPerPage: number;
     pageCount: number;
     useWordProblems: boolean;

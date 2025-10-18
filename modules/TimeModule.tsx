@@ -22,6 +22,7 @@ const TimeModule: React.FC = () => {
         type: TimeProblemType.ReadAnalog,
         difficulty: 'easy',
         clockFace: 'full',
+        digitalClockDisplay: 'show',
         problemsPerPage: 12,
         pageCount: 1,
         useWordProblems: false,
@@ -92,18 +93,23 @@ const TimeModule: React.FC = () => {
                     </details>
                 )}
 
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
                     <Select label="Sınıf Düzeyi" id="time-grade" value={settings.gradeLevel} onChange={handleGradeLevelChange} options={[{ value: 1, label: '1. Sınıf' },{ value: 2, label: '2. Sınıf' },{ value: 3, label: '3. Sınıf' },{ value: 4, label: '4. Sınıf' },{ value: 5, label: '5. Sınıf' }]} />
                     <Select label="Problem Türü" id="time-type" value={settings.type} onChange={e => handleSettingChange('type', e.target.value as TimeProblemType)} options={[{ value: TimeProblemType.ReadAnalog, label: 'Saat Okuma (Analog)' },{ value: TimeProblemType.DrawTime, label: 'Saati Çizme' },{ value: TimeProblemType.Duration, label: 'Süre Hesaplama' },{ value: TimeProblemType.FindEndTime, label: 'Bitiş Zamanını Bulma' },{ value: TimeProblemType.FindStartTime, label: 'Başlangıç Zamanını Bulma' },{ value: TimeProblemType.UnitConversion, label: 'Birim Dönüştürme' },{ value: TimeProblemType.Calendar, label: 'Takvim Problemleri' }]} />
                     <Select label="Zorluk" id="time-difficulty" value={settings.difficulty} onChange={e => handleSettingChange('difficulty', e.target.value as Difficulty)} options={[{ value: 'easy', label: 'Kolay (Tam Saatler)' },{ value: 'medium', label: 'Orta (Yarım/Çeyrek Saatler)' },{ value: 'hard', label: 'Zor (Tüm Dakikalar)' }]} />
-                    {isAnalogClock && <Select label="Saat Görünümü" id="clock-face" value={settings.clockFace} onChange={e => handleSettingChange('clockFace', e.target.value as ClockFaceDetail)} options={[{ value: 'full', label: 'Tam' },{ value: 'no-numbers', label: 'Sayılar Yok' },{ value: 'no-hands', label: 'Akrep/Yelkovan Yok' },{ value: 'no-minute-hand', label: 'Yelkovan Yok' }]} />}
+                    {isAnalogClock && (
+                        <>
+                            <Select label="Saat Görünümü" id="clock-face" value={settings.clockFace} onChange={e => handleSettingChange('clockFace', e.target.value as ClockFaceDetail)} options={[{ value: 'full', label: 'Tam' },{ value: 'no-numbers', label: 'Sayılar Yok' },{ value: 'no-hands', label: 'Akrep/Yelkovan Yok' },{ value: 'no-minute-hand', label: 'Yelkovan Yok' }]} />
+                            <Select label="Cevap Alanı" id="digital-clock-display" value={settings.digitalClockDisplay} onChange={e => handleSettingChange('digitalClockDisplay', e.target.value as 'show' | 'box' | 'hide')} options={[{ value: 'show', label: 'Dijital Saati Göster' }, { value: 'box', label: 'Cevap Kutusu Göster' }, { value: 'hide', label: 'Gizle' }]} />
+                        </>
+                    )}
                 </div>
 
                 <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
                     <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
                     <div className="mt-2 space-y-2">
                         <Checkbox label="Otomatik Sığdır" id="autoFit-time" checked={settings.autoFit ?? true} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
-                        <div className="grid grid-cols-2 gap-x-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2">
                             <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={50} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={isTableLayout || settings.autoFit} />
                             <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={isTableLayout}/>
                         </div>

@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState } from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
 import { generateContextualWordProblems } from '../services/geminiService';
@@ -114,7 +115,7 @@ export const RhythmicCountingModule: React.FC = () => {
                     </details>
                 )}
 
-                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
                      <Select
                         label="Problem Türü"
                         id="rhythmic-type"
@@ -172,7 +173,7 @@ export const RhythmicCountingModule: React.FC = () => {
                     {showStep && (
                         <Checkbox label="Sadece Katları Kullan" id="use-multiples" checked={settings.useMultiplesOnly}
                             onChange={e => handleSettingChange('useMultiplesOnly', e.target.checked)}
-                            containerClassName="col-span-2" />
+                            containerClassName="col-span-1 sm:col-span-2" />
                     )}
                 </div>
 
@@ -184,7 +185,7 @@ export const RhythmicCountingModule: React.FC = () => {
                             disabled={isPracticeSheet || isTableLayout}
                             title={isPracticeSheet ? "Alıştırma kağıdı modunda bu ayar devre dışıdır." : (isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : "")}
                         />
-                        <div className="grid grid-cols-2 gap-x-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2">
                             <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage}
                                 onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
                                 disabled={isPracticeSheet || isTableLayout || settings.autoFit}

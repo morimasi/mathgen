@@ -1,8 +1,9 @@
 // services/dyscalculiaService.ts
 
-import { Problem, DyscalculiaSubModuleType } from '../types';
-import { generateDyscalculiaAIProblem } from './geminiService';
-import { drawFractionPie, drawAnalogClock } from './svgService';
+// FIX: Add .ts extension to import paths
+import { Problem, DyscalculiaSubModuleType } from '../types.ts';
+import { generateDyscalculiaAIProblem } from './geminiService.ts';
+import { drawFractionPie, drawAnalogClock } from './svgService.ts';
 
 // --- LOCAL GENERATION LOGIC ---
 
