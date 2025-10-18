@@ -1,4 +1,5 @@
 
+
 import { ShapeType } from '../types';
 
 // --- FRACTION PIE ---
@@ -26,13 +27,49 @@ export const drawFractionPie = (numerator: number, denominator: number): string 
         const path = `
             <path d="M ${cx},${cy} L ${x1},${y1} A ${r},${r} 0 ${largeArcFlag},1 ${x2},${y2} Z"
                   fill="${i < numerator ? '#3b82f6' : '#e5e7eb'}"
-                  stroke="#6b7280" stroke-width="1" />
+                  stroke="#fff" stroke-width="2" />
         `;
         paths += path;
     }
 
-    return `<svg viewBox="0 0 ${2*r} ${2*r}" width="100" height="100">${paths}</svg>`;
+    return `<svg viewBox="0 0 ${2*r} ${2*r}" width="100" height="100"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#e5e7eb" stroke="#6b7280" stroke-width="1"/><g>${paths}</g></svg>`;
 };
+
+
+// --- NEW: FRACTION NUMBER LINE ---
+export const drawFractionNumberLine = (numerator: number, denominator: number, max: number = 2): string => {
+    const width = 400;
+    const height = 80;
+    const padding = 20;
+    let svg = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="${height}">`;
+    
+    // Main line with arrows
+    svg += `<defs><marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563" /></marker></defs>`;
+    svg += `<line x1="${padding}" y1="${height/2}" x2="${width - padding}" y2="${height/2}" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)" />`;
+
+    const totalTicks = max * denominator;
+    const tickSpacing = (width - 2 * padding) / totalTicks;
+
+    for (let i = 0; i <= totalTicks; i++) {
+        const x = padding + i * tickSpacing;
+        const isWhole = i % denominator === 0;
+        const tickHeight = isWhole ? 10 : 5;
+        svg += `<line x1="${x}" y1="${height/2 - tickHeight}" x2="${x}" y2="${height/2 + tickHeight}" stroke="#4b5563" stroke-width="${isWhole ? 2 : 1}" />`;
+
+        if (isWhole) {
+            svg += `<text x="${x}" y="${height/2 + 25}" text-anchor="middle" font-size="12">${i / denominator}</text>`;
+        }
+    }
+
+    // Highlight the fraction
+    const fracX = padding + (numerator * tickSpacing);
+    svg += `<circle cx="${fracX}" cy="${height/2}" r="5" fill="#ef4444" />`;
+    svg += `<text x="${fracX}" y="${height/2 - 20}" text-anchor="middle" font-size="14" font-weight="bold" fill="#ef4444">${numerator}/${denominator}</text>`;
+
+    svg += `</svg>`;
+    return svg;
+}
+
 
 // --- ANALOG CLOCK ---
 export const drawAnalogClock = (
@@ -68,9 +105,10 @@ export const drawAnalogClock = (
         for (let i = 1; i <= 12; i++) {
             const angle = i * 30 - 90;
             const rad = angle * Math.PI / 180;
-            const nx = center + (r-10) * Math.cos(rad);
-            const ny = center + (r-10) * Math.sin(rad);
-            numbers += `<text x="${nx}" y="${ny+4}" text-anchor="middle" font-size="10" fill="#333">${i}</text>`;
+            const isQuarter = i % 3 === 0;
+            const nx = center + (r - (isQuarter ? 12 : 10)) * Math.cos(rad);
+            const ny = center + (r - (isQuarter ? 12 : 10)) * Math.sin(rad);
+            numbers += `<text x="${nx}" y="${ny+4}" text-anchor="middle" font-size="${isQuarter ? 12 : 10}" font-weight="${isQuarter ? 'bold' : 'normal'}" fill="#333">${i}</text>`;
         }
     }
 
@@ -191,6 +229,27 @@ export const draw2DShape = (params: ShapeParams): string => {
                 </svg>
             `;
         }
+        case ShapeType.Rhombus: {
+            const s_dim = params.s || 60;
+            const s = s_dim * SCALE;
+            const angle = 60 * Math.PI / 180; // 60 degrees
+            const h = s * Math.sin(angle);
+            const w = s * (1 + Math.cos(angle));
+            const width = w + 2 * PADDING;
+            const height = h + 2 * PADDING;
+
+            const p1 = `${PADDING}, ${PADDING + h/2}`;
+            const p2 = `${PADDING + s * Math.cos(angle)}, ${PADDING}`;
+            const p3 = `${PADDING + w - (s * Math.cos(angle))}, ${PADDING}`; // Correction for p3
+            const p3_real = `${PADDING + w}, ${PADDING + h/2}`;
+            const p4 = `${PADDING + s * Math.cos(angle)}, ${PADDING + h}`;
+            return `
+                <svg viewBox="0 0 ${width} ${height}" width="${width * 0.8}" height="${height * 0.8}">
+                    <polygon points="${PADDING + w/2},${PADDING} ${PADDING+w},${PADDING+h/2} ${PADDING+w/2},${PADDING+h} ${PADDING},${PADDING+h/2}" style="${lineStyle}" />
+                    <text x="${PADDING+w/2}" y="${PADDING-8}" text-anchor="middle" style="${textStyle}">${s_dim}</text>
+                </svg>
+            `;
+        }
         case ShapeType.Parallelogram: {
             const b_dim = params.b || 80;
             const s_dim = params.s || 50;
@@ -200,7 +259,7 @@ export const draw2DShape = (params: ShapeParams): string => {
             const s = s_dim * SCALE;
             const h = h_dim * SCALE;
 
-            const offset = (s*s - h*h > 0) ? Math.sqrt(s*s - h*h) : 0;
+            const offset = (s*s - h*h > 0) ? Math.sqrt(s*s - h*h) : 20;
             const width = b + offset + 2 * PADDING;
             const height = h + 2 * PADDING;
             const p1 = `${PADDING + offset},${PADDING}`;
@@ -262,7 +321,7 @@ export const draw2DShape = (params: ShapeParams): string => {
             const center = size/2;
             let points = '';
             for(let i=0; i<n; i++){
-                const angle = (i * 2 * Math.PI / n) - (Math.PI/2);
+                const angle = (i * 2 * Math.PI / n) - (Math.PI/2) + (isHex ? 0 : Math.PI/10); // Adjust pentagon rotation
                 points += `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)} `;
             }
              return `
@@ -275,6 +334,7 @@ export const draw2DShape = (params: ShapeParams): string => {
         default: return '';
     }
 }
+
 
 export const drawAngle = (angle: number): string => {
     const size = 100;
@@ -295,15 +355,27 @@ export const drawAngle = (angle: number): string => {
 };
 
 export const drawSymmetryLine = (shape: string): string => {
-    // Placeholder SVGs for symmetry concept
+    // Replaced text-based shapes with actual SVG paths for better visuals
     if (shape === 'Kalp') {
         return `
             <svg viewBox="0 0 100 100" width="80" height="80">
-                <path d="M 50,90 C 10,50 40,20 50,40 C 60,20 90,50 50,90 Z" fill="#f43f5e" />
+                <path d="M 50,90 C 10,50 40,20 50,40 C 60,20 90,50 50,90 Z" fill="#f43f5e" stroke="#c22544" stroke-width="1.5" />
                 <line x1="50" y1="30" x2="50" y2="95" stroke="#333" stroke-width="1.5" stroke-dasharray="4 2" />
             </svg>
         `;
     }
+     if (shape === 'Kelebek') {
+         return `
+            <svg viewBox="0 0 100 100" width="80" height="80">
+                <g>
+                    <path d="M 50 50 C 20 20, 20 80, 50 50" fill="#f97316" />
+                    <path d="M 50 50 C 80 20, 80 80, 50 50" fill="#3b82f6" />
+                </g>
+                <line x1="50" y1="20" x2="50" y2="80" stroke="#333" stroke-width="1.5" stroke-dasharray="4 2" />
+            </svg>
+        `;
+     }
+     // Fallback for letters like A and C
      return `
             <svg viewBox="0 0 100 100" width="80" height="80">
                 <text x="50" y="60" text-anchor="middle" font-size="60" font-weight="bold">${shape[0]}</text>
@@ -311,3 +383,56 @@ export const drawSymmetryLine = (shape: string): string => {
             </svg>
         `;
 }
+
+// --- NEW: 3D SHAPES ---
+type SolidType = 'cube' | 'cylinder' | 'pyramid' | 'prism';
+
+export const draw3DShape = (type: SolidType): string => {
+    const lineStyle = 'stroke: #4b5563; stroke-width: 1.5;';
+    const fillStyle = 'fill: #e0f2fe;';
+    const dashedStyle = 'stroke: #9ca3af; stroke-width: 1; stroke-dasharray: 4 2;';
+    
+    switch(type) {
+        case 'cube':
+            return `
+                <svg viewBox="0 0 100 100" width="100" height="100">
+                    <rect x="20" y="30" width="50" height="50" style="${lineStyle} ${fillStyle}" />
+                    <path d="M 70 80 L 70 30 L 85 15 L 85 65 Z" style="${lineStyle} ${fillStyle}" />
+                    <path d="M 20 30 L 35 15 L 85 15 L 70 30 Z" style="${lineStyle} ${fillStyle}" />
+                    <line x1="20" y1="80" x2="35" y2="65" style="${dashedStyle}" />
+                    <line x1="35" y1="65" x2="85" y2="65" style="${dashedStyle}" />
+                    <line x1="35" y1="15" x2="35" y2="65" style="${dashedStyle}" />
+                </svg>
+            `;
+        case 'cylinder':
+            return `
+                <svg viewBox="0 0 100 100" width="80" height="100">
+                    <ellipse cx="50" cy="25" rx="30" ry="10" style="${lineStyle} ${fillStyle}" />
+                    <path d="M 20 25 V 75 A 30 10 0 0 0 80 75 V 25" style="${lineStyle} fill: #f0f9ff;" />
+                    <ellipse cx="50" cy="75" rx="30" ry="10" style="${lineStyle} ${fillStyle}" />
+                </svg>
+            `;
+        case 'pyramid': // Square base pyramid
+            return `
+                <svg viewBox="0 0 100 100" width="100" height="100">
+                    <polygon points="15,80 50,95 85,80 50,65" style="${lineStyle} fill: #f0f9ff;" />
+                    <line x1="15" y1="80" x2="50" y2="20" style="${lineStyle}" />
+                    <line x1="85" y1="80" x2="50" y2="20" style="${lineStyle}" />
+                    <line x1="50" y1="95" x2="50" y2="20" style="${lineStyle}" />
+                    <line x1="50" y1="65" x2="50" y2="20" style="${dashedStyle}" />
+                </svg>
+            `;
+        case 'prism': // Triangular prism
+            return `
+                <svg viewBox="0 0 100 100" width="120" height="100">
+                    <polygon points="20,70 60,70 40,30" style="${lineStyle} ${fillStyle}" />
+                    <polygon points="40,85 80,85 60,45" style="${lineStyle} ${fillStyle}" />
+                    <line x1="20" y1="70" x2="40" y2="85" style="${lineStyle}" />
+                    <line x1="60" y1="70" x2="80" y2="85" style="${lineStyle}" />
+                    <line x1="40" y1="30" x2="60" y2="45" style="${lineStyle}" />
+                </svg>
+            `;
+        default:
+            return '';
+    }
+};

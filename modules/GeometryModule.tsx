@@ -84,6 +84,8 @@ const GeometryModule: React.FC = () => {
         [ShapeType.Trapezoid]: 'Yamuk',
         [ShapeType.Pentagon]: 'Beşgen',
         [ShapeType.Hexagon]: 'Altıgen',
+        // FIX: Added missing Rhombus type to satisfy the ShapeType enum.
+        [ShapeType.Rhombus]: 'Eşkenar Dörtgen',
     };
     
     const shapeOptions = (settings.type === GeometryProblemType.Area ? areaShapes : perimeterShapes).map(s => ({value: s, label: shapeTurkishNames[s]}));

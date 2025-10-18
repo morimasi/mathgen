@@ -1,4 +1,5 @@
 
+
 import { Problem, GeometryProblemType, ShapeType, GeometrySettings } from '../types';
 import { draw2DShape, drawAngle, drawSymmetryLine } from './svgService';
 
@@ -30,6 +31,8 @@ export const generateGeometryProblem = (settings: GeometrySettings): { problem: 
                 [ShapeType.Trapezoid]: "yamuğun",
                 [ShapeType.Pentagon]: "düzgün beşgenin",
                 [ShapeType.Hexagon]: "düzgün altıgenin",
+                // FIX: Added missing Rhombus type to satisfy the ShapeType enum.
+                [ShapeType.Rhombus]: "eşkenar dörtgenin",
             };
 
             title = `Aşağıdaki ${shapeNames[shape]} ${isPerimeter ? 'çevresini' : 'alanını'} hesaplayınız.`;

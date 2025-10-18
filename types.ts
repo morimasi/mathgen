@@ -231,6 +231,7 @@ export enum ShapeType {
     Trapezoid = 'trapezoid',
     Pentagon = 'pentagon',
     Hexagon = 'hexagon',
+    Rhombus = 'rhombus',
 }
 
 export interface GeometrySettings {
