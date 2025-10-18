@@ -5,6 +5,16 @@ const getRandomInt = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+const shuffleArray = <T,>(array: T[]): T[] => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+};
+
+
 const BOX_STYLE = "display: inline-block; border: 1px solid #6b7280; border-radius: 4px; width: 44px; height: 36px; vertical-align: middle; text-align: center; line-height: 36px; font-weight: bold;";
 const SEPARATOR = '<span style="margin: 0 2px; font-weight: bold;">-</span>';
 const ROW_STYLE = "display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 1.25rem; line-height: 1.75rem;";
@@ -284,4 +294,17 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             const numbers = new Set<number>();
             while(numbers.size < orderCount) numbers.add(getRandomByDigits(digits));
             
-            const numArray = Array
+            const numArray = Array.from(numbers);
+            const sorted = [...numArray].sort((a,b) => a - b);
+            if (currentOrderDirection === 'descending') sorted.reverse();
+            const answer = sorted.join(' < ');
+
+            const question = `<div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; align-items: center; font-size: 1.25em; font-family: monospace;">
+                ${shuffleArray(numArray).map(n => `<span style="border: 1px solid #9ca3af; padding: 0.25rem 0.5rem; border-radius: 4px;">${n}</span>`).join('')}
+            </div>`;
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+    }
+    return { problem, title };
+};
