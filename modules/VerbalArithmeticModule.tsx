@@ -12,7 +12,7 @@ import { useProblemGenerator } from '../hooks/useProblemGenerator';
 const VerbalArithmeticModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<VerbalArithmeticSettings>({
-        operation: 'addition',
+        operation: 'mixed',
         maxResult: 10,
         problemsPerPage: 10,
         pageCount: 1,
@@ -46,10 +46,11 @@ const VerbalArithmeticModule: React.FC = () => {
                     label="İşlem Türü"
                     id="va-operation"
                     value={settings.operation}
-                    onChange={e => handleSettingChange('operation', e.target.value as 'addition' | 'subtraction')}
+                    onChange={e => handleSettingChange('operation', e.target.value as 'addition' | 'subtraction' | 'mixed')}
                     options={[
                         { value: 'addition', label: 'Toplama' },
                         { value: 'subtraction', label: 'Çıkarma' },
+                        { value: 'mixed', label: 'Karışık' },
                     ]}
                 />
                  <NumberInput 

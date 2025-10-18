@@ -367,23 +367,36 @@ const generateVisualAdditionSubtractionProblem = (settings: VisualAdditionSubtra
 
 const generateVerbalArithmeticProblem = (settings: VerbalArithmeticSettings): { problem: Problem, title: string } => {
     const { operation, maxResult } = settings;
-    const title = "İşlemi Sözel İfade Etme";
+    const title = "Aşağıdaki İşlemleri Yazıyla İfade Ediniz";
     let n1 = getRandomInt(1, maxResult - 1);
     let n2 = getRandomInt(1, maxResult - n1);
-    let answer = '';
-    let question = '';
+    let verbalAnswer = '';
+    let equation = '';
+    let result = 0;
 
-    if (operation === 'addition') {
-        const result = n1 + n2;
-        question = `<div style="font-size: 1.5rem; font-family: monospace; text-align: center;">${n1} + ${n2} = ${result}</div>`;
-        answer = `${numberToWords(n1)} artı ${numberToWords(n2)} eşittir ${numberToWords(result)}`;
+    const currentOp = operation === 'mixed' ? (Math.random() < 0.5 ? 'addition' : 'subtraction') : operation;
+
+    if (currentOp === 'addition') {
+        result = n1 + n2;
+        equation = `${n1} + ${n2} = ${result}`;
+        verbalAnswer = `${numberToWords(n1)} artı ${numberToWords(n2)} eşittir ${numberToWords(result)}`;
     } else { // subtraction
         if (n1 < n2) [n1, n2] = [n2, n1];
-        const result = n1 - n2;
-        question = `<div style="font-size: 1.5rem; font-family: monospace; text-align: center;">${n1} - ${n2} = ${result}</div>`;
-        answer = `${numberToWords(n1)} eksi ${numberToWords(n2)} eşittir ${numberToWords(result)}`;
+        if (n1 === n2) n1 += 1;
+        result = n1 - n2;
+        equation = `${n1} - ${n2} = ${result}`;
+        verbalAnswer = `${numberToWords(n1)} eksi ${numberToWords(n2)} eşittir ${numberToWords(result)}`;
     }
-    return { problem: { question, answer, category: 'verbal-arithmetic' }, title };
+
+    const writingSpace = `<div style="border-bottom: 1.5px dotted #9ca3af; height: 1.5em; margin-top: 0.75rem; margin-bottom: 0.5rem;"></div>`;
+
+    const question = `
+        <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 1.2rem; width: 100%;">
+            <span style="font-family: monospace; font-weight: bold;">İşlem: ${equation}</span>
+            ${writingSpace}
+        </div>`;
+
+    return { problem: { question, answer: verbalAnswer, category: 'verbal-arithmetic' }, title };
 };
 
 const generateMissingNumberPuzzlesProblem = (settings: MissingNumberPuzzlesSettings): { problem: Problem, title: string } => {

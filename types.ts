@@ -454,7 +454,7 @@ export interface VisualAdditionSubtractionSettings {
 
 // --- Verbal Arithmetic ---
 export interface VerbalArithmeticSettings {
-    operation: 'addition' | 'subtraction';
+    operation: 'addition' | 'subtraction' | 'mixed';
     maxResult: number;
     problemsPerPage: number;
     pageCount: number;
