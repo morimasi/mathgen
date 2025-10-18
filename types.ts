@@ -134,6 +134,7 @@ export enum PlaceValueProblemType {
     WordsToNumber = 'words-to-number',
     Comparison = 'comparison',
     ResultAsWords = 'result-as-words',
+    FromWords = 'from-words',
 }
 
 export type RoundingPlace = 'auto' | 'tens' | 'hundreds' | 'thousands';
@@ -148,6 +149,8 @@ export interface PlaceValueSettings {
     useWordProblems: boolean;
     topic: string;
     autoFit?: boolean;
+    fromWordsOrder?: 'ordered' | 'mixed';
+    fromWordsFormat?: 'inline' | 'vertical';
 }
 
 // --- RHYTHMIC COUNTING ---

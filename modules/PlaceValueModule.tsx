@@ -26,6 +26,8 @@ const PlaceValueModule: React.FC = () => {
         useWordProblems: false,
         topic: '',
         autoFit: true,
+        fromWordsOrder: 'ordered',
+        fromWordsFormat: 'inline',
     });
 
     const { generate } = useProblemGenerator({
@@ -103,6 +105,8 @@ const PlaceValueModule: React.FC = () => {
         switch (settings.type) {
             case PlaceValueProblemType.Rounding:
                 return "'Yuvarlama Yeri' seçeneği, 'Basamak Sayısı' ayarına göre dinamik olarak güncellenir. Örneğin, 3 basamaklı bir sayı için en fazla yüzlüğe yuvarlama seçeneği görünür.";
+            case PlaceValueProblemType.FromWords:
+                return "Bu yeni etkinlik, öğrencilerin '5 onluk + 2 birlik' gibi yazılı ifadeleri '52' gibi bir sayıya dönüştürmesini ister. 'Sıralama' ve 'Format' ayarlarıyla zorluğu ve görünümü özelleştirebilirsiniz.";
             case PlaceValueProblemType.FromExpanded:
                 return "Bu etkinlikte, çözümlemesi verilmiş bir sayının kendisini bulma istenir. Sayıların basamak değerlerini pekiştirmek için etkilidir.";
             case PlaceValueProblemType.Identification:
@@ -165,6 +169,7 @@ const PlaceValueModule: React.FC = () => {
                             { value: PlaceValueProblemType.Rounding, label: 'Yuvarlama' },
                             { value: PlaceValueProblemType.ExpandedForm, label: 'Çözümleme' },
                             { value: PlaceValueProblemType.FromExpanded, label: 'Çözümlenmiş Sayıyı Bulma' },
+                            { value: PlaceValueProblemType.FromWords, label: 'Basamak Değerinden Sayı Oluşturma' },
                             { value: PlaceValueProblemType.WriteInWords, label: 'Yazıyla Yazma' },
                             { value: PlaceValueProblemType.WordsToNumber, label: 'Okunuşu Verilen Sayıyı Yazma' },
                             { value: PlaceValueProblemType.Comparison, label: 'Karşılaştırma' },
@@ -187,6 +192,30 @@ const PlaceValueModule: React.FC = () => {
                             onChange={e => handleSettingChange('roundingPlace', e.target.value as RoundingPlace)}
                             options={roundingOptions}
                         />
+                     )}
+                     {settings.type === PlaceValueProblemType.FromWords && (
+                        <>
+                            <Select
+                                label="Sıralama"
+                                id="from-words-order"
+                                value={settings.fromWordsOrder}
+                                onChange={e => handleSettingChange('fromWordsOrder', e.target.value as 'ordered' | 'mixed')}
+                                options={[
+                                    { value: 'ordered', label: 'Sıralı' },
+                                    { value: 'mixed', label: 'Karışık Sıra' },
+                                ]}
+                            />
+                            <Select
+                                label="Format"
+                                id="from-words-format"
+                                value={settings.fromWordsFormat}
+                                onChange={e => handleSettingChange('fromWordsFormat', e.target.value as 'inline' | 'vertical')}
+                                options={[
+                                    { value: 'inline', label: 'Yan Yana' },
+                                    { value: 'vertical', label: 'Alt Alta' },
+                                ]}
+                            />
+                        </>
                      )}
                 </div>
                  <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>

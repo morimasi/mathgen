@@ -26,6 +26,7 @@ export const generatePlaceValueProblem = (settings: PlaceValueSettings): { probl
         [PlaceValueProblemType.Rounding]: "Sayıları belirtilen en yakın basamağa yuvarlayınız.",
         [PlaceValueProblemType.ExpandedForm]: "Verilen sayıları çözümlenmiş (açınım) halleriyle yazınız.",
         [PlaceValueProblemType.FromExpanded]: "Çözümlenmiş hali verilen sayıları bulunuz.",
+        [PlaceValueProblemType.FromWords]: "Basamak değerlerinden sayı oluşturma.",
         [PlaceValueProblemType.WriteInWords]: "Verilen sayıların okunuşlarını yazınız.",
         [PlaceValueProblemType.WordsToNumber]: "Okunuşu verilen sayıları rakamla yazınız.",
         [PlaceValueProblemType.Comparison]: "Sayıların arasına <, > veya = işaretlerinden uygun olanı koyunuz.",
@@ -123,6 +124,49 @@ export const generatePlaceValueProblem = (settings: PlaceValueSettings): { probl
             }
             parts.sort(() => Math.random() - 0.5); // shuffle parts
             const question = `<span style="font-size: 1.25em; font-family: monospace;">${parts.join(' + ')}</span>`;
+            problem = { ...problemBase, question, answer: num };
+            break;
+        }
+
+        case PlaceValueProblemType.FromWords: {
+            const { fromWordsOrder = 'ordered', fromWordsFormat = 'inline' } = settings;
+            title = fromWordsOrder === 'mixed'
+                ? "Aşağıda basamak değerleri karışık verilenleri sayı olarak yazınız."
+                : "Aşağıda basamak değerleri verilen sayıyı yazınız.";
+
+            const numStr = String(num);
+            const placeNames = ["birlik", "onluk", "yüzlük", "binlik", "on binlik", "yüz binlik", "milyonluk"];
+            
+            let parts: { value: number; name: string }[] = [];
+            for (let i = 0; i < numStr.length; i++) {
+                const digit = parseInt(numStr[i]);
+                if (digit > 0) {
+                    const placeName = placeNames[numStr.length - 1 - i];
+                    parts.push({ value: digit, name: placeName });
+                }
+            }
+
+            if (fromWordsOrder === 'mixed') {
+                parts.sort(() => Math.random() - 0.5);
+            } else {
+                // It's already descending by place value, reverse for standard display (yüzlük, onluk, birlik)
+                parts.reverse();
+            }
+
+            let question = '';
+            if (fromWordsFormat === 'inline') {
+                const partsStr = parts.map(p => `${p.value} ${p.name}`).join(' + ');
+                question = `<span style="font-size: 1.1em;">${partsStr} = ?</span>`;
+            } else { // vertical
+                const partsStr = parts.map(p => `<div>${p.value} ${p.name}</div>`).join('');
+                question = `
+                    <div style="font-size: 1.1em; line-height: 1.7; display: inline-block; text-align: right;">
+                        ${partsStr}
+                        <div style="border-top: 2px solid black; margin-top: 0.5em; padding-top: 0.5em; min-width: 120px;">?</div>
+                    </div>
+                `;
+            }
+
             problem = { ...problemBase, question, answer: num };
             break;
         }
