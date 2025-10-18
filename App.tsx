@@ -29,6 +29,8 @@ import {
     SettingsIcon,
 } from './components/icons/Icons';
 import Button from './components/form/Button';
+import Select from './components/form/Select';
+import NumberInput from './components/form/NumberInput';
 import { useFlyingLadybugs } from './services/FlyingLadybugContext';
 
 const Header: React.FC = () => {
@@ -56,7 +58,7 @@ const Header: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-1">
                     <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
-                    <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdırma Ayarları"><SettingsIcon /></button>
+                    <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
                     <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
                     <ThemeSwitcher />
                     <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
@@ -86,22 +88,43 @@ const WorksheetToolbar: React.FC = () => {
             setSettings(s => ({ ...s, scale: Math.max(0.2, scale) }));
         }
     };
+    
+    const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2"></div>;
 
     return (
         <div className="flex-shrink-0 bg-stone-100 dark:bg-stone-800/50 p-2 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 print:hidden">
-            <div className="flex items-center gap-2">
-                <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
-                <input
-                    id="zoom-slider"
-                    type="range"
-                    min="20"
-                    max="150"
-                    value={settings.scale * 100}
-                    onChange={(e) => setSettings(s => ({ ...s, scale: parseInt(e.target.value, 10) / 100 }))}
-                    className="w-32 accent-orange-700"
-                />
-                <span className="text-xs w-10 text-center">{Math.round(settings.scale * 100)}%</span>
-                <Button onClick={fitToScreen} size="sm" variant="secondary">Ekrana Sığdır</Button>
+            <div className="flex items-center gap-3">
+                {/* --- Scale --- */}
+                <div className="flex items-center gap-2">
+                    <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
+                    <input id="zoom-slider" type="range" min="20" max="150" value={settings.scale * 100} onChange={(e) => setSettings(s => ({ ...s, scale: parseInt(e.target.value, 10) / 100 }))} className="w-24 accent-orange-700"/>
+                    <span className="text-xs w-10 text-center">{Math.round(settings.scale * 100)}%</span>
+                    <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
+                </div>
+                <Separator />
+                {/* --- Layout --- */}
+                 <div className="flex items-center gap-2">
+                    <Select label="Düzen" id="layout-mode" value={settings.layoutMode} onChange={e => setSettings(s => ({...s, layoutMode: e.target.value as 'flow' | 'table'}))} options={[{ value: 'flow', label: 'Akış' }, { value: 'table', label: 'Tablo' }]}/>
+                    {settings.layoutMode === 'flow' ? (
+                        <NumberInput label="Sütun" id="columns" min={1} max={5} value={settings.columns} onChange={e => setSettings(s => ({...s, columns: parseInt(e.target.value,10)}))} className="w-14"/>
+                    ) : (
+                        <>
+                             <NumberInput label="Satır" id="rows" min={1} max={20} value={settings.rows} onChange={e => setSettings(s => ({...s, rows: parseInt(e.target.value,10)}))} className="w-14"/>
+                            <NumberInput label="Sütun" id="columns" min={1} max={5} value={settings.columns} onChange={e => setSettings(s => ({...s, columns: parseInt(e.target.value,10)}))} className="w-14"/>
+                        </>
+                    )}
+                </div>
+                 <Separator />
+                 {/* --- Style --- */}
+                <div className="flex items-center gap-2">
+                    <label htmlFor="margin-slider" className="text-xs font-medium">Marjin</label>
+                    <input id="margin-slider" type="range" min="0.5" max="4" step="0.1" value={settings.pageMargin} onChange={(e) => setSettings(s => ({ ...s, pageMargin: parseFloat(e.target.value) }))} className="w-20 accent-orange-700"/>
+                </div>
+                 <div className="flex items-center gap-2">
+                    <label htmlFor="fontsize-slider" className="text-xs font-medium">Yazı Tipi</label>
+                    <input id="fontsize-slider" type="range" min="10" max="24" step="1" value={settings.fontSize} onChange={(e) => setSettings(s => ({ ...s, fontSize: parseInt(e.target.value, 10) }))} className="w-20 accent-orange-700"/>
+                </div>
+                <Select label="Renk" id="color-theme" value={settings.colorTheme} onChange={e => setSettings(s => ({...s, colorTheme: e.target.value as 'black' | 'blue' | 'sepia'}))} options={[{ value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }, { value: 'sepia', label: 'Sepya' }]}/>
             </div>
             <Button onClick={handlePrint} size="sm" enableFlyingLadybug>
                 <PrintIcon className="w-4 h-4" />
