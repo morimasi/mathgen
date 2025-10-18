@@ -6,7 +6,7 @@ import { ThemeProvider, useTheme } from './services/ThemeContext';
 import { ColorThemeProvider } from './services/ColorThemeContext';
 import { FontThemeProvider } from './services/FontThemeContext';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext';
-import { ToastProvider } from './services/ToastContext';
+import { ToastProvider, useToast } from './services/ToastContext';
 import Tabs from './components/Tabs';
 import SettingsPanel from './components/SettingsPanel';
 import ProblemSheet from './components/ProblemSheet';
@@ -27,22 +27,76 @@ import {
     HeartIcon,
     MailIcon,
     SettingsIcon,
+    DownloadIcon
 } from './components/icons/Icons';
 import Button from './components/form/Button';
 import Select from './components/form/Select';
 import NumberInput from './components/form/NumberInput';
 import { useFlyingLadybugs } from './services/FlyingLadybugContext';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const Header: React.FC = () => {
     const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
-    const { clearWorksheet, triggerAutoRefresh } = useWorksheet();
-    const { spawnLadybug } = useFlyingLadybugs();
+    const { clearWorksheet, triggerAutoRefresh, setIsLoading } = useWorksheet();
+    const { settings: printSettings } = usePrintSettings();
+    const { addToast } = useToast();
 
     const onReset = () => {
         if (window.confirm('Tüm ayarları ve çalışma kağıdını sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
             clearWorksheet();
             localStorage.clear();
             window.location.reload();
+        }
+    };
+
+    const handlePrint = () => {
+        window.print();
+    };
+
+    const handleDownloadPDF = async () => {
+        setIsLoading(true);
+        addToast('PDF oluşturuluyor, lütfen bekleyin...', 'info');
+        try {
+            const pages = document.querySelectorAll<HTMLElement>('.worksheet-page');
+            if (pages.length === 0) {
+                addToast('İndirilecek içerik bulunamadı.', 'warning');
+                return;
+            }
+
+            const pdf = new jsPDF({
+                orientation: printSettings.orientation,
+                unit: 'mm',
+                format: 'a4',
+            });
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            for (let i = 0; i < pages.length; i++) {
+                const page = pages[i];
+                if (i > 0) {
+                    pdf.addPage();
+                }
+                const canvas = await html2canvas(page, {
+                    scale: 2, // Yüksek çözünürlük için ölçeği artır
+                    useCORS: true,
+                    width: page.offsetWidth,
+                    height: page.offsetHeight,
+                    windowWidth: page.scrollWidth,
+                    windowHeight: page.scrollHeight
+                });
+                const imgData = canvas.toDataURL('image/png');
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            }
+
+            pdf.save('MathGen_Calisma_Kagidi.pdf');
+            addToast('PDF başarıyla indirildi!', 'success');
+        } catch (error) {
+            console.error("PDF oluşturma hatası:", error);
+            addToast('PDF oluşturulurken bir hata oluştu.', 'error');
+        } finally {
+            setIsLoading(false);
         }
     };
     
@@ -60,6 +114,8 @@ const Header: React.FC = () => {
                     <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
                     <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
                     <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
+                    <button onClick={handlePrint} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon /></button>
+                    <button onClick={handleDownloadPDF} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
                     <ThemeSwitcher />
                     <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
                     <button onClick={openContactModal} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon /></button>
@@ -71,12 +127,6 @@ const Header: React.FC = () => {
 
 const WorksheetToolbar: React.FC = () => {
     const { settings, setSettings } = usePrintSettings();
-    const { spawnLadybug } = useFlyingLadybugs();
-
-    const handlePrint = (e: React.MouseEvent<HTMLButtonElement>) => {
-        spawnLadybug(e.clientX, e.clientY);
-        window.print();
-    };
 
     const fitToScreen = () => {
         const area = document.getElementById('worksheet-area');
@@ -126,10 +176,6 @@ const WorksheetToolbar: React.FC = () => {
                 </div>
                 <Select label="Renk" id="color-theme" value={settings.colorTheme} onChange={e => setSettings(s => ({...s, colorTheme: e.target.value as 'black' | 'blue' | 'sepia'}))} options={[{ value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }, { value: 'sepia', label: 'Sepya' }]}/>
             </div>
-            <Button onClick={handlePrint} size="sm" enableFlyingLadybug>
-                <PrintIcon className="w-4 h-4" />
-                Yazdır / PDF
-            </Button>
         </div>
     );
 };
