@@ -197,13 +197,13 @@ const AppContent: React.FC = () => {
             <div className="constellation-header print:hidden">
                 <svg className="constellation-svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
                     <polyline className="constellation-lines" points="50,95 90,110 140,115 180,105 230,100 280,85 350,75" />
-                    <circle className="star" cx="50" cy="95" r="2" style={{ animationDelay: '0.1s' }} />
-                    <circle className="star" cx="90" cy="110" r="2.5" style={{ animationDelay: '0.5s' }} />
-                    <circle className="star" cx="140" cy="115" r="2" style={{ animationDelay: '0.3s' }} />
-                    <circle className="star" cx="180" cy="105" r="1.5" style={{ animationDelay: '0.8s' }} />
-                    <circle className="star" cx="230" cy="100" r="2.5" style={{ animationDelay: '0.2s' }} />
-                    <circle className="star" cx="280" cy="85" r="2" style={{ animationDelay: '0.6s' }} />
-                    <circle className="star" cx="350" cy="75" r="2.2" style={{ animationDelay: '0.4s' }} />
+                    <circle className="star" cx="50" cy="95" r="3.5" style={{ animationDelay: '0.1s' }} />
+                    <circle className="star" cx="90" cy="110" r="4.5" style={{ animationDelay: '0.5s' }} />
+                    <circle className="star" cx="140" cy="115" r="3.5" style={{ animationDelay: '0.3s' }} />
+                    <circle className="star" cx="180" cy="105" r="3" style={{ animationDelay: '0.8s' }} />
+                    <circle className="star" cx="230" cy="100" r="4.5" style={{ animationDelay: '0.2s' }} />
+                    <circle className="star" cx="280" cy="85" r="3.5" style={{ animationDelay: '0.6s' }} />
+                    <circle className="star" cx="350" cy="75" r="4.2" style={{ animationDelay: '0.4s' }} />
                 </svg>
             </div>
             
