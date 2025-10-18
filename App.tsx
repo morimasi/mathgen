@@ -323,8 +323,6 @@ const AppContent: React.FC = () => {
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
             
-            <div className="constellation-header print:hidden" />
-            
             <header className="flex-shrink-0 bg-primary text-white shadow-md z-20 print:hidden">
                 <Header />
             </header>

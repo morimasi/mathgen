@@ -418,18 +418,6 @@
     padding-left: 50vw;
     padding-right: 50vw;
   }
-  
-  /* Constellation Header */
-  .constellation-header {
-    height: 60px;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(160deg, rgb(var(--theme-color-primary-rgb) / 0.8) 0%, rgb(var(--theme-color-primary-hover-rgb) / 0.9) 100%);
-  }
-
-  .dark .constellation-header {
-    background: linear-gradient(160deg, rgb(var(--theme-color-primary-rgb) / 0.3) 0%, rgb(var(--theme-color-primary-hover-rgb) / 0.5) 100%);
-  }
 }
 
 @media print {
