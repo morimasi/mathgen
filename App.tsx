@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { UIProvider, useUI } from './services/UIContext';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext';
@@ -210,6 +210,14 @@ const AppContent: React.FC = () => {
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
 
+    useEffect(() => {
+        const el = panAreaRef.current;
+        if (el) {
+            // Set initial scroll to the center to allow panning left and right
+            el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+        }
+    }, []); // Run only once on mount to set the initial state
+
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.button !== 0) return; // Only pan with left-click
         e.preventDefault();
@@ -310,7 +318,7 @@ const AppContent: React.FC = () => {
                     <WorksheetToolbar />
                     <div 
                         ref={panAreaRef}
-                        className="flex-grow overflow-auto p-4 md:p-8 cursor-grab"
+                        className="flex-grow overflow-auto p-4 md:p-8 cursor-grab pan-area"
                         onMouseDown={handleMouseDown}
                         onMouseMove={handleMouseMove}
                         onMouseUp={stopPanning}

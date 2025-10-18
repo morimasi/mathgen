@@ -414,6 +414,10 @@
 
   /* Pan/Zoom Cursor */
   .is-panning { @apply cursor-grabbing; }
+  .pan-area {
+    padding-left: 50vw;
+    padding-right: 50vw;
+  }
   
   /* Constellation Header */
   .constellation-header {
