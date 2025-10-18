@@ -142,7 +142,7 @@ const WorksheetToolbar: React.FC = () => {
     const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2"></div>;
 
     return (
-        <div className="flex-shrink-0 bg-stone-100 dark:bg-stone-800/50 p-2 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 print:hidden">
+        <div className="worksheet-toolbar flex-shrink-0 p-2 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 print:hidden">
             <div className="flex items-center gap-3">
                 {/* --- Scale --- */}
                 <div className="flex items-center gap-2">
@@ -213,7 +213,7 @@ const AppContent: React.FC = () => {
 
             <div className="flex flex-grow overflow-hidden">
                 <aside 
-                    className={`print:hidden transition-all duration-300 ease-in-out bg-white dark:bg-stone-800 shadow-lg ${
+                    className={`print:hidden transition-all duration-300 ease-in-out shadow-lg ${
                         isSettingsPanelCollapsed 
                             ? 'w-0 -translate-x-full opacity-0 p-0' 
                             : isWorksheetHovered 
@@ -237,7 +237,7 @@ const AppContent: React.FC = () => {
                 </div>
 
                 <main 
-                    className="flex-1 flex flex-col overflow-hidden bg-stone-200 dark:bg-stone-900/80 relative"
+                    className="flex-1 flex flex-col overflow-hidden relative"
                     onMouseEnter={() => setIsWorksheetHovered(true)}
                     onMouseLeave={() => setIsWorksheetHovered(false)}
                 >
