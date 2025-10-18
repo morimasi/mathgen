@@ -196,14 +196,14 @@ const AppContent: React.FC = () => {
             
             <div className="constellation-header print:hidden">
                 <svg className="constellation-svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
-                    <polyline className="constellation-lines" points="50,95 90,110 140,115 180,105 230,100 280,85 350,75" />
-                    <circle className="star" cx="50" cy="95" r="2" style={{ animationDelay: '0.1s' }} />
-                    <circle className="star" cx="90" cy="110" r="2.5" style={{ animationDelay: '0.5s' }} />
-                    <circle className="star" cx="140" cy="115" r="2" style={{ animationDelay: '0.3s' }} />
-                    <circle className="star" cx="180" cy="105" r="1.5" style={{ animationDelay: '0.8s' }} />
-                    <circle className="star" cx="230" cy="100" r="2.5" style={{ animationDelay: '0.2s' }} />
-                    <circle className="star" cx="280" cy="85" r="2" style={{ animationDelay: '0.6s' }} />
-                    <circle className="star" cx="350" cy="75" r="2.2" style={{ animationDelay: '0.4s' }} />
+                    <polyline className="constellation-lines" points="30,80 80,100 140,110 190,100 250,95 310,75 380,60" />
+                    <circle className="star" cx="30" cy="80" r="3" style={{ animationDelay: '0.1s' }} />
+                    <circle className="star" cx="80" cy="100" r="3.5" style={{ animationDelay: '0.5s' }} />
+                    <circle className="star" cx="140" cy="110" r="3" style={{ animationDelay: '0.3s' }} />
+                    <circle className="star" cx="190" cy="100" r="2.8" style={{ animationDelay: '0.8s' }} />
+                    <circle className="star" cx="250" cy="95" r="3.5" style={{ animationDelay: '0.2s' }} />
+                    <circle className="star" cx="310" cy="75" r="3" style={{ animationDelay: '0.6s' }} />
+                    <circle className="star" cx="380" cy="60" r="3.2" style={{ animationDelay: '0.4s' }} />
                 </svg>
             </div>
             
