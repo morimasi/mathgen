@@ -5,15 +5,6 @@ const getRandomInt = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-const shuffleArray = <T,>(array: T[]): T[] => {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-};
-
 const BOX_STYLE = "display: inline-block; border: 1px solid #6b7280; border-radius: 4px; width: 44px; height: 36px; vertical-align: middle; text-align: center; line-height: 36px; font-weight: bold;";
 const SEPARATOR = '<span style="margin: 0 2px; font-weight: bold;">-</span>';
 const ROW_STYLE = "display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 1.25rem; line-height: 1.75rem;";
@@ -201,7 +192,6 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             const { step: definedStep = 2, direction = 'forward', useMultiplesOnly = false, patternLength = 5, missingCount = 1 } = settings;
             const currentDirection = direction === 'mixed' ? (getRandomInt(0, 1) === 0 ? 'forward' : 'backward') : direction;
             const step = Math.abs(definedStep);
-            // FIX: Replaced undefined 'currentStep' with 'step' to resolve a reference error.
             const effectiveStep = currentDirection === 'backward' ? -step : step;
 
             let start: number;
@@ -294,24 +284,4 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             const numbers = new Set<number>();
             while(numbers.size < orderCount) numbers.add(getRandomByDigits(digits));
             
-            const numArray = Array.from(numbers);
-            const shuffled = shuffleArray(numArray);
-            
-            let sorted: number[];
-            if (currentOrderDirection === 'descending') {
-                sorted = [...numArray].sort((a, b) => b - a);
-            } else {
-                sorted = [...numArray].sort((a, b) => a - b);
-            }
-            
-            const question = `<div style="font-size: 1.25em; font-family: monospace;">${shuffled.join(', ')}</div>`;
-            const answer = sorted.join(', ');
-            problem = { ...problemBase, question, answer };
-            break;
-        }
-
-        default:
-             problem = { ...problemBase, question: 'Hata', answer: 'Hata' };
-    }
-    return { problem, title };
-};
+            const numArray = Array
