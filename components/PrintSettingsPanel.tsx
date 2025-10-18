@@ -119,17 +119,6 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                 />
                             </div>
                             <div className="space-y-1">
-                                <label htmlFor="print-problem-spacing" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
-                                   <span>Problem Aralığı (Dikey)</span>
-                                   <span className="text-stone-500 dark:text-stone-400 font-normal">{`${settings.problemSpacing.toFixed(1)}rem`}</span>
-                                </label>
-                                <input
-                                    type="range" id="print-problem-spacing" value={settings.problemSpacing} min={0} max={5} step={0.1}
-                                    onChange={e => handleChange('problemSpacing', parseFloat(e.target.value))}
-                                    className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
-                                />
-                            </div>
-                            <div className="space-y-1">
                                 <label htmlFor="print-page-margin" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
                                    <span>Kenar Boşluğu</span>
                                    <span className="text-stone-500 dark:text-stone-400 font-normal">{`${settings.pageMargin.toFixed(1)}rem`}</span>

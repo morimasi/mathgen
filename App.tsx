@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { UIProvider, useUI } from './services/UIContext';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext';
 import { ThemeProvider, useTheme } from './services/ThemeContext';
 import { ColorThemeProvider } from './services/ColorThemeContext';
-import { FontThemeProvider } from './services/FontThemeContext';
+import { FontThemeProvider, useFontTheme, fontThemes } from './services/FontThemeContext';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext';
 import { ToastProvider, useToast } from './services/ToastContext';
 import Tabs from './components/Tabs';
@@ -127,6 +127,8 @@ const Header: React.FC = () => {
 
 const WorksheetToolbar: React.FC = () => {
     const { settings, setSettings } = usePrintSettings();
+    const { fontTheme, setFontTheme } = useFontTheme();
+    const fontThemeOptions = Object.entries(fontThemes).map(([key, value]) => ({ value: key, label: value.name }));
 
     const fitToScreen = () => {
         const area = document.getElementById('worksheet-area');
@@ -147,7 +149,7 @@ const WorksheetToolbar: React.FC = () => {
                 {/* --- Scale --- */}
                 <div className="flex items-center gap-2">
                     <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
-                    <input id="zoom-slider" type="range" min="20" max="150" value={settings.scale * 100} onChange={(e) => setSettings(s => ({ ...s, scale: parseInt(e.target.value, 10) / 100 }))} className="w-24 accent-primary"/>
+                    <input id="zoom-slider" type="range" min="20" max="200" value={settings.scale * 100} onChange={(e) => setSettings(s => ({ ...s, scale: parseInt(e.target.value, 10) / 100 }))} className="w-24 accent-primary"/>
                     <span className="text-xs w-10 text-center">{Math.round(settings.scale * 100)}%</span>
                     <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
                 </div>
@@ -166,15 +168,24 @@ const WorksheetToolbar: React.FC = () => {
                 </div>
                  <Separator />
                  {/* --- Style --- */}
-                <div className="flex items-center gap-2">
-                    <label htmlFor="margin-slider" className="text-xs font-medium">Marjin</label>
-                    <input id="margin-slider" type="range" min="0.5" max="4" step="0.1" value={settings.pageMargin} onChange={(e) => setSettings(s => ({ ...s, pageMargin: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
+                <div className="flex items-center gap-3">
+                    <Select label="Hizalama" id="text-align" value={settings.textAlign} onChange={e => setSettings(s => ({ ...s, textAlign: e.target.value as 'left' | 'center' | 'right' }))} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
+                    <Select label="Kenarlık" id="border-style" value={settings.borderStyle} onChange={e => setSettings(s => ({ ...s, borderStyle: e.target.value as any }))} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
+                    <Select label="Defter Stili" id="notebook-style" value={settings.notebookStyle} onChange={e => setSettings(s => ({ ...s, notebookStyle: e.target.value as any }))} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
+                    <Select label="Yazı Tipi" id="font-theme" value={fontTheme} onChange={e => setFontTheme(e.target.value as any)} options={fontThemeOptions}/>
                 </div>
-                 <div className="flex items-center gap-2">
-                    <label htmlFor="fontsize-slider" className="text-xs font-medium">Yazı Tipi</label>
-                    <input id="fontsize-slider" type="range" min="10" max="24" step="1" value={settings.fontSize} onChange={(e) => setSettings(s => ({ ...s, fontSize: parseInt(e.target.value, 10) }))} className="w-20 accent-primary"/>
-                </div>
-                <Select label="Yazdırma Rengi" id="color-theme" value={settings.colorTheme} onChange={e => setSettings(s => ({...s, colorTheme: e.target.value as 'black' | 'blue' | 'sepia'}))} options={[{ value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }, { value: 'sepia', label: 'Sepya' }]}/>
+                 <Separator />
+                 {/* --- Spacing --- */}
+                 <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-0.5">
+                        <label htmlFor="problem-spacing-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Problem Aralığı</label>
+                        <input id="problem-spacing-slider" type="range" min="0" max="5" step="0.1" value={settings.problemSpacing} onChange={(e) => setSettings(s => ({ ...s, problemSpacing: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
+                    </div>
+                     <div className="flex flex-col gap-0.5">
+                        <label htmlFor="line-height-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Satır Yüksekliği</label>
+                        <input id="line-height-slider" type="range" min="1" max="2.5" step="0.1" value={settings.lineHeight} onChange={(e) => setSettings(s => ({ ...s, lineHeight: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
+                    </div>
+                 </div>
             </div>
         </div>
     );
@@ -189,7 +200,53 @@ const AppContent: React.FC = () => {
         isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
     } = useUI();
     const { isLoading } = useWorksheet();
+    const { settings, setSettings } = usePrintSettings();
     const [isWorksheetHovered, setIsWorksheetHovered] = useState(false);
+    
+    const panAreaRef = useRef<HTMLDivElement>(null);
+    const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.button !== 0) return; // Only pan with left-click
+        e.preventDefault();
+        const el = panAreaRef.current;
+        if (!el) return;
+        panState.current = {
+            isPanning: true,
+            startX: e.clientX - el.offsetLeft,
+            startY: e.clientY - el.offsetTop,
+            scrollLeft: el.scrollLeft,
+            scrollTop: el.scrollTop,
+        };
+        el.classList.add('is-panning');
+    };
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!panState.current.isPanning) return;
+        e.preventDefault();
+        const el = panAreaRef.current;
+        if (!el) return;
+        const x = e.clientX - el.offsetLeft;
+        const y = e.clientY - el.offsetTop;
+        const walkX = (x - panState.current.startX);
+        const walkY = (y - panState.current.startY);
+        el.scrollLeft = panState.current.scrollLeft - walkX;
+        el.scrollTop = panState.current.scrollTop - walkY;
+    };
+
+    const stopPanning = () => {
+        panState.current.isPanning = false;
+        panAreaRef.current?.classList.remove('is-panning');
+    };
+
+    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const scaleAmount = 0.05;
+        const newScale = e.deltaY > 0
+            ? Math.max(0.2, settings.scale - scaleAmount)
+            : Math.min(2.0, settings.scale + scaleAmount);
+        setSettings(s => ({ ...s, scale: newScale }));
+    };
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
@@ -247,7 +304,15 @@ const AppContent: React.FC = () => {
                         </div>
                     )}
                     <WorksheetToolbar />
-                    <div className="flex-grow overflow-auto p-4 md:p-8">
+                    <div 
+                        ref={panAreaRef}
+                        className="flex-grow overflow-auto p-4 md:p-8 cursor-grab"
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={stopPanning}
+                        onMouseLeave={stopPanning}
+                        onWheel={handleWheel}
+                    >
                         <ProblemSheet />
                     </div>
                 </main>

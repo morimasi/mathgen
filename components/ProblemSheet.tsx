@@ -17,8 +17,6 @@ const ProblemSheet: React.FC = () => {
         '--line-height': settings.lineHeight,
         '--text-align': settings.textAlign,
         '--color': `var(--theme-color-${settings.colorTheme})`,
-        '--border-style': settings.borderStyle,
-        '--notebook-style': settings.notebookStyle,
         '--scale': settings.scale,
     } as React.CSSProperties;
 
@@ -34,7 +32,7 @@ const ProblemSheet: React.FC = () => {
 
         if (problem.layout === 'given-wanted') {
              return (
-                <div key={index} className={`problem-item ${problem.display || ''} ${problemLayoutClass}`}>
+                <div key={index} className={`problem-item ${problem.display || ''} ${problemLayoutClass}`} data-border-style={settings.borderStyle}>
                     {problemContent}
                     <div className="given-wanted-container">
                         <div><strong>Verilenler:</strong><div className="solution-box"></div></div>
@@ -47,7 +45,7 @@ const ProblemSheet: React.FC = () => {
 
         if (problem.layout === 'with-visual-space') {
              return (
-                <div key={index} className={`problem-item ${problem.display || ''} ${problemLayoutClass}`}>
+                <div key={index} className={`problem-item ${problem.display || ''} ${problemLayoutClass}`} data-border-style={settings.borderStyle}>
                     {problemContent}
                     <div className="visual-space"></div>
                 </div>
@@ -55,7 +53,7 @@ const ProblemSheet: React.FC = () => {
         }
 
         return (
-            <div key={index} className={`problem-item ${problem.display || ''} ${problemLayoutClass}`}>
+            <div key={index} className={`problem-item ${problem.display || ''} ${problemLayoutClass}`} data-border-style={settings.borderStyle}>
                 {problemContent}
             </div>
         );
@@ -67,7 +65,9 @@ const ProblemSheet: React.FC = () => {
             id={`worksheet-container-${pageIndex}`}
             className={`worksheet-page print-page ${settings.orientation}`} 
             style={{ padding: pageMargins }}
+            data-notebook-style={settings.notebookStyle}
         >
+            <div className="notebook-background"></div>
             {settings.showHeader && (
                 <div className="worksheet-header">
                     <div className="header-field">Okul:</div>

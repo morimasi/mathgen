@@ -328,6 +328,31 @@
     line-height: var(--line-height);
     text-align: var(--text-align);
     color: var(--color);
+    z-index: 1;
+  }
+  .worksheet-page .notebook-background {
+    @apply absolute inset-0 -z-10;
+  }
+
+  .worksheet-page[data-notebook-style="lines"] .notebook-background {
+    background-image: linear-gradient(to bottom, transparent calc(var(--line-height) * var(--font-size) - 1px), #a0aec0 calc(var(--line-height) * var(--font-size) - 1px));
+    background-size: 100% calc(var(--line-height) * var(--font-size));
+  }
+  .worksheet-page[data-notebook-style="grid"] .notebook-background {
+    background-image: 
+      linear-gradient(to bottom, transparent 19px, #d1d5db 20px),
+      linear-gradient(to right, transparent 19px, #d1d5db 20px);
+    background-size: 20px 20px;
+  }
+  .worksheet-page[data-notebook-style="dotted"] .notebook-background {
+     background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+     background-size: 15px 15px;
+  }
+  .worksheet-page[data-notebook-style="handwriting"] .notebook-background {
+    background-image: 
+      linear-gradient(to bottom, transparent 49%, #a0aec0 50%, #a0aec0 51%, transparent 52%),
+      linear-gradient(to bottom, #bae6fd 1px, transparent 1px);
+    background-size: 100% calc(2 * var(--line-height) * var(--font-size));
   }
   .worksheet-page.landscape {
       width: 297mm;
@@ -349,7 +374,15 @@
     grid-template-rows: repeat(var(--rows, 10), auto);
   }
   .worksheet-body.layout-table .problem-item { @apply border-b border-r border-current p-4 m-0; }
-  .problem-item { @apply flex items-start gap-2 break-inside-avoid; margin-bottom: var(--problem-spacing); }
+  .problem-item { @apply flex items-start gap-2 break-inside-avoid; margin-bottom: var(--problem-spacing); transition: all 0.2s; }
+
+  /* Border Styles */
+  .problem-item[data-border-style="card"] { @apply bg-white/50 dark:bg-black/10 p-4 rounded-lg shadow-sm border border-black/10; }
+  .problem-item[data-border-style="solid"] { @apply border border-current p-3; }
+  .problem-item[data-border-style="dashed"] { @apply border-2 border-dashed border-current p-3; }
+  .problem-item[data-border-style="shadow-lift"] { @apply bg-white/50 dark:bg-black/10 p-4 rounded-md shadow-lg; }
+  .problem-item[data-border-style="top-bar-color"] { @apply border-t-4 border-primary pt-3 px-3 pb-3; }
+  
   .problem-item.flow { @apply flex-col items-center; }
   .problem-item.layout-with-visual-space { @apply flex-col items-stretch; }
   .visual-space { @apply w-full h-48 border-2 border-dashed border-stone-300 rounded-md mt-2; }
@@ -379,6 +412,9 @@
   .table-selector-cell.selected { @apply bg-primary; }
   .live-indicator { @apply text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 animate-pulse; }
 
+  /* Pan/Zoom Cursor */
+  .is-panning { @apply cursor-grabbing; }
+  
   /* Constellation Header */
   .constellation-header {
     height: 160px;
