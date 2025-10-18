@@ -424,7 +424,7 @@
 
   .spinning-petals {
     transform-origin: center;
-    animation: spin 1.5s linear infinite;
+    animation: spin 1s linear infinite;
   }
 
   /* Pan/Zoom Cursor */
