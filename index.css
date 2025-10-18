@@ -1,4 +1,4 @@
-@tailwind base;
+ @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -21,8 +21,6 @@
     --theme-color-primary-focus-rgb: 249 115 22;
     --theme-accent-text: theme('colors.orange.700');
     --theme-accent-bg: theme('colors.orange.100');
-    --theme-block-bg-rgb: 255 247 237; /* orange-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-mint {
     --theme-color-primary-rgb: 5 150 105;
@@ -30,8 +28,6 @@
     --theme-color-primary-focus-rgb: 16 185 129;
     --theme-accent-text: theme('colors.emerald.700');
     --theme-accent-bg: theme('colors.emerald.100');
-    --theme-block-bg-rgb: 236 253 245; /* emerald-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-rose {
     --theme-color-primary-rgb: 225 29 72;
@@ -39,8 +35,6 @@
     --theme-color-primary-focus-rgb: 244 63 94;
     --theme-accent-text: theme('colors.rose.700');
     --theme-accent-bg: theme('colors.rose.100');
-    --theme-block-bg-rgb: 255 241 242; /* rose-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-sky {
     --theme-color-primary-rgb: 2 132 199;
@@ -48,8 +42,6 @@
     --theme-color-primary-focus-rgb: 14 165 233;
     --theme-accent-text: theme('colors.sky.700');
     --theme-accent-bg: theme('colors.sky.100');
-    --theme-block-bg-rgb: 240 249 255; /* sky-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-lavender {
     --theme-color-primary-rgb: 139 92 246;
@@ -57,8 +49,6 @@
     --theme-color-primary-focus-rgb: 167 139 250;
     --theme-accent-text: theme('colors.violet.700');
     --theme-accent-bg: theme('colors.violet.100');
-    --theme-block-bg-rgb: 245 243 255; /* violet-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-graphite {
     --theme-color-primary-rgb: 51 65 85;
@@ -66,8 +56,6 @@
     --theme-color-primary-focus-rgb: 71 85 105;
     --theme-accent-text: theme('colors.slate.700');
     --theme-accent-bg: theme('colors.slate.100');
-    --theme-block-bg-rgb: 241 245 249; /* slate-100 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-gold {
     --theme-color-primary-rgb: 251 191 36;
@@ -75,8 +63,6 @@
     --theme-color-primary-focus-rgb: 252 211 77;
     --theme-accent-text: theme('colors.amber.700');
     --theme-accent-bg: theme('colors.amber.100');
-    --theme-block-bg-rgb: 255 251 235; /* amber-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-forest {
     --theme-color-primary-rgb: 21 128 61;
@@ -84,8 +70,6 @@
     --theme-color-primary-focus-rgb: 22 163 74;
     --theme-accent-text: theme('colors.green.700');
     --theme-accent-bg: theme('colors.green.100');
-    --theme-block-bg-rgb: 240 253 244; /* green-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-coral {
     --theme-color-primary-rgb: 248 113 113;
@@ -93,8 +77,6 @@
     --theme-color-primary-focus-rgb: 252 165 165;
     --theme-accent-text: theme('colors.red.700');
     --theme-accent-bg: theme('colors.red.100');
-    --theme-block-bg-rgb: 254 242 242; /* red-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
 
   /* --- NEW DARK THEMES (LIGHT MODE VERSION) --- */
@@ -104,8 +86,6 @@
     --theme-color-primary-focus-rgb: 37 99 235;
     --theme-accent-text: theme('colors.blue.700');
     --theme-accent-bg: theme('colors.blue.100');
-    --theme-block-bg-rgb: 239 246 255; /* blue-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-ruby {
     --theme-color-primary-rgb: 190 18 60; /* rose-700 */
@@ -113,8 +93,6 @@
     --theme-color-primary-focus-rgb: 225 29 72;
     --theme-accent-text: theme('colors.rose.700');
     --theme-accent-bg: theme('colors.rose.100');
-    --theme-block-bg-rgb: 255 241 242; /* rose-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-emerald {
     --theme-color-primary-rgb: 4 120 87; /* emerald-700 */
@@ -122,8 +100,6 @@
     --theme-color-primary-focus-rgb: 16 185 129;
     --theme-accent-text: theme('colors.emerald.700');
     --theme-accent-bg: theme('colors.emerald.100');
-    --theme-block-bg-rgb: 236 253 245; /* emerald-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
   .theme-amethyst {
     --theme-color-primary-rgb: 126 34 206; /* purple-700 */
@@ -131,37 +107,6 @@
     --theme-color-primary-focus-rgb: 147 51 234;
     --theme-accent-text: theme('colors.purple.700');
     --theme-accent-bg: theme('colors.purple.100');
-    --theme-block-bg-rgb: 250 245 255; /* purple-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
-  }
-
-  /* --- NEW COFFEE THEMES (LIGHT MODE VERSION) --- */
-  .theme-latte {
-    --theme-color-primary-rgb: 168 162 158; /* stone-400 */
-    --theme-color-primary-hover-rgb: 120 113 108; /* stone-500 */
-    --theme-color-primary-focus-rgb: 188 182 178;
-    --theme-accent-text: #57534e; /* stone-600 */
-    --theme-accent-bg: #f5f5f4; /* stone-100 */
-    --theme-block-bg-rgb: 250 250 249; /* stone-50 */
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
-  }
-  .theme-mocha {
-    --theme-color-primary-rgb: 141 110 99; /* neutral-400 */
-    --theme-color-primary-hover-rgb: 125 95 84;
-    --theme-color-primary-focus-rgb: 158 128 116;
-    --theme-accent-text: #854d0e; /* amber-800 */
-    --theme-accent-bg: #fefce8; /* yellow-50 */
-    --theme-block-bg-rgb: 245 242 241; 
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
-  }
-  .theme-espresso {
-    --theme-color-primary-rgb: 82 68 64; /* HSL(13, 12%, 28%) */
-    --theme-color-primary-hover-rgb: 67 55 52;
-    --theme-color-primary-focus-rgb: 100 83 77;
-    --theme-accent-text: #854d0e; /* amber-800 */
-    --theme-accent-bg: #f3f2f1; /* stone-100 */
-    --theme-block-bg-rgb: 235 232 230;
-    --theme-block-text-rgb: 28 25 23; /* stone-900 */
   }
 
   /* Dark Mode Overrides */
@@ -173,32 +118,22 @@
   .dark.theme-orange {
     --theme-accent-text: theme('colors.orange.400');
     --theme-accent-bg: theme('colors.orange.900/50');
-    --theme-block-bg-rgb: 50 20 0;
-    --theme-block-text-rgb: 255 237 213; /* orange-100 */
   }
   .dark.theme-mint {
     --theme-accent-text: theme('colors.emerald.400');
     --theme-accent-bg: theme('colors.emerald.900/50');
-    --theme-block-bg-rgb: 12 38 34;
-    --theme-block-text-rgb: 209 250 229; /* emerald-100 */
   }
   .dark.theme-rose {
     --theme-accent-text: theme('colors.rose.400');
     --theme-accent-bg: theme('colors.rose.900/50');
-    --theme-block-bg-rgb: 55 5 19;
-    --theme-block-text-rgb: 255 228 230; /* rose-100 */
   }
   .dark.theme-sky {
     --theme-accent-text: theme('colors.sky.400');
     --theme-accent-bg: theme('colors.sky.900/50');
-    --theme-block-bg-rgb: 11 36 63;
-    --theme-block-text-rgb: 224 242 254; /* sky-100 */
   }
   .dark.theme-lavender {
     --theme-accent-text: theme('colors.violet.400');
     --theme-accent-bg: theme('colors.violet.900/50');
-    --theme-block-bg-rgb: 36 19 64;
-    --theme-block-text-rgb: 237 233 254; /* violet-100 */
   }
   .dark.theme-graphite {
     --theme-color-primary-rgb: 100 116 139;
@@ -206,94 +141,50 @@
     --theme-color-primary-focus-rgb: 148 163 184;
     --theme-accent-text: theme('colors.slate.400');
     --theme-accent-bg: theme('colors.slate.800/50');
-    --theme-block-bg-rgb: 2 6 23; /* slate-950 */
-    --theme-block-text-rgb: 226 232 240; /* slate-200 */
   }
   .dark.theme-gold {
      --theme-accent-text: theme('colors.amber.400');
     --theme-accent-bg: theme('colors.amber.900/50');
-    --theme-block-bg-rgb: 53 28 1;
-    --theme-block-text-rgb: 254 243 199; /* amber-100 */
   }
   .dark.theme-forest {
     --theme-accent-text: theme('colors.green.400');
     --theme-accent-bg: theme('colors.green.900/50');
-    --theme-block-bg-rgb: 15 45 30;
-    --theme-block-text-rgb: 220 252 231; /* green-100 */
   }
   .dark.theme-coral {
      --theme-accent-text: theme('colors.red.400');
     --theme-accent-bg: theme('colors.red.900/50');
-    --theme-block-bg-rgb: 55 10 10;
-    --theme-block-text-rgb: 254 226 226; /* red-100 */
   }
 
   /* --- NEW DARK THEMES (DARK MODE VERSION) --- */
   .dark.theme-midnight {
-    --theme-color-primary-rgb: 96 165 250; /* blue-400 */
-    --theme-color-primary-hover-rgb: 59 130 246;
-    --theme-color-primary-focus-rgb: 147 197 253;
+    --theme-color-primary-rgb: 49 101 224;
+    --theme-color-primary-hover-rgb: 60 117 235;
+    --theme-color-primary-focus-rgb: 96 165 250;
     --theme-accent-text: theme('colors.blue.400');
     --theme-accent-bg: theme('colors.blue.900/50');
-    --theme-block-bg-rgb: 30 41 59; /* slate-800 */
-    --theme-block-text-rgb: 219 234 254; /* blue-100 */
   }
   .dark.theme-ruby {
-    --theme-color-primary-rgb: 244 63 94; /* rose-500 */
-    --theme-color-primary-hover-rgb: 225 29 72;
+    --theme-color-primary-rgb: 225 29 72;
+    --theme-color-primary-hover-rgb: 244 63 94;
     --theme-color-primary-focus-rgb: 251 113 133;
     --theme-accent-text: theme('colors.rose.400');
     --theme-accent-bg: theme('colors.rose.900/50');
-    --theme-block-bg-rgb: 55 4 33;
-    --theme-block-text-rgb: 255 228 230; /* rose-100 */
   }
   .dark.theme-emerald {
-    --theme-color-primary-rgb: 52 211 153; /* emerald-400 */
-    --theme-color-primary-hover-rgb: 16 185 129;
+    --theme-color-primary-rgb: 16 185 129;
+    --theme-color-primary-hover-rgb: 52 211 153;
     --theme-color-primary-focus-rgb: 110 231 183;
     --theme-accent-text: theme('colors.emerald.400');
     --theme-accent-bg: theme('colors.emerald.900/50');
-    --theme-block-bg-rgb: 6 33 26;
-    --theme-block-text-rgb: 209 250 229; /* emerald-100 */
   }
   .dark.theme-amethyst {
-    --theme-color-primary-rgb: 168 85 247; /* purple-500 */
-    --theme-color-primary-hover-rgb: 147 51 234;
+    --theme-color-primary-rgb: 147 51 234;
+    --theme-color-primary-hover-rgb: 168 85 247;
     --theme-color-primary-focus-rgb: 192 132 252;
     --theme-accent-text: theme('colors.purple.400');
     --theme-accent-bg: theme('colors.purple.900/50');
-    --theme-block-bg-rgb: 38 10 64;
-    --theme-block-text-rgb: 243 232 255; /* purple-100 */
   }
 
-  /* --- NEW COFFEE THEMES (DARK MODE VERSION) --- */
-  .dark.theme-latte {
-    --theme-color-primary-rgb: 168 162 158; /* stone-400 */
-    --theme-color-primary-hover-rgb: 156 150 145;
-    --theme-color-primary-focus-rgb: 180 174 169;
-    --theme-accent-text: #a8a29e; /* stone-400 */
-    --theme-accent-bg: #292524; /* stone-800 */
-    --theme-block-bg-rgb: 41 37 36; /* stone-800 */
-    --theme-block-text-rgb: 214 211 209; /* stone-300 */
-  }
-  .dark.theme-mocha {
-    --theme-color-primary-rgb: 141 110 99; 
-    --theme-color-primary-hover-rgb: 158 128 116;
-    --theme-color-primary-focus-rgb: 175 145 133;
-    --theme-accent-text: #d6d3d1; /* stone-300 */
-    --theme-accent-bg: #453b23;
-    --theme-block-bg-rgb: 46 39 32;
-    --theme-block-text-rgb: 214 211 209; /* stone-300 */
-  }
-  .dark.theme-espresso {
-    --theme-color-primary-rgb: 100 83 77;
-    --theme-color-primary-hover-rgb: 118 98 90;
-    --theme-color-primary-focus-rgb: 135 112 103;
-    --theme-accent-text: #d6d3d1; /* stone-300 */
-    --theme-accent-bg: #312621;
-    --theme-block-bg-rgb: 29 25 23; 
-    --theme-block-text-rgb: 214 211 209; /* stone-300 */
-  }
 
   /* Font Themes */
   .font-theme-klasik { --font-worksheet: 'Lora', serif; }
@@ -316,11 +207,6 @@
 }
 
 @layer components {
-  aside, .worksheet-toolbar, main, .worksheet-page {
-      background-color: rgb(var(--theme-block-bg-rgb));
-      color: rgb(var(--theme-block-text-rgb));
-      transition: background-color 0.3s ease, color 0.3s ease;
-  }
   .worksheet-area {
     @apply flex flex-col items-center;
     transform: scale(var(--scale, 1));
@@ -328,14 +214,14 @@
     transition: transform 0.2s ease;
   }
   .worksheet-page {
-    @apply shadow-lg my-4 relative;
+    @apply bg-white shadow-lg my-4 relative;
     width: 210mm;
     min-height: 297mm;
     box-sizing: border-box;
     font-size: var(--font-size);
     line-height: var(--line-height);
     text-align: var(--text-align);
-    /* `color` is now handled by the rule above */
+    color: black;
   }
   .worksheet-page.landscape {
       width: 297mm;
@@ -490,12 +376,12 @@
     height: auto;
     page-break-after: always;
     color: var(--color);
-    background-color: #fff !important; /* Ensure worksheet is white for printing */
   }
   
   .worksheet-page.white-page {
       color: black;
   }
+
 
   @page {
     /* color is now applied directly to .worksheet-page for better control */
