@@ -1,12 +1,17 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
-export type ColorTheme = 'orange' | 'mint' | 'rose' | 'sky';
+export type ColorTheme = 'orange' | 'mint' | 'rose' | 'sky' | 'lavender' | 'graphite' | 'gold' | 'forest' | 'coral';
 
 export const colorThemes: Record<ColorTheme, { name: string; className: string }> = {
   orange: { name: 'Varsayılan (Turuncu)', className: 'theme-orange' },
   mint: { name: 'Nane Yeşili', className: 'theme-mint' },
   rose: { name: 'Gül Pembesi', className: 'theme-rose' },
   sky: { name: 'Gökyüzü Mavisi', className: 'theme-sky' },
+  lavender: { name: 'Lavanta', className: 'theme-lavender' },
+  graphite: { name: 'Grafit', className: 'theme-graphite' },
+  gold: { name: 'Altın', className: 'theme-gold' },
+  forest: { name: 'Orman', className: 'theme-forest' },
+  coral: { name: 'Mercan', className: 'theme-coral' },
 };
 
 interface ColorThemeContextType {

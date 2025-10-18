@@ -68,7 +68,7 @@ const ThemeSwitcher: React.FC = () => {
 
                     {/* Color Theme Section */}
                     <SectionTitle>Renk Paleti</SectionTitle>
-                     <div className="grid grid-cols-4 gap-3 px-3">
+                     <div className="grid grid-cols-3 gap-3 px-3">
                         {Object.entries(colorThemes).map(([key, value]) => {
                             const themeKey = key as ColorTheme;
                             const colorClass = {
@@ -76,13 +76,18 @@ const ThemeSwitcher: React.FC = () => {
                                 mint: 'bg-emerald-500 text-emerald-500',
                                 rose: 'bg-rose-500 text-rose-500',
                                 sky: 'bg-sky-500 text-sky-500',
+                                lavender: 'bg-violet-500 text-violet-500',
+                                graphite: 'bg-slate-600 text-slate-600',
+                                gold: 'bg-amber-400 text-amber-400',
+                                forest: 'bg-green-700 text-green-700',
+                                coral: 'bg-red-400 text-red-400',
                             }[themeKey];
                             
                             return (
                                 <button
                                     key={key}
                                     onClick={() => setColorTheme(themeKey)}
-                                    className={`w-full h-8 rounded-full flex items-center justify-center transition-all ${colorClass} ${colorTheme === key ? 'ring-2 ring-offset-2 dark:ring-offset-stone-800 ring-primary-focus' : ''}`}
+                                    className={`w-full h-8 rounded-md flex items-center justify-center transition-all ${colorClass} ${colorTheme === key ? 'ring-2 ring-offset-2 dark:ring-offset-stone-800 ring-primary-focus' : ''}`}
                                     title={value.name}
                                     aria-label={value.name}
                                 />
