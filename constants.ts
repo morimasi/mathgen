@@ -1,14 +1,5 @@
 // constants.ts
 
-import {
-    VisualAdditionSubtractionIcon,
-    VerbalArithmeticIcon,
-    MissingNumberIcon,
-    SymbolicArithmeticIcon,
-    ProblemCreationIcon
-} from './components/icons/Icons';
-
-
 export const TAB_GROUPS = [
     {
         title: 'Matematiğe Hazırlık',
