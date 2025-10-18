@@ -1,4 +1,4 @@
-import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType, VisualAdditionSubtractionSettings, VerbalArithmeticSettings, MissingNumberPuzzlesSettings, SymbolicArithmeticSettings, ProblemCreationSettings } from '../types';
+import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType, VisualAdditionSubtractionSettings, VerbalArithmeticSettings, MissingNumberPuzzlesSettings, SymbolicArithmeticSettings, ProblemCreationSettings, SimpleGraphTaskType } from '../types';
 import { numberToWords } from './utils';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -280,11 +280,10 @@ const generateMeasurementIntroProblem = (settings: IntroToMeasurementSettings): 
     return { problem: { question, answer, category: 'intro-to-measurement' }, title };
 };
 
-const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: Problem, title: string } => {
-    const { graphType, theme, categoryCount, maxItemCount } = settings;
-    const title = "Nesneleri Say ve Grafiği Doldur";
-    const instruction = "Yukarıdaki nesneleri sayın ve grafikte uygun yerleri boyayın/işaretleyin.";
-    
+const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: Problem, title: string, preamble?: string } => {
+    const { graphType, taskType, theme, categoryCount, maxItemCount } = settings;
+
+    // --- DATA GENERATION (common for both tasks) ---
     const categories = getRandomItems(theme, categoryCount);
     const data: {[key: string]: number} = {};
     let allObjects: string[] = [];
@@ -297,51 +296,143 @@ const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: 
     
     allObjects = shuffleArray(allObjects);
 
-    const dataSVG = `<div style="font-size: 2.5rem; text-align: center; line-height: 1.5; padding: 1rem; border: 2px solid #ccc; border-radius: 8px; margin-bottom: 1.5rem;">${allObjects.join(' ')}</div>`;
-
-    let graphSVG = '';
+    // --- SVG & QUESTION GENERATION ---
     const graphWidth = 400;
     const graphHeight = 250;
     const padding = 50;
+    let question = '';
+    let answer: string | number = '';
+    let title = '';
+    let preamble: string | undefined = undefined;
 
-    if (graphType === SimpleGraphType.Pictograph) {
-        const rowHeight = (graphHeight - padding) / categoryCount;
-        graphSVG += `<g>`;
-        for(let i = 0; i < categoryCount; i++) {
-            const y = rowHeight * i + rowHeight / 2 + padding / 2;
-            graphSVG += `<text x="${padding - 10}" y="${y}" font-size="30" text-anchor="end" dominant-baseline="middle" fill="currentColor">${categories[i]}</text>`;
-            for (let j = 0; j < maxItemCount; j++) {
-                graphSVG += `<rect x="${padding + 10 + j * 40}" y="${y - 18}" width="36" height="36" fill="#f3f4f6" stroke="#d1d5db" />`;
+    if (taskType === SimpleGraphTaskType.Create) {
+        // --- CREATE GRAPH TASK ---
+        title = "Nesneleri Say ve Grafiği Doldur";
+        preamble = "Aşağıdaki nesneleri sayın ve grafikte uygun yerleri boyayın veya işaretleyin.";
+        answer = "Grafiği doldurunuz.";
+
+        const dataSVG = `<div style="font-size: 2.5rem; text-align: center; line-height: 1.5; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 1.5rem; background-color: #f9fafb;">${allObjects.join(' ')}</div>`;
+        let graphSVG = '';
+
+        if (graphType === SimpleGraphType.Pictograph) {
+            const rowHeight = (graphHeight - padding) / categoryCount;
+            graphSVG += `<g>`;
+            for(let i = 0; i < categoryCount; i++) {
+                const y = rowHeight * i + rowHeight / 2 + padding / 2;
+                graphSVG += `<text x="${padding - 15}" y="${y}" font-size="30" text-anchor="end" dominant-baseline="middle" fill="currentColor">${categories[i]}</text>`;
+                for (let j = 0; j < maxItemCount; j++) {
+                    graphSVG += `<rect x="${padding + 10 + j * 40}" y="${y - 18}" width="36" height="36" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5" rx="4" />`;
+                }
             }
+            graphSVG += `</g>`;
+        } else { // BarChart
+            const barWidth = (graphWidth - padding * 2) / categoryCount;
+            // Y Axis
+            graphSVG += `<g font-size="12px" fill="#4b5563">`;
+            for (let i = 0; i <= maxItemCount; i++) {
+                const y = graphHeight - padding - (i * (graphHeight - padding * 1.5) / maxItemCount);
+                graphSVG += `<text x="${padding - 10}" y="${y}" text-anchor="end" dominant-baseline="middle">${i}</text>`;
+                graphSVG += `<line x1="${padding - 5}" y1="${y}" x2="${graphWidth - padding}" y2="${y}" stroke="#e5e7eb" stroke-width="1" />`;
+            }
+            graphSVG += `</g>`;
+            // X Axis
+            graphSVG += `<g font-size="24px">`;
+            for (let i = 0; i < categoryCount; i++) {
+                const x = padding + i * barWidth + barWidth / 2;
+                graphSVG += `<text x="${x}" y="${graphHeight - padding + 25}" text-anchor="middle" fill="currentColor">${categories[i]}</text>`;
+            }
+            graphSVG += `</g>`;
+            // Axis Lines
+            graphSVG += `<path d="M ${padding} ${padding/2} L ${padding} ${graphHeight - padding} L ${graphWidth - padding} ${graphHeight - padding}" stroke="#4b5563" stroke-width="2" fill="none" />`;
         }
-        graphSVG += `</g>`;
-    } else { // BarChart
-        const barWidth = (graphWidth - padding * 2) / categoryCount;
-        // Y Axis
-        for (let i = 0; i <= maxItemCount; i++) {
-            const y = graphHeight - padding - (i * (graphHeight - padding * 1.5) / maxItemCount);
-            graphSVG += `<text x="${padding - 10}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="currentColor">${i}</text>`;
-            graphSVG += `<line x1="${padding - 5}" y1="${y}" x2="${graphWidth - padding}" y2="${y}" stroke="#e5e7eb" />`;
+        
+        question = `${dataSVG}<svg viewBox="0 0 ${graphWidth} ${graphHeight}" width="100%">${graphSVG}</svg>`;
+    
+    } else { // taskType === SimpleGraphTaskType.Read
+        // --- READ GRAPH TASK ---
+        title = "Grafiği Oku ve Soruyu Cevapla";
+        let graphSVG = '';
+        
+        // Draw FILLED graph
+        if (graphType === SimpleGraphType.Pictograph) {
+            const rowHeight = (graphHeight - padding) / categoryCount;
+            graphSVG += `<g>`;
+            for(let i = 0; i < categoryCount; i++) {
+                const y = rowHeight * i + rowHeight / 2 + padding / 2;
+                const category = categories[i];
+                const count = data[category];
+                graphSVG += `<text x="${padding - 15}" y="${y}" font-size="30" text-anchor="end" dominant-baseline="middle" fill="currentColor">${category}</text>`;
+                for (let j = 0; j < count; j++) {
+                     graphSVG += `<text x="${padding + 10 + j * 40 + 18}" y="${y}" font-size="30" text-anchor="middle" dominant-baseline="middle" fill="currentColor">${category}</text>`;
+                }
+            }
+            graphSVG += `</g>`;
+        } else { // BarChart
+            const barWidth = (graphWidth - padding * 2) / categoryCount;
+            const barSpacing = barWidth * 0.2;
+            const actualBarWidth = barWidth - barSpacing;
+
+            // Y Axis (same as create)
+            graphSVG += `<g font-size="12px" fill="#4b5563">`;
+            for (let i = 0; i <= maxItemCount; i++) {
+                const y = graphHeight - padding - (i * (graphHeight - padding * 1.5) / maxItemCount);
+                graphSVG += `<text x="${padding - 10}" y="${y}" text-anchor="end" dominant-baseline="middle">${i}</text>`;
+                graphSVG += `<line x1="${padding - 5}" y1="${y}" x2="${graphWidth - padding}" y2="${y}" stroke="#e5e7eb" stroke-width="1" />`;
+            }
+            graphSVG += `</g>`;
+
+            // Draw Bars
+            for (let i = 0; i < categoryCount; i++) {
+                const category = categories[i];
+                const count = data[category];
+                const barHeight = (count / maxItemCount) * (graphHeight - padding * 1.5);
+                const x = padding + i * barWidth + barSpacing / 2;
+                const y = graphHeight - padding - barHeight;
+                graphSVG += `<rect x="${x}" y="${y}" width="${actualBarWidth}" height="${barHeight}" fill="#60a5fa" rx="2" />`;
+            }
+
+            // X Axis (same as create, but drawn after bars to be on top if needed)
+            graphSVG += `<g font-size="24px">`;
+            for (let i = 0; i < categoryCount; i++) {
+                const x = padding + i * barWidth + barWidth / 2;
+                graphSVG += `<text x="${x}" y="${graphHeight - padding + 25}" text-anchor="middle" fill="currentColor">${categories[i]}</text>`;
+            }
+            graphSVG += `</g>`;
+            graphSVG += `<path d="M ${padding} ${padding/2} L ${padding} ${graphHeight - padding} L ${graphWidth - padding} ${graphHeight - padding}" stroke="#4b5563" stroke-width="2" fill="none" />`;
         }
-        // X Axis
-        for (let i = 0; i < categoryCount; i++) {
-            const x = padding + i * barWidth + barWidth / 2;
-            graphSVG += `<text x="${x}" y="${graphHeight - padding + 20}" text-anchor="middle" font-size="24" fill="currentColor">${categories[i]}</text>`;
+        
+        // Generate question about the graph
+        const maxValue = Math.max(...Object.values(data));
+        const maxItems = Object.keys(data).filter(key => data[key] === maxValue);
+        const minValue = Math.min(...Object.values(data));
+        const minItems = Object.keys(data).filter(key => data[key] === minValue);
+
+        const questionPool = [];
+        if (maxItems.length === 1) {
+            questionPool.push({ q: `Grafiğe göre <b>en çok</b> hangi nesneden vardır?`, a: maxItems[0] });
         }
-        graphSVG += `<line x1="${padding}" y1="${graphHeight - padding}" x2="${graphWidth - padding}" y2="${graphHeight - padding}" stroke="black" />`;
-        graphSVG += `<line x1="${padding}" y1="${padding/2}" x2="${padding}" y2="${graphHeight - padding}" stroke="black" />`;
+        if (minItems.length === 1 && maxValue !== minValue) {
+            questionPool.push({ q: `Grafiğe göre <b>en az</b> hangi nesneden vardır?`, a: minItems[0] });
+        }
+        const randomCat = categories[getRandomInt(0, categories.length - 1)];
+        questionPool.push({ q: `Grafikte toplam kaç tane <b>${randomCat}</b> vardır?`, a: data[randomCat] });
+        
+        const twoCats = shuffleArray(categories).slice(0, 2);
+        if (twoCats.length === 2 && data[twoCats[0]] !== data[twoCats[1]]) {
+            const more = data[twoCats[0]] > data[twoCats[1]] ? twoCats[0] : twoCats[1];
+            questionPool.push({ q: `<b>${twoCats[0]}</b> mı daha çok, yoksa <b>${twoCats[1]}</b> mi?`, a: more });
+        }
+        
+        const selectedQuestion = questionPool[getRandomInt(0, questionPool.length - 1)];
+        const graphQuestionText = `<p style="font-size: 1.2rem; text-align: center; margin-top: 1.5rem;">${selectedQuestion.q}</p>`;
+
+        question = `<svg viewBox="0 0 ${graphWidth} ${graphHeight}" width="100%">${graphSVG}</svg>${graphQuestionText}`;
+        answer = selectedQuestion.a;
     }
-
-    const question = `
-        <div>
-            <p style="font-size: 1.2rem; text-align: center; margin-bottom: 0.5rem;">${instruction}</p>
-            ${dataSVG}
-            <svg viewBox="0 0 ${graphWidth} ${graphHeight}">${graphSVG}</svg>
-        </div>
-    `;
-
-    return { problem: { question, answer: "Grafiği doldurunuz.", category: 'simple-graphs' }, title };
+    
+    return { problem: { question, answer, category: 'simple-graphs' }, title, preamble };
 };
+
 
 const generateVisualAdditionSubtractionProblem = (settings: VisualAdditionSubtractionSettings): { problem: Problem, title: string } => {
     const { operation, theme, maxNumber } = settings;

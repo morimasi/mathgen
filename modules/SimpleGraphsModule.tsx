@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { generateReadinessProblem } from '../services/readinessService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { SimpleGraphsSettings, SimpleGraphType, MathReadinessTheme } from '../types';
+import { SimpleGraphsSettings, SimpleGraphType, MathReadinessTheme, SimpleGraphTaskType } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -18,6 +18,7 @@ const SimpleGraphsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<SimpleGraphsSettings>({
         graphType: SimpleGraphType.Pictograph,
+        taskType: SimpleGraphTaskType.Create,
         theme: 'fruits',
         categoryCount: 3,
         maxItemCount: 5,
@@ -55,7 +56,7 @@ const SimpleGraphsModule: React.FC = () => {
         <div className="space-y-2">
             <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold">Basit Grafikler ve Veri Ayarları</h2>
-                <HintButton text="'Resim Grafiği (Piktograf)' ve 'Çubuk Grafiği' etkinlikleri, çocukların veri toplama, organize etme ve yorumlama becerilerini geliştirmeleri için ilk adımları sunar." />
+                <HintButton text="'Grafik Oluşturma' veri toplama ve grafiğe işleme becerisi kazandırırken, yeni 'Grafik Okuma' etkinliği ise hazır bir grafiği yorumlama ve veri analizi becerisi geliştirir." />
             </div>
              <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Checkbox
@@ -88,6 +89,16 @@ const SimpleGraphsModule: React.FC = () => {
                 )}
             </div>
             <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                <Select
+                    label="Etkinlik Türü"
+                    id="graph-task-type"
+                    value={settings.taskType}
+                    onChange={e => handleSettingChange('taskType', e.target.value as SimpleGraphTaskType)}
+                    options={[
+                        { value: SimpleGraphTaskType.Create, label: 'Grafik Oluşturma' },
+                        { value: SimpleGraphTaskType.Read, label: 'Grafik Okuma' },
+                    ]}
+                />
                 <Select
                     label="Grafik Türü"
                     id="graph-type"

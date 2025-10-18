@@ -434,8 +434,13 @@ export enum SimpleGraphType {
     Pictograph = 'pictograph',
     BarChart = 'barchart'
 }
+export enum SimpleGraphTaskType {
+    Create = 'create', // Count objects and fill the graph
+    Read = 'read',     // Read the provided graph and answer a question
+}
 export interface SimpleGraphsSettings {
     graphType: SimpleGraphType;
+    taskType: SimpleGraphTaskType;
     theme: MathReadinessTheme;
     categoryCount: number;
     maxItemCount: number;
