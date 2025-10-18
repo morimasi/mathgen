@@ -392,7 +392,7 @@ const generateVerbalArithmeticProblem = (settings: VerbalArithmeticSettings): { 
 
     const question = `
         <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 1.2rem; width: 100%;">
-            <span style="font-family: monospace; font-weight: bold;">İşlem: ${equation}</span>
+            <span style="font-family: monospace; font-weight: bold;">${equation}</span>
             ${writingSpace}
         </div>`;
 
