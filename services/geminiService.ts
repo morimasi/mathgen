@@ -8,9 +8,9 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
  * Her modül için bu temel talimata ek, uzmanlaşmış yönlendirmeler eklenir.
  */
 const systemInstruction = `
-Sen, ilkokul seviyesindeki öğrenciler için eğitim materyalleri hazırlayan uzman bir pedagog ve öğretim tasarımcısısın. Özellikle öğrenme güçlüğü (disleksi, diskalkuli, disgrafi) olan öğrencilerin ihtiyaçlarına yönelik materyal üretme konusunda derin bir uzmanlığa sahipsin.
-Amacın, kafa karıştırıcı olmayan, pedagojik olarak sağlam, yaşa uygun, motive edici ve mümkün olduğunca somutlaştırılmış problemler ve etkinlikler oluşturmaktır.
-Verdiğin cevaplar SADECE istenen formatta (JSON) olmalı, başka hiçbir açıklama, selamlama veya metin içermemelidir.
+Sen, ilkokul öğrencileri için yaratıcı ve pedagojik olarak sağlam eğitim materyalleri hazırlayan uzman bir öğretim tasarımcısısın. Özellikle disleksi, diskalkuli ve disgrafi gibi öğrenme güçlükleri konusunda derin bilgiye sahipsin.
+Görevin, her zaman yaşa uygun, anlaşılır, basit bir dil kullanan, ilgi çekici ve somut örnekler içeren problemler üretmektir.
+Verdiğin cevaplar SADECE istenen JSON formatında olmalı, başka hiçbir açıklama, selamlama veya metin içermemelidir.
 
 Öğrenme güçlükleri için özel kurallar:
 - DİSKALKULİ: Problemler aşırı basit bir dilde olmalı. Sayılar küçük (genellikle 1-20 arası) ve işlemler tek adımlı olmalı. Her zaman elma, araba, top gibi somut ve sayılabilir nesneler kullan. Soyut kavramlardan kaçın.
@@ -23,22 +23,22 @@ const getModuleSpecificInstructions = (sourceModule: string, settings: any): str
     const { topic, operationCount, gradeLevel } = settings;
 
     const modulePrompts: { [key: string]: string } = {
-        'arithmetic': `Dört işlem alıştırması. Özellikle ${settings.operation ? `"${settings.operation}" işlemi` : ''} üzerine odaklan.`,
-        'fractions': 'Kesirler. Somut örnekler kullan (pizza dilimi, pasta, elmanın parçaları).',
-        'decimals': 'Ondalık sayılar. Gerçek hayattan örnekler kullan (para, market alışverişi, metre ile ölçüm).',
-        'place-value': 'Basamak değeri, çözümleme ve yuvarlama.',
-        'rhythmic-counting': 'Ritmik sayma ve sayı örüntüleri.',
-        'time': 'Zaman ölçme. Analog/dijital saat okuma, süre hesaplama gibi konular.',
-        'geometry': 'Geometrik şekiller, alan ve çevre. Şekilleri basit ve net tanımla.',
-        'measurement': 'Ölçü birimleri (uzunluk, ağırlık, hacim) ve dönüşümleri.',
-        'dyslexia': 'Disleksiye özel, fonolojik farkındalık, harf-ses ilişkisi ve okuduğunu anlama odaklı etkinlikler.',
-        'dyscalculia': 'Diskalkuliye özel, sayı hissi, miktar karşılaştırma ve temel aritmetik becerilerine odaklanan, görsellerle desteklenmiş basit etkinlikler.',
-        'dysgraphia': 'Disgrafiye özel, ince motor becerileri, harf şekillendirme, yazı planlama ve yazma motivasyonunu artırıcı etkinlikler.',
+        'arithmetic': `Dört işlem becerilerini (toplama, çıkarma, çarpma, bölme) içeren, ${settings.operation ? `özellikle "${settings.operation}" işlemine odaklanan,` : ''}`,
+        'fractions': 'Kesirler (toplama, çıkarma, karşılaştırma vb.) konusunda, pizza dilimi, pasta gibi somut örnekler kullanarak,',
+        'decimals': 'Ondalık sayılar konusunda, para (TL), market alışverişi, metre ile ölçüm gibi gerçek hayat senaryoları kullanarak,',
+        'place-value': 'Basamak değeri, sayı çözümleme ve yuvarlama becerilerini hedefleyen,',
+        'rhythmic-counting': 'Ritmik sayma ve sayı örüntüleri üzerine,',
+        'time': 'Zaman ölçme (analog/dijital saat okuma, süre hesaplama vb.) ile ilgili,',
+        'geometry': 'Geometrik şekiller, alan ve çevre hesaplamaları gibi konuları içeren,',
+        'measurement': 'Ölçü birimleri (uzunluk, ağırlık, hacim) ve aralarındaki dönüşümleri konu alan,',
+        'dyslexia': 'Disleksiye özel, fonolojik farkındalık, harf-ses ilişkisi ve okuduğunu anlama odaklı etkinlikler içeren,',
+        'dyscalculia': 'Diskalkuliye özel, sayı hissi, miktar karşılaştırma ve temel aritmetik becerilerine odaklanan, görsellerle desteklenmiş basit etkinlikler içeren,',
+        'dysgraphia': 'Disgrafiye özel, ince motor becerileri, harf şekillendirme, yazı planlama ve yazma motivasyonunu artırıcı etkinlikler içeren,',
     };
     
     if (gradeLevel) instructions += `${gradeLevel}. sınıf seviyesine uygun,`;
     if (topic) instructions += ` "${topic}" temalı,`;
-    if (modulePrompts[sourceModule]) instructions += ` ${modulePrompts[sourceModule]} konusunda,`;
+    if (modulePrompts[sourceModule]) instructions += ` ${modulePrompts[sourceModule]}`;
     if (operationCount) instructions += ` ${operationCount > 1 ? `${operationCount} işlem gerektiren` : 'tek işlem gerektiren'} problemler oluştur.`;
     
     return instructions;
@@ -56,14 +56,13 @@ export const generateContextualWordProblems = async (sourceModule: string, setti
             userPrompt = `${baseInstructions} ${problemsPerPage} tane gerçek hayat problemi (kelime problemi) oluştur.`;
         }
         
-        // Gemini doesn't generate images with emojis well. This instruction is better for text-only.
         const visualInstruction = "Soruları daha ilgi çekici hale getirmek için problem metninin sonuna konuyla ilgili uygun bir emoji ekle.";
         if (useVisuals) {
             userPrompt += ` ${visualInstruction}`;
         }
         
         const response: GenerateContentResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-flash', // Image generation not suitable for this task. Sticking to text.
+            model: 'gemini-2.5-pro',
             contents: { parts: [{ text: userPrompt }] },
             config: {
                 systemInstruction,
