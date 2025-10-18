@@ -147,29 +147,7 @@
     height: 240px;
     position: relative;
     overflow: hidden;
-    background: #000;
-  }
-  .constellation-header::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100px;
-    background: linear-gradient(to top, rgba(109, 40, 2, 0.6), transparent);
-    z-index: 10;
-  }
-  .constellation-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 60"><path d="M0 60 L0 50 Q 150 20, 300 40 T 600 30 T 800 50 L800 60 Z" fill="%23221a15"/></svg>');
-    background-size: cover;
-    z-index: 11;
-    box-shadow: 0 -10px 20px rgba(0,0,0,0.5);
+    background: linear-gradient(to bottom, #4a2511, #1c0d06);
   }
   
   @keyframes move-stars-1 { from { background-position: 0 0; } to { background-position: -10000px 5000px; } }
