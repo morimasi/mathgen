@@ -45,13 +45,13 @@ const generateMatchingProblem = (settings: MatchingAndSortingSettings): { proble
         const y = (i * itemHeight) + FONT_SIZE + 10;
         
         // Column 1
-        svgContent += `<text x="50" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle">${items[i]}</text>`;
+        svgContent += `<text x="50" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle" fill="currentColor">${items[i]}</text>`;
         svgContent += `<circle cx="80" cy="${y}" r="5" fill="#d1d5db" />`;
 
         // Column 2
         const itemToDraw = type === 'shadow' ? 
             `<text x="250" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle" fill="black" opacity="0.6">${shuffledItems[i]}</text>` :
-            `<text x="250" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle">${shuffledItems[i]}</text>`;
+            `<text x="250" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle" fill="currentColor">${shuffledItems[i]}</text>`;
         svgContent += itemToDraw;
         svgContent += `<circle cx="220" cy="${y}" r="5" fill="#d1d5db" />`;
     }
@@ -97,7 +97,7 @@ const generateComparingProblem = (settings: ComparingQuantitiesSettings): { prob
          const answer = (instruction === "En Büyüğü") ? "3. Nesne" : "1. Nesne"; // Based on sorted scales
          
          const itemsSVG = scales.map((scale, i) => 
-            `<text x="${50 + i * 80}" y="50" font-size="${30 * scale}" text-anchor="middle" dominant-baseline="middle">${item}</text>`
+            `<text x="${50 + i * 80}" y="50" font-size="${30 * scale}" text-anchor="middle" dominant-baseline="middle" fill="currentColor">${item}</text>`
          ).join('');
 
          question = `<div style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">${instruction}</div>
@@ -183,11 +183,11 @@ const generatePositionalProblem = (settings: PositionalConceptsSettings): { prob
             let itemsSVG = `<rect x="50" y="150" width="300" height="20" fill="#a16207" /><rect x="80" y="170" width="10" height="60" fill="#a16207" /><rect x="280" y="170" width="10" height="60" fill="#a16207" />`; // table
             
             const targetY = isAbove ? 130 : 210;
-            itemsSVG += `<text x="${getRandomInt(80, 280)}" y="${targetY}" font-size="${FONT_SIZE}" text-anchor="middle">${targetItem}</text>`;
+            itemsSVG += `<text x="${getRandomInt(80, 280)}" y="${targetY}" font-size="${FONT_SIZE}" text-anchor="middle" fill="currentColor">${targetItem}</text>`;
             
             for(let i = 1; i < itemCount; i++) {
                  const otherY = !isAbove ? 130 : 210;
-                 itemsSVG += `<text x="${getRandomInt(80, 280)}" y="${otherY}" font-size="${FONT_SIZE}" text-anchor="middle">${items[i]}</text>`;
+                 itemsSVG += `<text x="${getRandomInt(80, 280)}" y="${otherY}" font-size="${FONT_SIZE}" text-anchor="middle" fill="currentColor">${items[i]}</text>`;
             }
 
             question = `<div><p style="font-size: 1.2rem; text-align: center;">${instruction}</p><svg viewBox="0 0 400 250">${itemsSVG}</svg></div>`;
@@ -229,8 +229,8 @@ const generateMeasurementIntroProblem = (settings: IntroToMeasurementSettings): 
                 title = "Ağır/Hafif Karşılaştırması";
                 instruction = "Hangisi daha ağır?";
                 const tilt = scale1 > scale2 ? -5 : 5;
-                svg1 = `<g transform="rotate(${-tilt} 150 150)"><text x="50" y="120" font-size="${FONT_SIZE * scale1}" text-anchor="middle">${item}</text></g>`;
-                svg2 = `<g transform="rotate(${-tilt} 150 150)"><text x="250" y="120" font-size="${FONT_SIZE * scale2}" text-anchor="middle">${item}</text></g>`;
+                svg1 = `<g transform="rotate(${-tilt} 150 150)"><text x="50" y="120" font-size="${FONT_SIZE * scale1}" text-anchor="middle" fill="currentColor">${item}</text></g>`;
+                svg2 = `<g transform="rotate(${-tilt} 150 150)"><text x="250" y="120" font-size="${FONT_SIZE * scale2}" text-anchor="middle" fill="currentColor">${item}</text></g>`;
                 // Balance Scale SVG
                 const balance = `<path d="M 150 180 L 150 50 M 100 50 L 200 50 M 100 50 L 50 150 M 200 50 L 250 150" stroke="#854d0e" stroke-width="4" fill="none" transform-origin="150 50" transform="rotate(${tilt})" />`;
                 svg1 = balance + svg1 + svg2;
@@ -262,11 +262,11 @@ const generateMeasurementIntroProblem = (settings: IntroToMeasurementSettings): 
 
             let unitsSVG = '';
             for(let i = 0; i < count; i++) {
-                unitsSVG += `<text x="${50 + i * unitWidth + unitWidth/2}" y="100" font-size="20" text-anchor="middle">${unit}</text>`;
+                unitsSVG += `<text x="${50 + i * unitWidth + unitWidth/2}" y="100" font-size="20" text-anchor="middle" fill="currentColor">${unit}</text>`;
             }
 
             const questionSVG = `
-                <text x="${50 + targetWidth/2}" y="50" font-size="30" text-anchor="middle">${target}</text>
+                <text x="${50 + targetWidth/2}" y="50" font-size="30" text-anchor="middle" fill="currentColor">${target}</text>
                 <line x1="50" y1="70" x2="${50 + targetWidth}" y2="70" stroke="black" stroke-dasharray="4 2" />
                 <line x1="50" y1="70" x2="50" y2="30" stroke="black" stroke-dasharray="4 2" />
                 <line x1="${50 + targetWidth}" y1="70" x2="${50 + targetWidth}" y2="30" stroke="black" stroke-dasharray="4 2" />
@@ -309,7 +309,7 @@ const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: 
         graphSVG += `<g>`;
         for(let i = 0; i < categoryCount; i++) {
             const y = rowHeight * i + rowHeight / 2 + padding / 2;
-            graphSVG += `<text x="${padding - 10}" y="${y}" font-size="30" text-anchor="end" dominant-baseline="middle">${categories[i]}</text>`;
+            graphSVG += `<text x="${padding - 10}" y="${y}" font-size="30" text-anchor="end" dominant-baseline="middle" fill="currentColor">${categories[i]}</text>`;
             for (let j = 0; j < maxItemCount; j++) {
                 graphSVG += `<rect x="${padding + 10 + j * 40}" y="${y - 18}" width="36" height="36" fill="#f3f4f6" stroke="#d1d5db" />`;
             }
@@ -320,13 +320,13 @@ const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: 
         // Y Axis
         for (let i = 0; i <= maxItemCount; i++) {
             const y = graphHeight - padding - (i * (graphHeight - padding * 1.5) / maxItemCount);
-            graphSVG += `<text x="${padding - 10}" y="${y}" text-anchor="end" dominant-baseline="middle">${i}</text>`;
+            graphSVG += `<text x="${padding - 10}" y="${y}" text-anchor="end" dominant-baseline="middle" fill="currentColor">${i}</text>`;
             graphSVG += `<line x1="${padding - 5}" y1="${y}" x2="${graphWidth - padding}" y2="${y}" stroke="#e5e7eb" />`;
         }
         // X Axis
         for (let i = 0; i < categoryCount; i++) {
             const x = padding + i * barWidth + barWidth / 2;
-            graphSVG += `<text x="${x}" y="${graphHeight - padding + 20}" text-anchor="middle" font-size="24">${categories[i]}</text>`;
+            graphSVG += `<text x="${x}" y="${graphHeight - padding + 20}" text-anchor="middle" font-size="24" fill="currentColor">${categories[i]}</text>`;
         }
         graphSVG += `<line x1="${padding}" y1="${graphHeight - padding}" x2="${graphWidth - padding}" y2="${graphHeight - padding}" stroke="black" />`;
         graphSVG += `<line x1="${padding}" y1="${padding/2}" x2="${padding}" y2="${graphHeight - padding}" stroke="black" />`;
