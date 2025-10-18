@@ -10,6 +10,7 @@ const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule.tsx'))
 const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule.tsx'));
 // FIX: Changed to a named import to resolve a type error with React.lazy.
 const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule.tsx').then(module => ({ default: module.RhythmicCountingModule })));
+// FIX: Add .tsx extension to import path
 const TimeModule = React.lazy(() => import('../modules/TimeModule.tsx'));
 const GeometryModule = React.lazy(() => import('../modules/GeometryModule.tsx'));
 const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule.tsx'));

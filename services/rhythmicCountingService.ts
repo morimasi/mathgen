@@ -1,3 +1,4 @@
+// FIX: Add .ts extension to import path
 import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types.ts';
 
 const getRandomInt = (min: number, max: number): number => {

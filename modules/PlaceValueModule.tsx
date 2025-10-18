@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { generatePlaceValueProblem } from '../services/placeValueService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types';
+// FIX: Add .ts extension to import path
+import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types.ts';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';

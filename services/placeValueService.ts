@@ -1,3 +1,4 @@
+// FIX: Add .ts extension to import paths
 import { Problem, PlaceValueProblemType, PlaceValueSettings } from '../types.ts';
 import { numberToWords } from './utils.ts';
 

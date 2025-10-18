@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { generateFractionsProblem } from '../services/fractionsService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types';
+// FIX: Add .ts extension to import path
+import { FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types.ts';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';

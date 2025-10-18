@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { generateGeometryProblem } from '../services/geometryService';
 import { generateContextualWordProblems } from '../services/geminiService';
-import { GeometrySettings, GeometryProblemType, ShapeType } from '../types';
+// FIX: Add .ts extension to import path
+import { GeometrySettings, GeometryProblemType, ShapeType } from '../types.ts';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
