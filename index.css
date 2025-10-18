@@ -144,7 +144,7 @@
 
   /* Constellation Header - Mars Theme */
   .constellation-header {
-    height: 160px;
+    height: 200px;
     position: relative;
     background-color: #4a1e1a; /* Dark reddish-brown base for Mars sky */
     background-image:
@@ -177,6 +177,18 @@
       move-stars-2 230s linear infinite;
     overflow: hidden;
   }
+  
+  /* Haze/Atmosphere effect for soft transition */
+  .constellation-header::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70%;
+    background: linear-gradient(to top, #5c2c28 5%, transparent 100%);
+    z-index: 1;
+  }
 
   /* Mars Surface Silhouette */
   .constellation-header::after {
@@ -185,15 +197,17 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 40px;
+    height: 60px;
     background: transparent;
+    z-index: 3;
     box-shadow: 
-      0px -10px 30px 15px #1a0a0a, /* Atmosphere glow on horizon */
-      -80px -5px 15px 5px #000,
-      50px -10px 20px 8px #111,
-      150px -8px 25px 10px #000,
-      280px -15px 30px 12px #211d1d,
-      -150px -2px 10px 2px #000;
+      /* Reddish atmospheric glow right at the horizon */
+      0px -12px 30px 18px #3a1a16, 
+      /* More defined, craggy rock shapes */
+      -150px -15px 30px 10px #000,
+      80px -25px 35px 15px #110505,
+      300px -18px 40px 18px #000,
+      -300px -8px 25px 10px #150808;
   }
 
   .constellation-svg {
@@ -202,6 +216,7 @@
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 2;
   }
   .constellation-lines {
     fill: none;
@@ -228,12 +243,12 @@
   @keyframes twinkle {
     0%, 100% {
       transform: scale(0.9);
-      filter: drop-shadow(0 0 2px #fff5e1);
+      filter: drop-shadow(0 0 3px #fff5e1);
       opacity: 0.7;
     }
     50% {
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 3px #ffffff);
+      transform: scale(1.2);
+      filter: drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 4px #ffffff);
       opacity: 1;
     }
   }
