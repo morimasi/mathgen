@@ -1,7 +1,6 @@
 import React from 'react';
 import { useWorksheet } from '../services/WorksheetContext';
 import { usePrintSettings } from '../services/PrintSettingsContext';
-import AnswerKey from './AnswerKey';
 import { Problem } from '../types';
 
 
@@ -95,7 +94,6 @@ const ProblemSheet: React.FC = () => {
     return (
         <div id="worksheet-area" className="worksheet-area" style={problemSheetStyle}>
             {pages}
-            <AnswerKey problems={problems} />
         </div>
     );
 };
