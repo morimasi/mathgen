@@ -99,7 +99,7 @@ const ArithmeticModule: React.FC = () => {
                         <Select label="Gereken İşlem Sayısı" id="arithmetic-op-count" value={settings.operationCount} onChange={e => handleSettingChange('operationCount', parseInt(e.target.value, 10))} options={[{ value: 1, label: '1 İşlemli' },{ value: 2, label: '2 İşlemli' },{ value: 3, label: '3 İşlemli' }]}/>
                         <div className="relative">
                             <TextInput label="Problem Konusu (İsteğe bağlı)" id="arithmetic-topic" value={settings.topic || ''} onChange={e => handleSettingChange('topic', e.target.value)} placeholder="Örn: Market, Park, Oyuncaklar" className="pr-9"/>
-                            <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700 dark:text-stone-400 dark:hover:text-orange-500 transition-colors" title="Rastgele Konu Öner"><ShuffleIcon className="w-4 h-4" /></button>
+                            <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-accent-text dark:text-stone-400 dark:hover:text-accent-text transition-colors" title="Rastgele Konu Öner"><ShuffleIcon className="w-4 h-4" /></button>
                         </div>
                         <Checkbox label="Görsel Destek Ekle (Emoji)" id="use-visuals-word-problems" checked={settings.useVisuals ?? false} onChange={e => handleSettingChange('useVisuals', e.target.checked)}/>
                     </div>

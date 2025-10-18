@@ -147,7 +147,7 @@ const WorksheetToolbar: React.FC = () => {
                 {/* --- Scale --- */}
                 <div className="flex items-center gap-2">
                     <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
-                    <input id="zoom-slider" type="range" min="20" max="150" value={settings.scale * 100} onChange={(e) => setSettings(s => ({ ...s, scale: parseInt(e.target.value, 10) / 100 }))} className="w-24 accent-orange-700"/>
+                    <input id="zoom-slider" type="range" min="20" max="150" value={settings.scale * 100} onChange={(e) => setSettings(s => ({ ...s, scale: parseInt(e.target.value, 10) / 100 }))} className="w-24 accent-primary"/>
                     <span className="text-xs w-10 text-center">{Math.round(settings.scale * 100)}%</span>
                     <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
                 </div>
@@ -168,11 +168,11 @@ const WorksheetToolbar: React.FC = () => {
                  {/* --- Style --- */}
                 <div className="flex items-center gap-2">
                     <label htmlFor="margin-slider" className="text-xs font-medium">Marjin</label>
-                    <input id="margin-slider" type="range" min="0.5" max="4" step="0.1" value={settings.pageMargin} onChange={(e) => setSettings(s => ({ ...s, pageMargin: parseFloat(e.target.value) }))} className="w-20 accent-orange-700"/>
+                    <input id="margin-slider" type="range" min="0.5" max="4" step="0.1" value={settings.pageMargin} onChange={(e) => setSettings(s => ({ ...s, pageMargin: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
                 </div>
                  <div className="flex items-center gap-2">
                     <label htmlFor="fontsize-slider" className="text-xs font-medium">Yazı Tipi</label>
-                    <input id="fontsize-slider" type="range" min="10" max="24" step="1" value={settings.fontSize} onChange={(e) => setSettings(s => ({ ...s, fontSize: parseInt(e.target.value, 10) }))} className="w-20 accent-orange-700"/>
+                    <input id="fontsize-slider" type="range" min="10" max="24" step="1" value={settings.fontSize} onChange={(e) => setSettings(s => ({ ...s, fontSize: parseInt(e.target.value, 10) }))} className="w-20 accent-primary"/>
                 </div>
                 <Select label="Yazdırma Rengi" id="color-theme" value={settings.colorTheme} onChange={e => setSettings(s => ({...s, colorTheme: e.target.value as 'black' | 'blue' | 'sepia'}))} options={[{ value: 'black', label: 'Siyah' }, { value: 'blue', label: 'Mavi' }, { value: 'sepia', label: 'Sepya' }]}/>
             </div>
@@ -207,7 +207,7 @@ const AppContent: React.FC = () => {
                 </svg>
             </div>
             
-            <header className="flex-shrink-0 bg-orange-700 text-white shadow-md z-20 print:hidden">
+            <header className="flex-shrink-0 bg-primary text-white shadow-md z-20 print:hidden">
                 <Header />
             </header>
 

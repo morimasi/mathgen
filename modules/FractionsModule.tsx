@@ -125,7 +125,7 @@ const FractionsModule: React.FC = () => {
                                     placeholder="Örn: Pizza, Pasta, Kurdele"
                                     className="pr-9"
                                 />
-                                <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-orange-700" title="Rastgele Konu Öner">
+                                <button type="button" onClick={handleRandomTopic} className="absolute right-2 bottom-[3px] text-stone-500 hover:text-accent-text" title="Rastgele Konu Öner">
                                     <ShuffleIcon className="w-4 h-4" />
                                 </button>
                             </div>

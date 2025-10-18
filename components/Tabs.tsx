@@ -142,7 +142,7 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
                         <button
                             onClick={() => handleClick(group.title)}
                             onMouseEnter={() => handleMouseEnter(group.title)}
-                            className={`tab-button-nav-item flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none ${
+                            className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none ${
                                 isGroupActive
                                     ? 'bg-white/20 text-white'
                                     : 'text-amber-100/70 hover:bg-white/10 hover:text-white'
@@ -169,7 +169,7 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
                                         onClick={() => handleItemClick(tab.id)}
                                         className={`w-full text-left flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
                                             activeTab === tab.id
-                                                ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300'
+                                                ? 'bg-accent-bg text-accent-text'
                                                 : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700'
                                         }`}
                                         role="menuitem"

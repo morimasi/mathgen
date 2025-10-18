@@ -82,7 +82,7 @@ const ThemeSwitcher: React.FC = () => {
                                 <button
                                     key={key}
                                     onClick={() => setColorTheme(themeKey)}
-                                    className={`w-full h-8 rounded-full flex items-center justify-center transition-all ${colorClass} ${colorTheme === key ? 'ring-2 ring-offset-2 dark:ring-offset-stone-800 ring-current' : ''}`}
+                                    className={`w-full h-8 rounded-full flex items-center justify-center transition-all ${colorClass} ${colorTheme === key ? 'ring-2 ring-offset-2 dark:ring-offset-stone-800 ring-primary-focus' : ''}`}
                                     title={value.name}
                                     aria-label={value.name}
                                 />
@@ -101,7 +101,7 @@ const ThemeSwitcher: React.FC = () => {
                                 onClick={() => setFontTheme(key as FontTheme)}
                                 className={`w-full text-left block px-3 py-1.5 text-sm rounded-md transition-colors ${
                                     fontTheme === key
-                                        ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300'
+                                        ? 'bg-accent-bg text-accent-text'
                                         : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700'
                                 }`}
                             >

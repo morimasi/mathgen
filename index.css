@@ -12,18 +12,60 @@
     --theme-color-blue: #1e3a8a;  /* blue-800 */
     --theme-color-sepia: #78350f; /* amber-800 */
   }
-  
+
+  /* --- THEME SYSTEM --- */
+  /* Default Theme: Orange Light */
+  :root, .theme-orange {
+    --theme-color-primary-rgb: 234 88 12;
+    --theme-color-primary-hover-rgb: 194 65 12;
+    --theme-color-primary-focus-rgb: 249 115 22;
+    --theme-accent-text: theme('colors.orange.700');
+    --theme-accent-bg: theme('colors.orange.100');
+  }
+  .theme-mint {
+    --theme-color-primary-rgb: 5 150 105;
+    --theme-color-primary-hover-rgb: 4 120 87;
+    --theme-color-primary-focus-rgb: 16 185 129;
+    --theme-accent-text: theme('colors.emerald.700');
+    --theme-accent-bg: theme('colors.emerald.100');
+  }
+  .theme-rose {
+    --theme-color-primary-rgb: 225 29 72;
+    --theme-color-primary-hover-rgb: 190 18 60;
+    --theme-color-primary-focus-rgb: 244 63 94;
+    --theme-accent-text: theme('colors.rose.700');
+    --theme-accent-bg: theme('colors.rose.100');
+  }
+  .theme-sky {
+    --theme-color-primary-rgb: 2 132 199;
+    --theme-color-primary-hover-rgb: 3 105 161;
+    --theme-color-primary-focus-rgb: 14 165 233;
+    --theme-accent-text: theme('colors.sky.700');
+    --theme-accent-bg: theme('colors.sky.100');
+  }
+
+  /* Dark Mode Overrides */
   .dark {
     --theme-color-black: #f5f5f4; /* stone-100 */
     --theme-color-blue: #93c5fd;  /* blue-300 */
     --theme-color-sepia: #fcd34d; /* amber-300 */
   }
-
-  /* Color Themes */
-  .theme-orange { --theme-color-primary-rgb: 234 88 12; --theme-color-primary-hover-rgb: 194 65 12; --theme-color-primary-focus-rgb: 249 115 22; --theme-accent-text: theme('colors.orange.700'); --theme-accent-bg: theme('colors.orange.100'); --dark-theme-accent-text: theme('colors.orange.400'); --dark-theme-accent-bg: theme('colors.orange.900/50'); }
-  .theme-mint { --theme-color-primary-rgb: 5 150 105; --theme-color-primary-hover-rgb: 4 120 87; --theme-color-primary-focus-rgb: 16 185 129; --theme-accent-text: theme('colors.emerald.700'); --theme-accent-bg: theme('colors.emerald.100'); --dark-theme-accent-text: theme('colors.emerald.400'); --dark-theme-accent-bg: theme('colors.emerald.900/50'); }
-  .theme-rose { --theme-color-primary-rgb: 225 29 72; --theme-color-primary-hover-rgb: 190 18 60; --theme-color-primary-focus-rgb: 244 63 94; --theme-accent-text: theme('colors.rose.700'); --theme-accent-bg: theme('colors.rose.100'); --dark-theme-accent-text: theme('colors.rose.400'); --dark-theme-accent-bg: theme('colors.rose.900/50'); }
-  .theme-sky { --theme-color-primary-rgb: 2 132 199; --theme-color-primary-hover-rgb: 3 105 161; --theme-color-primary-focus-rgb: 14 165 233; --theme-accent-text: theme('colors.sky.700'); --theme-accent-bg: theme('colors.sky.100'); --dark-theme-accent-text: theme('colors.sky.400'); --dark-theme-accent-bg: theme('colors.sky.900/50'); }
+  .dark.theme-orange {
+    --theme-accent-text: theme('colors.orange.400');
+    --theme-accent-bg: theme('colors.orange.900/50');
+  }
+  .dark.theme-mint {
+    --theme-accent-text: theme('colors.emerald.400');
+    --theme-accent-bg: theme('colors.emerald.900/50');
+  }
+  .dark.theme-rose {
+    --theme-accent-text: theme('colors.rose.400');
+    --theme-accent-bg: theme('colors.rose.900/50');
+  }
+  .dark.theme-sky {
+    --theme-accent-text: theme('colors.sky.400');
+    --theme-accent-bg: theme('colors.sky.900/50');
+  }
 
   /* Font Themes */
   .font-theme-klasik { --font-worksheet: 'Lora', serif; }
@@ -39,16 +81,10 @@
     font-family: var(--font-worksheet);
   }
 
-  .accent-orange-700 {
-      accent-color: theme('colors.orange.700');
+  /* Fallback for components that might not be themed via Tailwind config */
+  .accent-primary-color {
+      accent-color: rgb(var(--theme-color-primary-rgb));
   }
-  .dark .dark\:bg-stone-800\/50 {
-      background-color: rgba(39, 39, 42, 0.5);
-  }
-  .dark .dark\:bg-stone-900\/80 {
-      background-color: rgba(28, 25, 23, 0.8);
-  }
-
 }
 
 @layer components {
@@ -115,32 +151,8 @@
   @keyframes toast-exit { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
   .table-selector-grid { @apply grid gap-1 p-1 bg-stone-100 dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded; grid-template-columns: repeat(10, 1fr); }
   .table-selector-cell { @apply w-5 h-3 bg-stone-300 dark:bg-stone-500 rounded-sm transition-colors cursor-pointer; }
-  .table-selector-cell.selected { @apply bg-orange-500; }
+  .table-selector-cell.selected { @apply bg-primary; }
   .live-indicator { @apply text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 animate-pulse; }
-  
-  .tab-button-nav-item { background-color: rgba(var(--theme-color-primary-rgb), 1); }
-  .tab-button-nav-item.active, .tab-button-nav-item:hover { background-color: rgba(var(--theme-color-primary-hover-rgb), 1); }
-  
-  /* Applying theme colors to components */
-  button[variant="primary"] { background-color: rgba(var(--theme-color-primary-rgb), 1); }
-  button[variant="primary"]:hover { background-color: rgba(var(--theme-color-primary-hover-rgb), 1); }
-  button:focus-visible { outline-color: rgba(var(--theme-color-primary-focus-rgb), 1); }
-  input[type="range"] { accent-color: rgba(var(--theme-color-primary-rgb), 1); }
-  input[type="checkbox"]:checked { background-color: rgba(var(--theme-color-primary-rgb), 1); border-color: rgba(var(--theme-color-primary-rgb), 1); }
-  
-  .bg-orange-700 { background-color: rgb(var(--theme-color-primary-rgb)); }
-  .hover\:bg-orange-800:hover { background-color: rgb(var(--theme-color-primary-hover-rgb)); }
-  .focus\:ring-orange-600:focus { --tw-ring-color: rgb(var(--theme-color-primary-focus-rgb)); }
-  .accent-orange-700 { accent-color: rgb(var(--theme-color-primary-rgb)); }
-  .text-orange-700 { color: var(--theme-accent-text); }
-  .dark .dark\:text-orange-500 { color: var(--dark-theme-accent-text); }
-  .bg-orange-100 { background-color: var(--theme-accent-bg); }
-  .dark .dark\:bg-orange-900\/50 { background-color: var(--dark-theme-accent-bg); }
-  .dark .dark\:text-orange-300 { color: var(--dark-theme-accent-text); }
-  .dark .dark\:text-orange-400 { color: var(--dark-theme-accent-text); }
-  .text-orange-800 { color: var(--theme-accent-text); }
-  .focus\:border-orange-600:focus { border-color: rgb(var(--theme-color-primary-focus-rgb)); }
-  .text-orange-800 { color: var(--theme-accent-text); }
 
   /* Constellation Header */
   .constellation-header {
