@@ -1,4 +1,3 @@
-import React from 'react';
 import { PrintSettings } from '../types';
 
 // A helper function to get computed style with a fallback for Jest/JSDOM environment

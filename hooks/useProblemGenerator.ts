@@ -49,16 +49,15 @@ export const useProblemGenerator = <S,>({
                     pageCount: printSettings.layoutMode === 'table' ? 1 : settings.pageCount
                 });
             } else {
-                // FIX: Refactored problem count calculation for robustness and clarity.
                 let totalCount;
                 if (isPracticeSheet) {
                     totalCount = settings.pageCount ?? 1;
                 } else if (printSettings.layoutMode === 'table') {
                     totalCount = printSettings.rows * printSettings.columns;
                 } else if (settings.autoFit) {
-                    // calculateMaxProblems has a fallback if contentRef.current is null
-                    const problemsPerPage = calculateMaxProblems(contentRef, printSettings);
-                    totalCount = problemsPerPage * (settings.pageCount ?? 1);
+                    //FIX: contentRef can be null, provide fallback
+                    const problemsPerPage = contentRef.current ? calculateMaxProblems(contentRef, printSettings) : settings.problemsPerPage!;
+                    totalCount = (problemsPerPage || settings.problemsPerPage!) * (settings.pageCount ?? 1);
                 } else {
                     totalCount = (settings.problemsPerPage ?? 20) * (settings.pageCount ?? 1);
                 }
