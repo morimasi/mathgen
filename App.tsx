@@ -185,6 +185,10 @@ const WorksheetToolbar: React.FC = () => {
                         <label htmlFor="line-height-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Satır Yüksekliği</label>
                         <input id="line-height-slider" type="range" min="1" max="2.5" step="0.1" value={settings.lineHeight} onChange={(e) => setSettings(s => ({ ...s, lineHeight: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
                     </div>
+                     <div className="flex flex-col gap-0.5">
+                        <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
+                        <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={settings.pageMargin} onChange={(e) => setSettings(s => ({ ...s, pageMargin: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
+                    </div>
                  </div>
             </div>
         </div>

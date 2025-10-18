@@ -118,17 +118,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                     className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
                                 />
                             </div>
-                            <div className="space-y-1">
-                                <label htmlFor="print-page-margin" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
-                                   <span>Kenar Boşluğu</span>
-                                   <span className="text-stone-500 dark:text-stone-400 font-normal">{`${settings.pageMargin.toFixed(1)}rem`}</span>
-                                </label>
-                                <input
-                                    type="range" id="print-page-margin" value={settings.pageMargin} min={0.5} max={4} step={0.1}
-                                    onChange={e => handleChange('pageMargin', parseFloat(e.target.value))}
-                                    className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
-                                />
-                            </div>
+                           
                             <div className="space-y-1">
                                 <label htmlFor="print-scale" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
                                    <span>İçerik Ölçeği (Yazdırma)</span>
