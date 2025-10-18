@@ -323,6 +323,102 @@ const generateVisualMasterLocal = (settings: any): { problem: Problem, title: st
     return { problem: { question, answer, category: 'dyslexia' }, title };
 };
 
+const generateLetterDetectiveLocal = (settings: any): { problem: Problem, title: string } => {
+    const title = "Harf Dedektifi";
+    const { letterGroup, difficulty } = settings;
+    const groups = {
+        vowels: "aeıioöuü",
+        common_consonants: "mtkl",
+        tricky_consonants: "bdp"
+    };
+    const targetCharSet = groups[letterGroup as keyof typeof groups] || "abcdefg";
+    const targetChar = targetCharSet[getRandomInt(0, targetCharSet.length - 1)];
+    const alphabet = "abcdefghijklmnopqrstuvwxyz";
+    let question = "", answer = "";
+
+    if (difficulty === 'easy') {
+        let grid = '';
+        for (let i = 0; i < 25; i++) {
+            grid += Math.random() < 0.3 ? targetChar : alphabet[getRandomInt(0, alphabet.length - 1)];
+        }
+        question = `Verilen harflerin arasında <b>'${targetChar}'</b> harfini bul ve daire içine al.<br/><div style="font-size: 1.5rem; letter-spacing: 0.5em; text-align: center; line-height: 1.5; margin-top: 0.5rem; border: 1px solid #ccc; padding: 0.5rem;">${grid}</div>`;
+        answer = `Daire içine alınmış '${targetChar}' harfleri.`;
+    } else {
+        const pool = Object.values(wordPools).flat();
+        const targetWord = shuffleArray(pool.filter(w => w.startsWith(targetChar)))[0];
+        const distractors = shuffleArray(pool.filter(w => !w.startsWith(targetChar))).slice(0, 3);
+        const options = shuffleArray([targetWord, ...distractors]);
+        question = `<b>'${targetChar}'</b> harfiyle başlayan kelime hangisidir?<br/><ul>${options.map(o => `<li>${o}</li>`).join('')}</ul>`;
+        answer = targetWord;
+    }
+
+    return { problem: { question, answer, category: 'dyslexia' }, title };
+};
+
+const generateWordHunterLocal = (settings: any): { problem: Problem, title: string } => {
+    const title = "Kelime Avcısı";
+    const { focus } = settings;
+    let question = "", answer = "";
+    const examples = {
+        prefix: { word: "bilinçsiz", part: "bilinç" },
+        suffix: { word: "gözlükçü", part: "göz" },
+        root: { word: "balıkçı", part: "balık" }
+    };
+    const example = examples[focus];
+    question = `<b>${example.word}</b> kelimesinin kökünü veya ekini bulun. Odak: ${focus}`;
+    answer = example.part;
+    return { problem: { question, answer, category: 'dyslexia' }, title };
+};
+
+const generateSpellingChampionLocal = (settings: any): { problem: Problem, title: string } => {
+    const title = "Yazım Şampiyonu";
+    const errors = {
+        'herkez': 'herkes',
+        'yanlız': 'yalnız',
+        'supriz': 'sürpriz',
+        'eşortman': 'eşofman'
+    };
+    const incorrect = Object.keys(errors)[getRandomInt(0, Object.keys(errors).length - 1)];
+    const correct = errors[incorrect as keyof typeof errors];
+    const options = shuffleArray([correct, incorrect]);
+    const question = `Doğru yazılmış kelimeyi daire içine alın:<br/><div style="font-size: 1.5rem; text-align: center; margin-top: 0.5rem;">${options.join(' / ')}</div>`;
+    const answer = correct;
+    return { problem: { question, answer, category: 'dyslexia' }, title };
+};
+
+const generateMemoryGamerLocal = (settings: any): { problem: Problem, title: string } => {
+    const title = "Hafıza Oyuncusu";
+    const { type, sequenceLength } = settings;
+    // FIX: Declare 'question' variable before use. Improved typing for 'sequence'.
+    let sequence: (string | number)[] = [], answer = "", question = "";
+    if (type === 'digit_span') {
+        for (let i = 0; i < sequenceLength; i++) sequence.push(getRandomInt(0, 9));
+        answer = sequence.join('-');
+        question = `Aşağıdaki rakam dizisini aklınızda tutun ve öğretmeninize söyleyin:<br/><b style="font-size: 1.5rem;">${answer}</b>`;
+    } else {
+        const pool = wordPools.hayvanlar;
+        for (let i = 0; i < sequenceLength; i++) sequence.push(pool[getRandomInt(0, pool.length - 1)]);
+        answer = sequence.join(' - ');
+        question = `Aşağıdaki kelime dizisini aklınızda tutun ve öğretmeninize söyleyin:<br/><b style="font-size: 1.5rem;">${answer}</b>`;
+    }
+    return { problem: { question, answer, category: 'dyslexia' }, title };
+};
+
+const generateAuditoryWritingLocal = (settings: any): { problem: Problem, title: string } => {
+    const title = "İşitsel Yazma (Dikte)";
+    const { type } = settings;
+    let text = "";
+    if (type === 'single_words') {
+        text = wordPools.eşyalar[getRandomInt(0, wordPools.eşyalar.length - 1)];
+    } else {
+        text = "Ali topu at.";
+    }
+    const question = `Öğretmeninizin söylediği kelimeyi/cümleyi buraya yazın:<br/><div style="border-bottom: 1px solid black; height: 2rem; margin-top: 1rem;"></div>`;
+    const answer = text;
+    return { problem: { question, answer, category: 'dyslexia' }, title };
+};
+
+
 const generateMapReadingLocal = (settings: MapReadingSettings): { problem: Problem; title: string } => {
     const { difficulty, questionCount, region } = settings;
     const title = "Harita Okuma Etkinliği";
@@ -439,7 +535,21 @@ export const generateDyslexiaProblem = async (subModuleId: DyslexiaSubModuleType
             case 'map-reading':
                 result = generateMapReadingLocal(settings as MapReadingSettings);
                 break;
-            // Add other local generators here
+            case 'letter-detective':
+                result = generateLetterDetectiveLocal(settings);
+                break;
+            case 'word-hunter':
+                result = generateWordHunterLocal(settings);
+                break;
+            case 'spelling-champion':
+                result = generateSpellingChampionLocal(settings);
+                break;
+            case 'memory-gamer':
+                result = generateMemoryGamerLocal(settings);
+                break;
+            case 'auditory-writing':
+                result = generateAuditoryWritingLocal(settings);
+                break;
             default:
                 result = { 
                     problem: { question: `Bu alıştırma ('${subModuleId}') için yerel üreteç henüz tanımlanmadı.`, answer: "...", category: 'dyslexia' },

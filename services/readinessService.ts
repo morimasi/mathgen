@@ -36,22 +36,27 @@ const generateMatchingProblem = (settings: MatchingAndSortingSettings): { proble
     const shuffledItems = shuffleArray(items);
 
     const width = 300;
-    const height = 50 * itemCount;
+    const itemHeight = 60;
+    const height = itemHeight * itemCount;
     const FONT_SIZE = 30;
 
-    let col1SVG = '';
-    let col2SVG = '';
+    let svgContent = '';
     for(let i = 0; i < itemCount; i++) {
-        const y = (i * 50) + FONT_SIZE;
-        col1SVG += `<text x="50" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle">${items[i]}</text>`;
+        const y = (i * itemHeight) + FONT_SIZE + 10;
         
+        // Column 1
+        svgContent += `<text x="50" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle">${items[i]}</text>`;
+        svgContent += `<circle cx="80" cy="${y}" r="5" fill="#d1d5db" />`;
+
+        // Column 2
         const itemToDraw = type === 'shadow' ? 
             `<text x="250" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle" fill="black" opacity="0.6">${shuffledItems[i]}</text>` :
             `<text x="250" y="${y}" font-size="${FONT_SIZE}" text-anchor="middle" dominant-baseline="middle">${shuffledItems[i]}</text>`;
-        col2SVG += itemToDraw;
+        svgContent += itemToDraw;
+        svgContent += `<circle cx="220" cy="${y}" r="5" fill="#d1d5db" />`;
     }
     
-    const question = `<svg viewBox="0 0 ${width} ${height}" style="max-height: 400px; width: auto;">${col1SVG}${col2SVG}</svg>`;
+    const question = `<svg viewBox="0 0 ${width} ${height}" style="max-height: 400px; width: auto;">${svgContent}</svg>`;
 
     return { 
         problem: { question, answer: "Görseldeki gibi", category: 'matching-and-sorting' }, 

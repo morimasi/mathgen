@@ -88,6 +88,55 @@ const generateSentenceConstructionLocal = (settings: any): { problem: Problem, t
     return { problem: { question, answer, category: 'dysgraphia' }, title };
 };
 
+const generateLetterFormRecognitionLocal = (settings: any): { problem: Problem; title: string; } => {
+    const title = "Harf Formu Tanıma";
+    const { targetLetter } = settings;
+    const distractors = "abdegkmopqrs".split('').filter(l => l !== targetLetter);
+    let grid = '';
+    for (let i = 0; i < 30; i++) {
+        grid += Math.random() < 0.3 ? targetLetter : distractors[getRandomInt(0, distractors.length - 1)];
+    }
+    const question = `Harflerin arasında <b>'${targetLetter}'</b> harfini bul ve daire içine al.<br/><div style="font-size: 1.5rem; letter-spacing: 0.5em; text-align: center; line-height: 1.5; margin-top: 0.5rem;">${grid}</div>`;
+    return { problem: { question, answer: `Daire içine alınmış '${targetLetter}' harfleri.`, category: 'dysgraphia' }, title };
+};
+
+const generateLegibleWritingLocal = (settings: any): { problem: Problem; title: string; } => {
+    const title = "Okunaklı Yazı";
+    const { type } = settings;
+    let sentence = "kediyuvrlaktoplaoynuyor";
+    if (type === 'sizing') sentence = "bAZı hARfLEr büYÜk bAZılaRI kÜÇÜk";
+    const question = `Aşağıdaki cümleyi düzgün boşluklar ve harf boyutları ile yeniden yaz:<br/><b style="font-size: 1.2rem; font-family: monospace; display: block; margin-top: 0.5rem;">${sentence}</b><div style="border-bottom: 1px solid black; height: 2rem; margin-top: 1rem;"></div>`;
+    const answer = "Kedi yuvarlak topla oynuyor.";
+    return { problem: { question, answer, category: 'dysgraphia' }, title };
+};
+
+const generateWritingSpeedLocal = (settings: any): { problem: Problem; title: string; } => {
+    const title = "Yazma Hızı Alıştırması";
+    const word = "elma";
+    const question = `Aşağıdaki kelimeyi olabildiğince çok tekrar et:<br/><b style="font-size: 2rem;">${word}</b><div style="border: 1px dashed #ccc; height: 100px; margin-top: 1rem;"></div>`;
+    return { problem: { question, answer: "Tekrarlı yazım", category: 'dysgraphia' }, title };
+};
+
+const generatePunctuationLocal = (settings: any): { problem: Problem; title: string; } => {
+    const title = "Noktalama İşaretleri";
+    const sentence = "Ayşe markete gitti mi";
+    const question = `Cümlenin sonuna uygun noktalama işaretini koy:<br/><b style="font-size: 1.5rem;">${sentence} _</b>`;
+    const answer = "Ayşe markete gitti mi?";
+    return { problem: { question, answer, category: 'dysgraphia' }, title };
+};
+
+const generateKeyboardSkillsLocal = (settings: any): { problem: Problem; title: string; } => {
+    const title = "Klavye Becerileri";
+    const rows = {
+        'home-row': 'asdf jklş',
+        'top-row': 'qwer uıop',
+        'full': 'merhaba dünya'
+    };
+    const text = rows[settings.level as keyof typeof rows];
+    const question = `Aşağıdaki metni klavyede yazma alıştırması yapın:<br/><b style="font-family: monospace; font-size: 1.5rem;">${text}</b><div style="border: 1px dashed #ccc; height: 60px; margin-top: 1rem;"></div>`;
+    return { problem: { question, answer: "Klavye alıştırması", category: 'dysgraphia' }, title };
+};
+
 
 export const generateDysgraphiaProblem = async (subModuleId: DysgraphiaSubModuleType, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
     
@@ -113,7 +162,21 @@ export const generateDysgraphiaProblem = async (subModuleId: DysgraphiaSubModule
             case 'sentence-construction':
                 result = generateSentenceConstructionLocal(settings);
                 break;
-            // Add other local generators here
+            case 'letter-form-recognition':
+                result = generateLetterFormRecognitionLocal(settings);
+                break;
+            case 'legible-writing':
+                result = generateLegibleWritingLocal(settings);
+                break;
+            case 'writing-speed':
+                result = generateWritingSpeedLocal(settings);
+                break;
+            case 'punctuation':
+                result = generatePunctuationLocal(settings);
+                break;
+            case 'keyboard-skills':
+                result = generateKeyboardSkillsLocal(settings);
+                break;
             default:
                 result = { 
                     problem: { question: `Bu alıştırma ('${subModuleId}') için yerel üreteç henüz tanımlanmadı.`, answer: "...", category: 'dysgraphia' },

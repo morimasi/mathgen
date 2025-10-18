@@ -2,7 +2,7 @@
 
 import { Problem, DyscalculiaSubModuleType } from '../types';
 import { generateDyscalculiaAIProblem } from './geminiService';
-import { drawFractionPie } from './svgService';
+import { drawFractionPie, drawAnalogClock } from './svgService';
 
 // --- LOCAL GENERATION LOGIC ---
 
@@ -110,6 +110,77 @@ const generateFractionsDecimalsIntroLocal = (settings: any): { problem: Problem,
     return { problem: { question, answer, category: 'dyscalculia' }, title };
 };
 
+const generateNumberGroupingLocal = (settings: any): { problem: Problem; title: string; } => {
+    const { maxNumber } = settings;
+    const title = "Sayı Gruplama (Onluk Birlik)";
+    const number = getRandomInt(11, maxNumber);
+    const tens = Math.floor(number / 10);
+    const ones = number % 10;
+    const question = `<b>${number}</b> sayısında kaç onluk ve kaç birlik vardır?<br/>Onluk: ___ Birlik: ___`;
+    const answer = `Onluk: ${tens}, Birlik: ${ones}`;
+    return { problem: { question, answer, category: 'dyscalculia' }, title };
+};
+
+const generateMathLanguageLocal = (settings: any): { problem: Problem; title: string; } => {
+    const title = "Matematiksel Dil";
+    const map = { '+': 'Artı', '-': 'Eksi', '=': 'Eşittir' };
+    const symbol = Object.keys(map)[getRandomInt(0, 2)];
+    const word = map[symbol as keyof typeof map];
+    const question = `<b>'${word}'</b> kelimesinin matematiksel sembolü nedir?`;
+    const answer = symbol;
+    return { problem: { question, answer, category: 'dyscalculia' }, title };
+};
+
+const generateTimeMeasurementGeometryLocal = (settings: any): { problem: Problem; title: string; } => {
+    const { category } = settings;
+    if (category === 'time') {
+        const title = "Saat Okuma";
+        const hour = getRandomInt(1, 12);
+        const question = drawAnalogClock(hour, 0);
+        const answer = `Saat tam ${hour}`;
+        return { problem: { question, answer, category: 'dyscalculia' }, title };
+    }
+    // Add simple measurement and geometry questions
+    const title = "Ölçme/Geometri";
+    const question = "Hangi çizgi daha uzun?";
+    const answer = "Üstteki";
+    return { problem: { question, answer, category: 'dyscalculia' }, title };
+};
+
+const generateSpatialReasoningLocal = (settings: any): { problem: Problem; title: string; } => {
+    const title = "Uzamsal Akıl Yürütme";
+    const pattern = "🟥🟦🟥";
+    const question = `Aşağıdaki deseni kopyalayın:<br/><b style="font-size: 2rem;">${pattern}</b><div style="border: 1px dashed #ccc; height: 3rem; margin-top: 1rem;"></div>`;
+    const answer = pattern;
+    return { problem: { question, answer, category: 'dyscalculia' }, title };
+};
+
+const generateEstimationSkillsLocal = (settings: any): { problem: Problem; title: string; } => {
+    const title = "Tahmin Becerileri";
+    const count = getRandomInt(5, 20);
+    const items = '🔵'.repeat(count);
+    const question = `Resimde yaklaşık olarak kaç top olduğunu tahmin et.<br/><div style="font-size: 1.5rem; line-height: 1.2;">${items}</div>`;
+    const answer = `Yaklaşık ${Math.round(count / 5) * 5}`;
+    return { problem: { question, answer, category: 'dyscalculia' }, title };
+};
+
+const generateVisualNumberRepresentationLocal = (settings: any): { problem: Problem; title: string; } => {
+    const { maxNumber, representation } = settings;
+    const title = "Sayıların Görsel Temsili";
+    const number = getRandomInt(1, maxNumber);
+    let representationHtml = '';
+    if (representation === 'dots') {
+        representationHtml = `<span style="font-size: 2rem; color: #3b82f6;">${'●'.repeat(number)}</span>`;
+    } else { // blocks
+        const tens = Math.floor(number / 10);
+        const ones = number % 10;
+        representationHtml = `<span style="font-size: 2rem; color: #ef4444;">${'|'.repeat(tens)}</span><span style="font-size: 2rem; color: #3b82f6; margin-left: 0.5rem;">${'●'.repeat(ones)}</span>`;
+    }
+    const question = `Aşağıdaki görsel hangi sayıyı temsil ediyor?<br/>${representationHtml}`;
+    const answer = String(number);
+    return { problem: { question, answer, category: 'dyscalculia' }, title };
+};
+
 export const generateDyscalculiaProblem = async (subModuleId: DyscalculiaSubModuleType, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
     
     const aiModules: DyscalculiaSubModuleType[] = ['problem-solving', 'interactive-story-dc'];
@@ -137,7 +208,24 @@ export const generateDyscalculiaProblem = async (subModuleId: DyscalculiaSubModu
             case 'fractions-decimals-intro':
                 result = generateFractionsDecimalsIntroLocal(settings);
                 break;
-            // Add other local generators here
+            case 'number-grouping':
+                result = generateNumberGroupingLocal(settings);
+                break;
+            case 'math-language':
+                result = generateMathLanguageLocal(settings);
+                break;
+            case 'time-measurement-geometry':
+                result = generateTimeMeasurementGeometryLocal(settings);
+                break;
+            case 'spatial-reasoning':
+                result = generateSpatialReasoningLocal(settings);
+                break;
+            case 'estimation-skills':
+                result = generateEstimationSkillsLocal(settings);
+                break;
+            case 'visual-number-representation':
+                result = generateVisualNumberRepresentationLocal(settings);
+                break;
             default:
                 result = { 
                     problem: { question: `Bu alıştırma ('${subModuleId}') için yerel üreteç henüz tanımlanmadı.`, answer: "...", category: 'dyscalculia' },
