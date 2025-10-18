@@ -32,7 +32,8 @@ export const useProblemGenerator = <S,>({
 
     useEffect(() => {
         if (!contentRef.current) {
-            contentRef.current = document.getElementById('worksheet-container-0');
+            // FIX: Cast the result of getElementById to HTMLDivElement to match the ref's type.
+            contentRef.current = document.getElementById('worksheet-container-0') as HTMLDivElement;
         }
     }, []);
 

@@ -1,1 +1,144 @@
-full contents of index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-stone-100 text-stone-900 dark:bg-stone-900 dark:text-stone-100 transition-colors duration-300;
+  }
+
+  /* Color Themes */
+  .theme-orange { --theme-color-primary-rgb: 234 88 12; --theme-color-primary-hover-rgb: 194 65 12; --theme-color-primary-focus-rgb: 249 115 22; --theme-accent-text: theme('colors.orange.700'); --theme-accent-bg: theme('colors.orange.100'); --dark-theme-accent-text: theme('colors.orange.400'); --dark-theme-accent-bg: theme('colors.orange.900/50'); }
+  .theme-mint { --theme-color-primary-rgb: 5 150 105; --theme-color-primary-hover-rgb: 4 120 87; --theme-color-primary-focus-rgb: 16 185 129; --theme-accent-text: theme('colors.emerald.700'); --theme-accent-bg: theme('colors.emerald.100'); --dark-theme-accent-text: theme('colors.emerald.400'); --dark-theme-accent-bg: theme('colors.emerald.900/50'); }
+  .theme-rose { --theme-color-primary-rgb: 225 29 72; --theme-color-primary-hover-rgb: 190 18 60; --theme-color-primary-focus-rgb: 244 63 94; --theme-accent-text: theme('colors.rose.700'); --theme-accent-bg: theme('colors.rose.100'); --dark-theme-accent-text: theme('colors.rose.400'); --dark-theme-accent-bg: theme('colors.rose.900/50'); }
+  .theme-sky { --theme-color-primary-rgb: 2 132 199; --theme-color-primary-hover-rgb: 3 105 161; --theme-color-primary-focus-rgb: 14 165 233; --theme-accent-text: theme('colors.sky.700'); --theme-accent-bg: theme('colors.sky.100'); --dark-theme-accent-text: theme('colors.sky.400'); --dark-theme-accent-bg: theme('colors.sky.900/50'); }
+
+  /* Font Themes */
+  .font-theme-klasik { --font-worksheet: 'Lora', serif; }
+  .font-theme-modern { --font-worksheet: 'Nunito Sans', sans-serif; }
+  .font-theme-disleksi1 { --font-worksheet: 'Lexend', sans-serif; }
+  .font-theme-disleksi2 { --font-worksheet: 'Atkinson Hyperlegible', sans-serif; }
+  .font-theme-eglenceli { --font-worksheet: 'Caveat', cursive; }
+  .font-theme-yumusak { --font-worksheet: 'Comfortaa', sans-serif; }
+  .font-theme-blok { --font-worksheet: 'Roboto Slab', serif; }
+  .font-theme-net { --font-worksheet: 'Montserrat', sans-serif; }
+
+  #worksheet-area {
+    font-family: var(--font-worksheet);
+  }
+
+  .accent-orange-700 {
+      accent-color: theme('colors.orange.700');
+  }
+  .dark .dark\:bg-stone-800\/50 {
+      background-color: rgba(39, 39, 42, 0.5);
+  }
+  .dark .dark\:bg-stone-900\/80 {
+      background-color: rgba(28, 25, 23, 0.8);
+  }
+
+}
+
+@layer components {
+  .worksheet-area {
+    @apply flex flex-col items-center;
+    transform: scale(var(--scale, 1));
+    transform-origin: top center;
+    transition: transform 0.2s ease;
+  }
+  .worksheet-page {
+    @apply bg-white text-black shadow-lg my-4 relative;
+    width: 210mm;
+    min-height: 297mm;
+    box-sizing: border-box;
+    color: var(--color);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    text-align: var(--text-align);
+  }
+  .worksheet-page.landscape {
+      width: 297mm;
+      min-height: 210mm;
+  }
+  .worksheet-header { @apply flex justify-between text-sm mb-8 pb-2 border-b-2 border-current; }
+  .header-field { @apply border-b border-dotted border-current flex-1 min-w-[150px]; }
+  .header-field:not(:last-child) { @apply mr-8; }
+  .worksheet-title { @apply text-2xl font-bold mb-4; }
+  .worksheet-preamble { @apply text-base mb-6 italic; }
+  .worksheet-body.layout-flow {
+    @apply grid;
+    grid-template-columns: repeat(var(--columns, 2), 1fr);
+    gap: var(--problem-spacing) var(--column-gap);
+  }
+  .worksheet-body.layout-table {
+    @apply grid border border-current;
+    grid-template-columns: repeat(var(--columns, 2), 1fr);
+    grid-template-rows: repeat(var(--rows, 10), auto);
+  }
+  .worksheet-body.layout-table .problem-item { @apply border-b border-r border-current p-4 m-0; }
+  .problem-item { @apply flex items-start gap-2 break-inside-avoid; margin-bottom: var(--problem-spacing); }
+  .problem-item.flow { @apply flex-col items-center; }
+  .problem-item.layout-with-visual-space { @apply flex-col items-stretch; }
+  .visual-space { @apply w-full h-48 border-2 border-dashed border-stone-300 rounded-md mt-2; }
+  .problem-item.layout-given-wanted { @apply flex-col items-stretch; }
+  .given-wanted-container { @apply mt-2 space-y-2 text-sm; }
+  .solution-box { @apply w-full h-12 border border-stone-300 rounded p-1 mt-1; }
+  .solution-box.tall { @apply h-24; }
+  .answer-key { @apply bg-white p-8 hidden w-[210mm] box-border; }
+  @keyframes daisy-sway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
+  .daisy-sway { animation: daisy-sway 4s ease-in-out infinite; transform-origin: 75px 140px; }
+  @keyframes crawl { 0% { transform: translate(0, 0) rotate(-10deg); } 25% { transform: translate(5px, -10px) rotate(0deg); } 50% { transform: translate(-5px, -20px) rotate(10deg); } 75% { transform: translate(0, -30px) rotate(0deg); } 100% { transform: translate(0, 0) rotate(-10deg); } }
+  .crawling-bug { animation: crawl 8s ease-in-out infinite; }
+  .flying-ladybug-container { position: absolute; width: 40px; height: 40px; will-change: transform, opacity, top, left; }
+  .wings { transform-origin: 30px 30px; animation: flap 0.1s linear infinite alternate; }
+  .left-wing { transform-origin: 30px 30px; animation: flap-left 0.1s linear infinite alternate; }
+  .right-wing { transform-origin: 30px 30px; animation: flap-right 0.1s linear infinite alternate; }
+  @keyframes flap-left { from { transform: rotate(-5deg); } to { transform: rotate(25deg); } }
+  @keyframes flap-right { from { transform: rotate(5deg); } to { transform: rotate(-25deg); } }
+  .toast-container { @apply fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3; }
+  .toast-item { @apply flex items-center gap-3 p-3 rounded-lg shadow-lg border w-80; }
+  .toast-item-enter { animation: toast-enter 0.3s ease-out forwards; }
+  .toast-item-exit { animation: toast-exit 0.3s ease-in forwards; }
+  @keyframes toast-enter { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toast-exit { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
+  .table-selector-grid { @apply grid gap-1 p-1 bg-stone-100 dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded; grid-template-columns: repeat(10, 1fr); }
+  .table-selector-cell { @apply w-5 h-3 bg-stone-300 dark:bg-stone-500 rounded-sm transition-colors cursor-pointer; }
+  .table-selector-cell.selected { @apply bg-orange-500; }
+  .live-indicator { @apply text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 animate-pulse; }
+  
+  .tab-button-nav-item { background-color: rgba(var(--theme-color-primary-rgb), 1); }
+  .tab-button-nav-item.active, .tab-button-nav-item:hover { background-color: rgba(var(--theme-color-primary-hover-rgb), 1); }
+  
+  /* Applying theme colors to components */
+  button[variant="primary"] { background-color: rgba(var(--theme-color-primary-rgb), 1); }
+  button[variant="primary"]:hover { background-color: rgba(var(--theme-color-primary-hover-rgb), 1); }
+  button:focus-visible { outline-color: rgba(var(--theme-color-primary-focus-rgb), 1); }
+  input[type="range"] { accent-color: rgba(var(--theme-color-primary-rgb), 1); }
+  input[type="checkbox"]:checked { background-color: rgba(var(--theme-color-primary-rgb), 1); border-color: rgba(var(--theme-color-primary-rgb), 1); }
+  
+  .bg-orange-700 { background-color: rgb(var(--theme-color-primary-rgb)); }
+  .hover\:bg-orange-800:hover { background-color: rgb(var(--theme-color-primary-hover-rgb)); }
+  .focus\:ring-orange-600:focus { --tw-ring-color: rgb(var(--theme-color-primary-focus-rgb)); }
+  .accent-orange-700 { accent-color: rgb(var(--theme-color-primary-rgb)); }
+  .text-orange-700 { color: var(--theme-accent-text); }
+  .dark .dark\:text-orange-500 { color: var(--dark-theme-accent-text); }
+  .bg-orange-100 { background-color: var(--theme-accent-bg); }
+  .dark .dark\:bg-orange-900\/50 { background-color: var(--dark-theme-accent-bg); }
+  .dark .dark\:text-orange-300 { color: var(--dark-theme-accent-text); }
+  .dark .dark\:text-orange-400 { color: var(--dark-theme-accent-text); }
+  .text-orange-800 { color: var(--theme-accent-text); }
+  .focus\:border-orange-600:focus { border-color: rgb(var(--theme-color-primary-focus-rgb)); }
+  .text-orange-800 { color: var(--theme-accent-text); }
+}
+
+@media print {
+  body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .worksheet-page { box-shadow: none !important; margin: 0 !important; page-break-after: always; }
+  .print-hidden { display: none !important; }
+  .print-only { display: block !important; }
+}
+
+/* Fallback for JSDOM or other environments where 'rem' might not be defined */
+:root {
+  font-size: 16px;
+}
