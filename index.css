@@ -144,10 +144,48 @@
 }
 
 @media print {
-  body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  .worksheet-page { box-shadow: none !important; margin: 0 !important; page-break-after: always; }
-  .print-hidden { display: none !important; }
-  .print-only { display: block !important; }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    background-color: #fff !important;
+  }
+  
+  /* Reset layout for printing, hide all UI except the worksheet area */
+  body, #root, #root > div, #root > div > div.flex {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  main, main > div {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+  
+  .worksheet-area {
+    transform: none !important;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .worksheet-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    border: none !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto;
+    page-break-after: always;
+  }
+
+  /* Ensure print-hidden utility works */
+  .print-hidden {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
 }
 
 /* Fallback for JSDOM or other environments where 'rem' might not be defined */
