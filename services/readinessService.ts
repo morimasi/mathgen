@@ -1,4 +1,5 @@
-import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType } from '../types';
+import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType, VisualAdditionSubtractionSettings, VerbalArithmeticSettings, MissingNumberPuzzlesSettings, SymbolicArithmeticSettings, ProblemCreationSettings } from '../types';
+import { numberToWords } from './utils';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -337,10 +338,187 @@ const generateSimpleGraphProblem = (settings: SimpleGraphsSettings): { problem: 
     return { problem: { question, answer: "Grafiği doldurunuz.", category: 'simple-graphs' }, title };
 };
 
+const generateVisualAdditionSubtractionProblem = (settings: VisualAdditionSubtractionSettings): { problem: Problem, title: string } => {
+    const { operation, theme, maxNumber } = settings;
+    const title = "Şekillerle Toplama ve Çıkarma";
+    const currentOp = operation === 'mixed' ? (Math.random() < 0.5 ? 'addition' : 'subtraction') : operation;
+    const item = getRandomItems(theme, 1)[0];
+
+    let n1 = getRandomInt(1, maxNumber);
+    let n2 = getRandomInt(1, maxNumber);
+    let question = '', answer: number | string = 0;
+
+    if (currentOp === 'addition') {
+        if (n1 + n2 > maxNumber * 1.5) { // Keep result from being too large
+            n1 = getRandomInt(1, Math.floor(maxNumber / 1.5));
+            n2 = getRandomInt(1, Math.floor(maxNumber / 1.5));
+        }
+        answer = n1 + n2;
+        question = `<div style="font-size: 2.5rem; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1rem;"><span>${item.repeat(n1)}</span> <span>+</span> <span>${item.repeat(n2)}</span> <span>=</span> <span style="border: 2px solid #6b7280; width: 80px; height: 60px; display: inline-block; border-radius: 8px;"></span></div>`;
+    } else { // subtraction
+        if (n1 < n2) [n1, n2] = [n2, n1];
+        if (n1 === n2) n1 += 1;
+        answer = n1 - n2;
+        question = `<div style="font-size: 2.5rem; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1rem;"><span>${item.repeat(n1)}</span> <span>-</span> <span>${item.repeat(n2)}</span> <span>=</span> <span style="border: 2px solid #6b7280; width: 80px; height: 60px; display: inline-block; border-radius: 8px;"></span></div>`;
+    }
+
+    return { problem: { question, answer, category: 'visual-addition-subtraction' }, title };
+};
+
+const generateVerbalArithmeticProblem = (settings: VerbalArithmeticSettings): { problem: Problem, title: string } => {
+    const { operation, maxResult } = settings;
+    const title = "İşlemi Sözel İfade Etme";
+    let n1 = getRandomInt(1, maxResult - 1);
+    let n2 = getRandomInt(1, maxResult - n1);
+    let answer = '';
+    let question = '';
+
+    if (operation === 'addition') {
+        const result = n1 + n2;
+        question = `<div style="font-size: 1.5rem; font-family: monospace; text-align: center;">${n1} + ${n2} = ${result}</div>`;
+        answer = `${numberToWords(n1)} artı ${numberToWords(n2)} eşittir ${numberToWords(result)}`;
+    } else { // subtraction
+        if (n1 < n2) [n1, n2] = [n2, n1];
+        const result = n1 - n2;
+        question = `<div style="font-size: 1.5rem; font-family: monospace; text-align: center;">${n1} - ${n2} = ${result}</div>`;
+        answer = `${numberToWords(n1)} eksi ${numberToWords(n2)} eşittir ${numberToWords(result)}`;
+    }
+    return { problem: { question, answer, category: 'verbal-arithmetic' }, title };
+};
+
+const generateMissingNumberPuzzlesProblem = (settings: MissingNumberPuzzlesSettings): { problem: Problem, title: string } => {
+    const { operation, termCount, maxResult } = settings;
+    const title = "Eksik Sayıyı Bulma";
+    const dot = '●';
+    const box = `<span style="display: inline-block; border: 2px solid #6b7280; width: 40px; height: 40px; border-radius: 8px; vertical-align: middle;"></span>`;
+    const termDiv = (num: number) => `<div>${num}<br/><span style="font-size: 1rem; color: #6b7280; line-height: 1;">${dot.repeat(num)}</span></div>`;
+
+    let question = '', answer = 0;
+    const containerStyle = `font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-align: center;`;
+
+    if (operation === 'addition') {
+        if (termCount === 2) {
+            const result = getRandomInt(2, maxResult);
+            const n1 = getRandomInt(1, result - 1);
+            const n2 = result - n1;
+            const missingPart = getRandomInt(1, 3);
+            if (missingPart === 1) {
+                question = `<div style="${containerStyle}">${box} + ${termDiv(n2)} = ${termDiv(result)}</div>`;
+                answer = n1;
+            } else if (missingPart === 2) {
+                question = `<div style="${containerStyle}">${termDiv(n1)} + ${box} = ${termDiv(result)}</div>`;
+                answer = n2;
+            } else {
+                question = `<div style="${containerStyle}">${termDiv(n1)} + ${termDiv(n2)} = ${box}</div>`;
+                answer = result;
+            }
+        } else { // 3 terms
+            const result = getRandomInt(3, maxResult);
+            const n1 = getRandomInt(1, result - 2);
+            const n2 = getRandomInt(1, result - n1 - 1);
+            const n3 = result - n1 - n2;
+            answer = n3; // for simplicity, always miss n3
+            question = `<div style="${containerStyle}">${termDiv(n1)} + ${termDiv(n2)} + ${box} = ${termDiv(result)}</div>`;
+        }
+    } else { // subtraction
+        const n1 = getRandomInt(2, maxResult);
+        const n2 = getRandomInt(1, n1 - 1);
+        const result = n1 - n2;
+        const missingPart = getRandomInt(1, 3);
+        if (missingPart === 1) {
+             question = `<div style="${containerStyle}">${box} - ${termDiv(n2)} = ${termDiv(result)}</div>`;
+             answer = n1;
+        } else if (missingPart === 2) {
+             question = `<div style="${containerStyle}">${termDiv(n1)} - ${box} = ${termDiv(result)}</div>`;
+             answer = n2;
+        } else {
+             question = `<div style="${containerStyle}">${termDiv(n1)} - ${termDiv(n2)} = ${box}</div>`;
+             answer = result;
+        }
+    }
+
+    return { problem: { question, answer, category: 'missing-number-puzzles' }, title };
+};
+
+const generateSymbolicArithmeticProblem = (settings: SymbolicArithmeticSettings): { problem: Problem, title: string, preamble?: string } => {
+    const { operation, theme, maxNumber } = settings;
+    const title = "Simgelerle İşlemler";
+    const items = getRandomItems(theme, maxNumber);
+    
+    const symbolMap = new Map<string, number>();
+    const keyParts: string[] = [];
+    items.forEach((item, index) => {
+        const value = index + 1;
+        symbolMap.set(item, value);
+        keyParts.push(`<span style="font-size: 1.5rem; margin-right: 1rem;">${item} = ${value}</span>`);
+    });
+    
+    const preamble = `<div style="text-align: center; margin-bottom: 1.5rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 8px;"><b>Simge Anahtarı:</b><br/>${keyParts.join(' ')}</div>`;
+
+    const currentOp = operation === 'mixed' ? (Math.random() < 0.5 ? 'addition' : 'subtraction') : operation;
+    
+    let s1 = items[getRandomInt(0, items.length - 1)];
+    let s2 = items[getRandomInt(0, items.length - 1)];
+    let v1 = symbolMap.get(s1)!;
+    let v2 = symbolMap.get(s2)!;
+    
+    let question = '', answer = 0;
+    
+    if (currentOp === 'addition') {
+        question = `<div style="font-size: 2.5rem; display: flex; align-items: center; justify-content: center; gap: 1rem;"><span>${s1}</span> <span>+</span> <span>${s2}</span> <span>=</span> <span style="border: 2px solid #6b7280; width: 80px; height: 60px; display: inline-block; border-radius: 8px;"></span></div>`;
+        answer = v1 + v2;
+    } else { // subtraction
+        if (v1 < v2) {
+            [v1, v2] = [v2, v1];
+            [s1, s2] = [s2, s1];
+        }
+        question = `<div style="font-size: 2.5rem; display: flex; align-items: center; justify-content: center; gap: 1rem;"><span>${s1}</span> <span>-</span> <span>${s2}</span> <span>=</span> <span style="border: 2px solid #6b7280; width: 80px; height: 60px; display: inline-block; border-radius: 8px;"></span></div>`;
+        answer = v1 - v2;
+    }
+
+    return { problem: { question, answer, category: 'symbolic-arithmetic' }, title, preamble };
+};
+
+const generateProblemCreationProblem = (settings: ProblemCreationSettings): { problem: Problem, title: string } => {
+    const { operation, difficulty, theme } = settings;
+    const title = "Problem Kurma";
+
+    const maxResult = difficulty === 'easy' ? 20 : (difficulty === 'medium' ? 100 : 1000);
+    const item = getRandomItems(theme, 1)[0];
+    
+    let equation = '';
+    
+    if (operation === 'addition') {
+        const n1 = getRandomInt(1, maxResult - 1);
+        const n2 = getRandomInt(1, maxResult - n1);
+        equation = `${n1} + ${n2} = ${n1 + n2}`;
+    } else { // subtraction
+        const n1 = getRandomInt(2, maxResult);
+        const n2 = getRandomInt(1, n1 - 1);
+        equation = `${n1} - ${n2} = ${n1 - n2}`;
+    }
+
+    const question = `
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <p>Aşağıdaki işlemi ve görseli kullanarak bir problem yazınız.</p>
+            <div style="display: flex; align-items: center; gap: 2rem; background-color: #f3f4f6; padding: 1rem; border-radius: 8px;">
+                <span style="font-size: 2.5rem;">${item}</span>
+                <span style="font-size: 1.5rem; font-family: monospace; font-weight: bold;">${equation}</span>
+            </div>
+            <div style="border: 1px dashed #9ca3af; height: 120px; border-radius: 8px; margin-top: 0.5rem; padding: 0.5rem;">
+                <p style="color: #9ca3af; font-size: 0.9rem;">Probleminizi buraya yazın...</p>
+            </div>
+        </div>
+    `;
+
+    return { problem: { question, answer: "Öğrenci yanıtı", category: 'problem-creation' }, title };
+};
+
+
 export const generateReadinessProblem = (
     module: string,
     settings: any
-): { problem: Problem, title: string, error?: string } => {
+): { problem: Problem, title: string, error?: string, preamble?: string } => {
     switch (module) {
         case 'matching-and-sorting':
             return generateMatchingProblem(settings as MatchingAndSortingSettings);
@@ -358,6 +536,16 @@ export const generateReadinessProblem = (
             return generateMeasurementIntroProblem(settings as IntroToMeasurementSettings);
         case 'simple-graphs':
             return generateSimpleGraphProblem(settings as SimpleGraphsSettings);
+        case 'visual-addition-subtraction':
+            return generateVisualAdditionSubtractionProblem(settings as VisualAdditionSubtractionSettings);
+        case 'verbal-arithmetic':
+            return generateVerbalArithmeticProblem(settings as VerbalArithmeticSettings);
+        case 'missing-number-puzzles':
+            return generateMissingNumberPuzzlesProblem(settings as MissingNumberPuzzlesSettings);
+        case 'symbolic-arithmetic':
+            return generateSymbolicArithmeticProblem(settings as SymbolicArithmeticSettings);
+        case 'problem-creation':
+            return generateProblemCreationProblem(settings as ProblemCreationSettings);
         default:
             return {
                 problem: { question: "Hata", answer: "Hata", category: 'error' },
