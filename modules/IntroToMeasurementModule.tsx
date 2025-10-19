@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+// FIX: Add .ts extension to import of readinessService to fix module resolution error.
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
 import { IntroToMeasurementSettings, IntroMeasurementType, MathReadinessTheme, Difficulty } from '../types.ts';

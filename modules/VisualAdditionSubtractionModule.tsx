@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+// FIX: Add .ts extension to import of readinessService to fix module resolution error.
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { VisualAdditionSubtractionSettings, MathReadinessTheme } from '../types.ts';
 import Button from '../components/form/Button.tsx';

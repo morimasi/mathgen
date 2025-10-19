@@ -6,6 +6,7 @@ import { ShuffleIcon } from '../components/icons/Icons.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import { calculateMaxProblems } from '../services/layoutService.ts';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
+// FIX: Add .ts extension to import of dyscalculiaService to fix module resolution error.
 import { generateDyscalculiaProblem } from '../services/dyscalculiaService.ts';
 import { useWorksheet } from '../services/WorksheetContext.tsx';
 
