@@ -1,4 +1,5 @@
-// FIX: Add .ts extension to import path
+// services/rhythmicCountingService.ts
+
 import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types';
 
 const getRandomInt = (min: number, max: number): number => {
@@ -203,7 +204,7 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             const { step: definedStep = 2, direction = 'forward', useMultiplesOnly = false, patternLength = 5, missingCount = 1 } = settings;
             const currentDirection = direction === 'mixed' ? (getRandomInt(0, 1) === 0 ? 'forward' : 'backward') : direction;
             const step = Math.abs(definedStep);
-            const effectiveStep = currentDirection === 'backward' ? -step : effectiveStep;
+            const effectiveStep = currentDirection === 'backward' ? -step : step;
 
             let start: number;
             
@@ -267,7 +268,6 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
 
         case RhythmicProblemType.OddEven: {
             const number = getRandomInt(min, max);
-            // FIX: Declare question and answer variables.
             const question = `<b>${number}</b> sayısı tek mi çift mi?`;
             const answer = number % 2 === 0 ? "Çift" : "Tek";
             problem = { ...problemBase, question, answer };
@@ -286,7 +286,6 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             
             const sorted = [...numbers].sort((a, b) => currentOrderDirection === 'descending' ? b - a : a - b);
             
-            // FIX: Declare question and answer variables.
             const question = `Bu sayıları ${orderText} sıralayınız:<br/><div style="font-size: 1.25rem; font-family: monospace; margin-top: 0.5rem;">${numbers.join(', ')}</div>`;
             const answer = sorted.join(', ');
             problem = { ...problemBase, question, answer };
@@ -299,7 +298,6 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             while (n1 === n2) {
                 n2 = getRandomInt(min, max);
             }
-            // FIX: Declare question and answer variables.
             const question = `<span style="font-size: 1.5rem; font-family: monospace;">${n1} ___ ${n2}</span>`;
             const answer = n1 > n2 ? '>' : '<';
             problem = { ...problemBase, question, answer };
