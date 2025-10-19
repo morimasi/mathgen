@@ -9,6 +9,7 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 // FIX: Add .ts extension to import of dyslexiaService to fix module resolution error.
 import { generateDyslexiaProblem } from '../services/dyslexiaService.ts';
 import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { useDebounce } from '../hooks/useDebounce.ts';
 
 // Import all sub-module setting components
 import SoundWizardSettings from './dyslexia/SoundWizardSettings.tsx';
@@ -74,8 +75,8 @@ const DyslexiaModule: React.FC = () => {
     const [settings, setSettings] = useState<DyslexiaSettings>(defaultSettings);
     const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
     const contentRef = useRef<HTMLDivElement>(null);
-    const isInitialMount = useRef(true);
-    
+    const debouncedSettings = useDebounce(settings, 500);
+
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyslexiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
@@ -123,26 +124,24 @@ const DyslexiaModule: React.FC = () => {
         }
         setIsLoading(false);
     }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings, isPracticeSheet]);
-
+    
+    // Auto-refresh when refresh button is clicked
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === `dyslexia-${activeSubModuleId}`) {
             handleGenerate(true);
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
-    // Live update for non-AI modules
+    // Debounced live update for non-AI modules
     useEffect(() => {
-        const isAIModule = ['comprehension-explorer', 'vocabulary-explorer', 'interactive-story', 'reading-fluency-coach'].includes(activeSubModuleId);
-        if (isInitialMount.current || isAIModule) {
-            isInitialMount.current = false;
-            return;
+        const isAIModule = ['comprehension-explorer', 'vocabulary-explorer', 'interactive-story', 'reading-fluency-coach'].includes(debouncedSettings.activeSubModule);
+        if (isAIModule) return;
+        
+        if (lastGeneratorModule === `dyslexia-${debouncedSettings.activeSubModule}`) {
+             handleGenerate(true);
         }
+    }, [debouncedSettings, lastGeneratorModule, handleGenerate]);
 
-        if (lastGeneratorModule === `dyslexia-${activeSubModuleId}`) {
-            const handler = setTimeout(() => handleGenerate(true), 300);
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
     const handleSubModuleChange = (id: DyslexiaSubModuleType) => {
         setSettings(prev => ({ ...prev, activeSubModule: id }));

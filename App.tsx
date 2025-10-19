@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, memo } from 'react';
+import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext.tsx';
@@ -279,6 +279,7 @@ const AppContent: React.FC = () => {
     const [isMouseOverWorksheet, setIsMouseOverWorksheet] = useState(false);
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
+    const throttleTimeout = useRef<number | null>(null);
 
     useEffect(() => {
         const el = panAreaRef.current;
@@ -287,7 +288,7 @@ const AppContent: React.FC = () => {
         }
     }, []);
 
-    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if (e.button !== 0) return;
         e.preventDefault();
         const el = panAreaRef.current;
@@ -300,37 +301,52 @@ const AppContent: React.FC = () => {
             scrollTop: el.scrollTop,
         };
         el.classList.add('is-panning');
-    };
+    }, []);
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if (!panState.current.isPanning) return;
         e.preventDefault();
         const el = panAreaRef.current;
         if (!el) return;
-        const x = e.clientX - el.offsetLeft;
-        const y = e.clientY - el.offsetTop;
-        const walkX = (x - panState.current.startX);
-        const walkY = (y - panState.current.startY);
-        el.scrollLeft = panState.current.scrollLeft - walkX;
-        el.scrollTop = panState.current.scrollTop - walkY;
-    };
+        
+        if (throttleTimeout.current) return;
+        
+        throttleTimeout.current = window.setTimeout(() => {
+            throttleTimeout.current = null;
+            const x = e.clientX - el.offsetLeft;
+            const y = e.clientY - el.offsetTop;
+            const walkX = (x - panState.current.startX);
+            const walkY = (y - panState.current.startY);
+            el.scrollLeft = panState.current.scrollLeft - walkX;
+            el.scrollTop = panState.current.scrollTop - walkY;
+        }, 16); // Throttle to ~60fps
 
-    const stopPanning = () => {
+    }, []);
+
+    const stopPanning = useCallback(() => {
         panState.current.isPanning = false;
         panAreaRef.current?.classList.remove('is-panning');
-    };
+    }, []);
 
-    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
         if (e.ctrlKey || e.metaKey) { // Allow pinch-zoom on trackpads
             e.preventDefault();
-            const scaleAmount = 0.05;
-            const newScale = e.deltaY > 0
-                ? Math.max(0.2, settings.scale - scaleAmount)
-                : Math.min(2.0, settings.scale + scaleAmount);
-            setSettings(s => ({ ...s, scale: newScale }));
+            
+            if (throttleTimeout.current) return;
+
+            throttleTimeout.current = window.setTimeout(() => {
+                throttleTimeout.current = null;
+                const scaleAmount = 0.05;
+                setSettings(s => {
+                    const newScale = e.deltaY > 0
+                        ? Math.max(0.2, s.scale - scaleAmount)
+                        : Math.min(2.0, s.scale + scaleAmount);
+                    return { ...s, scale: newScale };
+                });
+            }, 16); // Throttle to ~60fps
         }
         // If no ctrl/meta key, allow normal vertical scrolling of the pan area
-    };
+    }, [setSettings]);
     
     const handleSaveAssignment = () => {
         addToast('Ödev başarıyla kaydedildi! (Simülasyon)', 'success');

@@ -146,7 +146,7 @@ const generateIntroToMeasurement = (settings: IntroToMeasurementSettings): { pro
     let question = '';
     if (type === 'compare-length') question = 'Daha uzun olan kalemi işaretle: ✏️ ✏️';
     else if (type === 'compare-weight') question = 'Daha ağır olan hayvanı işaretle: 🐘 🐁';
-    else if (type === 'compare-capacity') question = 'Daha çok su alan bardağı işaretle:  गिलास 🥃';
+    else if (type === 'compare-capacity') question = 'Daha çok su alan bardağı işaretle:  gिलास 🥃';
     else question = 'Silginin boyu kaç ataçtır?';
     return { problem: { question, answer: "İşaretleme", category: 'intro-to-measurement' }, title };
 };

@@ -9,6 +9,7 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import Button from '../components/form/Button.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 import HintButton from '../components/HintButton.tsx';
+import { useDebounce } from '../hooks/useDebounce.ts';
 
 const initialVisualSupportSettings: VisualSupportSettings = {
     operation: ArithmeticOperation.Addition,
@@ -24,6 +25,7 @@ const initialVisualSupportSettings: VisualSupportSettings = {
 const VisualSupportModule: React.FC = () => {
     const [settings, setSettings] = useState<VisualSupportSettings>(initialVisualSupportSettings);
     const { settings: printSettings, setSettings: setPrintSettings } = usePrintSettings();
+    const debouncedSettings = useDebounce(settings, 500);
 
     const { generate } = useProblemGenerator({
         moduleKey: 'visual-support',
@@ -36,9 +38,11 @@ const VisualSupportModule: React.FC = () => {
     }, [generate]);
 
     useEffect(() => {
-        // Automatically generate on initial mount for this specific module
+        // This effect now runs only when debouncedSettings changes,
+        // preventing rapid re-renders while the user is adjusting sliders.
         handleGenerate(true);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [debouncedSettings]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
     const handleSettingChange = (field: keyof VisualSupportSettings, value: any) => {
         setSettings({ ...settings, [field]: value });
@@ -55,7 +59,7 @@ const VisualSupportModule: React.FC = () => {
         <div className="space-y-2">
             <h2 className="text-sm font-semibold flex items-center gap-2">
                 Görsel Destek Ayarları
-                <HintButton text="Bu modüldeki ayarları değiştirdikten sonra, değişiklikleri görmek için 'Uygula' düğmesine tıklayın." />
+                <HintButton text="Ayarlar değiştirildiğinde, çalışma kağıdı otomatik olarak güncellenir. Donmaları önlemek için siz durduktan kısa bir süre sonra güncelleme yapılır." />
             </h2>
              <p className="text-xs text-stone-600 dark:text-stone-400">
                 Bu modül, nesneler ve kutular kullanarak temel matematik işlemleri için görsel alıştırmalar oluşturur.
@@ -170,8 +174,8 @@ const VisualSupportModule: React.FC = () => {
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
-            <div className="flex flex-wrap gap-2 pt-1.5">
-                <Button onClick={() => handleGenerate(true)} size="sm" enableFlyingLadybug>Uygula</Button>
+             <div className="flex flex-wrap gap-2 pt-1.5">
+                <Button onClick={() => handleGenerate(true)} size="sm" enableFlyingLadybug>Şimdi Uygula</Button>
                 <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
             </div>
         </div>
