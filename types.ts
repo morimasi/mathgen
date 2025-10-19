@@ -30,6 +30,29 @@ export interface PrintSettings {
     textAlign: 'left' | 'center' | 'right';
 }
 
+// --- TEACHER PANEL ---
+export type AssignmentStatus = 'tamamlandı' | 'beklemede' | 'geç';
+export interface PerformanceData {
+    [moduleKey: string]: number; // e.g., 'arithmetic': 85
+}
+export interface Assignment {
+    id: number;
+    name: string;
+    module: string;
+    dueDate: string;
+    status: AssignmentStatus;
+    score?: number;
+}
+export interface Student {
+    id: number;
+    name: string;
+    group: string;
+    avatar: string;
+    assignments: Assignment[];
+    performance: PerformanceData;
+}
+
+
 // --- MODULES ---
 
 // Arithmetic

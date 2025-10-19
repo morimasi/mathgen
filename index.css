@@ -525,6 +525,41 @@
     padding-left: 50vw;
     padding-right: 50vw;
   }
+  
+  /* Teacher Panel */
+  .teacher-panel-nav-item {
+    @apply flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-md text-sm font-medium transition-all;
+  }
+  .teacher-panel-nav-item.active {
+    @apply bg-primary/10 text-primary dark:bg-primary/20 dark:text-white;
+  }
+  .teacher-panel-nav-item:not(.active) {
+    @apply text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700;
+  }
+
+  .teacher-panel-card {
+      @apply bg-white dark:bg-stone-800 p-4 rounded-lg shadow;
+  }
+
+  .teacher-panel-table th {
+    @apply text-left text-xs font-semibold text-stone-500 uppercase tracking-wider py-2 px-3;
+  }
+
+  .teacher-panel-table td {
+    @apply py-3 px-3 text-sm;
+  }
+
+  .teacher-panel-table tbody tr {
+    @apply border-b border-stone-200 dark:border-stone-700;
+  }
+   .teacher-panel-table tbody tr:last-child {
+    @apply border-b-0;
+  }
+  
+  .assignment-creation-banner {
+    @apply bg-amber-100 dark:bg-amber-900/50 border-t-4 border-amber-500 p-3 text-center text-amber-800 dark:text-amber-200;
+    animation: fadeIn 0.3s ease-out;
+  }
 }
 
 @media print {
