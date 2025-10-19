@@ -1,7 +1,7 @@
 import React from 'react';
-import { NumberGroupingSettings } from '../../types';
-import NumberInput from '../../components/form/NumberInput';
-import HintButton from '../../components/HintButton';
+import { NumberGroupingSettings } from '../../types.ts';
+import NumberInput from '../../components/form/NumberInput.tsx';
+import HintButton from '../../components/HintButton.tsx';
 
 interface Props {
     settings: NumberGroupingSettings;

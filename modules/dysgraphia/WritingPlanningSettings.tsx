@@ -1,7 +1,7 @@
 import React from 'react';
-import { WritingPlanningSettings } from '../../types';
-import TextInput from '../../components/form/TextInput';
-import HintButton from '../../components/HintButton';
+import { WritingPlanningSettings } from '../../types.ts';
+import TextInput from '../../components/form/TextInput.tsx';
+import HintButton from '../../components/HintButton.tsx';
 
 interface Props {
     settings: WritingPlanningSettings;

@@ -1,7 +1,7 @@
 import React from 'react';
-import { InteractiveStoryDgSettings } from '../../types';
-import Select from '../../components/form/Select';
-import HintButton from '../../components/HintButton';
+import { InteractiveStoryDgSettings } from '../../types.ts';
+import Select from '../../components/form/Select.tsx';
+import HintButton from '../../components/HintButton.tsx';
 
 interface Props {
     settings: InteractiveStoryDgSettings;

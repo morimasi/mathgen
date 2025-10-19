@@ -1,8 +1,8 @@
 import React from 'react';
-import { NumberSenseSettings } from '../../types';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import HintButton from '../../components/HintButton';
+import { NumberSenseSettings } from '../../types.ts';
+import Select from '../../components/form/Select.tsx';
+import NumberInput from '../../components/form/NumberInput.tsx';
+import HintButton from '../../components/HintButton.tsx';
 
 interface Props {
     settings: NumberSenseSettings;

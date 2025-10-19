@@ -1,7 +1,7 @@
 // services/dysgraphiaService.ts
 
-import { Problem, DysgraphiaSubModuleType } from '../types';
-import { generateDysgraphiaAIProblem } from './geminiService';
+import { Problem, DysgraphiaSubModuleType } from '../types.ts';
+import { generateDysgraphiaAIProblem } from './geminiService.ts';
 
 // --- LOCAL GENERATION LOGIC ---
 

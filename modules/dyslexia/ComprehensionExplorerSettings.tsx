@@ -1,7 +1,7 @@
 import React from 'react';
-import { ComprehensionExplorerSettings } from '../../types';
-import Select from '../../components/form/Select';
-import HintButton from '../../components/HintButton';
+import { ComprehensionExplorerSettings } from '../../types.ts';
+import Select from '../../components/form/Select.tsx';
+import HintButton from '../../components/HintButton.tsx';
 
 interface Props {
     settings: ComprehensionExplorerSettings;

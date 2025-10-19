@@ -1,8 +1,8 @@
 import React from 'react';
-import { SoundWizardSettings } from '../../types';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import HintButton from '../../components/HintButton';
+import { SoundWizardSettings } from '../../types.ts';
+import Select from '../../components/form/Select.tsx';
+import NumberInput from '../../components/form/NumberInput.tsx';
+import HintButton from '../../components/HintButton.tsx';
 
 interface Props {
     settings: SoundWizardSettings;

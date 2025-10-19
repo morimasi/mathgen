@@ -1,35 +1,35 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Problem, DyslexiaSettings, DyslexiaSubModuleType } from '../types';
-import Button from '../components/form/Button';
-import NumberInput from '../components/form/NumberInput';
-import { ShuffleIcon } from '../components/icons/Icons';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
-import SettingsPresetManager from '../components/SettingsPresetManager';
-import { generateDyslexiaProblem } from '../services/dyslexiaService';
-import { useWorksheet } from '../services/WorksheetContext';
+import { Problem, DyslexiaSettings, DyslexiaSubModuleType } from '../types.ts';
+import Button from '../components/form/Button.tsx';
+import NumberInput from '../components/form/NumberInput.tsx';
+import { ShuffleIcon } from '../components/icons/Icons.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import { calculateMaxProblems } from '../services/layoutService.ts';
+import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
+import { generateDyslexiaProblem } from '../services/dyslexiaService.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 // Import all sub-module setting components
-import SoundWizardSettings from './dyslexia/SoundWizardSettings';
-import LetterDetectiveSettings from './dyslexia/LetterDetectiveSettings';
-import ReadingFluencyCoachSettings from './dyslexia/ReadingFluencyCoachSettings';
-import ComprehensionExplorerSettings from './dyslexia/ComprehensionExplorerSettings';
-import VocabularyExplorerSettings from './dyslexia/VocabularyExplorerSettings';
-import VisualMasterSettings from './dyslexia/VisualMasterSettings';
-import WordHunterSettings from './dyslexia/WordHunterSettings';
-import SpellingChampionSettings from './dyslexia/SpellingChampionSettings';
-import MemoryGamerSettings from './dyslexia/MemoryGamerSettings';
-import AuditoryWritingSettings from './dyslexia/AuditoryWritingSettings';
-import InteractiveStorySettings from './dyslexia/InteractiveStorySettings';
-import AttentionQuestionSettings from './dyslexia/AttentionQuestionSettings';
-import MapReadingSettings from './dyslexia/MapReadingSettings';
+import SoundWizardSettings from './dyslexia/SoundWizardSettings.tsx';
+import LetterDetectiveSettings from './dyslexia/LetterDetectiveSettings.tsx';
+import ReadingFluencyCoachSettings from './dyslexia/ReadingFluencyCoachSettings.tsx';
+import ComprehensionExplorerSettings from './dyslexia/ComprehensionExplorerSettings.tsx';
+import VocabularyExplorerSettings from './dyslexia/VocabularyExplorerSettings.tsx';
+import VisualMasterSettings from './dyslexia/VisualMasterSettings.tsx';
+import WordHunterSettings from './dyslexia/WordHunterSettings.tsx';
+import SpellingChampionSettings from './dyslexia/SpellingChampionSettings.tsx';
+import MemoryGamerSettings from './dyslexia/MemoryGamerSettings.tsx';
+import AuditoryWritingSettings from './dyslexia/AuditoryWritingSettings.tsx';
+import InteractiveStorySettings from './dyslexia/InteractiveStorySettings.tsx';
+import AttentionQuestionSettings from './dyslexia/AttentionQuestionSettings.tsx';
+import MapReadingSettings from './dyslexia/MapReadingSettings.tsx';
 
 // Import all sub-module icons
 import {
     SoundWizardIcon, LetterDetectiveIcon, ReadingFluencyCoachIcon, ComprehensionExplorerIcon,
     VocabularyExplorerIcon, VisualMasterIcon, WordHunterIcon, SpellingChampionIcon, MemoryGamerIcon,
     AuditoryWritingIcon, InteractiveStoryIcon, AttentionIcon, MapIcon
-} from '../components/icons/Icons';
+} from '../components/icons/Icons.tsx';
 
 const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
     { id: 'attention-questions', label: 'Dikkat Soruları', icon: AttentionIcon },
