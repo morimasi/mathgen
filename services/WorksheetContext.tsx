@@ -8,6 +8,7 @@ interface UpdateWorksheetArgs {
     preamble?: string;
     generatorModule?: string;
     pageCount?: number;
+    sheetStyle?: React.CSSProperties;
 }
 
 interface PresetToLoad {
@@ -21,6 +22,7 @@ interface WorksheetContextType {
     preamble: string | null;
     isLoading: boolean;
     pageCount: number;
+    sheetStyle: React.CSSProperties;
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
     presetToLoad: PresetToLoad | null;
@@ -39,16 +41,22 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [preamble, setPreamble] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [pageCount, setPageCount] = useState(1);
+    const [sheetStyle, setSheetStyle] = useState<React.CSSProperties>({});
     const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [presetToLoad, setPresetToLoad] = useState<PresetToLoad | null>(null);
 
-    const updateWorksheet = useCallback(({ newProblems, clearPrevious, title: newTitle, preamble: newPreamble, generatorModule, pageCount: newPageCount }: UpdateWorksheetArgs) => {
+    const updateWorksheet = useCallback(({ newProblems, clearPrevious, title: newTitle, preamble: newPreamble, generatorModule, pageCount: newPageCount, sheetStyle: newSheetStyle }: UpdateWorksheetArgs) => {
         setProblems(prev => clearPrevious ? newProblems : [...prev, ...newProblems]);
         if (newTitle) setTitle(newTitle);
         setPreamble(newPreamble ?? null);
         if (generatorModule) setLastGeneratorModule(generatorModule);
         if (newPageCount !== undefined) setPageCount(newPageCount);
+        if (clearPrevious) {
+            setSheetStyle(newSheetStyle ?? {});
+        } else if (newSheetStyle && Object.keys(newSheetStyle).length > 0) {
+            setSheetStyle(s => ({...s, ...newSheetStyle}));
+        }
     }, []);
 
     const clearWorksheet = useCallback(() => {
@@ -56,6 +64,7 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
         setTitle('Çalışma Kağıdı');
         setPreamble(null);
         setLastGeneratorModule(null);
+        setSheetStyle({});
     }, []);
 
     const triggerAutoRefresh = useCallback(() => {
@@ -69,6 +78,7 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             preamble,
             isLoading,
             pageCount,
+            sheetStyle,
             autoRefreshTrigger,
             lastGeneratorModule,
             presetToLoad,

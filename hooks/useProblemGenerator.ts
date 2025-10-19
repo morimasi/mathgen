@@ -3,7 +3,7 @@ import { useWorksheet } from '../services/WorksheetContext.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import { calculateMaxProblems } from '../services/layoutService.ts';
 import { useToast } from '../services/ToastContext.tsx';
-import { Problem } from '../types.ts';
+import { Problem, VisualSupportSettings } from '../types.ts';
 
 interface GeneratorOptions<S> {
     moduleKey: string;
@@ -39,6 +39,19 @@ export const useProblemGenerator = <S,>({
         try {
             const finalSettings = { ...settings, ...overrideSettings };
 
+            let sheetStyle: React.CSSProperties = {};
+            if (moduleKey === 'visual-support') {
+                const s = finalSettings as unknown as VisualSupportSettings; // Cast needed
+                // FIX: Cast style object to React.CSSProperties to allow for CSS custom properties (variables).
+                sheetStyle = {
+                    '--visual-emoji-size': `${s.emojiSize}px`,
+                    '--visual-number-size': `${s.numberSize}px`,
+                    '--visual-box-width': `${s.boxSize}px`,
+                    '--visual-box-height': `${s.boxSize}px`,
+                    '--visual-container-min-width': `${s.boxSize * 1.5}px`,
+                } as React.CSSProperties;
+            }
+
             if (finalSettings.useWordProblems && aiGeneratorFn) {
                 const problems = await aiGeneratorFn(moduleKey, finalSettings);
                 updateWorksheet({ 
@@ -46,7 +59,8 @@ export const useProblemGenerator = <S,>({
                     clearPrevious, 
                     title: aiGeneratorTitle || 'Yapay Zeka Destekli Problemler',
                     generatorModule: moduleKey,
-                    pageCount: printSettings.layoutMode === 'table' ? 1 : finalSettings.pageCount
+                    pageCount: printSettings.layoutMode === 'table' ? 1 : finalSettings.pageCount,
+                    sheetStyle,
                 });
             } else {
                 let totalCount;
@@ -88,7 +102,8 @@ export const useProblemGenerator = <S,>({
                     title: newTitle, 
                     preamble: newPreamble,
                     generatorModule: moduleKey,
-                    pageCount: printSettings.layoutMode === 'table' || isPracticeSheet ? 1 : finalSettings.pageCount
+                    pageCount: printSettings.layoutMode === 'table' || isPracticeSheet ? 1 : finalSettings.pageCount,
+                    sheetStyle,
                 });
             }
         } catch (error: any) {

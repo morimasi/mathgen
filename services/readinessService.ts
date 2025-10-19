@@ -221,17 +221,19 @@ const generateMissingNumberPuzzles = (settings: MissingNumberPuzzlesSettings): {
     const n2 = getRandomInt(1, maxResult - n1);
     const result = n1 + n2;
 
-    let question = '', answer = '';
+    let question = '';
+    // FIX: Explicitly type 'answer' as 'string | number' and assign numbers directly to avoid type inference issues.
+    let answer: string | number = '';
     const missingPart = getRandomInt(1, 3);
 
     if (operation === 'addition') {
-        if (missingPart === 1) { question = `? + ${n2} = ${result}`; answer = String(n1); }
-        else if (missingPart === 2) { question = `${n1} + ? = ${result}`; answer = String(n2); }
-        else { question = `${n1} + ${n2} = ?`; answer = String(result); }
+        if (missingPart === 1) { question = `? + ${n2} = ${result}`; answer = n1; }
+        else if (missingPart === 2) { question = `${n1} + ? = ${result}`; answer = n2; }
+        else { question = `${n1} + ${n2} = ?`; answer = result; }
     } else { // subtraction
-        if (missingPart === 1) { question = `? - ${n1} = ${n2}`; answer = String(result); }
-        else if (missingPart === 2) { question = `${result} - ? = ${n2}`; answer = String(n1); }
-        else { question = `${result} - ${n1} = ?`; answer = String(n2); }
+        if (missingPart === 1) { question = `? - ${n1} = ${n2}`; answer = result; }
+        else if (missingPart === 2) { question = `${result} - ? = ${n2}`; answer = n1; }
+        else { question = `${result} - ${n1} = ?`; answer = n2; }
     }
 
     return { problem: { question: `<div style="font-size: 1.5rem;">${question}</div>`, answer, category: 'missing-number-puzzles' }, title };

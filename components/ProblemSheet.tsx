@@ -5,7 +5,7 @@ import { Problem } from '../types.ts';
 
 
 const ProblemSheet: React.FC = () => {
-    const { problems, title, preamble, pageCount } = useWorksheet();
+    const { problems, title, preamble, pageCount, sheetStyle } = useWorksheet();
     const { settings } = usePrintSettings();
     
     const pageMargins = `${settings.pageMargin}rem`;
@@ -18,6 +18,7 @@ const ProblemSheet: React.FC = () => {
         '--text-align': settings.textAlign,
         '--color': `var(--theme-color-${settings.colorTheme})`,
         '--scale': settings.scale,
+        ...sheetStyle
     } as React.CSSProperties;
 
     const renderProblem = (problem: Problem, index: number) => {

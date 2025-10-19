@@ -90,14 +90,12 @@ const generateMapReadingLocal = (settings: any): { problem: Problem; title: stri
 export const generateDyslexiaProblem = async (subModuleId: DyslexiaSubModuleType, settings: any, count: number): Promise<{ problems: Problem[], title: string, error?: string }> => {
     
     // Modules that rely on AI generation
+    // FIX: Removed dysgraphia-specific modules that are not part of DyslexiaSubModuleType.
     const aiModules: DyslexiaSubModuleType[] = [
         'reading-fluency-coach', 
         'comprehension-explorer', 
         'vocabulary-explorer', 
-        'interactive-story',
-        'picture-sequencing', // Dysgraphia, but can be used here
-        'writing-planning', // Dysgraphia, but can be used here
-        'creative-writing' // Dysgraphia, but can be used here
+        'interactive-story'
     ];
 
     if (aiModules.includes(subModuleId)) {
