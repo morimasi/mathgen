@@ -25,6 +25,8 @@ interface UIContextType {
     isTeacherPanelVisible: boolean;
     openTeacherPanel: () => void;
     closeTeacherPanel: () => void;
+    isAnswerKeyVisible: boolean;
+    setIsAnswerKeyVisible: (visible: boolean) => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -38,6 +40,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isFavoritesPanelVisible, setFavoritesPanelVisible] = useState(false);
     const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(window.innerWidth < 768); // Collapse on mobile by default
     const [isTeacherPanelVisible, setTeacherPanelVisible] = useState(false);
+    const [isAnswerKeyVisible, setIsAnswerKeyVisible] = useState(false);
 
     const openPrintSettings = useCallback(() => setPrintSettingsVisible(true), []);
     const closePrintSettings = useCallback(() => setPrintSettingsVisible(false), []);
@@ -59,7 +62,8 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             isContactModalVisible, openContactModal, closeContactModal,
             isFavoritesPanelVisible, openFavoritesPanel, closeFavoritesPanel,
             isSettingsPanelCollapsed, setIsSettingsPanelCollapsed,
-            isTeacherPanelVisible, openTeacherPanel, closeTeacherPanel
+            isTeacherPanelVisible, openTeacherPanel, closeTeacherPanel,
+            isAnswerKeyVisible, setIsAnswerKeyVisible
         }}>
             {children}
         </UIContext.Provider>

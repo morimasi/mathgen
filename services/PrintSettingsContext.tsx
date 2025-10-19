@@ -16,6 +16,7 @@ const initialPrintSettings: PrintSettings = {
     fontSize: 16,
     showHeader: false,
     showProblemNumbers: false,
+    includeAnswerKey: false,
     notebookStyle: 'none',
     borderStyle: 'none',
     problemSpacing: 2,

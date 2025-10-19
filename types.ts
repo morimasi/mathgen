@@ -19,6 +19,7 @@ export interface PrintSettings {
     fontSize: number;
     showHeader: boolean;
     showProblemNumbers: boolean;
+    includeAnswerKey: boolean;
     notebookStyle: 'none' | 'lines' | 'grid' | 'dotted' | 'handwriting';
     borderStyle: 'none' | 'card' | 'solid' | 'dashed' | 'shadow-lift' | 'top-bar-color';
     problemSpacing: number;

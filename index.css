@@ -466,7 +466,14 @@
     grid-template-rows: repeat(var(--rows, 10), auto);
   }
   .worksheet-body.layout-table .problem-item { @apply border-b border-r border-current p-4 m-0; }
-  .problem-item { @apply flex items-start gap-2 break-inside-avoid; margin-bottom: var(--problem-spacing); transition: all 0.2s; }
+  .problem-item { @apply flex items-start gap-2 break-inside-avoid relative; margin-bottom: var(--problem-spacing); transition: all 0.2s; }
+
+  .problem-answer {
+    @apply absolute -right-2 top-0 bg-green-100 dark:bg-green-900/80 text-green-700 dark:text-green-300 text-xs font-bold px-2 py-0.5 rounded-full shadow-sm;
+    animation: fadeInAnswer 0.3s ease-out;
+  }
+  @keyframes fadeInAnswer { from { opacity: 0; transform: scale(0.8) translateY(-5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
 
   /* Border Styles */
   .problem-item[data-border-style="card"] { @apply bg-white/50 dark:bg-black/10 p-4 rounded-lg shadow-sm border border-black/10; }
@@ -482,7 +489,19 @@
   .given-wanted-container { @apply mt-2 space-y-2 text-sm; }
   .solution-box { @apply w-full h-12 border border-stone-300 rounded p-1 mt-1; }
   .solution-box.tall { @apply h-24; }
-  .answer-key { @apply bg-white p-8 hidden w-[210mm] box-border; }
+  
+  .answer-key-page { @apply print-only; }
+  .answer-key-grid {
+    @apply grid gap-px bg-current border border-current;
+    grid-template-columns: repeat(var(--columns, 2), 1fr);
+  }
+  .answer-key-item {
+    @apply p-2 bg-white text-black text-sm;
+  }
+  .answer-key-item-number {
+    @apply font-bold mr-2;
+  }
+
   @keyframes daisy-sway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
   .daisy-sway { animation: daisy-sway 4s ease-in-out infinite; transform-origin: 75px 140px; }
   @keyframes crawl { 0% { transform: translate(0, 0) rotate(-10deg); } 25% { transform: translate(5px, -10px) rotate(0deg); } 50% { transform: translate(-5px, -20px) rotate(10deg); } 75% { transform: translate(0, -30px) rotate(0deg); } 100% { transform: translate(0, 0) rotate(-10deg); } }
@@ -608,6 +627,8 @@
   .worksheet-page.white-page {
       color: black;
   }
+  
+  .print-only { display: block !important; }
 
   @page {
     /* color is now applied directly to .worksheet-page for better control */
@@ -616,9 +637,6 @@
   /* Ensure print-hidden utility works */
   .print-hidden, .print\:hidden {
     display: none !important;
-  }
-  .print-only {
-    display: block !important;
   }
 }
 

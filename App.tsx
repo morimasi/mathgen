@@ -32,6 +32,7 @@ import {
     MoreVerticalIcon,
     DashboardIcon,
     ClipboardIcon,
+    KeyIcon,
 } from './components/icons/Icons.tsx';
 import Button from './components/form/Button.tsx';
 import Select from './components/form/Select.tsx';
@@ -40,6 +41,7 @@ import { useFlyingLadybugs } from './services/FlyingLadybugContext.tsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
+import Checkbox from './components/form/Checkbox.tsx';
 
 const Header: React.FC = memo(() => {
     const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel, openTeacherPanel } = useUI();
@@ -187,6 +189,7 @@ const Header: React.FC = memo(() => {
 
 const WorksheetToolbar: React.FC = memo(() => {
     const { settings, setSettings } = usePrintSettings();
+    const { isAnswerKeyVisible, setIsAnswerKeyVisible } = useUI();
     const { fontTheme, setFontTheme } = useFontTheme();
     const fontThemeOptions = Object.entries(fontThemes).map(([key, value]) => ({ value: key, label: value.name }));
 
@@ -250,6 +253,10 @@ const WorksheetToolbar: React.FC = memo(() => {
                         <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={settings.pageMargin} onChange={(e) => setSettings(s => ({ ...s, pageMargin: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
                     </div>
                  </div>
+            </div>
+             <div className="flex items-center gap-2">
+                <KeyIcon className="w-4 h-4 text-stone-500" />
+                <Checkbox label="Cevapları Göster" id="show-answers" checked={isAnswerKeyVisible} onChange={e => setIsAnswerKeyVisible(e.target.checked)} />
             </div>
         </div>
     );
