@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext.tsx';
@@ -15,7 +15,6 @@ import PrintSettingsPanel from './components/PrintSettingsPanel.tsx';
 import HowToUseModal from './components/HowToUseModal.tsx';
 import ContactModal from './components/ContactModal.tsx';
 import FavoritesPanel from './components/FavoritesPanel.tsx';
-import TeacherPanel from './components/TeacherPanel.tsx';
 import AnimatedLogo from './components/AnimatedLogo.tsx';
 import ThemeSwitcher from './components/ThemeSwitcher.tsx';
 import { TAB_GROUPS } from './constants.ts';
@@ -29,10 +28,7 @@ import {
     SettingsIcon,
     DownloadIcon,
     MenuIcon,
-    MoreVerticalIcon,
-    DashboardIcon,
-    ClipboardIcon,
-    KeyIcon,
+    MoreVerticalIcon
 } from './components/icons/Icons.tsx';
 import Button from './components/form/Button.tsx';
 import Select from './components/form/Select.tsx';
@@ -41,10 +37,9 @@ import { useFlyingLadybugs } from './services/FlyingLadybugContext.tsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
-import Checkbox from './components/form/Checkbox.tsx';
 
 const Header: React.FC = memo(() => {
-    const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel, openTeacherPanel } = useUI();
+    const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
     const { clearWorksheet, triggerAutoRefresh, setIsLoading } = useWorksheet();
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
@@ -132,7 +127,6 @@ const Header: React.FC = memo(() => {
             <button onClick={triggerAutoRefresh} className="action-button" title="Soruları Yenile"><RefreshIcon /><span>Soruları Yenile</span></button>
             <button onClick={() => { openPrintSettings(); setActionMenuOpen(false); }} className="action-button" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /><span>Yazdırma Ayarları</span></button>
             <button onClick={() => { openFavoritesPanel(); setActionMenuOpen(false); }} className="action-button" title="Favorilerim"><HeartIcon /><span>Favorilerim</span></button>
-            <button onClick={() => { openTeacherPanel(); setActionMenuOpen(false); }} className="action-button" title="Öğretmen Paneli"><DashboardIcon /><span>Öğretmen Paneli</span></button>
             <button onClick={handlePrint} className="action-button" title="Yazdır"><PrintIcon /><span>Yazdır</span></button>
             <button onClick={handleDownloadPDF} className="action-button" title="PDF Olarak İndir"><DownloadIcon /><span>PDF İndir</span></button>
             <button onClick={() => { openHowToUse(); setActionMenuOpen(false); }} className="action-button" title="Nasıl Kullanılır?"><HelpIcon /><span>Nasıl Kullanılır?</span></button>
@@ -175,7 +169,6 @@ const Header: React.FC = memo(() => {
                     <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
                     <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
                     <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
-                    <button onClick={openTeacherPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Öğretmen Paneli"><DashboardIcon /></button>
                     <button onClick={handlePrint} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon /></button>
                     <button onClick={handleDownloadPDF} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
                     <ThemeSwitcher />
@@ -189,7 +182,6 @@ const Header: React.FC = memo(() => {
 
 const WorksheetToolbar: React.FC = memo(() => {
     const { settings, setSettings } = usePrintSettings();
-    const { isAnswerKeyVisible, setIsAnswerKeyVisible } = useUI();
     const { fontTheme, setFontTheme } = useFontTheme();
     const fontThemeOptions = Object.entries(fontThemes).map(([key, value]) => ({ value: key, label: value.name }));
 
@@ -254,32 +246,23 @@ const WorksheetToolbar: React.FC = memo(() => {
                     </div>
                  </div>
             </div>
-             <div className="flex items-center gap-2">
-                <KeyIcon className="w-4 h-4 text-stone-500" />
-                <Checkbox label="Cevapları Göster" id="show-answers" checked={isAnswerKeyVisible} onChange={e => setIsAnswerKeyVisible(e.target.checked)} />
-            </div>
         </div>
     );
 });
 
 const AppContent: React.FC = () => {
     const { 
-        appMode, setAppMode,
         isPrintSettingsVisible, closePrintSettings,
         isHowToUseVisible, closeHowToUse,
         isContactModalVisible, closeContactModal,
         isFavoritesPanelVisible, closeFavoritesPanel,
-        isTeacherPanelVisible, closeTeacherPanel,
         isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
     } = useUI();
     const { isLoading } = useWorksheet();
-    const { addToast } = useToast();
     const { settings, setSettings } = usePrintSettings();
     
-    const [isMouseOverWorksheet, setIsMouseOverWorksheet] = useState(false);
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
-    const throttleTimeout = useRef<number | null>(null);
 
     useEffect(() => {
         const el = panAreaRef.current;
@@ -288,7 +271,7 @@ const AppContent: React.FC = () => {
         }
     }, []);
 
-    const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.button !== 0) return;
         e.preventDefault();
         const el = panAreaRef.current;
@@ -301,57 +284,37 @@ const AppContent: React.FC = () => {
             scrollTop: el.scrollTop,
         };
         el.classList.add('is-panning');
-    }, []);
+    };
 
-    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!panState.current.isPanning) return;
         e.preventDefault();
         const el = panAreaRef.current;
         if (!el) return;
-        
-        if (throttleTimeout.current) return;
-        
-        throttleTimeout.current = window.setTimeout(() => {
-            throttleTimeout.current = null;
-            const x = e.clientX - el.offsetLeft;
-            const y = e.clientY - el.offsetTop;
-            const walkX = (x - panState.current.startX);
-            const walkY = (y - panState.current.startY);
-            el.scrollLeft = panState.current.scrollLeft - walkX;
-            el.scrollTop = panState.current.scrollTop - walkY;
-        }, 16); // Throttle to ~60fps
+        const x = e.clientX - el.offsetLeft;
+        const y = e.clientY - el.offsetTop;
+        const walkX = (x - panState.current.startX);
+        const walkY = (y - panState.current.startY);
+        el.scrollLeft = panState.current.scrollLeft - walkX;
+        el.scrollTop = panState.current.scrollTop - walkY;
+    };
 
-    }, []);
-
-    const stopPanning = useCallback(() => {
+    const stopPanning = () => {
         panState.current.isPanning = false;
         panAreaRef.current?.classList.remove('is-panning');
-    }, []);
+    };
 
-    const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
         if (e.ctrlKey || e.metaKey) { // Allow pinch-zoom on trackpads
             e.preventDefault();
-            
-            if (throttleTimeout.current) return;
-
-            throttleTimeout.current = window.setTimeout(() => {
-                throttleTimeout.current = null;
-                const scaleAmount = 0.05;
-                setSettings(s => {
-                    const newScale = e.deltaY > 0
-                        ? Math.max(0.2, s.scale - scaleAmount)
-                        : Math.min(2.0, s.scale + scaleAmount);
-                    return { ...s, scale: newScale };
-                });
-            }, 16); // Throttle to ~60fps
+            const scaleAmount = 0.05;
+            const newScale = e.deltaY > 0
+                ? Math.max(0.2, settings.scale - scaleAmount)
+                : Math.min(2.0, settings.scale + scaleAmount);
+            setSettings(s => ({ ...s, scale: newScale }));
         }
         // If no ctrl/meta key, allow normal vertical scrolling of the pan area
-    }, [setSettings]);
-    
-    const handleSaveAssignment = () => {
-        addToast('Ödev başarıyla kaydedildi! (Simülasyon)', 'success');
-        setAppMode('worksheet');
-    }
+    };
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
@@ -362,32 +325,15 @@ const AppContent: React.FC = () => {
 
             <div className="flex flex-grow overflow-hidden">
                 <aside 
-                    onMouseEnter={() => setIsMouseOverWorksheet(false)}
-                    className={`print:hidden transition-all duration-300 ease-in-out shadow-lg bg-white dark:bg-stone-800 relative ${
+                    className={`print:hidden transition-all duration-300 ease-in-out shadow-lg bg-white dark:bg-stone-800 ${
                         isSettingsPanelCollapsed 
                             ? 'w-0 -translate-x-full opacity-0 p-0' 
-                            : isMouseOverWorksheet ? 'w-32' : 'w-80'
+                            : 'w-80 p-4'
                     }`}
                 >
-                     {appMode === 'assignmentCreation' && (
-                        <div className="assignment-creation-banner">
-                            <p className="font-bold text-sm">Ödev Oluşturma Modu</p>
-                            <p className="text-xs">Ayarları yapıp "Ödevi Kaydet" butonuna basın.</p>
-                        </div>
-                    )}
-                    <div className={`overflow-y-auto h-full transition-opacity duration-200 p-4 ${
-                            (isMouseOverWorksheet && !isSettingsPanelCollapsed) ? 'opacity-0 delay-0' : 'opacity-100 delay-200'
-                        }`}
-                    >
+                    <div className="overflow-y-auto h-full">
                         <SettingsPanel />
                     </div>
-                     {appMode === 'assignmentCreation' && !isSettingsPanelCollapsed && (
-                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-stone-800 border-t border-stone-200 dark:border-stone-700">
-                           <Button onClick={handleSaveAssignment} className="w-full">
-                                <ClipboardIcon className="w-5 h-5" /> Ödevi Kaydet
-                           </Button>
-                        </div>
-                    )}
                 </aside>
 
                  <div className="relative flex-shrink-0 print:hidden">
@@ -401,13 +347,12 @@ const AppContent: React.FC = () => {
                 </div>
 
                 <main 
-                    onMouseEnter={() => setIsMouseOverWorksheet(true)}
                     className="flex-1 flex flex-col overflow-hidden relative"
                 >
                     {isLoading && (
-                        <div className="absolute inset-0 bg-stone-100/80 dark:bg-stone-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-30 gap-4">
+                        <div className="absolute inset-0 bg-black/40 dark:bg-stone-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-30 gap-4">
                             <LoadingDaisy />
-                            <p className="text-accent-text text-lg font-semibold animate-pulse">Etkinlik hazırlanıyor...</p>
+                            <p className="text-white text-lg font-semibold animate-pulse">Etkinlik hazırlanıyor...</p>
                         </div>
                     )}
                     <WorksheetToolbar />
@@ -429,7 +374,6 @@ const AppContent: React.FC = () => {
             <HowToUseModal isVisible={isHowToUseVisible} onClose={closeHowToUse} />
             <ContactModal isVisible={isContactModalVisible} onClose={closeContactModal} />
             <FavoritesPanel isVisible={isFavoritesPanelVisible} onClose={closeFavoritesPanel} />
-            <TeacherPanel isVisible={isTeacherPanelVisible} onClose={closeTeacherPanel} />
         </div>
     );
 };

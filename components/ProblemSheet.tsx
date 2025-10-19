@@ -1,15 +1,12 @@
 import React from 'react';
 import { useWorksheet } from '../services/WorksheetContext.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
-import { useUI } from '../services/UIContext.tsx';
 import { Problem } from '../types.ts';
-import AnswerKey from './AnswerKey.tsx';
 
 
 const ProblemSheet: React.FC = () => {
-    const { problems, title, preamble, pageCount, sheetStyle } = useWorksheet();
+    const { problems, title, preamble, pageCount } = useWorksheet();
     const { settings } = usePrintSettings();
-    const { isAnswerKeyVisible } = useUI();
     
     const pageMargins = `${settings.pageMargin}rem`;
     const problemSpacing = `${settings.problemSpacing}rem`;
@@ -21,7 +18,6 @@ const ProblemSheet: React.FC = () => {
         '--text-align': settings.textAlign,
         '--color': `var(--theme-color-${settings.colorTheme})`,
         '--scale': settings.scale,
-        ...sheetStyle
     } as React.CSSProperties;
 
     const renderProblem = (problem: Problem, index: number) => {
@@ -29,7 +25,6 @@ const ProblemSheet: React.FC = () => {
             <>
                 {settings.showProblemNumbers && <span className="problem-number">{index + 1}.</span>}
                 <div className="problem-content" dangerouslySetInnerHTML={{ __html: problem.question }} />
-                {isAnswerKeyVisible && <span className="problem-answer">{problem.answer}</span>}
             </>
         );
 
@@ -99,7 +94,6 @@ const ProblemSheet: React.FC = () => {
     return (
         <div id="worksheet-area" className="worksheet-area" style={problemSheetStyle}>
             {pages}
-            {settings.includeAnswerKey && <AnswerKey />}
         </div>
     );
 };

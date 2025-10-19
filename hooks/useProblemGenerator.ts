@@ -3,7 +3,7 @@ import { useWorksheet } from '../services/WorksheetContext.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import { calculateMaxProblems } from '../services/layoutService.ts';
 import { useToast } from '../services/ToastContext.tsx';
-import { Problem, VisualSupportSettings } from '../types.ts';
+import { Problem } from '../types.ts';
 
 interface GeneratorOptions<S> {
     moduleKey: string;
@@ -11,6 +11,7 @@ interface GeneratorOptions<S> {
     generatorFn: (settings: S) => { problem: Problem, title: string, error?: string, preamble?: string };
     aiGeneratorFn?: (module: string, settings: S) => Promise<Problem[]>;
     aiGeneratorTitle?: string;
+    isLive?: boolean;
     isPracticeSheet?: boolean;
 }
 
@@ -20,12 +21,14 @@ export const useProblemGenerator = <S,>({
     generatorFn,
     aiGeneratorFn,
     aiGeneratorTitle,
+    isLive = false,
     isPracticeSheet = false,
 }: GeneratorOptions<S>) => {
     const { updateWorksheet, setIsLoading, lastGeneratorModule, autoRefreshTrigger } = useWorksheet();
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
     const contentRef = useRef<HTMLDivElement | null>(null);
+    const isInitialMount = useRef(true);
 
     useEffect(() => {
         if (!contentRef.current) {
@@ -39,19 +42,6 @@ export const useProblemGenerator = <S,>({
         try {
             const finalSettings = { ...settings, ...overrideSettings };
 
-            let sheetStyle: React.CSSProperties = {};
-            if (moduleKey === 'visual-support') {
-                const s = finalSettings as unknown as VisualSupportSettings; // Cast needed
-                // FIX: Cast style object to React.CSSProperties to allow for CSS custom properties (variables).
-                sheetStyle = {
-                    '--visual-emoji-size': `${s.emojiSize}px`,
-                    '--visual-number-size': `${s.numberSize}px`,
-                    '--visual-box-width': `${s.boxSize}px`,
-                    '--visual-box-height': `${s.boxSize}px`,
-                    '--visual-container-min-width': `${s.boxSize * 1.5}px`,
-                } as React.CSSProperties;
-            }
-
             if (finalSettings.useWordProblems && aiGeneratorFn) {
                 const problems = await aiGeneratorFn(moduleKey, finalSettings);
                 updateWorksheet({ 
@@ -59,8 +49,7 @@ export const useProblemGenerator = <S,>({
                     clearPrevious, 
                     title: aiGeneratorTitle || 'Yapay Zeka Destekli Problemler',
                     generatorModule: moduleKey,
-                    pageCount: printSettings.layoutMode === 'table' ? 1 : finalSettings.pageCount,
-                    sheetStyle,
+                    pageCount: printSettings.layoutMode === 'table' ? 1 : finalSettings.pageCount
                 });
             } else {
                 let totalCount;
@@ -102,8 +91,7 @@ export const useProblemGenerator = <S,>({
                     title: newTitle, 
                     preamble: newPreamble,
                     generatorModule: moduleKey,
-                    pageCount: printSettings.layoutMode === 'table' || isPracticeSheet ? 1 : finalSettings.pageCount,
-                    sheetStyle,
+                    pageCount: printSettings.layoutMode === 'table' || isPracticeSheet ? 1 : finalSettings.pageCount
                 });
             }
         } catch (error: any) {
@@ -125,7 +113,22 @@ export const useProblemGenerator = <S,>({
         addToast,
     ]);
 
-    // Handle auto refresh on print settings change or header refresh button
+    // Handle live updates
+    useEffect(() => {
+        if (!isLive || isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        if (lastGeneratorModule === moduleKey) {
+            const handler = setTimeout(() => {
+                generate(true);
+            }, 300); // Debounce
+            return () => clearTimeout(handler);
+        }
+    }, [settings, printSettings, isLive, generate, lastGeneratorModule, moduleKey]);
+
+    // Handle auto refresh on print settings change
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === moduleKey) {
             generate(true);

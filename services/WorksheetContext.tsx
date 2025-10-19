@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
-import { Problem } from '../types.ts';
+import { Problem, VisualSupportSettings, ArithmeticOperation } from '../types.ts';
 
 interface UpdateWorksheetArgs {
     newProblems: Problem[];
@@ -8,7 +8,6 @@ interface UpdateWorksheetArgs {
     preamble?: string;
     generatorModule?: string;
     pageCount?: number;
-    sheetStyle?: React.CSSProperties;
 }
 
 interface PresetToLoad {
@@ -22,7 +21,7 @@ interface WorksheetContextType {
     preamble: string | null;
     isLoading: boolean;
     pageCount: number;
-    sheetStyle: React.CSSProperties;
+    visualSupportSettings: VisualSupportSettings;
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
     presetToLoad: PresetToLoad | null;
@@ -30,10 +29,22 @@ interface WorksheetContextType {
     clearWorksheet: () => void;
     setIsLoading: (loading: boolean) => void;
     triggerAutoRefresh: () => void;
+    setVisualSupportSettings: (settings: VisualSupportSettings) => void;
     setPresetToLoad: (preset: PresetToLoad | null) => void;
 }
 
 const WorksheetContext = createContext<WorksheetContextType | undefined>(undefined);
+
+const initialVisualSupportSettings: VisualSupportSettings = {
+    operation: ArithmeticOperation.Addition,
+    maxNumber: 10,
+    problemsPerPage: 12,
+    pageCount: 1,
+    autoFit: true,
+    emojiSize: 32,
+    numberSize: 16,
+    boxSize: 50,
+};
 
 export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [problems, setProblems] = useState<Problem[]>([]);
@@ -41,22 +52,17 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [preamble, setPreamble] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [pageCount, setPageCount] = useState(1);
-    const [sheetStyle, setSheetStyle] = useState<React.CSSProperties>({});
+    const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>(initialVisualSupportSettings);
     const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [presetToLoad, setPresetToLoad] = useState<PresetToLoad | null>(null);
 
-    const updateWorksheet = useCallback(({ newProblems, clearPrevious, title: newTitle, preamble: newPreamble, generatorModule, pageCount: newPageCount, sheetStyle: newSheetStyle }: UpdateWorksheetArgs) => {
+    const updateWorksheet = useCallback(({ newProblems, clearPrevious, title: newTitle, preamble: newPreamble, generatorModule, pageCount: newPageCount }: UpdateWorksheetArgs) => {
         setProblems(prev => clearPrevious ? newProblems : [...prev, ...newProblems]);
         if (newTitle) setTitle(newTitle);
         setPreamble(newPreamble ?? null);
         if (generatorModule) setLastGeneratorModule(generatorModule);
         if (newPageCount !== undefined) setPageCount(newPageCount);
-        if (clearPrevious) {
-            setSheetStyle(newSheetStyle ?? {});
-        } else if (newSheetStyle && Object.keys(newSheetStyle).length > 0) {
-            setSheetStyle(s => ({...s, ...newSheetStyle}));
-        }
     }, []);
 
     const clearWorksheet = useCallback(() => {
@@ -64,7 +70,6 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
         setTitle('Çalışma Kağıdı');
         setPreamble(null);
         setLastGeneratorModule(null);
-        setSheetStyle({});
     }, []);
 
     const triggerAutoRefresh = useCallback(() => {
@@ -78,7 +83,7 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             preamble,
             isLoading,
             pageCount,
-            sheetStyle,
+            visualSupportSettings,
             autoRefreshTrigger,
             lastGeneratorModule,
             presetToLoad,
@@ -86,6 +91,7 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             clearWorksheet,
             setIsLoading,
             triggerAutoRefresh,
+            setVisualSupportSettings,
             setPresetToLoad
         }}>
             {children}

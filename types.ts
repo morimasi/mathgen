@@ -19,7 +19,6 @@ export interface PrintSettings {
     fontSize: number;
     showHeader: boolean;
     showProblemNumbers: boolean;
-    includeAnswerKey: boolean;
     notebookStyle: 'none' | 'lines' | 'grid' | 'dotted' | 'handwriting';
     borderStyle: 'none' | 'card' | 'solid' | 'dashed' | 'shadow-lift' | 'top-bar-color';
     problemSpacing: number;
@@ -30,29 +29,6 @@ export interface PrintSettings {
     orientation: 'portrait' | 'landscape';
     textAlign: 'left' | 'center' | 'right';
 }
-
-// --- TEACHER PANEL ---
-export type AssignmentStatus = 'tamamlandı' | 'beklemede' | 'geç';
-export interface PerformanceData {
-    [moduleKey: string]: number; // e.g., 'arithmetic': 85
-}
-export interface Assignment {
-    id: number;
-    name: string;
-    module: string;
-    dueDate: string;
-    status: AssignmentStatus;
-    score?: number;
-}
-export interface Student {
-    id: number;
-    name: string;
-    group: string;
-    avatar: string;
-    assignments: Assignment[];
-    performance: PerformanceData;
-}
-
 
 // --- MODULES ---
 

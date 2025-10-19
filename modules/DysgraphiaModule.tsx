@@ -8,7 +8,6 @@ import { calculateMaxProblems } from '../services/layoutService.ts';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { generateDysgraphiaProblem } from '../services/dysgraphiaService.ts';
 import { useWorksheet } from '../services/WorksheetContext.tsx';
-import { useDebounce } from '../hooks/useDebounce.ts';
 
 // Import all sub-module setting components
 import FineMotorSkillsSettings from './dysgraphia/FineMotorSkillsSettings.tsx';
@@ -68,7 +67,7 @@ const DysgraphiaModule: React.FC = () => {
     const [settings, setSettings] = useState<DysgraphiaSettings>(defaultSettings);
     const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
     const contentRef = useRef<HTMLDivElement>(null);
-    const debouncedSettings = useDebounce(settings, 500);
+    const isInitialMount = useRef(true);
     
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DysgraphiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
@@ -114,23 +113,25 @@ const DysgraphiaModule: React.FC = () => {
         setIsLoading(false);
     }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
 
-    // Auto-refresh on header button click
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === `dysgraphia-${activeSubModuleId}`) {
             handleGenerate(true);
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
-    // Debounced live update for non-AI modules
+    // Live update for non-AI modules
     useEffect(() => {
-        const isAIModule = ['picture-sequencing', 'writing-planning', 'creative-writing', 'interactive-story-dg'].includes(debouncedSettings.activeSubModule);
-        if (isAIModule) return;
-
-        if (lastGeneratorModule === `dysgraphia-${debouncedSettings.activeSubModule}`) {
-            handleGenerate(true);
+        const isAIModule = ['picture-sequencing', 'writing-planning', 'creative-writing', 'interactive-story-dg'].includes(activeSubModuleId);
+        if (isInitialMount.current || isAIModule) {
+            isInitialMount.current = false;
+            return;
         }
-    }, [debouncedSettings, lastGeneratorModule, handleGenerate]);
 
+        if (lastGeneratorModule === `dysgraphia-${activeSubModuleId}`) {
+            const handler = setTimeout(() => handleGenerate(true), 300);
+            return () => clearTimeout(handler);
+        }
+    }, [settings, printSettings, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
     const handleSubModuleChange = (id: DysgraphiaSubModuleType) => {
         setSettings(prev => ({ ...prev, activeSubModule: id }));

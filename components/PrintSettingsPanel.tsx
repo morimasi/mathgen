@@ -153,12 +153,6 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                 checked={settings.showProblemNumbers}
                                 onChange={e => handleChange('showProblemNumbers', e.target.checked)}
                             />
-                            <Checkbox
-                                label="Çıktıya Cevap Anahtarı Ekle"
-                                id="print-include-answer-key"
-                                checked={settings.includeAnswerKey}
-                                onChange={e => handleChange('includeAnswerKey', e.target.checked)}
-                            />
                         </div>
                     </div>
                 </div>

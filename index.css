@@ -13,14 +13,6 @@
     transition: background-color 0.3s, color 0.3s;
   }
 
-  a {
-    @apply transition-colors duration-200;
-  }
-
-  input, select, textarea {
-    @apply transition-colors duration-200 ease-in-out;
-  }
-
   :root {
     --theme-color-black: #1c1917; /* stone-900 */
     --theme-color-blue: #1e3a8a;  /* blue-800 */
@@ -466,14 +458,7 @@
     grid-template-rows: repeat(var(--rows, 10), auto);
   }
   .worksheet-body.layout-table .problem-item { @apply border-b border-r border-current p-4 m-0; }
-  .problem-item { @apply flex items-start gap-2 break-inside-avoid relative; margin-bottom: var(--problem-spacing); transition: all 0.2s; }
-
-  .problem-answer {
-    @apply absolute -right-2 top-0 bg-green-100 dark:bg-green-900/80 text-green-700 dark:text-green-300 text-xs font-bold px-2 py-0.5 rounded-full shadow-sm;
-    animation: fadeInAnswer 0.3s ease-out;
-  }
-  @keyframes fadeInAnswer { from { opacity: 0; transform: scale(0.8) translateY(-5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
+  .problem-item { @apply flex items-start gap-2 break-inside-avoid; margin-bottom: var(--problem-spacing); transition: all 0.2s; }
 
   /* Border Styles */
   .problem-item[data-border-style="card"] { @apply bg-white/50 dark:bg-black/10 p-4 rounded-lg shadow-sm border border-black/10; }
@@ -489,19 +474,7 @@
   .given-wanted-container { @apply mt-2 space-y-2 text-sm; }
   .solution-box { @apply w-full h-12 border border-stone-300 rounded p-1 mt-1; }
   .solution-box.tall { @apply h-24; }
-  
-  .answer-key-page { @apply print-only; }
-  .answer-key-grid {
-    @apply grid gap-px bg-current border border-current;
-    grid-template-columns: repeat(var(--columns, 2), 1fr);
-  }
-  .answer-key-item {
-    @apply p-2 bg-white text-black text-sm;
-  }
-  .answer-key-item-number {
-    @apply font-bold mr-2;
-  }
-
+  .answer-key { @apply bg-white p-8 hidden w-[210mm] box-border; }
   @keyframes daisy-sway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
   .daisy-sway { animation: daisy-sway 4s ease-in-out infinite; transform-origin: 75px 140px; }
   @keyframes crawl { 0% { transform: translate(0, 0) rotate(-10deg); } 25% { transform: translate(5px, -10px) rotate(0deg); } 50% { transform: translate(-5px, -20px) rotate(10deg); } 75% { transform: translate(0, -30px) rotate(0deg); } 100% { transform: translate(0, 0) rotate(-10deg); } }
@@ -543,41 +516,6 @@
   .pan-area {
     padding-left: 50vw;
     padding-right: 50vw;
-  }
-  
-  /* Teacher Panel */
-  .teacher-panel-nav-item {
-    @apply flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-md text-sm font-medium transition-all;
-  }
-  .teacher-panel-nav-item.active {
-    @apply bg-primary/10 text-primary dark:bg-primary/20 dark:text-white;
-  }
-  .teacher-panel-nav-item:not(.active) {
-    @apply text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700;
-  }
-
-  .teacher-panel-card {
-      @apply bg-white dark:bg-stone-800 p-4 rounded-lg shadow;
-  }
-
-  .teacher-panel-table th {
-    @apply text-left text-xs font-semibold text-stone-500 uppercase tracking-wider py-2 px-3;
-  }
-
-  .teacher-panel-table td {
-    @apply py-3 px-3 text-sm;
-  }
-
-  .teacher-panel-table tbody tr {
-    @apply border-b border-stone-200 dark:border-stone-700;
-  }
-   .teacher-panel-table tbody tr:last-child {
-    @apply border-b-0;
-  }
-  
-  .assignment-creation-banner {
-    @apply bg-amber-100 dark:bg-amber-900/50 border-t-4 border-amber-500 p-3 text-center text-amber-800 dark:text-amber-200;
-    animation: fadeIn 0.3s ease-out;
   }
 }
 
@@ -627,8 +565,6 @@
   .worksheet-page.white-page {
       color: black;
   }
-  
-  .print-only { display: block !important; }
 
   @page {
     /* color is now applied directly to .worksheet-page for better control */
@@ -637,6 +573,9 @@
   /* Ensure print-hidden utility works */
   .print-hidden, .print\:hidden {
     display: none !important;
+  }
+  .print-only {
+    display: block !important;
   }
 }
 
