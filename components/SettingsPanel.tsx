@@ -70,15 +70,13 @@ const SettingsPanel: React.FC = () => {
     };
 
     return (
-        <div key={activeTab} className="module-content">
-            <Suspense fallback={
-                <div className="flex items-center justify-center h-48">
-                    <LoadingIcon className="w-8 h-8" />
-                </div>
-            }>
-                {renderActiveModule()}
-            </Suspense>
-        </div>
+        <Suspense fallback={
+            <div className="flex items-center justify-center h-48">
+                <LoadingIcon className="w-8 h-8" />
+            </div>
+        }>
+            {renderActiveModule()}
+        </Suspense>
     );
 };
 
