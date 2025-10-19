@@ -1,19 +1,19 @@
 import React, { useState, useCallback } from 'react';
-import { generateFractionsProblem } from '../services/fractionsService';
-import { generateContextualWordProblems } from '../services/geminiService';
+import { generateFractionsProblem } from '../services/fractionsService.ts';
+import { generateContextualWordProblems } from '../services/geminiService.ts';
 // FIX: Add .ts extension to import path
-import { FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types';
-import Button from '../components/form/Button';
-import NumberInput from '../components/form/NumberInput';
-import Select from '../components/form/Select';
-import Checkbox from '../components/form/Checkbox';
-import TextInput from '../components/form/TextInput';
-import { ShuffleIcon } from '../components/icons/Icons';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import SettingsPresetManager from '../components/SettingsPresetManager';
-import { TOPIC_SUGGESTIONS } from '../constants';
-import HintButton from '../components/HintButton';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types.ts';
+import Button from '../components/form/Button.tsx';
+import NumberInput from '../components/form/NumberInput.tsx';
+import Select from '../components/form/Select.tsx';
+import Checkbox from '../components/form/Checkbox.tsx';
+import TextInput from '../components/form/TextInput.tsx';
+import { ShuffleIcon } from '../components/icons/Icons.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
+import { TOPIC_SUGGESTIONS } from '../constants.ts';
+import HintButton from '../components/HintButton.tsx';
+import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
 const FractionsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();

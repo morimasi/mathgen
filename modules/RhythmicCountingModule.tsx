@@ -1,26 +1,20 @@
-
-
-
-
-
-
 import React, { useState } from 'react';
-import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
-import { generateContextualWordProblems } from '../services/geminiService';
+import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService.ts';
+import { generateContextualWordProblems } from '../services/geminiService.ts';
 // FIX: Add .ts extension to import path
-import { RhythmicCountingSettings, RhythmicProblemType } from '../types';
-import Button from '../components/form/Button';
-import NumberInput from '../components/form/NumberInput';
-import Select from '../components/form/Select';
-import Checkbox from '../components/form/Checkbox';
-import TextInput from '../components/form/TextInput';
-import { ShuffleIcon } from '../components/icons/Icons';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import SettingsPresetManager from '../components/SettingsPresetManager';
-import { TOPIC_SUGGESTIONS } from '../constants';
-import HintButton from '../components/HintButton';
+import { RhythmicCountingSettings, RhythmicProblemType } from '../types.ts';
+import Button from '../components/form/Button.tsx';
+import NumberInput from '../components/form/NumberInput.tsx';
+import Select from '../components/form/Select.tsx';
+import Checkbox from '../components/form/Checkbox.tsx';
+import TextInput from '../components/form/TextInput.tsx';
+import { ShuffleIcon } from '../components/icons/Icons.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
+import { TOPIC_SUGGESTIONS } from '../constants.ts';
+import HintButton from '../components/HintButton.tsx';
 // FIX: Add .ts extension to import path
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
+import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
 // FIX: Switched to a named export to resolve a React.lazy type error. The original file content was corrupted with code from another module, causing numerous errors. The content has been fully restored.
 export const RhythmicCountingModule: React.FC = () => {

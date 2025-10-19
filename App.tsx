@@ -1,23 +1,23 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
-import { UIProvider, useUI } from './services/UIContext';
-import { WorksheetProvider, useWorksheet } from './services/WorksheetContext';
-import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext';
-import { ThemeProvider, useTheme } from './services/ThemeContext';
-import { ColorThemeProvider } from './services/ColorThemeContext';
-import { FontThemeProvider, useFontTheme, fontThemes } from './services/FontThemeContext';
-import { FlyingLadybugProvider } from './services/FlyingLadybugContext';
-import { ToastProvider, useToast } from './services/ToastContext';
-import Tabs from './components/Tabs';
-import SettingsPanel from './components/SettingsPanel';
-import ProblemSheet from './components/ProblemSheet';
-import ToastContainer from './components/ToastContainer';
-import PrintSettingsPanel from './components/PrintSettingsPanel';
-import HowToUseModal from './components/HowToUseModal';
-import ContactModal from './components/ContactModal';
-import FavoritesPanel from './components/FavoritesPanel';
-import AnimatedLogo from './components/AnimatedLogo';
-import ThemeSwitcher from './components/ThemeSwitcher';
-import { TAB_GROUPS } from './constants';
+import { UIProvider, useUI } from './services/UIContext.tsx';
+import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
+import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext.tsx';
+import { ThemeProvider, useTheme } from './services/ThemeContext.tsx';
+import { ColorThemeProvider } from './services/ColorThemeContext.tsx';
+import { FontThemeProvider, useFontTheme, fontThemes } from './services/FontThemeContext.tsx';
+import { FlyingLadybugProvider } from './services/FlyingLadybugContext.tsx';
+import { ToastProvider, useToast } from './services/ToastContext.tsx';
+import Tabs from './components/Tabs.tsx';
+import SettingsPanel from './components/SettingsPanel.tsx';
+import ProblemSheet from './components/ProblemSheet.tsx';
+import ToastContainer from './components/ToastContainer.tsx';
+import PrintSettingsPanel from './components/PrintSettingsPanel.tsx';
+import HowToUseModal from './components/HowToUseModal.tsx';
+import ContactModal from './components/ContactModal.tsx';
+import FavoritesPanel from './components/FavoritesPanel.tsx';
+import AnimatedLogo from './components/AnimatedLogo.tsx';
+import ThemeSwitcher from './components/ThemeSwitcher.tsx';
+import { TAB_GROUPS } from './constants.ts';
 import { 
     DoubleArrowLeftIcon,
     PrintIcon,
@@ -29,11 +29,11 @@ import {
     DownloadIcon,
     MenuIcon,
     MoreVerticalIcon
-} from './components/icons/Icons';
-import Button from './components/form/Button';
-import Select from './components/form/Select';
-import NumberInput from './components/form/NumberInput';
-import { useFlyingLadybugs } from './services/FlyingLadybugContext';
+} from './components/icons/Icons.tsx';
+import Button from './components/form/Button.tsx';
+import Select from './components/form/Select.tsx';
+import NumberInput from './components/form/NumberInput.tsx';
+import { useFlyingLadybugs } from './services/FlyingLadybugContext.tsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';

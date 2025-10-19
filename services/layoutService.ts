@@ -1,6 +1,6 @@
 // FIX: Added React import to resolve namespace error for React.RefObject.
 import React from 'react';
-import { PrintSettings } from '../types';
+import { PrintSettings } from '../types.ts';
 
 // A helper function to get computed style with a fallback for Jest/JSDOM environment
 const getComputedStyleWithFallback = (element: Element, pseudoElt?: string | null): CSSStyleDeclaration => {

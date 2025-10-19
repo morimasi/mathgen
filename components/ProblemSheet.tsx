@@ -1,8 +1,8 @@
 import React from 'react';
-import { useWorksheet } from '../services/WorksheetContext';
-import { usePrintSettings } from '../services/PrintSettingsContext';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 // FIX: Add .ts extension to import path
-import { Problem } from '../types';
+import { Problem } from '../types.ts';
 
 
 const ProblemSheet: React.FC = () => {

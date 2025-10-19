@@ -1,21 +1,21 @@
 // FIX: Add .ts extension to import path
-import { ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types';
-import Button from '../components/form/Button';
-import NumberInput from '../components/form/NumberInput';
-import Select from '../components/form/Select';
-import Checkbox from '../components/form/Checkbox';
-import TextInput from '../components/form/TextInput';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import { ShuffleIcon, MicrophoneIcon, MicrophoneOffIcon } from '../components/icons/Icons';
-import SettingsPresetManager from '../components/SettingsPresetManager';
+import { ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types.ts';
+import Button from '../components/form/Button.tsx';
+import NumberInput from '../components/form/NumberInput.tsx';
+import Select from '../components/form/Select.tsx';
+import Checkbox from '../components/form/Checkbox.tsx';
+import TextInput from '../components/form/TextInput.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import { ShuffleIcon, MicrophoneIcon, MicrophoneOffIcon } from '../components/icons/Icons.tsx';
+import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import React, { useState, useEffect, useRef } from 'react';
-import { generateArithmeticProblem } from '../services/mathService';
-import { generateContextualWordProblems } from '../services/geminiService';
-import { TOPIC_SUGGESTIONS } from '../constants';
-import HintButton from '../components/HintButton';
-import { useProblemGenerator } from '../hooks/useProblemGenerator';
-import { useToast } from '../services/ToastContext';
-import { parseSpokenMath } from '../services/utils';
+import { generateArithmeticProblem } from '../services/mathService.ts';
+import { generateContextualWordProblems } from '../services/geminiService.ts';
+import { TOPIC_SUGGESTIONS } from '../constants.ts';
+import HintButton from '../components/HintButton.tsx';
+import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useToast } from '../services/ToastContext.tsx';
+import { parseSpokenMath } from '../services/utils.ts';
 
 declare global {
     interface Window {

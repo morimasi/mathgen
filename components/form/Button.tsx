@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFlyingLadybugs } from '../../services/FlyingLadybugContext';
+import { useFlyingLadybugs } from '../../services/FlyingLadybugContext.tsx';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';

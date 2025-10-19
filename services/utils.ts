@@ -1,5 +1,5 @@
 // --- NUMBER TO WORDS (TURKISH) ---
-import { ArithmeticOperation } from '../types';
+import { ArithmeticOperation } from '../types.ts';
 
 const ones = ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"];
 const tens = ["", "on", "yirmi", "otuz", "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan"];
