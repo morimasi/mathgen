@@ -15,6 +15,7 @@ const initialPrintSettings: PrintSettings = {
     columnGap: 2,
     fontSize: 16,
     showHeader: false,
+    studentName: '',
     showProblemNumbers: false,
     includeAnswerKey: false,
     notebookStyle: 'none',

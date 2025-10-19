@@ -18,6 +18,7 @@ export interface PrintSettings {
     columnGap: number;
     fontSize: number;
     showHeader: boolean;
+    studentName: string;
     showProblemNumbers: boolean;
     includeAnswerKey: boolean;
     notebookStyle: 'none' | 'lines' | 'grid' | 'dotted' | 'handwriting';
