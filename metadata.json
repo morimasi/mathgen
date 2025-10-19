@@ -1,5 +1,5 @@
 {
-  "name": "Matematik İşlem Becerileri",
+  "name": "Matematik İşlem Becerileri(geliştirme)",
   "description": "Öğretmenler ve veliler için ilkokul seviyesinde, farklı zorluklarda özelleştirilebilir ve yazdırılabilir matematik problemleri üreten bir web uygulaması.",
   "requestFramePermissions": [
     "microphone"
