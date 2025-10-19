@@ -2,11 +2,13 @@
 
 
 
+
+
 import React, { useState } from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService';
 import { generateContextualWordProblems } from '../services/geminiService';
 // FIX: Add .ts extension to import path
-import { RhythmicCountingSettings, RhythmicProblemType } from '../types.ts';
+import { RhythmicCountingSettings, RhythmicProblemType } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';
@@ -18,7 +20,7 @@ import SettingsPresetManager from '../components/SettingsPresetManager';
 import { TOPIC_SUGGESTIONS } from '../constants';
 import HintButton from '../components/HintButton';
 // FIX: Add .ts extension to import path
-import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
 // FIX: Switched to a named export to resolve a React.lazy type error. The original file content was corrupted with code from another module, causing numerous errors. The content has been fully restored.
 export const RhythmicCountingModule: React.FC = () => {

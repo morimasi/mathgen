@@ -1,6 +1,6 @@
 // FIX: Add .ts extension to import paths
-import { Problem, TimeSettings, TimeProblemType } from '../types.ts';
-import { drawAnalogClock } from './svgService.ts';
+import { Problem, TimeSettings, TimeProblemType } from '../types';
+import { drawAnalogClock } from './svgService';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 const padZero = (num: number) => String(num).padStart(2, '0');
@@ -10,6 +10,8 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
     let problem: Problem;
     let title = '';
     const problemBase = { category: 'time' };
+    let question: string;
+    let answer: string | number;
 
     switch (type) {
         case TimeProblemType.ReadAnalog:
@@ -26,7 +28,7 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
             }
 
             const timeStr = `${padZero(hour)}:${padZero(minute)}`;
-            const answer = timeStr;
+            answer = timeStr;
 
             if (type === TimeProblemType.ReadAnalog) {
                 const svg = drawAnalogClock(hour, minute, clockFace);
@@ -36,11 +38,11 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
                 } else if (digitalClockDisplay === 'box') {
                     answerBox = `<div style="font-size: 1.5rem; font-family: monospace; text-align: center; border: 1px solid black; padding: 5px; margin: 0.5rem auto; width: 80px;">__:__</div>`;
                 }
-                const question = `<div style="display: flex; flex-direction: column; align-items: center;">${svg}${answerBox}</div>`;
+                question = `<div style="display: flex; flex-direction: column; align-items: center;">${svg}${answerBox}</div>`;
                 problem = { ...problemBase, question, answer };
             } else { // DrawTime
                 const svg = drawAnalogClock(0, 0, 'no-hands');
-                 const question = `<div style="display: flex; flex-direction: column; align-items: center;">
+                 question = `<div style="display: flex; flex-direction: column; align-items: center;">
                     <div style="font-size: 1.5rem; font-family: monospace; text-align: center; letter-spacing: 2px; margin-bottom: 0.5rem;">${timeStr}</div>
                     ${svg}
                 </div>`;
@@ -65,10 +67,6 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
             const startTime = `${padZero(startHour)}:${padZero(startMinute)}`;
             const endTime = `${padZero(endHour)}:${padZero(endMinute)}`;
             const duration = durationMinutes < 60 ? `${durationMinutes} dakika` : `${Math.floor(durationMinutes / 60)} saat ${durationMinutes % 60 === 0 ? '' : `${durationMinutes % 60} dakika`}`.trim();
-
-            // FIX: Declare question and answer variables to resolve scope errors.
-            let question: string;
-            let answer: string;
 
             switch(type) {
                 case TimeProblemType.Duration:
@@ -101,9 +99,8 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
             ];
             const conv = conversions[getRandomInt(0, conversions.length - 1)];
             const num = parseInt(conv.q);
-            // FIX: Declare question and answer variables to resolve scope errors.
-            const question = conv.q;
-            const answer = conv.a(num);
+            question = conv.q;
+            answer = conv.a(num);
             problem = { ...problemBase, question, answer, display: 'inline' };
             break;
         }
@@ -112,9 +109,8 @@ export const generateTimeProblem = (settings: TimeSettings): { problem: Problem,
             title = "Takvim Problemleri";
             const day = getRandomInt(1, 28);
             const month = "Mayıs";
-            const question = `Bugün ${day} ${month} ise, 1 hafta sonrası hangi tarihtir?`;
-            // FIX: Declare answer variable to resolve scope error.
-            const answer = `${day + 7} ${month}`;
+            question = `Bugün ${day} ${month} ise, 1 hafta sonrası hangi tarihtir?`;
+            answer = `${day + 7} ${month}`;
             problem = { ...problemBase, question, answer, display: 'inline' };
             break;
         }

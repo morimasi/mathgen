@@ -1,9 +1,9 @@
 import { useCallback, useRef, useEffect } from 'react';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
-import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
-import { calculateMaxProblems } from '../services/layoutService.ts';
-import { useToast } from '../services/ToastContext.tsx';
-import { Problem } from '../types.ts';
+import { useWorksheet } from '../services/WorksheetContext';
+import { usePrintSettings } from '../services/PrintSettingsContext';
+import { calculateMaxProblems } from '../services/layoutService';
+import { useToast } from '../services/ToastContext';
+import { Problem } from '../types';
 
 interface GeneratorOptions<S> {
     moduleKey: string;

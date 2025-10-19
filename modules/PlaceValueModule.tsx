@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { generatePlaceValueProblem } from '../services/placeValueService';
 import { generateContextualWordProblems } from '../services/geminiService';
 // FIX: Add .ts extension to import path
-import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types.ts';
+import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';

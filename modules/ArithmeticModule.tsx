@@ -1,5 +1,5 @@
 // FIX: Add .ts extension to import path
-import { ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types.ts';
+import { ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import Select from '../components/form/Select';

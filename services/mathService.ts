@@ -1,6 +1,6 @@
 // FIX: Add .ts extension to import paths
-import { Problem, DecimalsOperation, ArithmeticOperation, CarryBorrowPreference, DivisionType, DecimalsSettings, ArithmeticSettings, VisualSupportSettings } from '../types.ts';
-import { numberToWords } from './utils.ts';
+import { Problem, DecimalsOperation, ArithmeticOperation, CarryBorrowPreference, DivisionType, DecimalsSettings, ArithmeticSettings, VisualSupportSettings } from '../types';
+import { numberToWords } from './utils';
 
 // --- UTILS ---
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;

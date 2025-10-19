@@ -1,5 +1,5 @@
 // FIX: Add .ts extension to import path
-import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types.ts';
+import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types';
 
 const getRandomInt = (min: number, max: number): number => {
   if (min > max) [min, max] = [max, min];
@@ -224,88 +224,4 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             
             if (useMultiplesOnly) {
                 const minMultiplier = Math.ceil(validMin / step);
-                const maxMultiplier = Math.floor(validMax / step);
-                if (maxMultiplier < minMultiplier) return { 
-                    problem: { ...problemBase, question: 'Hata', answer: 'Hata' }, 
-                    title: "Hata",
-                    error: "Belirtilen aralıkta ve adımda, sadece katları kullanarak bir örüntü oluşturulamadı. Lütfen Min/Max değerlerini veya Adım ayarını değiştirin."
-                };
-                start = getRandomInt(minMultiplier, maxMultiplier) * step;
-            } else {
-                start = getRandomInt(validMin, validMax);
-            }
-
-            const sequence = Array.from({ length: patternLength || 5 }, (_, i) => start + i * effectiveStep);
-            
-            if (type === RhythmicProblemType.FindRule) {
-                const question = `<div style="${ROW_STYLE}">${sequence.join(SEPARATOR)}</div>`;
-                const answer = `${Math.abs(step)}'er ${currentDirection === 'forward' ? 'artıyor' : 'azalıyor'}`;
-                problem = { ...problemBase, question, answer };
-                break;
-            }
-
-            const validIndicesRange = { min: 1, max: (patternLength || 5) - 2 };
-            if (validIndicesRange.min > validIndicesRange.max) return { 
-                problem: { ...problemBase, question: 'Hata', answer: 'Hata' }, 
-                title: "Hata",
-                error: "Örüntü çok kısa. 'Eksik Sayısı' için daha uzun bir 'Örüntü Uzunluğu' gereklidir (en az 3)."
-            };
-
-            const effectiveMissingCount = Math.min(missingCount, validIndicesRange.max - validIndicesRange.min + 1);
-            const missingIndices = new Set<number>();
-            while (missingIndices.size < effectiveMissingCount) {
-                missingIndices.add(getRandomInt(validIndicesRange.min, validIndicesRange.max));
-            }
-
-            const answers = Array.from(missingIndices).map(index => sequence[index]).sort((a, b) => a - b);
-            const answer = answers.join(', ');
-
-            const boxes = sequence.map((num, index) => 
-                missingIndices.has(index)
-                    ? `<span style="${BOX_STYLE}"></span>` 
-                    : `<span style="${BOX_STYLE}">${num}</span>`
-            );
-
-            const question = `<div style="${ROW_STYLE}">${boxes.join(SEPARATOR)}</div>`;
-            problem = { ...problemBase, question, answer };
-            break;
-        }
-        
-        case RhythmicProblemType.OddEven: {
-            const num = getRandomInt(min, max);
-            const question = `<span style="font-size: 1.25em; font-family: monospace;">${num}</span>`;
-            const answer = num % 2 === 0 ? 'Çift' : 'Tek';
-            problem = { ...problemBase, question, answer };
-            break;
-        }
-
-        case RhythmicProblemType.Comparison: {
-            const num1 = getRandomInt(min, max);
-            let num2 = getRandomInt(min, max);
-            while (num1 === num2) num2 = getRandomInt(min, max);
-            const answer = num1 > num2 ? '>' : (num1 < num2 ? '<' : '=');
-            const question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} ___ ${num2}</span>`;
-            problem = { ...problemBase, question, answer };
-            break;
-        }
-        
-        case RhythmicProblemType.Ordering: {
-            const { orderCount = 5 } = settings;
-            const getRandomByDigits = (d: number) => d === 1 ? getRandomInt(0, 9) : getRandomInt(Math.pow(10, d - 1), Math.pow(10, d) - 1);
-            const numbers = new Set<number>();
-            while(numbers.size < orderCount) numbers.add(getRandomByDigits(digits));
-            
-            const numArray = Array.from(numbers);
-            const sorted = [...numArray].sort((a,b) => a - b);
-            if (currentOrderDirection === 'descending') sorted.reverse();
-            const answer = sorted.join(' < ');
-
-            const question = `<div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; align-items: center; font-size: 1.25em; font-family: monospace;">
-                ${shuffleArray(numArray).map(n => `<span style="border: 1px solid #9ca3af; padding: 0.25rem 0.5rem; border-radius: 4px;">${n}</span>`).join('')}
-            </div>`;
-            problem = { ...problemBase, question, answer };
-            break;
-        }
-    }
-    return { problem, title };
-};
+                

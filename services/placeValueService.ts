@@ -1,6 +1,6 @@
 // FIX: Add .ts extension to import paths
-import { Problem, PlaceValueProblemType, PlaceValueSettings } from '../types.ts';
-import { numberToWords } from './utils.ts';
+import { Problem, PlaceValueProblemType, PlaceValueSettings } from '../types';
+import { numberToWords } from './utils';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
