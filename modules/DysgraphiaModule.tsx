@@ -1,34 +1,34 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Problem, DysgraphiaSettings, DysgraphiaSubModuleType } from '../types.ts';
-import Button from '../components/form/Button.tsx';
-import NumberInput from '../components/form/NumberInput.tsx';
-import { ShuffleIcon } from '../components/icons/Icons.tsx';
-import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
-import { calculateMaxProblems } from '../services/layoutService.ts';
-import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
-import { generateDysgraphiaProblem } from '../services/dysgraphiaService.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { Problem, DysgraphiaSettings, DysgraphiaSubModuleType } from '../types';
+import Button from '../components/form/Button';
+import NumberInput from '../components/form/NumberInput';
+import { ShuffleIcon } from '../components/icons/Icons';
+import { usePrintSettings } from '../services/PrintSettingsContext';
+import { calculateMaxProblems } from '../services/layoutService';
+import SettingsPresetManager from '../components/SettingsPresetManager';
+import { generateDysgraphiaProblem } from '../services/dysgraphiaService';
+import { useWorksheet } from '../services/WorksheetContext';
 
 // Import all sub-module setting components
-import FineMotorSkillsSettings from './dysgraphia/FineMotorSkillsSettings.tsx';
-import LetterFormationSettings from './dysgraphia/LetterFormationSettings.tsx';
-import LetterFormRecognitionSettings from './dysgraphia/LetterFormRecognitionSettings.tsx';
-import LegibleWritingSettings from './dysgraphia/LegibleWritingSettings.tsx';
-import PictureSequencingSettings from './dysgraphia/PictureSequencingSettings.tsx';
-import WritingSpeedSettings from './dysgraphia/WritingSpeedSettings.tsx';
-import SentenceConstructionSettings from './dysgraphia/SentenceConstructionSettings.tsx';
-import PunctuationSettings from './dysgraphia/PunctuationSettings.tsx';
-import WritingPlanningSettings from './dysgraphia/WritingPlanningSettings.tsx';
-import CreativeWritingSettings from './dysgraphia/CreativeWritingSettings.tsx';
-import KeyboardSkillsSettings from './dysgraphia/KeyboardSkillsSettings.tsx';
-import InteractiveStoryDgSettings from './dysgraphia/InteractiveStorySettings.tsx';
+import FineMotorSkillsSettings from './dysgraphia/FineMotorSkillsSettings';
+import LetterFormationSettings from './dysgraphia/LetterFormationSettings';
+import LetterFormRecognitionSettings from './dysgraphia/LetterFormRecognitionSettings';
+import LegibleWritingSettings from './dysgraphia/LegibleWritingSettings';
+import PictureSequencingSettings from './dysgraphia/PictureSequencingSettings';
+import WritingSpeedSettings from './dysgraphia/WritingSpeedSettings';
+import SentenceConstructionSettings from './dysgraphia/SentenceConstructionSettings';
+import PunctuationSettings from './dysgraphia/PunctuationSettings';
+import WritingPlanningSettings from './dysgraphia/WritingPlanningSettings';
+import CreativeWritingSettings from './dysgraphia/CreativeWritingSettings';
+import KeyboardSkillsSettings from './dysgraphia/KeyboardSkillsSettings';
+import InteractiveStoryDgSettings from './dysgraphia/InteractiveStorySettings';
 
 // Import all sub-module icons
 import {
     FineMotorSkillsIcon, LetterFormationIcon, LetterFormRecognitionIcon, LegibleWritingIcon, PictureSequencingIcon,
     WritingSpeedIcon, SentenceConstructionIcon, PunctuationIcon, WritingPlanningIcon, CreativeWritingIcon,
     KeyboardSkillsIcon, InteractiveStoryIcon
-} from '../components/icons/Icons.tsx';
+} from '../components/icons/Icons';
 
 const subModules: { id: DysgraphiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
     { id: 'fine-motor-skills', label: 'İnce Motor Becerileri', icon: FineMotorSkillsIcon },

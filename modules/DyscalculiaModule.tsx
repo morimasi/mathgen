@@ -1,27 +1,27 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Problem, DyscalculiaSettings, DyscalculiaSubModuleType } from '../types.ts';
-import Button from '../components/form/Button.tsx';
-import NumberInput from '../components/form/NumberInput.tsx';
-import { ShuffleIcon } from '../components/icons/Icons.tsx';
-import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
-import { calculateMaxProblems } from '../services/layoutService.ts';
-import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
-import { generateDyscalculiaProblem } from '../services/dyscalculiaService.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { Problem, DyscalculiaSettings, DyscalculiaSubModuleType } from '../types';
+import Button from '../components/form/Button';
+import NumberInput from '../components/form/NumberInput';
+import { ShuffleIcon } from '../components/icons/Icons';
+import { usePrintSettings } from '../services/PrintSettingsContext';
+import { calculateMaxProblems } from '../services/layoutService';
+import SettingsPresetManager from '../components/SettingsPresetManager';
+import { generateDyscalculiaProblem } from '../services/dyscalculiaService';
+import { useWorksheet } from '../services/WorksheetContext';
 
 // Import all sub-module setting components
-import NumberSenseSettings from './dyscalculia/NumberSenseSettings.tsx';
-import ArithmeticFluencySettings from './dyscalculia/ArithmeticFluencySettings.tsx';
-import NumberGroupingSettings from './dyscalculia/NumberGroupingSettings.tsx';
-import ProblemSolvingSettings from './dyscalculia/ProblemSolvingSettings.tsx';
-import MathLanguageSettings from './dyscalculia/MathLanguageSettings.tsx';
-import TimeMeasurementGeometrySettings from './dyscalculia/TimeMeasurementGeometrySettings.tsx';
-import SpatialReasoningSettings from './dyscalculia/SpatialReasoningSettings.tsx';
-import EstimationSkillsSettings from './dyscalculia/EstimationSkillsSettings.tsx';
-import FractionsDecimalsIntroSettings from './dyscalculia/FractionsDecimalsIntroSettings.tsx';
-import VisualNumberRepresentationSettings from './dyscalculia/VisualNumberRepresentationSettings.tsx';
-import VisualArithmeticSettings from './dyscalculia/VisualArithmeticSettings.tsx';
-import InteractiveStoryDcSettings from './dyscalculia/InteractiveStorySettings.tsx';
+import NumberSenseSettings from './dyscalculia/NumberSenseSettings';
+import ArithmeticFluencySettings from './dyscalculia/ArithmeticFluencySettings';
+import NumberGroupingSettings from './dyscalculia/NumberGroupingSettings';
+import ProblemSolvingSettings from './dyscalculia/ProblemSolvingSettings';
+import MathLanguageSettings from './dyscalculia/MathLanguageSettings';
+import TimeMeasurementGeometrySettings from './dyscalculia/TimeMeasurementGeometrySettings';
+import SpatialReasoningSettings from './dyscalculia/SpatialReasoningSettings';
+import EstimationSkillsSettings from './dyscalculia/EstimationSkillsSettings';
+import FractionsDecimalsIntroSettings from './dyscalculia/FractionsDecimalsIntroSettings';
+import VisualNumberRepresentationSettings from './dyscalculia/VisualNumberRepresentationSettings';
+import VisualArithmeticSettings from './dyscalculia/VisualArithmeticSettings';
+import InteractiveStoryDcSettings from './dyscalculia/InteractiveStorySettings';
 
 
 // Import all sub-module icons
@@ -29,7 +29,7 @@ import {
     NumberSenseIcon, ArithmeticFluencyIcon, NumberGroupingIcon, ProblemSolvingIcon, MathLanguageIcon,
     TimeIcon, SpatialReasoningIcon, EstimationSkillsIcon, FractionsDecimalsIntroIcon,
     VisualNumberRepresentationIcon, VisualArithmeticIcon, InteractiveStoryIcon
-} from '../components/icons/Icons.tsx';
+} from '../components/icons/Icons';
 
 const subModules: { id: DyscalculiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
     { id: 'number-sense', label: 'Sayı Hissi', icon: NumberSenseIcon },

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
-import { Problem, VisualSupportSettings, ArithmeticOperation } from '../types.ts';
+import { Problem, VisualSupportSettings, ArithmeticOperation } from '../types';
 
 interface UpdateWorksheetArgs {
     newProblems: Problem[];

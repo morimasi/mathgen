@@ -1,8 +1,8 @@
 import React from 'react';
-import { PictureSequencingSettings } from '../../types.ts';
-import Select from '../../components/form/Select.tsx';
-import TextInput from '../../components/form/TextInput.tsx';
-import HintButton from '../../components/HintButton.tsx';
+import { PictureSequencingSettings } from '../../types';
+import Select from '../../components/form/Select';
+import TextInput from '../../components/form/TextInput';
+import HintButton from '../../components/HintButton';
 
 interface Props {
     settings: PictureSequencingSettings;

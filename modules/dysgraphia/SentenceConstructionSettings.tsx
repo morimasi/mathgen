@@ -1,7 +1,7 @@
 import React from 'react';
-import { SentenceConstructionSettings } from '../../types.ts';
-import NumberInput from '../../components/form/NumberInput.tsx';
-import HintButton from '../../components/HintButton.tsx';
+import { SentenceConstructionSettings } from '../../types';
+import NumberInput from '../../components/form/NumberInput';
+import HintButton from '../../components/HintButton';
 
 interface Props {
     settings: SentenceConstructionSettings;

@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { generateGeometryProblem } from '../services/geometryService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
+// FIX: Add .ts extension to import path
 import { GeometrySettings, GeometryProblemType, ShapeType } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
@@ -84,6 +85,7 @@ const GeometryModule: React.FC = () => {
         [ShapeType.Trapezoid]: 'Yamuk',
         [ShapeType.Pentagon]: 'Beşgen',
         [ShapeType.Hexagon]: 'Altıgen',
+        // FIX: Added missing Rhombus type to satisfy the ShapeType enum.
         [ShapeType.Rhombus]: 'Eşkenar Dörtgen',
     };
     

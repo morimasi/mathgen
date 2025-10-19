@@ -1,28 +1,27 @@
 import React, { useState, useCallback } from 'react';
-import { generateReadinessProblem } from '../services/readinessService.ts';
-import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { SimpleGraphsSettings, SimpleGraphType, MathReadinessTheme, SimpleGraphTaskType } from '../types.ts';
-import Button from '../components/form/Button.tsx';
-import NumberInput from '../components/form/NumberInput.tsx';
-import Select from '../components/form/Select.tsx';
-import Checkbox from '../components/form/Checkbox.tsx';
-import TextInput from '../components/form/TextInput.tsx';
-import { ShuffleIcon } from '../components/icons/Icons.tsx';
-import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
-import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
-import { TOPIC_SUGGESTIONS } from '../constants.ts';
-import HintButton from '../components/HintButton.tsx';
-import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { generateReadinessProblem } from '../services/readinessService';
+import { generateContextualWordProblems } from '../services/geminiService';
+import { SimpleGraphsSettings, SimpleGraphType, MathReadinessTheme, SimpleGraphTaskType } from '../types';
+import Button from '../components/form/Button';
+import NumberInput from '../components/form/NumberInput';
+import Select from '../components/form/Select';
+import Checkbox from '../components/form/Checkbox';
+import TextInput from '../components/form/TextInput';
+import { ShuffleIcon } from '../components/icons/Icons';
+import { usePrintSettings } from '../services/PrintSettingsContext';
+import SettingsPresetManager from '../components/SettingsPresetManager';
+import { TOPIC_SUGGESTIONS } from '../constants';
+import HintButton from '../components/HintButton';
+import { useProblemGenerator } from '../hooks/useProblemGenerator';
 
-// FIX: Switched to a named export to resolve a React.lazy type error. The original file was empty.
-export const SimpleGraphsModule: React.FC = () => {
+const SimpleGraphsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<SimpleGraphsSettings>({
         graphType: SimpleGraphType.Pictograph,
-        taskType: SimpleGraphTaskType.Read,
-        theme: 'mixed',
+        taskType: SimpleGraphTaskType.Create,
+        theme: 'fruits',
         categoryCount: 3,
-        maxItemCount: 8,
+        maxItemCount: 5,
         problemsPerPage: 2,
         pageCount: 1,
         autoFit: true,
@@ -56,10 +55,10 @@ export const SimpleGraphsModule: React.FC = () => {
     return (
         <div className="space-y-2">
             <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold">Basit Grafikler Ayarları</h2>
-                <HintButton text="'Grafik Oluşturma' görevinde öğrenci, verilen nesneleri sayıp boş bir grafiğe işler. 'Grafik Okuma' görevinde ise dolu bir grafik üzerinden sorulan soruları yanıtlar." />
+                <h2 className="text-sm font-semibold">Basit Grafikler ve Veri Ayarları</h2>
+                <HintButton text="'Grafik Oluşturma' veri toplama ve grafiğe işleme becerisi kazandırırken, yeni 'Grafik Okuma' etkinliği ise hazır bir grafiği yorumlama ve veri analizi becerisi geliştirir." />
             </div>
-            <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+             <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Checkbox
                     label="Gerçek Hayat Problemleri (AI)"
                     id="use-word-problems-graphs"
@@ -70,11 +69,11 @@ export const SimpleGraphsModule: React.FC = () => {
                     <div className="mt-1.5 pl-6">
                          <div className="relative">
                             <TextInput
-                                label="Problem Konusu (İsteğe Bağlı)"
+                                label="Problem Konusu (İsteğe bağlı)"
                                 id="graphs-topic"
                                 value={settings.topic || ''}
                                 onChange={e => handleSettingChange('topic', e.target.value)}
-                                placeholder="Örn: Sınıftaki Öğrenciler, Hayvanat Bahçesi"
+                                placeholder="Örn: Sınıftaki Oyuncaklar"
                                 className="pr-10"
                             />
                             <button
@@ -89,25 +88,25 @@ export const SimpleGraphsModule: React.FC = () => {
                     </div>
                 )}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1.5">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                <Select
+                    label="Etkinlik Türü"
+                    id="graph-task-type"
+                    value={settings.taskType}
+                    onChange={e => handleSettingChange('taskType', e.target.value as SimpleGraphTaskType)}
+                    options={[
+                        { value: SimpleGraphTaskType.Create, label: 'Grafik Oluşturma' },
+                        { value: SimpleGraphTaskType.Read, label: 'Grafik Okuma' },
+                    ]}
+                />
                 <Select
                     label="Grafik Türü"
                     id="graph-type"
                     value={settings.graphType}
                     onChange={e => handleSettingChange('graphType', e.target.value as SimpleGraphType)}
                     options={[
-                        { value: SimpleGraphType.Pictograph, label: 'Resim Grafiği' },
-                        { value: SimpleGraphType.BarChart, label: 'Sütun Grafiği' },
-                    ]}
-                />
-                 <Select
-                    label="Görev Türü"
-                    id="task-type"
-                    value={settings.taskType}
-                    onChange={e => handleSettingChange('taskType', e.target.value as SimpleGraphTaskType)}
-                    options={[
-                        { value: SimpleGraphTaskType.Read, label: 'Grafik Okuma' },
-                        { value: SimpleGraphTaskType.Create, label: 'Grafik Oluşturma' },
+                        { value: SimpleGraphType.Pictograph, label: 'Resim Grafiği (Piktograf)' },
+                        { value: SimpleGraphType.BarChart, label: 'Çubuk Grafiği' },
                     ]}
                 />
                 <Select
@@ -116,11 +115,11 @@ export const SimpleGraphsModule: React.FC = () => {
                     value={settings.theme}
                     onChange={e => handleSettingChange('theme', e.target.value as MathReadinessTheme)}
                     options={[
-                        { value: 'mixed', label: 'Karışık' },
+                        { value: 'fruits', label: 'Meyveler/Yiyecekler' },
                         { value: 'animals', label: 'Hayvanlar' },
                         { value: 'vehicles', label: 'Taşıtlar' },
-                        { value: 'fruits', label: 'Meyveler/Yiyecekler' },
                         { value: 'shapes', label: 'Şekiller' },
+                        { value: 'mixed', label: 'Karışık' },
                     ]}
                 />
                 <NumberInput 
@@ -131,7 +130,7 @@ export const SimpleGraphsModule: React.FC = () => {
                     onChange={e => handleSettingChange('categoryCount', parseInt(e.target.value))}
                 />
                 <NumberInput 
-                    label="En Fazla Nesne Sayısı"
+                    label="En Fazla Nesne"
                     id="max-item-count"
                     min={3} max={10}
                     value={settings.maxItemCount}
@@ -140,7 +139,7 @@ export const SimpleGraphsModule: React.FC = () => {
                 <NumberInput 
                     label="Sayfa Başına Problem"
                     id="problems-per-page"
-                    min={1} max={4}
+                    min={1} max={5}
                     value={settings.problemsPerPage}
                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
                     disabled={settings.autoFit || isTableLayout}
@@ -149,7 +148,7 @@ export const SimpleGraphsModule: React.FC = () => {
                 <NumberInput 
                     label="Sayfa Sayısı"
                     id="page-count"
-                    min={1} max={20}
+                    min={1} max={10}
                     value={settings.pageCount}
                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
                     disabled={isTableLayout}
@@ -168,3 +167,5 @@ export const SimpleGraphsModule: React.FC = () => {
         </div>
     );
 };
+
+export default SimpleGraphsModule;

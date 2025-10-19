@@ -1,7 +1,7 @@
 import React from 'react';
-import { FractionsDecimalsIntroSettings } from '../../types.ts';
-import Select from '../../components/form/Select.tsx';
-import HintButton from '../../components/HintButton.tsx';
+import { FractionsDecimalsIntroSettings } from '../../types';
+import Select from '../../components/form/Select';
+import HintButton from '../../components/HintButton';
 
 interface Props {
     settings: FractionsDecimalsIntroSettings;

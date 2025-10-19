@@ -1,7 +1,7 @@
 import React from 'react';
-import { EstimationSkillsSettings } from '../../types.ts';
-import Select from '../../components/form/Select.tsx';
-import HintButton from '../../components/HintButton.tsx';
+import { EstimationSkillsSettings } from '../../types';
+import Select from '../../components/form/Select';
+import HintButton from '../../components/HintButton';
 
 interface Props {
     settings: EstimationSkillsSettings;

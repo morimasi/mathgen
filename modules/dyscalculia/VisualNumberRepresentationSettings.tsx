@@ -1,8 +1,8 @@
 import React from 'react';
-import { VisualNumberRepresentationSettings } from '../../types.ts';
-import Select from '../../components/form/Select.tsx';
-import NumberInput from '../../components/form/NumberInput.tsx';
-import HintButton from '../../components/HintButton.tsx';
+import { VisualNumberRepresentationSettings } from '../../types';
+import Select from '../../components/form/Select';
+import NumberInput from '../../components/form/NumberInput';
+import HintButton from '../../components/HintButton';
 
 interface Props {
     settings: VisualNumberRepresentationSettings;

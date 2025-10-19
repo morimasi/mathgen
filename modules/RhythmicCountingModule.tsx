@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
+// FIX: Add .ts extension to import path
 import { RhythmicCountingSettings, RhythmicProblemType } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
@@ -12,6 +13,7 @@ import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
+// FIX: Add .ts extension to import path
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
 // FIX: Switched to a named export to resolve a React.lazy type error. The original file content was corrupted with code from another module, causing numerous errors. The content has been fully restored.
