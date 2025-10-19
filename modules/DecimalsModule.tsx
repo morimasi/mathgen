@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { generateDecimalProblem } from '../services/mathService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-// FIX: Add .ts extension to import path
 import { DecimalsSettings, DecimalsProblemType, DecimalsOperation, Difficulty } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';

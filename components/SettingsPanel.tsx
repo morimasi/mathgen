@@ -3,14 +3,12 @@ import { useUI } from '../services/UIContext.tsx';
 import { LoadingIcon } from './icons/Icons.tsx';
 
 // Lazily import all module components for code-splitting
-// FIX: Added file extensions (.tsx) to all lazy-loaded module imports to resolve module resolution errors.
 const ArithmeticModule = React.lazy(() => import('../modules/ArithmeticModule.tsx'));
 const FractionsModule = React.lazy(() => import('../modules/FractionsModule.tsx'));
 const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule.tsx'));
 const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule.tsx'));
 // FIX: Changed to a named import to resolve a type error with React.lazy.
 const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule.tsx').then(module => ({ default: module.RhythmicCountingModule })));
-// FIX: Add .tsx extension to import path
 const TimeModule = React.lazy(() => import('../modules/TimeModule.tsx'));
 const GeometryModule = React.lazy(() => import('../modules/GeometryModule.tsx'));
 const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule.tsx'));
@@ -24,7 +22,8 @@ const BasicShapesModule = React.lazy(() => import('../modules/BasicShapesModule.
 const PositionalConceptsModule = React.lazy(() => import('../modules/PositionalConceptsModule.tsx'));
 // FIX: Changed to a named import for IntroToMeasurementModule to resolve a type error with React.lazy, similar to the fix for RhythmicCountingModule.
 const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule.tsx').then(module => ({ default: module.IntroToMeasurementModule })));
-const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule.tsx'));
+// FIX: Changed to a named import for SimpleGraphsModule to resolve a type error with React.lazy.
+const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule.tsx').then(module => ({ default: module.SimpleGraphsModule })));
 const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
 const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule.tsx'));
 const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule.tsx'));

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useWorksheet } from '../services/WorksheetContext.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
-// FIX: Add .ts extension to import path
 import { Problem } from '../types.ts';
 
 
