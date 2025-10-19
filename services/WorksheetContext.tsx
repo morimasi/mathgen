@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
-import { Problem, VisualSupportSettings, ArithmeticOperation } from '../types.ts';
+import { Problem } from '../types.ts';
 
 interface UpdateWorksheetArgs {
     newProblems: Problem[];
@@ -21,7 +21,6 @@ interface WorksheetContextType {
     preamble: string | null;
     isLoading: boolean;
     pageCount: number;
-    visualSupportSettings: VisualSupportSettings;
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
     presetToLoad: PresetToLoad | null;
@@ -29,22 +28,10 @@ interface WorksheetContextType {
     clearWorksheet: () => void;
     setIsLoading: (loading: boolean) => void;
     triggerAutoRefresh: () => void;
-    setVisualSupportSettings: (settings: VisualSupportSettings) => void;
     setPresetToLoad: (preset: PresetToLoad | null) => void;
 }
 
 const WorksheetContext = createContext<WorksheetContextType | undefined>(undefined);
-
-const initialVisualSupportSettings: VisualSupportSettings = {
-    operation: ArithmeticOperation.Addition,
-    maxNumber: 10,
-    problemsPerPage: 12,
-    pageCount: 1,
-    autoFit: true,
-    emojiSize: 32,
-    numberSize: 16,
-    boxSize: 50,
-};
 
 export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [problems, setProblems] = useState<Problem[]>([]);
@@ -52,7 +39,6 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [preamble, setPreamble] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [pageCount, setPageCount] = useState(1);
-    const [visualSupportSettings, setVisualSupportSettings] = useState<VisualSupportSettings>(initialVisualSupportSettings);
     const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [presetToLoad, setPresetToLoad] = useState<PresetToLoad | null>(null);
@@ -83,7 +69,6 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             preamble,
             isLoading,
             pageCount,
-            visualSupportSettings,
             autoRefreshTrigger,
             lastGeneratorModule,
             presetToLoad,
@@ -91,7 +76,6 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             clearWorksheet,
             setIsLoading,
             triggerAutoRefresh,
-            setVisualSupportSettings,
             setPresetToLoad
         }}>
             {children}

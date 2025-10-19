@@ -11,7 +11,6 @@ interface GeneratorOptions<S> {
     generatorFn: (settings: S) => { problem: Problem, title: string, error?: string, preamble?: string };
     aiGeneratorFn?: (module: string, settings: S) => Promise<Problem[]>;
     aiGeneratorTitle?: string;
-    isLive?: boolean;
     isPracticeSheet?: boolean;
 }
 
@@ -21,14 +20,12 @@ export const useProblemGenerator = <S,>({
     generatorFn,
     aiGeneratorFn,
     aiGeneratorTitle,
-    isLive = false,
     isPracticeSheet = false,
 }: GeneratorOptions<S>) => {
     const { updateWorksheet, setIsLoading, lastGeneratorModule, autoRefreshTrigger } = useWorksheet();
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
     const contentRef = useRef<HTMLDivElement | null>(null);
-    const isInitialMount = useRef(true);
 
     useEffect(() => {
         if (!contentRef.current) {
@@ -113,22 +110,7 @@ export const useProblemGenerator = <S,>({
         addToast,
     ]);
 
-    // Handle live updates
-    useEffect(() => {
-        if (!isLive || isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        if (lastGeneratorModule === moduleKey) {
-            const handler = setTimeout(() => {
-                generate(true);
-            }, 300); // Debounce
-            return () => clearTimeout(handler);
-        }
-    }, [settings, printSettings, isLive, generate, lastGeneratorModule, moduleKey]);
-
-    // Handle auto refresh on print settings change
+    // Handle auto refresh on print settings change or header refresh button
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === moduleKey) {
             generate(true);

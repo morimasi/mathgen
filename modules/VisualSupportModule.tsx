@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { generateVisualProblem } from '../services/mathService.ts';
 import { VisualSupportSettings, ArithmeticOperation } from '../types.ts';
 import NumberInput from '../components/form/NumberInput.tsx';
@@ -8,22 +8,36 @@ import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import Button from '../components/form/Button.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
+import HintButton from '../components/HintButton.tsx';
+
+const initialVisualSupportSettings: VisualSupportSettings = {
+    operation: ArithmeticOperation.Addition,
+    maxNumber: 10,
+    problemsPerPage: 12,
+    pageCount: 1,
+    autoFit: true,
+    emojiSize: 32,
+    numberSize: 16,
+    boxSize: 50,
+};
 
 const VisualSupportModule: React.FC = () => {
-    const { visualSupportSettings: settings, setVisualSupportSettings: setSettings } = useWorksheet();
+    const [settings, setSettings] = useState<VisualSupportSettings>(initialVisualSupportSettings);
     const { settings: printSettings, setSettings: setPrintSettings } = usePrintSettings();
 
     const { generate } = useProblemGenerator({
         moduleKey: 'visual-support',
         settings,
         generatorFn: generateVisualProblem,
-        isLive: true,
     });
+    
+    const handleGenerate = useCallback((clearPrevious: boolean) => {
+        generate(clearPrevious);
+    }, [generate]);
 
     useEffect(() => {
         // Automatically generate on initial mount for this specific module
-        generate(true);
+        handleGenerate(true);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSettingChange = (field: keyof VisualSupportSettings, value: any) => {
@@ -41,10 +55,10 @@ const VisualSupportModule: React.FC = () => {
         <div className="space-y-2">
             <h2 className="text-sm font-semibold flex items-center gap-2">
                 Görsel Destek Ayarları
-                <span className="live-indicator" title="Bu modüldeki değişiklikler anında yansıtılır">Canlı</span>
+                <HintButton text="Bu modüldeki ayarları değiştirdikten sonra, değişiklikleri görmek için 'Uygula' düğmesine tıklayın." />
             </h2>
              <p className="text-xs text-stone-600 dark:text-stone-400">
-                Bu modül, nesneler ve kutular kullanarak temel matematik işlemleri için görsel alıştırmalar oluşturur. Ayarlar anında çalışma kağıdına yansır.
+                Bu modül, nesneler ve kutular kullanarak temel matematik işlemleri için görsel alıştırmalar oluşturur.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 pt-1">
@@ -108,16 +122,6 @@ const VisualSupportModule: React.FC = () => {
                                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10) || 1)}
                                     disabled={settings.autoFit}
                                 />
-                                <Button
-                                    onClick={() => generate(true)}
-                                    disabled={settings.autoFit}
-                                    size="sm"
-                                    variant="secondary"
-                                    className="h-[27px]"
-                                    title="Manuel sayfa ve problem sayısını uygula"
-                                >
-                                    Uygula
-                                </Button>
                             </div>
                         </div>
                     </div>
@@ -166,6 +170,10 @@ const VisualSupportModule: React.FC = () => {
                 currentSettings={settings}
                 onLoadSettings={setSettings}
             />
+            <div className="flex flex-wrap gap-2 pt-1.5">
+                <Button onClick={() => handleGenerate(true)} size="sm" enableFlyingLadybug>Uygula</Button>
+                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+            </div>
         </div>
     );
 };

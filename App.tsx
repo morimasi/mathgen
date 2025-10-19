@@ -350,9 +350,9 @@ const AppContent: React.FC = () => {
                     className="flex-1 flex flex-col overflow-hidden relative"
                 >
                     {isLoading && (
-                        <div className="absolute inset-0 bg-black/40 dark:bg-stone-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-30 gap-4">
+                        <div className="absolute inset-0 bg-stone-100/80 dark:bg-stone-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-30 gap-4">
                             <LoadingDaisy />
-                            <p className="text-white text-lg font-semibold animate-pulse">Etkinlik hazırlanıyor...</p>
+                            <p className="text-stone-800 dark:text-stone-200 text-lg font-semibold animate-pulse">Etkinlik hazırlanıyor...</p>
                         </div>
                     )}
                     <WorksheetToolbar />
