@@ -312,6 +312,90 @@
 }
 
 @layer components {
+  /* Module Transition */
+  .module-content {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Details/Summary animation */
+  details > summary {
+    list-style: none;
+    @apply transition-colors duration-200;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+  details > summary::before {
+    content: '▶';
+    margin-right: 0.5rem;
+    font-size: 0.6em;
+    display: inline-block;
+    vertical-align: middle;
+    transform: translateY(-1px);
+    transition: transform 0.2s ease-in-out;
+  }
+  details[open] > summary {
+    @apply mb-2;
+  }
+  details[open] > summary::before {
+    transform: rotate(90deg);
+  }
+  details > div {
+    animation: details-show 0.3s ease-out;
+  }
+  @keyframes details-show {
+    from {
+      opacity: 0;
+      transform: scale(0.98) translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Enhanced interactive element styles */
+  .action-button {
+    @apply flex items-center w-full px-4 py-2 text-sm text-left text-stone-700 dark:text-stone-300 rounded-md hover:bg-stone-100 dark:hover:bg-stone-700 transition-all duration-150;
+  }
+  .action-button > svg {
+      @apply mr-3 w-5 h-5 transition-transform duration-150;
+  }
+  .action-button:hover > svg {
+      @apply scale-110 rotate-3;
+  }
+
+  /* Subtle hover effects for header buttons */
+  header .p-2.rounded-md:hover svg {
+    transform: scale(1.15) rotate(8deg);
+  }
+  header .p-2.rounded-md svg {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  header .p-2.rounded-md:active svg {
+      transform: scale(0.9);
+      transition-duration: 0.1s;
+  }
+
+  /* Generic form element focus */
+  input, select, textarea {
+    @apply transition-all duration-150;
+  }
+  
+  /* Checkbox animation */
+  input[type="checkbox"] {
+    transition: all 0.2s ease;
+  }
+  input[type="checkbox"]:checked {
+    transform: scale(1.05);
+    @apply ring-2 ring-primary ring-offset-1 dark:ring-offset-stone-800;
+  }
+
+
   .worksheet-area {
     @apply flex flex-col items-center;
     transform: scale(var(--scale, 1));

@@ -156,8 +156,8 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
                         </button>
                         
                         <div
-                             className={`absolute left-0 mt-2 w-56 origin-top-left bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20 py-1 transition-all duration-150 ease-out ${
-                                 openMenu === group.title ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+                             className={`absolute left-0 mt-2 w-56 origin-top-left bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20 py-1 transition-all duration-150 ease-out transform ${
+                                 openMenu === group.title ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
                              }`}
                              role="menu"
                         >
