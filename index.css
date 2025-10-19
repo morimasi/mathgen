@@ -579,32 +579,6 @@
     @apply bg-amber-100 dark:bg-amber-900/50 border-t-4 border-amber-500 p-3 text-center text-amber-800 dark:text-amber-200;
     animation: fadeIn 0.3s ease-out;
   }
-
-  /* Theme Previews */
-  .theme-preview-button {
-    @apply w-full flex flex-col items-center gap-1.5 p-1 rounded-lg transition-colors duration-200 hover:bg-stone-100 dark:hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-stone-800 focus:ring-primary-focus;
-  }
-  .theme-preview-button.selected {
-    @apply ring-2 ring-primary bg-stone-100 dark:bg-stone-700;
-  }
-  .theme-preview {
-    @apply w-full h-20 rounded-sm shadow-inner p-1.5 flex flex-col overflow-hidden border border-black/10;
-    background-color: rgb(var(--theme-block-bg-rgb));
-    font-family: var(--font-worksheet);
-    color: rgb(var(--theme-block-text-rgb));
-  }
-  .theme-preview .preview-title {
-    @apply h-2 w-10/12 rounded-sm mb-2 opacity-60;
-    background-color: var(--theme-accent-text);
-  }
-  .theme-preview .preview-line {
-    @apply h-1.5 w-full rounded-sm mb-1.5 opacity-70;
-    background-color: currentColor;
-  }
-  .theme-preview .preview-line.short { @apply w-8/12; }
-  .preview-label {
-    @apply text-xs text-center text-stone-600 dark:text-stone-400 truncate w-full;
-  }
 }
 
 @media print {

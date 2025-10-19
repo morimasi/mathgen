@@ -76,7 +76,7 @@ const ProblemSheet: React.FC = () => {
             {settings.showHeader && (
                 <div className="worksheet-header">
                     <div className="header-field">Okul:</div>
-                    <div className="header-field">İsim: {settings.studentName}</div>
+                    <div className="header-field">İsim:</div>
                     <div className="header-field">Tarih:</div>
                 </div>
             )}

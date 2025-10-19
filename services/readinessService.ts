@@ -222,7 +222,7 @@ const generateMissingNumberPuzzles = (settings: MissingNumberPuzzlesSettings): {
     const result = n1 + n2;
 
     let question = '';
-    // FIX: Initialize 'answer' to prevent it from being potentially unassigned, which can cause type errors.
+    // FIX: Initialize 'answer' and explicitly type it as 'string | number' to fix a type error where it could be inferred as 'unknown' or be unassigned.
     let answer: string | number = '';
     const missingPart = getRandomInt(1, 3);
 

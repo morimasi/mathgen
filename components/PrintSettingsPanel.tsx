@@ -5,7 +5,6 @@ import { PrintSettings } from '../types.ts';
 import Checkbox from './form/Checkbox.tsx';
 import TableSelector from './form/TableSelector.tsx';
 import SettingsPresetManager from './SettingsPresetManager.tsx';
-import TextInput from './form/TextInput.tsx';
 
 interface PrintSettingsPanelProps {
     isVisible: boolean;
@@ -142,13 +141,6 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                      <div>
                         <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">İçerik</h3>
                         <div className="space-y-3">
-                            <TextInput
-                                label="Öğrenci Adı"
-                                id="print-student-name"
-                                value={settings.studentName}
-                                onChange={e => handleChange('studentName', e.target.value)}
-                                placeholder="Çalışma kağıdına eklenecek isim"
-                            />
                            <Checkbox
                                 label="Başlık Ekle (Okul, İsim, Tarih)"
                                 id="print-show-header"
