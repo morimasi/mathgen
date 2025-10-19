@@ -203,7 +203,7 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             const { step: definedStep = 2, direction = 'forward', useMultiplesOnly = false, patternLength = 5, missingCount = 1 } = settings;
             const currentDirection = direction === 'mixed' ? (getRandomInt(0, 1) === 0 ? 'forward' : 'backward') : direction;
             const step = Math.abs(definedStep);
-            const effectiveStep = currentDirection === 'backward' ? -step : step;
+            const effectiveStep = currentDirection === 'backward' ? -step : effectiveStep;
 
             let start: number;
             
@@ -224,4 +224,97 @@ export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettin
             
             if (useMultiplesOnly) {
                 const minMultiplier = Math.ceil(validMin / step);
+                const maxMultiplier = Math.floor(validMax / step);
+                if (maxMultiplier < minMultiplier) {
+                     return { 
+                        problem: { ...problemBase, question: 'Hata', answer: 'Hata' }, 
+                        title: "Hata",
+                        error: "Bu ayarlarla adımın katı olan bir başlangıç sayısı bulunamadı."
+                    };
+                }
+                start = getRandomInt(minMultiplier, maxMultiplier) * step;
+            } else {
+                start = getRandomInt(validMin, validMax);
+            }
+
+            const sequence: (number | string)[] = Array.from({ length: patternLength }, (_, i) => start + i * effectiveStep);
+            let answerParts: string[] = [];
+            
+            if (type === RhythmicProblemType.FindRule) {
+                const rule = currentDirection === 'forward' ? `${step}'er artan` : `${step}'er azalan`;
+                problem = {
+                    ...problemBase,
+                    question: `<div style="font-family: monospace; font-size: 1.25rem;">${sequence.join(' - ')}</div>`,
+                    answer: rule
+                };
+            } else { // Pattern completion
+                const missingIndexes = shuffleArray(Array.from({ length: patternLength }, (_, i) => i)).slice(0, missingCount);
+                missingIndexes.sort((a,b) => a-b);
                 
+                missingIndexes.forEach(index => {
+                    answerParts.push(String(sequence[index]));
+                    sequence[index] = '___';
+                });
+
+                problem = {
+                    ...problemBase,
+                    question: `<div style="font-family: monospace; font-size: 1.25rem;">${sequence.join(' - ')}</div>`,
+                    answer: answerParts.join(', ')
+                };
+            }
+            break;
+        }
+
+        case RhythmicProblemType.OddEven: {
+            const number = getRandomInt(min, max);
+            // FIX: Declare question and answer variables.
+            const question = `<b>${number}</b> sayısı tek mi çift mi?`;
+            const answer = number % 2 === 0 ? "Çift" : "Tek";
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+
+        case RhythmicProblemType.Ordering: {
+            const { orderCount = 5 } = settings;
+            const numbers: number[] = [];
+            while(numbers.length < orderCount) {
+                const newNum = getRandomInt(min, max);
+                if (!numbers.includes(newNum)) {
+                    numbers.push(newNum);
+                }
+            }
+            
+            const sorted = [...numbers].sort((a, b) => currentOrderDirection === 'descending' ? b - a : a - b);
+            
+            // FIX: Declare question and answer variables.
+            const question = `Bu sayıları ${orderText} sıralayınız:<br/><div style="font-size: 1.25rem; font-family: monospace; margin-top: 0.5rem;">${numbers.join(', ')}</div>`;
+            const answer = sorted.join(', ');
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+
+        case RhythmicProblemType.Comparison: {
+            let n1 = getRandomInt(min, max);
+            let n2 = getRandomInt(min, max);
+            while (n1 === n2) {
+                n2 = getRandomInt(min, max);
+            }
+            // FIX: Declare question and answer variables.
+            const question = `<span style="font-size: 1.5rem; font-family: monospace;">${n1} ___ ${n2}</span>`;
+            const answer = n1 > n2 ? '>' : '<';
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+
+        default:
+            problem = { ...problemBase, question: 'Hata', answer: 'Hata' };
+            title = "Hata";
+            return {
+                problem,
+                title,
+                error: 'Geçersiz ritmik sayma problemi türü seçildi.'
+            };
+    }
+    
+    return { problem, title };
+};
