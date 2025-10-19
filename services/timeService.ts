@@ -1,6 +1,7 @@
-// FIX: Add .ts extension to import paths
-import { Problem, TimeSettings, TimeProblemType } from '../types';
-import { drawAnalogClock } from './svgService';
+// services/timeService.ts
+
+import { Problem, TimeSettings, TimeProblemType } from '../types.ts';
+import { drawAnalogClock } from './svgService.ts';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 const padZero = (num: number) => String(num).padStart(2, '0');

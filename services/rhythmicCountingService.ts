@@ -1,6 +1,6 @@
 // services/rhythmicCountingService.ts
 
-import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types';
+import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types.ts';
 
 const getRandomInt = (min: number, max: number): number => {
   if (min > max) [min, max] = [max, min];

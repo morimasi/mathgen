@@ -1,4 +1,6 @@
-import { Problem, MeasurementProblemType, MeasurementSettings, Difficulty } from '../types';
+// services/measurementService.ts
+
+import { Problem, MeasurementProblemType, MeasurementSettings, Difficulty } from '../types.ts';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);

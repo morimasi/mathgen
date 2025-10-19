@@ -1,4 +1,5 @@
-// FIX: Add .ts extension to import paths
+// services/fractionsService.ts
+
 import { Problem, FractionsOperation, FractionsSettings, FractionsProblemType } from '../types.ts';
 import { drawFractionPie } from './svgService.ts';
 import { formatFractionAsWords } from './utils.ts';
@@ -139,4 +140,102 @@ export const generateFractionsProblem = (settings: FractionsSettings): { problem
                 }
                 q1_str = `${f1.num}/${f1.den}`;
                 q2_str = `${f2.num}/${f2.den}`;
+            } else { // easy
+                const den = [2,3,4,5,6,8,10,12][getRandomInt(0,7)];
+                f1 = { num: getRandomInt(1, den - 1), den };
+                f2 = { num: getRandomInt(1, den - 1), den };
+                q1_str = `${f1.num}/${f1.den}`;
+                q2_str = `${f2.num}/${f2.den}`;
+            }
+
+            let result: Fraction;
+            let question = "";
+            const opSymbol = { 'addition': '+', 'subtraction': '-', 'multiplication': '×', 'division': '÷' }[currentOperation!];
+            
+            switch (currentOperation) {
+                case FractionsOperation.Addition:
+                    result = { num: f1.num * f2.den + f2.num * f1.den, den: f1.den * f2.den };
+                    break;
+                case FractionsOperation.Subtraction:
+                    if ((f1.num / f1.den) < (f2.num / f2.den)) {
+                        [f1, f2] = [f2, f1];
+                        [q1_str, q2_str] = [q2_str, q1_str];
+                    }
+                    result = { num: f1.num * f2.den - f2.num * f1.den, den: f1.den * f2.den };
+                    break;
+                case FractionsOperation.Multiplication:
+                    result = { num: f1.num * f2.num, den: f1.den * f2.den };
+                    break;
+                case FractionsOperation.Division:
+                    result = { num: f1.num * f2.den, den: f1.den * f2.num };
+                    break;
+                default:
+                    result = { num: 0, den: 1 };
+            }
+            
+            if(useWords && format === 'inline') {
+                const opText = { 'addition': 'toplamı', 'subtraction': 'farkı', 'multiplication': 'çarpımı', 'division': 'bölümü' }[currentOperation!];
+                question = `${formatFractionAsWords(q1_str)} ile ${formatFractionAsWords(q2_str)} kesirlerinin ${opText} kaçtır?`;
+            } else if (format === 'vertical-html') {
+                 question = generateVerticalFractionHTML(q1_str, q2_str, opSymbol);
             } else {
+                 question = `<span style="font-size: 1.25em; font-family: monospace;">${q1_str} ${opSymbol} ${q2_str} = ?</span>`;
+            }
+
+            problem = { ...problemBase, display: format, question, answer: toMixed(result) };
+            break;
+        }
+
+        case FractionsProblemType.Recognition: {
+            title = "Şekille gösterilen kesri yazınız.";
+            const den = [2,3,4,5,6,8,10][getRandomInt(0,6)];
+            const num = getRandomInt(1, den);
+            const question = drawFractionPie(num, den);
+            const answer = `${num}/${den}`;
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+
+        case FractionsProblemType.Comparison: {
+            title = "Kesirleri karşılaştırıp araya <, > veya = koyunuz.";
+            let f1 = generateFraction('medium');
+            let f2 = generateFraction('medium');
+            while(f1.num/f1.den === f2.num/f2.den) f2 = generateFraction('medium');
+
+            const question = `<span style="font-size: 1.5em; font-family: monospace;">${f1.num}/${f1.den} ___ ${f2.num}/${f2.den}</span>`;
+            const answer = (f1.num/f1.den) > (f2.num/f2.den) ? '>' : '<';
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+
+        case FractionsProblemType.Equivalent: {
+            title = "Verilen kesre denk olan kesri bulunuz.";
+            const f1 = simplify(generateFraction('medium'));
+            const multiplier = getRandomInt(2, 5);
+            const f2 = { num: f1.num * multiplier, den: f1.den * multiplier };
+            const question = `<span style="font-size: 1.5em; font-family: monospace;">${f1.num}/${f1.den} = ${f2.num}/?</span>`;
+            const answer = String(f2.den);
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+
+        case FractionsProblemType.FractionOfSet: {
+            title = "Bir bütünün istenen kesir kadarını bulunuz.";
+            const den = [2,3,4,5,6,8,10][getRandomInt(0,6)];
+            const num = getRandomInt(1, den - 1);
+            const multiplier = getRandomInt(2, Math.floor(maxSetSize / den));
+            const whole = den * multiplier;
+            
+            const question = `<span style="font-size: 1.2em;">${whole} sayısının ${num}/${den} kadarı kaçtır?</span>`;
+            const answer = (whole / den) * num;
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+
+        default:
+            problem = { ...problemBase, question: 'Hata', answer: 'Hata' };
+            return { problem, title: 'Hata', error: 'Geçersiz kesir problemi türü' };
+    }
+
+    return { problem, title };
+};

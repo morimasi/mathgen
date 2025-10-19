@@ -1,4 +1,5 @@
-// FIX: Add .ts extension to import paths
+// services/geometryService.ts
+
 import { Problem, GeometryProblemType, ShapeType, GeometrySettings } from '../types.ts';
 import { draw2DShape, drawAngle, drawSymmetryLine } from './svgService.ts';
 

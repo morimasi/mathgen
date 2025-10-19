@@ -1,4 +1,5 @@
-// FIX: Added React import to resolve namespace error for React.RefObject.
+// services/layoutService.ts
+
 import React from 'react';
 import { PrintSettings } from '../types.ts';
 
