@@ -141,7 +141,7 @@ ${formData.message}`;
                         onChange={handleChange}
                         required
                         placeholder="Soru, öneri veya geri bildiriminizi buraya yazın..."
-                        className="block w-full px-3 py-2 bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-600 focus:border-orange-600 sm:text-sm"
+                        className="block w-full px-3 py-2 bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary dark:focus-visible:ring-offset-stone-700 sm:text-sm"
                     />
                 </div>
 
@@ -153,7 +153,7 @@ ${formData.message}`;
                         name="screenshot"
                         accept="image/*"
                         onChange={handleFileChange}
-                        className="block w-full text-xs text-stone-900 border border-stone-300 rounded-lg cursor-pointer bg-stone-50 dark:text-stone-400 focus:outline-none dark:bg-stone-700 dark:border-stone-600 dark:placeholder-stone-400"
+                        className="block w-full text-xs text-stone-900 border border-stone-300 rounded-lg cursor-pointer bg-stone-50 dark:text-stone-400 focus:outline-none dark:bg-stone-700 dark:border-stone-600 dark:placeholder-stone-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary dark:file:bg-primary/20 dark:file:text-orange-300 hover:file:bg-primary/20"
                     />
                     <p className="mt-2 text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-md">
                         <strong>Önemli:</strong> Lütfen ekran görüntüsünü, e-posta programınız açıldıktan sonra <strong>manuel olarak e-postaya eklemeyi unutmayın.</strong>

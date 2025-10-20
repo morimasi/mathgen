@@ -18,12 +18,6 @@ const TableSelector: React.FC<TableSelectorProps> = ({ rows, cols, onSelect }) =
     const handleMouseLeave = () => {
         setHoveredCell(null);
     };
-
-    const handleClick = () => {
-        if (hoveredCell) {
-            onSelect(hoveredCell.r, hoveredCell.c);
-        }
-    };
     
     const displayRows = hoveredCell ? hoveredCell.r : rows;
     const displayCols = hoveredCell ? hoveredCell.c : cols;
@@ -33,23 +27,22 @@ const TableSelector: React.FC<TableSelectorProps> = ({ rows, cols, onSelect }) =
             <div 
                 className="table-selector-grid"
                 onMouseLeave={handleMouseLeave}
-                onClick={handleClick} // Click on the whole grid confirms selection
             >
                 {Array.from({ length: MAX_GRID_SIZE }).map((_, r) =>
                     Array.from({ length: MAX_GRID_SIZE }).map((_, c) => {
                         const rowIndex = r + 1;
                         const colIndex = c + 1;
                         
-                        let cellClass = 'table-selector-cell';
-                        if (rowIndex <= displayRows && colIndex <= displayCols) {
-                            cellClass += ' selected';
-                        }
+                        const isSelected = rowIndex <= displayRows && colIndex <= displayCols;
 
                         return (
-                            <div
+                            <button
                                 key={`${r}-${c}`}
-                                className={cellClass}
+                                className={`table-selector-cell ${isSelected ? 'selected' : ''}`}
                                 onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
+                                onFocus={() => handleMouseEnter(rowIndex, colIndex)}
+                                onClick={() => onSelect(rowIndex, colIndex)}
+                                aria-label={`${rowIndex} x ${colIndex} tablo`}
                             />
                         );
                     })

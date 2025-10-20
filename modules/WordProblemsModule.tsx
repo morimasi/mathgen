@@ -184,7 +184,7 @@ const WordProblemsModule: React.FC = () => {
                      <textarea
                         id="custom-prompt"
                         rows={3}
-                        className="block w-full px-2 py-0.5 text-xs bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-600 focus:border-orange-600"
+                        className="block w-full px-2 py-0.5 text-xs bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary dark:focus-visible:ring-offset-stone-700"
                         placeholder={dynamicPlaceholder}
                         value={settings.customPrompt}
                         onChange={e => handleSettingChange('customPrompt', e.target.value)}

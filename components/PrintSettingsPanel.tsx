@@ -27,23 +27,45 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
         }));
     };
 
-    // Handle closing on Escape key press
+    // Handle focus trapping and Escape key press
     useEffect(() => {
+        if (!isVisible) return;
+        const panel = panelRef.current;
+        if (!panel) return;
+
+        const focusableElements = Array.from(panel.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ));
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        firstElement?.focus();
+
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
+                return;
+            }
+
+            if (event.key !== 'Tab') return;
+
+            if (event.shiftKey) { // Shift+Tab
+                if (document.activeElement === firstElement) {
+                    lastElement?.focus();
+                    event.preventDefault();
+                }
+            } else { // Tab
+                if (document.activeElement === lastElement) {
+                    firstElement?.focus();
+                    event.preventDefault();
+                }
             }
         };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [onClose]);
 
-    // Handle focus trapping
-    useEffect(() => {
-        if (isVisible) {
-            panelRef.current?.focus();
-        }
-    }, [isVisible]);
+        panel.addEventListener('keydown', handleKeyDown);
+        return () => panel.removeEventListener('keydown', handleKeyDown);
+    }, [isVisible, onClose]);
+
 
     const isTableMode = settings.layoutMode === 'table';
 
@@ -64,7 +86,7 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                     <h2 className="text-lg font-semibold">Gelişmiş Yazdırma Ayarları</h2>
                     <button 
                         onClick={onClose} 
-                        className="p-2 -mr-2 rounded-md hover:bg-stone-100 dark:hover:bg-stone-700 text-2xl leading-none"
+                        className="p-2 -mr-2 rounded-md hover:bg-stone-100 dark:hover:bg-stone-700 text-2xl leading-none focus-visible:ring-2 focus-visible:ring-primary"
                         aria-label="Kapat"
                     >
                         &times;

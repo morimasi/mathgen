@@ -25,16 +25,43 @@ const FavoritesPanel: React.FC<FavoritesPanelProps> = ({ isVisible, onClose }) =
     const panelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') onClose();
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [onClose]);
+        if (!isVisible) return;
+        const panel = panelRef.current;
+        if (!panel) return;
 
-    useEffect(() => {
-        if (isVisible) panelRef.current?.focus();
-    }, [isVisible]);
+        const focusableElements = Array.from(panel.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ));
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        firstElement?.focus();
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+                return;
+            }
+
+            if (event.key !== 'Tab') return;
+
+            if (event.shiftKey) { // Shift+Tab
+                if (document.activeElement === firstElement) {
+                    lastElement?.focus();
+                    event.preventDefault();
+                }
+            } else { // Tab
+                if (document.activeElement === lastElement) {
+                    firstElement?.focus();
+                    event.preventDefault();
+                }
+            }
+        };
+        
+        panel.addEventListener('keydown', handleKeyDown);
+        return () => panel.removeEventListener('keydown', handleKeyDown);
+    }, [isVisible, onClose]);
+
 
     const handleLoad = (moduleKey: string, presetName: string) => {
         setPresetToLoad({ moduleKey, presetName });
@@ -70,7 +97,7 @@ const FavoritesPanel: React.FC<FavoritesPanelProps> = ({ isVisible, onClose }) =
                     <h2 className="text-lg font-semibold">Favori Ayarlarım</h2>
                     <button 
                         onClick={onClose} 
-                        className="p-2 -mr-2 rounded-md hover:bg-stone-100 dark:hover:bg-stone-700 text-2xl leading-none"
+                        className="p-2 -mr-2 rounded-md hover:bg-stone-100 dark:hover:bg-stone-700 text-2xl leading-none focus-visible:ring-2 focus-visible:ring-primary"
                         aria-label="Kapat"
                     >
                         &times;
@@ -92,7 +119,7 @@ const FavoritesPanel: React.FC<FavoritesPanelProps> = ({ isVisible, onClose }) =
                                                 <Button onClick={() => handleLoad(moduleKey, presetName)} size="sm" variant="secondary" title="Yükle">
                                                     <LoadIcon className="w-4 h-4" />
                                                 </Button>
-                                                <button onClick={() => handleRemove(moduleKey, presetName)} className="p-1 rounded-full text-stone-400 hover:text-rose-500 transition-colors" title="Favorilerden Kaldır">
+                                                <button onClick={() => handleRemove(moduleKey, presetName)} className="p-1 rounded-full text-stone-400 hover:text-rose-500 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500" title="Favorilerden Kaldır">
                                                     <FavoriteIcon className="w-5 h-5 fill-rose-500 text-rose-500" />
                                                 </button>
                                             </div>

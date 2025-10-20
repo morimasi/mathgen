@@ -244,19 +244,61 @@ const moduleContent: { [key: string]: { title: string; content: React.ReactNode 
 
 const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => {
     const panelRef = useRef<HTMLDivElement>(null);
+    const navRef = useRef<HTMLElement>(null);
     const [activeSection, setActiveSection] = useState('overview');
 
     useEffect(() => {
+        if (!isVisible) return;
+        const panel = panelRef.current;
+        if (!panel) return;
+
+        const focusableElements = Array.from(panel.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ));
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        
+        firstElement?.focus();
+
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') onClose();
+            if (event.key === 'Escape') {
+                onClose();
+                return;
+            }
+            if (event.key !== 'Tab') return;
+
+            if (event.shiftKey) { // Shift+Tab
+                if (document.activeElement === firstElement) {
+                    lastElement?.focus();
+                    event.preventDefault();
+                }
+            } else { // Tab
+                if (document.activeElement === lastElement) {
+                    firstElement?.focus();
+                    event.preventDefault();
+                }
+            }
         };
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [onClose]);
+    }, [isVisible, onClose]);
 
-    useEffect(() => {
-        if (isVisible) panelRef.current?.focus();
-    }, [isVisible]);
+    const handleNavKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+        if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+        event.preventDefault();
+        const focusableButtons = Array.from(navRef.current?.querySelectorAll('button') || []);
+        const currentIndex = focusableButtons.findIndex(btn => btn === document.activeElement);
+        let nextIndex = -1;
+        if (event.key === 'ArrowDown') {
+            nextIndex = currentIndex < focusableButtons.length - 1 ? currentIndex + 1 : 0;
+        } else { // ArrowUp
+            nextIndex = currentIndex > 0 ? currentIndex - 1 : focusableButtons.length - 1;
+        }
+        if (nextIndex !== -1) {
+            focusableButtons[nextIndex]?.focus();
+        }
+    };
+
 
     const allModules = [{ id: 'overview', label: 'Genel Bakış' }, ...TAB_GROUPS.flatMap(g => g.tabs)];
     const { title, content } = moduleContent[activeSection] || { title: 'Yükleniyor...', content: '' };
@@ -276,12 +318,12 @@ const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => 
             >
                 <header className="flex justify-between items-center p-4 border-b border-stone-200 dark:border-stone-700 flex-shrink-0">
                     <h2 className="text-2xl font-bold">Nasıl Kullanılır?</h2>
-                    <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-700 text-3xl leading-none" aria-label="Kapat">&times;</button>
+                    <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-700 text-3xl leading-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Kapat">&times;</button>
                 </header>
                 
                 <div className="flex flex-grow overflow-hidden">
                     <aside className="w-1/3 md:w-1/4 border-r border-stone-200 dark:border-stone-700 p-2 overflow-y-auto">
-                        <nav className="flex flex-col gap-1">
+                        <nav ref={navRef} onKeyDown={handleNavKeyDown} className="flex flex-col gap-1">
                             {allModules.map(module => {
                                 const Icon = iconMap[module.id];
                                 return (

@@ -11,7 +11,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, id, className, containerClas
             <input
                 type="checkbox"
                 id={id}
-                className={`h-4 w-4 rounded border-stone-300 text-orange-700 focus:ring-orange-600 dark:bg-stone-700 dark:border-stone-600 dark:checked:bg-orange-700 dark:focus:ring-orange-700 dark:ring-offset-stone-800 ${className}`}
+                className={`h-4 w-4 rounded border-stone-300 text-orange-700 focus:ring-0 focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2 dark:bg-stone-700 dark:border-stone-600 dark:checked:bg-orange-700 dark:focus-visible:ring-offset-stone-800 ${className}`}
                 {...props}
             />
             <label htmlFor={id} className="font-medium text-xs text-stone-700 dark:text-stone-300 select-none cursor-pointer">

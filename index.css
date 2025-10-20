@@ -411,7 +411,8 @@
   @keyframes toast-enter { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
   @keyframes toast-exit { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
   .table-selector-grid { @apply grid gap-1 p-1 bg-stone-100 dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded; grid-template-columns: repeat(10, 1fr); }
-  .table-selector-cell { @apply w-5 h-3 bg-stone-300 dark:bg-stone-500 rounded-sm transition-colors cursor-pointer; }
+  .table-selector-cell { @apply w-5 h-3 bg-stone-300 dark:bg-stone-500 rounded-sm transition-colors cursor-pointer p-0 border-none; }
+  .table-selector-cell:focus-visible { @apply ring-2 ring-primary ring-offset-1; }
   .table-selector-cell.selected { @apply bg-primary; }
   .live-indicator { @apply text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 animate-pulse; }
 

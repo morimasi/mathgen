@@ -20,12 +20,12 @@ const Button: React.FC<ButtonProps> = ({
     ...props 
 }) => {
     const { spawnLadybug } = useFlyingLadybugs();
-    const baseClasses = 'font-semibold rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-stone-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2';
+    const baseClasses = 'font-semibold rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-stone-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2';
 
     const variantClasses = {
-        primary: 'bg-primary text-white hover:bg-primary-hover focus:ring-primary-focus',
-        secondary: 'bg-stone-200 text-stone-800 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600 focus:ring-stone-500',
-        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+        primary: 'bg-primary text-white hover:bg-primary-hover focus-visible:ring-primary-focus',
+        secondary: 'bg-stone-200 text-stone-800 hover:bg-stone-300 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600 focus-visible:ring-stone-500',
+        danger: 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500',
     };
 
     const sizeClasses = {
