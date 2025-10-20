@@ -78,11 +78,12 @@ const Header: React.FC = memo(() => {
     const handleDownloadPDF = async () => {
         setActionMenuOpen(false);
         setIsLoading(true);
-        addToast('PDF oluşturuluyor, lütfen bekleyin...', 'info');
+        addToast('PDF oluşturma işlemi başlatılıyor...', 'info');
         try {
             const pages = document.querySelectorAll<HTMLElement>('.worksheet-page');
             if (pages.length === 0) {
                 addToast('İndirilecek içerik bulunamadı.', 'warning');
+                setIsLoading(false);
                 return;
             }
 
@@ -96,13 +97,15 @@ const Header: React.FC = memo(() => {
             const pdfHeight = pdf.internal.pageSize.getHeight();
 
             for (let i = 0; i < pages.length; i++) {
+                addToast(`Sayfa ${i + 1}/${pages.length} taranıyor...`, 'info');
                 const page = pages[i];
                 if (i > 0) {
                     pdf.addPage();
                 }
                 const canvas = await html2canvas(page, {
-                    scale: 2,
+                    scale: 1.5, // OPTIMIZATION: Reduced scale from 2 to 1.5 for faster rendering.
                     useCORS: true,
+                    logging: false, // OPTIMIZATION: Disable logging for a minor performance boost.
                     width: page.offsetWidth,
                     height: page.offsetHeight,
                     windowWidth: page.scrollWidth,
@@ -111,7 +114,8 @@ const Header: React.FC = memo(() => {
                 const imgData = canvas.toDataURL('image/png');
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
             }
-
+            
+            addToast('PDF dosyası oluşturuluyor...', 'info');
             pdf.save('MathGen_Calisma_Kagidi.pdf');
             addToast('PDF başarıyla indirildi!', 'success');
         } catch (error) {
