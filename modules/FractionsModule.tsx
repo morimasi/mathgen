@@ -32,7 +32,7 @@ const FractionsModule: React.FC = () => {
         useVisuals: false,
         topic: '',
         useMixedNumbers: true,
-        autoFit: true,
+        autoFit: false,
     });
     
     const { generate } = useProblemGenerator({

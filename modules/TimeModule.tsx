@@ -27,7 +27,7 @@ const TimeModule: React.FC = () => {
         pageCount: 1,
         useWordProblems: false,
         topic: '',
-        autoFit: true,
+        autoFit: false,
     });
     
     const { generate } = useProblemGenerator({

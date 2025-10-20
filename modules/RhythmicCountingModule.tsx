@@ -35,7 +35,7 @@ export const RhythmicCountingModule: React.FC = () => {
         useWordProblems: false,
         topic: '',
         orderDirection: 'ascending',
-        autoFit: true,
+        autoFit: false,
     });
 
     const isPracticeSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);

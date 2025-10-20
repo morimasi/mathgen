@@ -30,7 +30,7 @@ const WordProblemsModule: React.FC = () => {
         pageCount: 1,
         operationCount: 1,
         customPrompt: '',
-        autoFit: true,
+        autoFit: false,
         sourceModule: 'none',
         useVisuals: false,
         layout: 'default',

@@ -1,6 +1,6 @@
 // services/readinessService.ts
 
-import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType, VisualAdditionSubtractionSettings, VerbalArithmeticSettings, MissingNumberPuzzlesSettings, SymbolicArithmeticSettings, ProblemCreationSettings, SimpleGraphTaskType } from '../types.ts';
+import { Problem, MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, ShapeType, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings, PositionalConceptType, IntroMeasurementType, SimpleGraphType, VisualAdditionSubtractionSettings, VerbalArithmeticSettings, MissingNumberPuzzlesSettings, SymbolicArithmeticSettings, ProblemCreationSettings, SimpleGraphTaskType, PatternType, ShapeRecognitionType, NumberRecognitionType } from '../types.ts';
 import { numberToWords } from './utils.ts';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -109,59 +109,188 @@ const generateComparingProblem = (settings: ComparingQuantitiesSettings): { prob
 };
 
 const generateNumberRecProblem = (settings: NumberRecognitionSettings): { problem: Problem, title: string } => {
-    // This is a placeholder as this module requires more complex logic.
     const {type, theme, numberRange} = settings;
-    const title = "Sayıları Tanıma ve Sayma";
     const [min, max] = numberRange.split('-').map(Number);
     
-    const count = getRandomInt(min, max);
-    const item = getRandomItems(theme, 1)[0];
-    const items = Array(count).fill(item).join(' ');
+    let title = "Sayıları Tanıma ve Sayma";
+    let question = '', answer: string|number = '';
     
-    const question = `<div style="display: flex; align-items: center; gap: 1rem; font-size: 2rem;">
-                        <div style="border: 1px solid #999; padding: 0.5rem; border-radius: 4px; min-width: 150px; text-align: center;">${items}</div>
-                        <span>=</span>
-                        <div style="border: 1px solid #999; padding: 0.5rem; width: 60px; height: 60px; border-radius: 4px;"></div>
-                      </div>`;
+    switch(type) {
+        case NumberRecognitionType.CountAndWrite: {
+            title = "Nesneleri Say ve Sayısını Yaz";
+            const count = getRandomInt(min, max);
+            const item = getRandomItems(theme, 1)[0];
+            const items = Array(count).fill(item).join(' ');
+            
+            question = `<div style="display: flex; align-items: center; justify-content: center; gap: 1rem; font-size: 2rem;">
+                                <div style="border: 1px solid #999; padding: 0.5rem; border-radius: 4px; min-width: 150px; text-align: center;">${items}</div>
+                                <span>=</span>
+                                <div style="border: 2px solid #6b7280; width: 60px; height: 60px; display:inline-flex; align-items:center; justify-content:center; border-radius: 8px;"></div>
+                              </div>`;
+            answer = count;
+            break;
+        }
+        case NumberRecognitionType.CountAndColor: {
+            title = "İstenen Sayıda Nesneyi Boya";
+            const count = getRandomInt(min, max);
+            const totalItems = Math.max(count + 2, Math.floor(max * 1.2));
+            const item = getRandomItems(theme, 1)[0];
+            const items = Array(totalItems).fill(`<span style="font-size: 2rem; opacity: 0.3;">${item}</span>`).join(' ');
+            
+            question = `<div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                            <div style="font-size: 3rem; font-weight: bold;">${count}</div>
+                            <div style="border: 1px solid #999; padding: 1rem; border-radius: 8px; line-height: 1.5;">${items}</div>
+                        </div>`;
+            answer = `${count} nesne boyanır.`;
+            break;
+        }
+        case NumberRecognitionType.ConnectTheDots: {
+            title = "Noktaları Birleştirerek Resmi Tamamla";
+            const numPoints = max;
+            // This is a simplified representation. A real one would need path data.
+            const points = Array.from({length: numPoints}, (_, i) => {
+                const angle = (i / numPoints) * 2 * Math.PI;
+                const r = 100 + getRandomInt(-10, 10);
+                const x = 150 + r * Math.cos(angle);
+                const y = 150 + r * Math.sin(angle);
+                return {x, y, num: i + 1};
+            });
+            
+            const pointsSVG = points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="2" fill="black" /><text x="${p.x+5}" y="${p.y+5}" font-size="10">${p.num}</text>`).join('');
+            question = `<svg viewBox="0 0 300 300">${pointsSVG}</svg>`;
+            answer = `Noktalar birleştirilir.`;
+            break;
+        }
+    }
                       
-    return { problem: { question, answer: count, category: 'number-recognition' }, title };
+    return { problem: { question, answer, category: 'number-recognition' }, title };
 };
 
 const generatePatternsProblem = (settings: PatternsSettings): { problem: Problem, title: string } => {
-    // This is a placeholder
     const {type, theme} = settings;
-    const title = "Örüntüyü Tamamlayınız";
+    let title = "Örüntüyü Tamamlayınız";
     
     const items = getRandomItems(theme, 3);
     let sequence: string[] = [];
     let answer = '';
     
-    if(type === 'repeating-ab') {
-        sequence = [items[0], items[1], items[0], items[1], ''];
-        answer = items[0];
-    } else if (type === 'repeating-abc') {
-        sequence = [items[0], items[1], items[2], items[0], items[1], ''];
-        answer = items[2];
-    } else { // growing
+    if(type === PatternType.Growing) {
         const start = getRandomInt(1, 5);
-        sequence = [String(start), String(start + 1), String(start + 2), ''];
-        answer = String(start + 3);
+        sequence = [items[0].repeat(start), items[0].repeat(start + 1), ''];
+        answer = items[0].repeat(start + 2);
+        title = "Büyüyen Örüntüyü Tamamla";
+    } else { // Repeating
+        const pattern = (type === PatternType.RepeatingAB) ? [items[0], items[1]] : [items[0], items[1], items[2]];
+        sequence = [...pattern, ...pattern];
+        answer = sequence.shift()!; // The next item is the first one
+        sequence.push('');
     }
     
     const sequenceHTML = sequence.map(item => 
-        item === '' ? `<div style="width: 50px; height: 50px; border: 2px dashed #999; border-radius: 8px;"></div>`
-                    : `<span style="font-size: 3rem;">${item}</span>`
-    ).join('<span style="font-size: 2rem; margin: 0 0.5rem;">→</span>');
+        item === '' ? `<div style="width: 50px; height: 50px; border: 2px dashed #999; border-radius: 8px; display:inline-block; vertical-align: middle;"></div>`
+                    : `<span style="font-size: 3rem; display:inline-block; vertical-align: middle; width: 50px; text-align: center;">${item}</span>`
+    ).join('<span style="font-size: 2rem; margin: 0 0.5rem; display:inline-block; vertical-align: middle;">→</span>');
 
-    const question = `<div style="display: flex; align-items: center; gap: 0.5rem;">${sequenceHTML}</div>`;
+    const question = `<div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">${sequenceHTML}</div>`;
     return { problem: { question, answer, category: 'patterns' }, title };
 };
 
 const generateBasicShapesProblem = (settings: BasicShapesSettings): { problem: Problem, title: string } => {
-    // This is a placeholder
-    const title = "Şekilleri Tanıma";
-    const question = `<div style="font-size: 3rem;">🔺 🔵 🟥 🔵 🟥</div>`;
-    return { problem: { question, answer: "Görsel", category: 'basic-shapes' }, title };
+    const { type, shapes } = settings;
+
+    const shapeSVGMap: {[key: string]: string} = {
+        [ShapeType.Circle]: `<circle cx="0" cy="0" r="20" fill="#a7f3d0" stroke="#047857" stroke-width="2" />`,
+        [ShapeType.Square]: `<rect x="-20" y="-20" width="40" height="40" fill="#bae6fd" stroke="#0369a1" stroke-width="2" />`,
+        [ShapeType.Triangle]: `<polygon points="0,-20 -23,20 23,20" fill="#fecaca" stroke="#b91c1c" stroke-width="2" />`,
+        [ShapeType.Rectangle]: `<rect x="-25" y="-15" width="50" height="30" fill="#e9d5ff" stroke="#6b21a8" stroke-width="2" />`,
+    };
+    const shapeNames: {[key: string]: string} = {
+        [ShapeType.Circle]: 'daire',
+        [ShapeType.Square]: 'kare',
+        [ShapeType.Triangle]: 'üçgen',
+        [ShapeType.Rectangle]: 'dikdörtgen',
+    };
+    const availableShapes = [ShapeType.Circle, ShapeType.Square, ShapeType.Triangle, ShapeType.Rectangle];
+
+    switch(type) {
+        case ShapeRecognitionType.ColorShape: {
+            const title = "İstenen Şekilleri Boyama";
+            const targetShape = shapes[getRandomInt(0, shapes.length - 1)];
+            const targetName = shapeNames[targetShape] || 'şekli';
+            const instruction = `<p style="font-size: 1.2rem; text-align: center;">Tüm <b>${targetName}</b> şekillerini boya.</p>`;
+
+            const shapePool = shuffleArray([...shapes, ...shapes, ...availableShapes, ...availableShapes]);
+            let svgContent = '';
+            for(let i=0; i<12; i++) {
+                const shapeToDraw = shapePool[i % shapePool.length];
+                const x = 50 + (i % 4) * 80 + getRandomInt(-10, 10);
+                const y = 50 + Math.floor(i / 4) * 80 + getRandomInt(-10, 10);
+                const scale = 0.6 + Math.random() * 0.4;
+                const rotation = getRandomInt(0, 45);
+                const shapeSvg = (shapeSVGMap[shapeToDraw] || shapeSVGMap[ShapeType.Circle]).replace(/fill="#[a-f0-9]+"/, 'fill="white"');
+                svgContent += `<g transform="translate(${x}, ${y}) scale(${scale}) rotate(${rotation})">${shapeSvg}</g>`;
+            }
+            const question = `${instruction}<svg viewBox="0 0 400 300">${svgContent}</svg>`;
+            const answer = `Tüm ${targetName}ler boyanır.`;
+            return { problem: { question, answer, category: 'basic-shapes' }, title };
+        }
+        case ShapeRecognitionType.MatchObjectShape: {
+            const title = "Nesne-Şekil Eşleştirme";
+            const objectShapeMap: {[key: string]: ShapeType} = {
+                '🍕': ShapeType.Triangle, '🏀': ShapeType.Circle, '🎁': ShapeType.Square, '📺': ShapeType.Rectangle,
+                '🍉': ShapeType.Circle, '🥪': ShapeType.Triangle, '🖼️': ShapeType.Square, '✉️': ShapeType.Rectangle
+            };
+            const objects = Object.keys(objectShapeMap);
+            const targetObject = objects[getRandomInt(0, objects.length-1)];
+            const correctShape = objectShapeMap[targetObject];
+            
+            const distractors = availableShapes.filter(s => s !== correctShape);
+            const options = shuffleArray([correctShape, ...shuffleArray(distractors).slice(0,2)]);
+            
+            let optionsSVG = '';
+            options.forEach((shape, i) => {
+                const x = 200 + i * 80;
+                const y = 75;
+                optionsSVG += `<g transform="translate(${x}, ${y}) scale(1.2)">${shapeSVGMap[shape]}</g>`;
+            });
+
+            const question = `<div style="display:flex; align-items: center; justify-content: center; gap: 2rem;">
+                <span style="font-size: 4rem;">${targetObject}</span>
+                <svg viewBox="150 0 300 150">${optionsSVG}</svg>
+            </div>`;
+            const answer = `Doğru şekil: ${shapeNames[correctShape]}`;
+            return { problem: { question, answer, category: 'basic-shapes' }, title };
+        }
+        case ShapeRecognitionType.CountShapes: {
+            const title = "Şekil Sayma";
+            const targetShape = availableShapes[getRandomInt(0, availableShapes.length - 1)];
+            const targetName = shapeNames[targetShape];
+            const instruction = `<p style="font-size: 1.2rem; text-align: center;">Resimde kaç tane <b>${targetName}</b> var?</p>`;
+            
+            let svgContent = '';
+            let count = 0;
+            for(let i=0; i<15; i++) {
+                const shapeToDraw = availableShapes[getRandomInt(0, availableShapes.length - 1)];
+                if (shapeToDraw === targetShape) count++;
+                const x = 30 + Math.random() * 340;
+                const y = 30 + Math.random() * 240;
+                const scale = 0.5 + Math.random() * 0.4;
+                const rotation = getRandomInt(0, 90);
+                svgContent += `<g transform="translate(${x}, ${y}) scale(${scale}) rotate(${rotation})">${shapeSVGMap[shapeToDraw]}</g>`;
+            }
+            if (count === 0 && Math.random() < 0.5) { 
+                 const x = 30 + Math.random() * 340;
+                 const y = 30 + Math.random() * 240;
+                 svgContent += `<g transform="translate(${x}, ${y})">${shapeSVGMap[targetShape]}</g>`;
+                 count = 1;
+            }
+            const question = `${instruction}<svg viewBox="0 0 400 300" style="border: 1px solid #ccc; border-radius: 8px;">${svgContent}</svg>`;
+            const answer = String(count);
+             return { problem: { question, answer, category: 'basic-shapes' }, title };
+        }
+        default:
+            return { problem: { question: 'Bilinmeyen şekil etkinliği', answer: "Hata", category: 'basic-shapes' }, title: "Hata" };
+    }
 };
 
 const generatePositionalProblem = (settings: PositionalConceptsSettings): { problem: Problem, title: string } => {

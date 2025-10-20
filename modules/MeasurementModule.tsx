@@ -23,7 +23,7 @@ const MeasurementModule: React.FC = () => {
         problemsPerPage: 20,
         pageCount: 1,
         useWordProblems: false,
-        autoFit: true,
+        autoFit: false,
         useVisuals: false,
         topic: '',
     });

@@ -24,7 +24,7 @@ const GeometryModule: React.FC = () => {
         problemsPerPage: 12,
         pageCount: 1,
         useWordProblems: false,
-        autoFit: true,
+        autoFit: false,
         topic: '',
     });
 

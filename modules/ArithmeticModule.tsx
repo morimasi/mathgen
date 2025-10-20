@@ -49,7 +49,7 @@ const ArithmeticModule: React.FC = () => {
         operationCount: 1,
         useVisuals: false,
         topic: '',
-        autoFit: true,
+        autoFit: false,
     });
     
     const { generate } = useProblemGenerator({

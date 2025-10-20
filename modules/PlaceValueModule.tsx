@@ -26,7 +26,7 @@ const PlaceValueModule: React.FC = () => {
         pageCount: 1,
         useWordProblems: false,
         topic: '',
-        autoFit: true,
+        autoFit: false,
         fromWordsOrder: 'ordered',
         fromWordsFormat: 'inline',
     });
