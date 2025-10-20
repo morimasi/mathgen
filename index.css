@@ -293,10 +293,13 @@
   }
 
   /* Font Themes */
-  .font-theme-klasik { --font-worksheet: 'Lora', serif; }
-  .font-theme-modern { --font-worksheet: 'Nunito Sans', sans-serif; }
   .font-theme-disleksi1 { --font-worksheet: 'Lexend', sans-serif; }
   .font-theme-disleksi2 { --font-worksheet: 'Atkinson Hyperlegible', sans-serif; }
+  .font-theme-disleksi3 { --font-worksheet: 'Open Dyslexic', sans-serif; }
+  .font-theme-disleksi4 { --font-worksheet: 'Comic Neue', cursive; }
+  .font-theme-disleksi5 { --font-worksheet: 'Readex Pro', sans-serif; }
+  .font-theme-klasik { --font-worksheet: 'Lora', serif; }
+  .font-theme-modern { --font-worksheet: 'Nunito Sans', sans-serif; }
   .font-theme-eglenceli { --font-worksheet: 'Caveat', cursive; }
   .font-theme-yumusak { --font-worksheet: 'Comfortaa', sans-serif; }
   .font-theme-blok { --font-worksheet: 'Roboto Slab', serif; }

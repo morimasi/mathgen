@@ -1,12 +1,15 @@
 import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 
-export type FontTheme = 'klasik' | 'modern' | 'disleksi1' | 'disleksi2' | 'eglenceli' | 'yumusak' | 'blok' | 'net';
+export type FontTheme = 'klasik' | 'modern' | 'disleksi1' | 'disleksi2' | 'disleksi3' | 'disleksi4' | 'disleksi5' | 'eglenceli' | 'yumusak' | 'blok' | 'net';
 
 export const fontThemes: Record<FontTheme, { name: string; className: string }> = {
-  klasik: { name: 'Klasik (Lora)', className: 'font-theme-klasik' },
-  modern: { name: 'Modern (Nunito Sans)', className: 'font-theme-modern' },
   disleksi1: { name: 'Disleksi Dostu (Lexend)', className: 'font-theme-disleksi1' },
   disleksi2: { name: 'Okunaklı (Atkinson)', className: 'font-theme-disleksi2' },
+  disleksi3: { name: 'Özel (OpenDyslexic)', className: 'font-theme-disleksi3' },
+  disleksi4: { name: 'Yumuşak Hatlı (Comic Neue)', className: 'font-theme-disleksi4' },
+  disleksi5: { name: 'Ekran Odaklı (Readex Pro)', className: 'font-theme-disleksi5' },
+  klasik: { name: 'Klasik (Lora)', className: 'font-theme-klasik' },
+  modern: { name: 'Modern (Nunito Sans)', className: 'font-theme-modern' },
   eglenceli: { name: 'El Yazısı (Caveat)', className: 'font-theme-eglenceli' },
   yumusak: { name: 'Yumuşak (Comfortaa)', className: 'font-theme-yumusak' },
   blok: { name: 'Blok (Roboto Slab)', className: 'font-theme-blok' },
