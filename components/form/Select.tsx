@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 interface SelectOption {
     value: string | number;
@@ -30,4 +30,4 @@ const Select: React.FC<SelectProps> = ({ label, id, options, className, containe
     );
 };
 
-export default Select;
+export default memo(Select);

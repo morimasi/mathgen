@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
@@ -21,4 +21,4 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, id, className, containerClas
     );
 };
 
-export default Checkbox;
+export default memo(Checkbox);

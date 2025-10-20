@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useFlyingLadybugs } from '../../services/FlyingLadybugContext.tsx';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger';
@@ -54,4 +54,4 @@ const Button: React.FC<ButtonProps> = ({
     );
 };
 
-export default Button;
+export default memo(Button);

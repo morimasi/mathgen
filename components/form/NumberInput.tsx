@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 interface NumberInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -19,4 +19,4 @@ const NumberInput: React.FC<NumberInputProps> = ({ label, id, className, contain
     );
 };
 
-export default NumberInput;
+export default memo(NumberInput);

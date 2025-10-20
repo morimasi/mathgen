@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -19,4 +19,4 @@ const TextInput: React.FC<TextInputProps> = ({ label, id, className, containerCl
     );
 };
 
-export default TextInput;
+export default memo(TextInput);
