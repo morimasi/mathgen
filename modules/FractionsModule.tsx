@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { generateFractionsProblem } from '../services/fractionsService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-// FIX: Add .ts extension to import path
 import { FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
@@ -233,7 +232,7 @@ const FractionsModule: React.FC = () => {
                  <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
                     <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
                     <div className="mt-2 space-y-2">
-                        <Checkbox label="Otomatik Sığdır" id="autoFit-fractions" checked={settings.autoFit ?? true} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
+                        <Checkbox label="Otomatik Sığdır" id="autoFit-fractions" checked={settings.autoFit} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2">
                             <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={100} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={isTableLayout || settings.autoFit} />
                             <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={isTableLayout} />

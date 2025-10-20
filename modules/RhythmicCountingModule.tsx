@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-// FIX: Add .ts extension to import path
 import { RhythmicCountingSettings, RhythmicProblemType } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
@@ -13,10 +12,8 @@ import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
-// FIX: Add .ts extension to import path
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
-// FIX: Switched to a named export to resolve a React.lazy type error. The original file content was corrupted with code from another module, causing numerous errors. The content has been fully restored.
 export const RhythmicCountingModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<RhythmicCountingSettings>({
@@ -176,7 +173,7 @@ export const RhythmicCountingModule: React.FC = () => {
                 <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
                     <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
                     <div className="mt-2 space-y-2">
-                        <Checkbox label="Otomatik Sığdır" id="autoFit-rhythmic" checked={settings.autoFit ?? true}
+                        <Checkbox label="Otomatik Sığdır" id="autoFit-rhythmic" checked={settings.autoFit}
                             onChange={e => handleSettingChange('autoFit', e.target.checked)}
                             disabled={isPracticeSheet || isTableLayout}
                             title={isPracticeSheet ? "Alıştırma kağıdı modunda bu ayar devre dışıdır." : (isTableLayout ? "Tablo modunda bu ayar devre dışıdır." : "")}

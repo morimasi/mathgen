@@ -2,30 +2,58 @@ import React, { useState } from 'react';
 import TextInput from '../components/form/TextInput.tsx';
 import Button from '../components/form/Button.tsx';
 import { XIcon, InstagramIcon } from '../components/icons/Icons.tsx';
+import Select from '../components/form/Select.tsx';
 
 const ContactModule: React.FC = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         message: '',
+        feedbackType: 'general',
     });
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setImagePreview(null);
+        }
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const recipient = 'morimasi@gmail.com';
-        const subject = encodeURIComponent('MathGen Uygulaması Geri Bildirimi');
-        const body = encodeURIComponent(
-`Ad: ${formData.name}
+        const feedbackTypeLabels: {[key: string]: string} = {
+            general: 'Genel Geri Bildirim',
+            bug: 'Hata Bildirimi',
+            feature: 'Özellik İsteği',
+            other: 'Diğer'
+        };
+        const subject = encodeURIComponent(`MathGen Geri Bildirimi: ${feedbackTypeLabels[formData.feedbackType]}`);
+        
+        let bodyContent = `Geri Bildirim Türü: ${feedbackTypeLabels[formData.feedbackType]}
+Ad: ${formData.name}
 E-posta: ${formData.email}
 
 Mesaj:
-${formData.message}`
-        );
+${formData.message}`;
+
+        if (imagePreview) {
+            bodyContent += "\n\n--- \nNot: Kullanıcı bir ekran görüntüsü ekledi. Lütfen e-postanın eklerini kontrol edin.";
+        }
+
+        const body = encodeURIComponent(bodyContent);
 
         // This will open the user's default email client
         window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
@@ -69,6 +97,21 @@ ${formData.message}`
                 <p className="text-xs text-stone-500 dark:text-stone-400 -mt-2">
                     Bu form, bilgisayarınızdaki varsayılan e-posta uygulamasını açacaktır.
                 </p>
+
+                <Select
+                    label="Geri Bildirim Türü"
+                    id="contact-feedback-type"
+                    name="feedbackType"
+                    value={formData.feedbackType}
+                    onChange={handleChange}
+                    options={[
+                        { value: 'general', label: 'Genel Geri Bildirim' },
+                        { value: 'bug', label: 'Hata Bildirimi' },
+                        { value: 'feature', label: 'Özellik İsteği' },
+                        { value: 'other', label: 'Diğer' },
+                    ]}
+                />
+
                 <TextInput
                     label="Adınız"
                     id="contact-name"
@@ -101,6 +144,28 @@ ${formData.message}`
                         className="block w-full px-3 py-2 bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-600 focus:border-orange-600 sm:text-sm"
                     />
                 </div>
+
+                 <div>
+                    <label htmlFor="contact-screenshot" className="font-medium text-sm text-stone-700 dark:text-stone-300 mb-1.5 block">Ekran Görüntüsü Ekle (İsteğe Bağlı)</label>
+                    <input
+                        type="file"
+                        id="contact-screenshot"
+                        name="screenshot"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="block w-full text-xs text-stone-900 border border-stone-300 rounded-lg cursor-pointer bg-stone-50 dark:text-stone-400 focus:outline-none dark:bg-stone-700 dark:border-stone-600 dark:placeholder-stone-400"
+                    />
+                    <p className="mt-2 text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-md">
+                        <strong>Önemli:</strong> Lütfen ekran görüntüsünü, e-posta programınız açıldıktan sonra <strong>manuel olarak e-postaya eklemeyi unutmayın.</strong>
+                    </p>
+                    {imagePreview && (
+                        <div className="mt-2">
+                            <p className="text-xs font-semibold mb-1">Önizleme:</p>
+                            <img src={imagePreview} alt="Ekran görüntüsü önizlemesi" className="max-w-full h-auto rounded-md border border-stone-300 dark:border-stone-600" />
+                        </div>
+                    )}
+                </div>
+
                 <Button type="submit" className="w-full">E-posta Olarak Gönder</Button>
             </form>
         </div>

@@ -30,7 +30,9 @@ export const generatePlaceValueProblem = (settings: PlaceValueSettings): { probl
         [PlaceValueProblemType.WriteInWords]: "Verilen sayıların okunuşlarını yazınız.",
         [PlaceValueProblemType.WordsToNumber]: "Okunuşu verilen sayıları rakamla yazınız.",
         [PlaceValueProblemType.Comparison]: "Sayıların arasına <, > veya = işaretlerinden uygun olanı koyunuz.",
-        [PlaceValueProblemType.ResultAsWords]: "Aşağıdaki işlemlerin sonucunu yazıyla yazınız."
+        [PlaceValueProblemType.ResultAsWords]: "Aşağıdaki işlemlerin sonucunu yazıyla yazınız.",
+        // FIX: Add missing property for NumberFromClues to satisfy the type.
+        [PlaceValueProblemType.NumberFromClues]: "Sayı Bulmaca"
     };
     title = problemTypeTitles[type];
 

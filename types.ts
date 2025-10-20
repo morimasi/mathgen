@@ -61,6 +61,7 @@ export interface ArithmeticSettings {
     useVisuals: boolean;
     topic: string;
     autoFit: boolean;
+    allowNegativeNumbers: boolean;
     // Voice command overrides
     n1?: number;
     n2?: number;
@@ -165,7 +166,8 @@ export enum PlaceValueProblemType {
     WriteInWords = 'write-in-words',
     WordsToNumber = 'words-to-number',
     Comparison = 'comparison',
-    ResultAsWords = 'result-as-words'
+    ResultAsWords = 'result-as-words',
+    NumberFromClues = 'number-from-clues',
 }
 export type RoundingPlace = 'tens' | 'hundreds' | 'thousands' | 'auto';
 export interface PlaceValueSettings {

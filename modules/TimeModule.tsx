@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-// FIX: Add .ts/.tsx extensions to import paths
 import { generateTimeProblem } from '../services/timeService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
 import { TimeSettings, TimeProblemType, Difficulty, ClockFaceDetail } from '../types.ts';
@@ -108,7 +107,7 @@ const TimeModule: React.FC = () => {
                 <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
                     <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
                     <div className="mt-2 space-y-2">
-                        <Checkbox label="Otomatik Sığdır" id="autoFit-time" checked={settings.autoFit ?? true} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
+                        <Checkbox label="Otomatik Sığdır" id="autoFit-time" checked={settings.autoFit} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2">
                             <NumberInput label="Sayfa Başına Problem Sayısı" id="problems-per-page" min={1} max={50} value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))} disabled={isTableLayout || settings.autoFit} />
                             <NumberInput label="Sayfa Sayısı" id="page-count" min={1} max={20} value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))} disabled={isTableLayout}/>
