@@ -78,6 +78,7 @@ export interface VisualSupportSettings {
     emojiSize: number;
     numberSize: number;
     boxSize: number;
+    theme: MathReadinessTheme;
 }
 
 // Word Problems (AI)

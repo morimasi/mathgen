@@ -62,6 +62,20 @@ const VisualSupportModule: React.FC = () => {
                             { value: ArithmeticOperation.MixedAdditionSubtraction, label: 'Karışık (Toplama-Çıkarma)' },
                         ]}
                     />
+
+                    <Select
+                        label="Görsel Tema"
+                        id="visual-theme"
+                        value={settings.theme}
+                        onChange={e => handleSettingChange('theme', e.target.value)}
+                        options={[
+                            { value: 'mixed', label: 'Karışık' },
+                            { value: 'animals', label: 'Hayvanlar' },
+                            { value: 'vehicles', label: 'Taşıtlar' },
+                            { value: 'fruits', label: 'Meyveler/Yiyecekler' },
+                            { value: 'shapes', label: 'Şekiller' },
+                        ]}
+                    />
                     
                     <NumberInput 
                         label="En Büyük Sayı"

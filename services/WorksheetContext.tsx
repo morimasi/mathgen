@@ -44,6 +44,7 @@ const initialVisualSupportSettings: VisualSupportSettings = {
     emojiSize: 32,
     numberSize: 16,
     boxSize: 50,
+    theme: 'mixed',
 };
 
 export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
