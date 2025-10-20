@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+// FIX: Add .ts extension to import path
 import { generatePlaceValueProblem } from '../services/placeValueService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
 import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types.ts';

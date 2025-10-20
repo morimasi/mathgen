@@ -1,247 +1,182 @@
 // services/placeValueService.ts
 
-import { Problem, PlaceValueProblemType, PlaceValueSettings } from '../types.ts';
+import { Problem, PlaceValueSettings, PlaceValueProblemType } from '../types.ts';
 import { numberToWords } from './utils.ts';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
+const getRandomByDigits = (d: number): number => {
+    if (d === 1) return getRandomInt(0, 9);
+    return getRandomInt(Math.pow(10, d - 1), Math.pow(10, d) - 1);
+};
+const shuffleArray = <T,>(array: T[]): T[] => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+};
 
-const getRandomByDigits = (digits: number): number => {
-    if (digits === 1) return getRandomInt(0, 9);
-    const min = Math.pow(10, digits - 1);
-    const max = Math.pow(10, digits) - 1;
-    return getRandomInt(min, max);
-}
 
 export const generatePlaceValueProblem = (settings: PlaceValueSettings): { problem: Problem, title: string, error?: string } => {
-    const { type, digits } = settings;
-    const effectiveDigits = (type === PlaceValueProblemType.Rounding && digits < 2) ? 2 : digits;
-    const num = getRandomByDigits(effectiveDigits);
-
-    let problem: Problem;
-    let title = '';
+    const { type, digits, roundingPlace, fromWordsOrder, fromWordsFormat } = settings;
     const problemBase = { category: 'place-value' };
+    let title = 'Basamak Değeri Alıştırmaları';
+    let problem: Problem;
     
-    const problemTypeTitles: { [key in PlaceValueProblemType]: string } = {
-        [PlaceValueProblemType.Identification]: "Verilen sayılarda altı çizili rakamın basamak değerini bulunuz.",
-        [PlaceValueProblemType.Rounding]: "Sayıları belirtilen en yakın basamağa yuvarlayınız.",
-        [PlaceValueProblemType.ExpandedForm]: "Verilen sayıları çözümlenmiş (açınım) halleriyle yazınız.",
-        [PlaceValueProblemType.FromExpanded]: "Çözümlenmiş hali verilen sayıları bulunuz.",
-        [PlaceValueProblemType.FromWords]: "Basamak değerlerinden sayı oluşturma.",
-        [PlaceValueProblemType.WriteInWords]: "Verilen sayıların okunuşlarını yazınız.",
-        [PlaceValueProblemType.WordsToNumber]: "Okunuşu verilen sayıları rakamla yazınız.",
-        [PlaceValueProblemType.Comparison]: "Sayıların arasına <, > veya = işaretlerinden uygun olanı koyunuz.",
-        [PlaceValueProblemType.ResultAsWords]: "Aşağıdaki işlemlerin sonucunu yazıyla yazınız.",
-        // FIX: Add missing property for NumberFromClues to satisfy the type.
-        [PlaceValueProblemType.NumberFromClues]: "Sayı Bulmaca"
-    };
-    title = problemTypeTitles[type];
-
+    const number = getRandomByDigits(digits);
 
     switch (type) {
         case PlaceValueProblemType.Identification: {
-            const numStr = String(num);
-            const digitIndex = getRandomInt(0, numStr.length - 1);
-            const placeNames = ["birler", "onlar", "yüzler", "binler", "on binler", "yüz binler", "milyonlar"];
-            const placeName = placeNames[numStr.length - 1 - digitIndex];
-
-            const questionHtml = numStr.split('').map((char, index) => 
-                index === digitIndex ? `<span style="text-decoration: underline; font-weight: bold;">${char}</span>` : char
-            ).join('');
-
-            const question = `<div style="font-size: 1.25em; font-family: monospace;">${questionHtml}</div>`;
-            const answer = parseInt(numStr[digitIndex]) * Math.pow(10, numStr.length - 1 - digitIndex);
-            problem = { ...problemBase, question, answer };
+            title = "Basamak Değeri Bulma";
+            const numStr = String(number);
+            const index = getRandomInt(0, numStr.length - 1);
+            const digit = numStr[index];
+            const placeValue = parseInt(digit) * Math.pow(10, numStr.length - 1 - index);
+            
+            const highlightedNumber = numStr.split('').map((d, i) => i === index ? `<u style="font-weight: bold;">${d}</u>` : d).join('');
+            const question = `<b>${highlightedNumber}</b> sayısında altı çizili rakamın basamak değeri kaçtır?`;
+            problem = { ...problemBase, question, answer: placeValue };
             break;
         }
-        
         case PlaceValueProblemType.Rounding: {
-            if (num < 10) {
-                return { 
-                    problem: { ...problemBase, question: 'Hata', answer: 'Hata' }, 
-                    title: "Hata",
-                    error: "Yuvarlama işlemi için en az 2 basamaklı sayılar gerekir. Lütfen 'Basamak Sayısı' ayarını artırın."
-                };
-            }
-            const { roundingPlace = 'auto' } = settings;
-            const numStr = String(num);
-            
-            let roundToIndex: number;
+            title = "Sayı Yuvarlama";
+            let place: 'tens' | 'hundreds' | 'thousands' = 'tens';
+            let divisor = 10;
+            const availablePlaces: ('tens' | 'hundreds' | 'thousands')[] = [];
+            if (digits >= 2) availablePlaces.push('tens');
+            if (digits >= 3) availablePlaces.push('hundreds');
+            if (digits >= 4) availablePlaces.push('thousands');
 
-            switch(roundingPlace) {
-                case 'tens':
-                    roundToIndex = 1;
-                    break;
-                case 'hundreds':
-                    roundToIndex = 2;
-                    break;
-                case 'thousands':
-                    roundToIndex = 3;
-                    break;
-                case 'auto':
-                default:
-                    roundToIndex = getRandomInt(1, numStr.length - 1);
-                    break;
+            if (roundingPlace === 'auto') {
+                place = availablePlaces[getRandomInt(0, availablePlaces.length - 1)];
+            } else {
+                place = roundingPlace as 'tens' | 'hundreds' | 'thousands';
             }
 
-            // Safety check for invalid rounding place vs digits
-            if (roundToIndex >= numStr.length) {
-                roundToIndex = numStr.length - 1;
+            let placeName = '';
+            switch (place) {
+                case 'tens': divisor = 10; placeName = 'onluğa'; break;
+                case 'hundreds': divisor = 100; placeName = 'yüzlüğe'; break;
+                case 'thousands': divisor = 1000; placeName = 'binliğe'; break;
             }
 
-            const placeNames = ["onluğa", "yüzlüğe", "binliğe", "on binliğe", "yüz binliğe", "milyonluğa"];
-            const placeName = placeNames[roundToIndex - 1];
-            
-            const question = `<div style="font-size: 1.25em; font-family: monospace;">${num} ➞ En yakın ${placeName}</div>`;
-            const roundToPlace = Math.pow(10, roundToIndex);
-            const answer = Math.round(num / roundToPlace) * roundToPlace;
+            const answer = Math.round(number / divisor) * divisor;
+            const question = `<b>${number}</b> sayısını en yakın ${placeName} yuvarlayınız.`;
             problem = { ...problemBase, question, answer };
             break;
         }
-
         case PlaceValueProblemType.ExpandedForm: {
-             const numStr = String(num);
-             let parts = [];
-             for(let i = 0; i < numStr.length; i++){
-                const digit = parseInt(numStr[i]);
-                if (digit > 0) {
-                    const placeValue = Math.pow(10, numStr.length - 1 - i);
-                    parts.push(digit * placeValue);
-                }
-             }
-             const question = `<span style="font-size: 1.25em; font-family: monospace;">${num}</span>`;
-             const answer = parts.join(' + ');
-             problem = { ...problemBase, question, answer };
-             break;
-        }
-
-        case PlaceValueProblemType.FromExpanded: {
-            const numStr = String(num);
-            let parts = [];
-            for(let i = 0; i < numStr.length; i++){
-               const digit = parseInt(numStr[i]);
-               if (digit > 0) {
-                   const placeValue = Math.pow(10, numStr.length - 1 - i);
-                   parts.push(`${digit * placeValue}`);
-               }
-            }
-            parts.sort(() => Math.random() - 0.5); // shuffle parts
-            const question = `<span style="font-size: 1.25em; font-family: monospace;">${parts.join(' + ')}</span>`;
-            problem = { ...problemBase, question, answer: num };
-            break;
-        }
-
-        case PlaceValueProblemType.FromWords: {
-            const { fromWordsOrder = 'ordered', fromWordsFormat = 'inline' } = settings;
-            title = fromWordsOrder === 'mixed'
-                ? "Aşağıda basamak değerleri karışık verilenleri sayı olarak yazınız."
-                : "Aşağıda basamak değerleri verilen sayıyı yazınız.";
-
-            const numStr = String(num);
-            const placeNames = ["birlik", "onluk", "yüzlük", "binlik", "on binlik", "yüz binlik", "milyonluk"];
-            
-            let parts: { value: number; name: string }[] = [];
+            title = "Sayı Çözümleme";
+            const numStr = String(number);
+            const parts: string[] = [];
             for (let i = 0; i < numStr.length; i++) {
                 const digit = parseInt(numStr[i]);
                 if (digit > 0) {
-                    const placeName = placeNames[numStr.length - 1 - i];
-                    parts.push({ value: digit, name: placeName });
+                    const placeValue = digit * Math.pow(10, numStr.length - 1 - i);
+                    parts.push(String(placeValue));
                 }
             }
-
-            if (fromWordsOrder === 'mixed') {
-                parts.sort(() => Math.random() - 0.5);
-            } else {
-                // It's already descending by place value, reverse for standard display (yüzlük, onluk, birlik)
-                parts.reverse();
-            }
-
-            let question = '';
-            if (fromWordsFormat === 'inline') {
-                const partsStr = parts.map(p => `${p.value} ${p.name}`).join(' + ');
-                question = `<span style="font-size: 1.1em;">${partsStr} = ?</span>`;
-            } else { // vertical
-                const partsStr = parts.map(p => `<div>${p.value} ${p.name}</div>`).join('');
-                question = `
-                    <div style="font-size: 1.1em; line-height: 1.7; display: inline-block; text-align: right;">
-                        ${partsStr}
-                        <div style="border-top: 2px solid black; margin-top: 0.5em; padding-top: 0.5em; min-width: 120px;">?</div>
-                    </div>
-                `;
-            }
-
-            problem = { ...problemBase, question, answer: num };
-            break;
-        }
-
-        case PlaceValueProblemType.WriteInWords: {
-            const question = `<span style="font-size: 1.25em; font-family: monospace;">${num}</span>`;
-            const answer = numberToWords(num);
+            const question = `<b>${number}</b> sayısını çözümleyiniz.`;
+            const answer = parts.join(' + ');
             problem = { ...problemBase, question, answer };
             break;
         }
-
-        case PlaceValueProblemType.WordsToNumber: {
-            const words = numberToWords(num);
-            const question = `<span style="font-size: 1.1em;">${words}</span>`;
-            problem = { ...problemBase, question, answer: num };
+        case PlaceValueProblemType.FromExpanded: {
+            title = "Çözümlenmiş Sayıyı Bulma";
+             const numStr = String(number);
+            const parts: string[] = [];
+            for (let i = 0; i < numStr.length; i++) {
+                const digit = parseInt(numStr[i]);
+                if (digit > 0) {
+                    const placeValue = digit * Math.pow(10, numStr.length - 1 - i);
+                    parts.push(String(placeValue));
+                }
+            }
+            const question = `Çözümlenmiş hali <b>${shuffleArray(parts).join(' + ')}</b> olan sayı kaçtır?`;
+            problem = { ...problemBase, question, answer: number };
             break;
         }
-
-        case PlaceValueProblemType.Comparison: {
-            let attempts = 0;
-            while (attempts < 100) {
-                const num2 = getRandomByDigits(digits);
-                if (num !== num2) {
-                    const question = `<span style="font-size: 1.25em; font-family: monospace;">${num} ___ ${num2}</span>`;
-                    const answer = num > num2 ? '>' : '<';
-                    problem = { ...problemBase, question, answer };
-                    return { problem, title };
+        case PlaceValueProblemType.FromWords: {
+            title = "Basamak Değerinden Sayı Oluşturma";
+            const numStr = String(number);
+            const placeNames = ['birlik', 'onluk', 'yüzlük', 'binlik', 'on binlik', 'yüz binlik', 'milyonluk'];
+            const parts: string[] = [];
+            for (let i = 0; i < numStr.length; i++) {
+                const digit = parseInt(numStr[i]);
+                const placeIndex = numStr.length - 1 - i;
+                if (digit > 0) {
+                    parts.push(`${digit} ${placeNames[placeIndex]}`);
                 }
-                attempts++;
             }
-             return {
-                problem: { ...problemBase, question: 'Hata', answer: 'Hata' },
-                title: "Hata",
-                error: "Rastgele üretilen sayılar sürekli aynı geldiği için problem oluşturulamadı. Lütfen tekrar deneyin."
-            };
-        }
-        
-        case PlaceValueProblemType.ResultAsWords: {
-            const operations = ['addition', 'subtraction', 'multiplication'];
-            const operation = operations[getRandomInt(0, operations.length - 1)];
-
-            let question: string;
-            let result: number;
+            const displayParts = fromWordsOrder === 'mixed' ? shuffleArray(parts) : parts.reverse();
             
-            if (operation === 'multiplication') {
-                const num1 = getRandomByDigits(Math.min(digits, 3));
-                const num2 = getRandomByDigits(Math.min(digits, 2));
-                question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} × ${num2} = ?</span>`;
-                result = num1 * num2;
-            } else {
-                const num1 = getRandomByDigits(digits);
-                const num2 = getRandomByDigits(digits);
-                if (operation === 'addition') {
-                    question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} + ${num2} = ?</span>`;
-                    result = num1 + num2;
-                } else { // subtraction
-                    if (num1 < num2) {
-                        question = `<span style="font-size: 1.25em; font-family: monospace;">${num2} - ${num1} = ?</span>`;
-                        result = num2 - num1;
-                    } else {
-                        question = `<span style="font-size: 1.25em; font-family: monospace;">${num1} - ${num2} = ?</span>`;
-                        result = num1 - num2;
-                    }
-                }
-            }
+            const questionText = fromWordsFormat === 'vertical'
+                ? `<div style="text-align: left; display: inline-block;">${displayParts.join('<br>')}</div>`
+                : displayParts.join(' + ');
 
-            const answer = numberToWords(result);
+            const question = `Aşağıdaki basamak değerlerinden oluşan sayı kaçtır?<br/><b>${questionText}</b>`;
+            problem = { ...problemBase, question, answer: number };
+            break;
+        }
+        case PlaceValueProblemType.WriteInWords: {
+            title = "Sayıları Yazıyla Yazma";
+            const question = `<b>${number}</b> sayısının okunuşunu yazınız.`;
+            const answer = numberToWords(number);
             problem = { ...problemBase, question, answer };
             break;
         }
-        
+         case PlaceValueProblemType.WordsToNumber: {
+            title = "Okunuşu Verilen Sayıyı Yazma";
+            const words = numberToWords(number);
+            const question = `Okunuşu <b>"${words}"</b> olan sayıyı yazınız.`;
+            problem = { ...problemBase, question, answer: number };
+            break;
+        }
+        case PlaceValueProblemType.Comparison: {
+            title = "Sayıları Karşılaştırma";
+            let num2 = getRandomByDigits(digits);
+            while (num2 === number) {
+                num2 = getRandomByDigits(digits);
+            }
+            const question = `Aşağıdaki sayıların arasına <b>&lt;, &gt;, =</b> işaretlerinden uygun olanı koyunuz.<br/><div style="font-size: 1.5rem; font-family: monospace; margin-top: 0.5rem;">${number} ___ ${num2}</div>`;
+            const answer = number > num2 ? '>' : '<';
+            problem = { ...problemBase, question, answer };
+            break;
+        }
+        case PlaceValueProblemType.NumberFromClues: {
+             title = "Sayı Bulmaca";
+             const numStr = String(number);
+             const clues: string[] = [];
+             const usedIndexes: number[] = [];
+
+             for (let i = 0; i < Math.min(numStr.length, 3); i++) {
+                 let index = getRandomInt(0, numStr.length - 1);
+                 while(usedIndexes.includes(index)) {
+                     index = getRandomInt(0, numStr.length - 1);
+                 }
+                 usedIndexes.push(index);
+
+                 const placeNames = ['Birler', 'Onlar', 'Yüzler', 'Binler', 'On Binler', 'Yüz Binler', 'Milyonlar'];
+                 const placeIndex = numStr.length - 1 - index;
+                 clues.push(`${placeNames[placeIndex]} basamağım <b>${numStr[index]}</b>.`);
+             }
+             const question = `Ben kimim?<ul style="list-style-type: '❓'; padding-left: 2rem; margin-top: 0.5rem;">${clues.map(c => `<li>${c}</li>`).join('')}</ul>`;
+             problem = { ...problemBase, question, answer: number };
+             break;
+        }
+        case PlaceValueProblemType.ResultAsWords: {
+            title = "İşlem Sonucunu Yazıyla Yazma";
+            const n1 = getRandomInt(10, 500);
+            const n2 = getRandomInt(10, 500);
+            const question = `<b>${n1} + ${n2}</b> işleminin sonucunu yazıyla yazınız.`;
+            const answer = numberToWords(n1 + n2);
+             problem = { ...problemBase, question, answer };
+            break;
+        }
         default:
             problem = { ...problemBase, question: 'Hata', answer: 'Hata' };
+            return { problem, title: 'Hata', error: 'Geçersiz basamak değeri problemi türü' };
     }
     return { problem, title };
 };

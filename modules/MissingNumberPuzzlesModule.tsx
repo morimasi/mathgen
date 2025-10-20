@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+// FIX: Add .ts extension to import path
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { MissingNumberPuzzlesSettings } from '../types.ts';
 import Button from '../components/form/Button.tsx';
