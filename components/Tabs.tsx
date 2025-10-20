@@ -29,7 +29,7 @@ import {
     MissingNumberIcon,
     SymbolicArithmeticIcon,
     ProblemCreationIcon,
-} from './icons/Icons';
+} from './icons/Icons.tsx';
 
 interface Tab {
     id: string;

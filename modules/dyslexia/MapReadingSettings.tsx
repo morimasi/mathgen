@@ -1,8 +1,7 @@
 import React from 'react';
-import { MapReadingSettings } from '../../types';
-import Select from '../../components/form/Select';
-import NumberInput from '../../components/form/NumberInput';
-import HintButton from '../../components/HintButton';
+import { MapReadingSettings } from '../../types.ts';
+import Select from '../../components/form/Select.tsx';
+import HintButton from '../../components/HintButton.tsx';
 
 interface Props {
     settings: MapReadingSettings;
@@ -14,44 +13,29 @@ const MapReadingSettingsComponent: React.FC<Props> = ({ settings, onChange }) =>
         <div className="space-y-2">
             <div className="flex items-center gap-2">
                 <h3 className="text-sm font-semibold">Harita Okuma Ayarları</h3>
-                <HintButton text="Bu etkinlik, Türkiye haritası üzerinde yönergeleri takip ederek şehirleri bulma, renklendirme ve işaretleme becerilerini geliştirir. Görsel dikkat, okuduğunu anlama ve temel coğrafya bilgisini birleştirir." />
+                <HintButton text="Görsel-uzamsal becerileri ve yönergeleri takip etme yeteneğini geliştirmek için basit harita okuma etkinlikleri sunar." />
             </div>
             <div className="grid grid-cols-2 gap-2">
                 <Select
-                    label="Bölge Seçimi"
-                    id="mr-region"
-                    value={settings.region}
-                    onChange={e => onChange({ region: e.target.value as MapReadingSettings['region'] })}
+                    label="Harita Türü"
+                    id="mr-mapType"
+                    value={settings.mapType}
+                    onChange={e => onChange({ mapType: e.target.value as MapReadingSettings['mapType'] })}
                     options={[
-                        { value: 'turkey', label: 'Tüm Türkiye' },
-                        { value: 'marmara', label: 'Marmara Bölgesi' },
-                        { value: 'ege', label: 'Ege Bölgesi' },
-                        { value: 'akdeniz', label: 'Akdeniz Bölgesi' },
-                        { value: 'karadeniz', label: 'Karadeniz Bölgesi' },
-                        { value: 'icanadolu', label: 'İç Anadolu Bölgesi' },
-                        { value: 'doguanadolu', label: 'Doğu Anadolu Bölgesi' },
-                        { value: 'guneydoguanadolu', label: 'Güneydoğu Anadolu Bölgesi' },
+                        { value: 'neighborhood', label: 'Mahalle' },
+                        { value: 'zoo', label: 'Hayvanat Bahçesi' },
+                        { value: 'city', label: 'Şehir Merkezi' },
                     ]}
-                    containerClassName="col-span-2"
                 />
                 <Select
-                    label="Zorluk Seviyesi"
-                    id="mr-difficulty"
-                    value={settings.difficulty}
-                    onChange={e => onChange({ difficulty: e.target.value as MapReadingSettings['difficulty'] })}
+                    label="Görev"
+                    id="mr-task"
+                    value={settings.task}
+                    onChange={e => onChange({ task: e.target.value as MapReadingSettings['task'] })}
                     options={[
-                        { value: 'easy', label: 'Kolay' },
-                        { value: 'medium', label: 'Orta' },
-                        { value: 'hard', label: 'Zor' },
+                        { value: 'find-place', label: 'Yeri Bul' },
+                        { value: 'follow-directions', label: 'Yönergeleri Takip Et' },
                     ]}
-                />
-                <NumberInput
-                    label="Yönerge Sayısı"
-                    id="mr-questionCount"
-                    min={3}
-                    max={10}
-                    value={settings.questionCount}
-                    onChange={e => onChange({ questionCount: parseInt(e.target.value, 10) })}
                 />
             </div>
         </div>

@@ -1,70 +1,80 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Problem, DyslexiaSettings, DyslexiaSubModuleType } from '../types';
-import Button from '../components/form/Button';
-import NumberInput from '../components/form/NumberInput';
-import { ShuffleIcon } from '../components/icons/Icons';
-import { usePrintSettings } from '../services/PrintSettingsContext';
-import { calculateMaxProblems } from '../services/layoutService';
-import SettingsPresetManager from '../components/SettingsPresetManager';
-import { generateDyslexiaProblem } from '../services/dyslexiaService';
-import { useWorksheet } from '../services/WorksheetContext';
+import { Problem, DyslexiaSettings, DyslexiaSubModuleType } from '../types.ts';
+import Button from '../components/form/Button.tsx';
+import NumberInput from '../components/form/NumberInput.tsx';
+import { ShuffleIcon } from '../components/icons/Icons.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import { calculateMaxProblems } from '../services/layoutService.ts';
+import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
+import { generateDyslexiaProblem } from '../services/dyslexiaService.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 // Import all sub-module setting components
-import SoundWizardSettings from './dyslexia/SoundWizardSettings';
-import LetterDetectiveSettings from './dyslexia/LetterDetectiveSettings';
-import ReadingFluencyCoachSettings from './dyslexia/ReadingFluencyCoachSettings';
-import ComprehensionExplorerSettings from './dyslexia/ComprehensionExplorerSettings';
-import VocabularyExplorerSettings from './dyslexia/VocabularyExplorerSettings';
-import VisualMasterSettings from './dyslexia/VisualMasterSettings';
-import WordHunterSettings from './dyslexia/WordHunterSettings';
-import SpellingChampionSettings from './dyslexia/SpellingChampionSettings';
-import MemoryGamerSettings from './dyslexia/MemoryGamerSettings';
-import AuditoryWritingSettings from './dyslexia/AuditoryWritingSettings';
-import InteractiveStorySettings from './dyslexia/InteractiveStorySettings';
-import AttentionQuestionSettings from './dyslexia/AttentionQuestionSettings';
-import MapReadingSettings from './dyslexia/MapReadingSettings';
+import SoundWizardSettings from './dyslexia/SoundWizardSettings.tsx';
+import LetterDetectiveSettings from './dyslexia/LetterDetectiveSettings.tsx';
+import ReadingFluencyCoachSettings from './dyslexia/ReadingFluencyCoachSettings.tsx';
+import ComprehensionExplorerSettings from './dyslexia/ComprehensionExplorerSettings.tsx';
+import VocabularyExplorerSettings from './dyslexia/VocabularyExplorerSettings.tsx';
+import VisualMasterSettings from './dyslexia/VisualMasterSettings.tsx';
+import WordHunterSettings from './dyslexia/WordHunterSettings.tsx';
+import SpellingChampionSettings from './dyslexia/SpellingChampionSettings.tsx';
+import MemoryGamerSettings from './dyslexia/MemoryGamerSettings.tsx';
+import AuditoryWritingSettings from './dyslexia/AuditoryWritingSettings.tsx';
+import InteractiveStorySettings from './dyslexia/InteractiveStorySettings.tsx';
+import AttentionQuestionSettings from './dyslexia/AttentionQuestionSettings.tsx';
+import MapReadingSettings from './dyslexia/MapReadingSettings.tsx';
+
 
 // Import all sub-module icons
 import {
-    SoundWizardIcon, LetterDetectiveIcon, ReadingFluencyCoachIcon, ComprehensionExplorerIcon,
-    VocabularyExplorerIcon, VisualMasterIcon, WordHunterIcon, SpellingChampionIcon, MemoryGamerIcon,
-    AuditoryWritingIcon, InteractiveStoryIcon, AttentionIcon, MapIcon
-} from '../components/icons/Icons';
+    NumberSenseIcon, // Placeholder, replace with actual icons if available
+    LetterFormationIcon,
+    ReadingFluencyCoachSettings as ReadingIcon,
+    ComprehensionExplorerSettings as ComprehensionIcon,
+    VocabularyExplorerSettings as VocabularyIcon,
+    VisualMasterSettings as VisualIcon,
+    WordHunterSettings as WordHunterIcon,
+    SpellingChampionSettings as SpellingIcon,
+    MemoryGamerSettings as MemoryIcon,
+    AuditoryWritingSettings as AuditoryIcon,
+    InteractiveStoryIcon,
+    AttentionQuestionSettings as AttentionIcon,
+    MapReadingSettings as MapIcon,
+} from '../components/icons/Icons.tsx';
+
 
 const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
-    { id: 'attention-questions', label: 'Dikkat Soruları', icon: AttentionIcon },
-    { id: 'sound-wizard', label: 'Ses Büyücüsü', icon: SoundWizardIcon },
-    { id: 'letter-detective', label: 'Harf Dedektifi', icon: LetterDetectiveIcon },
-    { id: 'reading-fluency-coach', label: 'Sesli Okuma Koçu', icon: ReadingFluencyCoachIcon },
-    { id: 'comprehension-explorer', label: 'Anlam Kâşifi', icon: ComprehensionExplorerIcon },
-    { id: 'vocabulary-explorer', label: 'Kelime Kâşifi', icon: VocabularyExplorerIcon },
-    { id: 'visual-master', label: 'Görsel Usta', icon: VisualMasterIcon },
-    { id: 'word-hunter', label: 'Kelime Avcısı', icon: WordHunterIcon },
-    { id: 'spelling-champion', label: 'Yazım Şampiyonu', icon: SpellingChampionIcon },
-    { id: 'memory-gamer', label: 'Hafıza Oyuncusu', icon: MemoryGamerIcon },
-    { id: 'auditory-writing', label: 'İşitsel Yazma (Dikte)', icon: AuditoryWritingIcon },
-    { id: 'interactive-story', label: 'Uygulamalı Hikaye Macerası', icon: InteractiveStoryIcon },
+    { id: 'sound-wizard', label: 'Ses Büyücüsü', icon: NumberSenseIcon },
+    { id: 'letter-detective', label: 'Harf Dedektifi', icon: LetterFormationIcon },
+    { id: 'reading-fluency-coach', label: 'Sesli Okuma Koçu (AI)', icon: ReadingIcon },
+    { id: 'comprehension-explorer', label: 'Anlam Kâşifi (AI)', icon: ComprehensionIcon },
+    { id: 'vocabulary-explorer', label: 'Kelime Kâşifi (AI)', icon: VocabularyIcon },
+    { id: 'visual-master', label: 'Görsel Usta', icon: VisualIcon },
+    { id: 'word-hunter', label: 'Kelime Avcısı (AI)', icon: WordHunterIcon },
+    { id: 'spelling-champion', label: 'Yazım Şampiyonu (AI)', icon: SpellingIcon },
+    { id: 'memory-gamer', label: 'Hafıza Oyuncusu', icon: MemoryIcon },
+    { id: 'auditory-writing', label: 'İşitsel Yazma (AI)', icon: AuditoryIcon },
+    { id: 'interactive-story', label: 'Hikaye Macerası (AI)', icon: InteractiveStoryIcon },
+    { id: 'attention-question', label: 'Dikkat Soruları', icon: AttentionIcon },
     { id: 'map-reading', label: 'Harita Okuma', icon: MapIcon },
 ];
 
 const defaultSettings: DyslexiaSettings = {
-    activeSubModule: 'attention-questions',
-    problemsPerPage: 10,
-    pageCount: 1,
-    autoFit: true,
-    attentionQuestions: { questionType: 'numerical', difficulty: 'easy', numberRange: '1-50' },
+    activeSubModule: 'sound-wizard',
+    problemsPerPage: 10, pageCount: 1, autoFit: true,
     soundWizard: { type: 'rhyme', difficulty: 'easy', wordLength: 4 },
     letterDetective: { letterGroup: 'vowels', difficulty: 'easy' },
-    readingFluencyCoach: { gradeLevel: '2', topic: 'Hayvanlar' },
-    comprehensionExplorer: { textLength: 'short', questionType: 'main_idea', gradeLevel: '2' },
-    vocabularyExplorer: { difficulty: 'easy', gradeLevel: '2' },
+    readingFluencyCoach: { gradeLevel: '1', topic: 'Hayvanlar' },
+    comprehensionExplorer: { gradeLevel: '2', textLength: 'short', questionType: 'main_idea' },
+    vocabularyExplorer: { gradeLevel: '2', difficulty: 'easy' },
     visualMaster: { type: 'letter', pair: 'b-d' },
     wordHunter: { focus: 'suffix', difficulty: 'easy' },
-    spellingChampion: { difficulty: 'easy', category: 'common_errors' },
+    spellingChampion: { category: 'common_errors', difficulty: 'easy' },
     memoryGamer: { type: 'digit_span', sequenceLength: 3 },
     auditoryWriting: { type: 'single_words', difficulty: 'easy' },
     interactiveStory: { genre: 'adventure', gradeLevel: '2' },
-    mapReading: { difficulty: 'easy', questionCount: 5, region: 'turkey' },
+    attentionQuestion: { questionType: 'numerical', difficulty: 'easy', numberRange: '1-50' },
+    mapReading: { mapType: 'zoo', task: 'find-place' },
 };
 
 
@@ -74,13 +84,11 @@ const DyslexiaModule: React.FC = () => {
     const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
     const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
-    
+
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyslexiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
-
-    const isPracticeSheet = activeSubModuleId === 'map-reading';
-
+    
     useEffect(() => {
         if (!contentRef.current) {
             (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = document.getElementById('worksheet-container-0') as HTMLDivElement;
@@ -93,9 +101,7 @@ const DyslexiaModule: React.FC = () => {
             let totalCount;
             const isTableLayout = printSettings.layoutMode === 'table';
 
-            if (isPracticeSheet) {
-                totalCount = settings.pageCount;
-            } else if (isTableLayout) {
+            if (isTableLayout) {
                 totalCount = printSettings.rows * printSettings.columns;
             } else if (settings.autoFit) {
                 const problemsPerPage = calculateMaxProblems(contentRef, printSettings) || settings.problemsPerPage;
@@ -113,15 +119,16 @@ const DyslexiaModule: React.FC = () => {
                     newProblems: result.problems, 
                     clearPrevious, 
                     title: result.title, 
+                    preamble: result.preamble,
                     generatorModule: `dyslexia-${activeSubModuleId}`, 
-                    pageCount: isTableLayout || isPracticeSheet ? 1 : settings.pageCount
+                    pageCount: isTableLayout ? 1 : settings.pageCount
                 });
             }
         } catch (error: any) {
             console.error(error);
         }
         setIsLoading(false);
-    }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings, isPracticeSheet]);
+    }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
 
     useEffect(() => {
         if (autoRefreshTrigger > 0 && lastGeneratorModule === `dyslexia-${activeSubModuleId}`) {
@@ -131,7 +138,7 @@ const DyslexiaModule: React.FC = () => {
 
     // Live update for non-AI modules
     useEffect(() => {
-        const isAIModule = ['comprehension-explorer', 'vocabulary-explorer', 'interactive-story', 'reading-fluency-coach'].includes(activeSubModuleId);
+        const isAIModule = ['reading-fluency-coach', 'comprehension-explorer', 'vocabulary-explorer', 'word-hunter', 'spelling-champion', 'auditory-writing', 'interactive-story'].includes(activeSubModuleId);
         if (isInitialMount.current || isAIModule) {
             isInitialMount.current = false;
             return;
@@ -150,7 +157,7 @@ const DyslexiaModule: React.FC = () => {
     const handleSettingChange = (field: keyof DyslexiaSettings, value: any) => {
         setSettings(prev => ({ ...prev, [field]: value }));
     };
-
+    
     const handleSubModuleSettingChange = (subModuleSettings: any) => {
         setSettings(prev => ({
             ...prev,
@@ -161,7 +168,6 @@ const DyslexiaModule: React.FC = () => {
     const renderSettingsPanel = () => {
         const props = { settings: activeSubModuleSettings, onChange: handleSubModuleSettingChange };
         switch (activeSubModuleId) {
-            case 'attention-questions': return <AttentionQuestionSettings {...props} />;
             case 'sound-wizard': return <SoundWizardSettings {...props} />;
             case 'letter-detective': return <LetterDetectiveSettings {...props} />;
             case 'reading-fluency-coach': return <ReadingFluencyCoachSettings {...props} />;
@@ -173,6 +179,7 @@ const DyslexiaModule: React.FC = () => {
             case 'memory-gamer': return <MemoryGamerSettings {...props} />;
             case 'auditory-writing': return <AuditoryWritingSettings {...props} />;
             case 'interactive-story': return <InteractiveStorySettings {...props} />;
+            case 'attention-question': return <AttentionQuestionSettings {...props} />;
             case 'map-reading': return <MapReadingSettings {...props} />;
             default: return null;
         }
@@ -201,7 +208,7 @@ const DyslexiaModule: React.FC = () => {
                 <div className="pt-2 border-t border-stone-200 dark:border-stone-700">
                     <div className="grid grid-cols-2 gap-2">
                          <NumberInput label="Problem Sayısı" id="dx-problems-per-page" min={1} max={50}
-                            value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit || isPracticeSheet} />
+                            value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit} />
                          <NumberInput label="Sayfa Sayısı" id="dx-page-count" min={1} max={20}
                             value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} />
                     </div>
