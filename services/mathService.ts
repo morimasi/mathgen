@@ -122,6 +122,120 @@ export const generateVisualProblem = (settings: VisualSupportSettings): { proble
      return { problem: { ...problemBase, question: 'Hata', answer: 'Hata' }, title: "Hata" };
 };
 
+// --- OPTIMIZED ARITHMETIC HELPERS ---
+
+const generateOperandsWithCarry = (digits1: number, digits2: number): [number, number] => {
+    let s1 = '', s2 = '';
+    const dMax = Math.max(digits1, digits2);
+    const dMin = Math.min(digits1, digits2);
+    const carryColumn = getRandomInt(0, dMin - 1); // A carry will happen here (from right)
+    let carry = 0;
+
+    for (let i = 0; i < dMax; i++) {
+        let d1 = 0, d2 = 0;
+        if (i < dMin) {
+            if (i === carryColumn) {
+                d1 = getRandomInt(1, 9); // Ensure d1+d2 can be >= 10
+                d2 = getRandomInt(10 - d1, 9);
+            } else {
+                d1 = getRandomInt(0, 9);
+                d2 = getRandomInt(0, 8 - d1); // Avoid carry
+            }
+        } else {
+            d1 = getRandomInt(1, 9); // Non-zero for longer number
+            d2 = 0;
+        }
+        s1 = d1 + s1;
+        s2 = (i < dMin ? d2 : '') + s2;
+    }
+
+    const n1 = parseInt(s1.padEnd(digits1, '0'));
+    const n2 = parseInt(s2.padEnd(digits2, '0'));
+    return digits1 >= digits2 ? [n1, n2] : [n2, n1];
+};
+
+const generateOperandsWithoutCarry = (digits1: number, digits2: number): [number, number] => {
+    let s1 = '', s2 = '';
+    const dMax = Math.max(digits1, digits2);
+    const dMin = Math.min(digits1, digits2);
+    for (let i = 0; i < dMax; i++) {
+        let d1 = getRandomInt(i === dMax -1 ? 1 : 0, 9);
+        let d2 = 0;
+        if (i < dMin) {
+            d2 = getRandomInt(i === dMin -1 ? 1 : 0, 9 - d1);
+        }
+        s1 = d1 + s1;
+        s2 = d2 + s2;
+    }
+    const n1 = parseInt(s1.padEnd(digits1, '0'));
+    const n2 = parseInt(s2.padEnd(digits2, '0'));
+    return digits1 >= digits2 ? [n1, n2] : [n2, n1];
+};
+
+const generateOperandsWithBorrow = (digits1: number, digits2: number): [number, number] => {
+    let s1 = '', s2 = '';
+    const dMax = Math.max(digits1, digits2);
+    const borrowColumn = getRandomInt(0, dMax - 1);
+    
+    for (let i = 0; i < dMax; i++) {
+        let d1 = 0, d2 = 0;
+        if (i === borrowColumn) {
+            d2 = getRandomInt(1, 9);
+            d1 = getRandomInt(0, d2 - 1);
+        } else {
+            d1 = getRandomInt(1, 9);
+            d2 = getRandomInt(0, d1);
+        }
+        s1 = d1 + s1;
+        s2 = d2 + s2;
+    }
+
+    const n1 = parseInt(s1);
+    const n2 = parseInt(s2.padStart(digits1, '0'));
+    
+    return n1 > n2 ? [n1, n2] : [n2, n1];
+};
+
+const generateOperandsWithoutBorrow = (digits1: number, digits2: number): [number, number] => {
+    let s1 = '', s2 = '';
+    const dMax = Math.max(digits1, digits2);
+    for (let i = 0; i < dMax; i++) {
+        const d1 = getRandomInt(i === dMax - 1 ? 1: 0, 9);
+        const d2 = getRandomInt(0, d1);
+        s1 = d1 + s1;
+        s2 = d2 + s2;
+    }
+    const n1 = parseInt(s1);
+    const n2 = parseInt(s2.padStart(digits1, '0'));
+    return n1 > n2 ? [n1, n2] : [n2, n1];
+};
+
+const generateOperandsForDivision = (digits1: number, digits2: number, divisionType: DivisionType): [number, number] => {
+    const divisor = getRandomByDigits(digits2);
+    if (divisor === 0) return generateOperandsForDivision(digits1, digits2, divisionType);
+    
+    const dividendMin = Math.pow(10, digits1 - 1);
+    const dividendMax = Math.pow(10, digits1) - 1;
+
+    if (divisionType === 'without-remainder') {
+        const quotientMin = Math.ceil(dividendMin / divisor);
+        const quotientMax = Math.floor(dividendMax / divisor);
+        const quotient = getRandomInt(quotientMin > 0 ? quotientMin : 1, quotientMax);
+        const dividend = divisor * quotient;
+        return [dividend, divisor];
+    } 
+
+    const dividend = getRandomByDigits(digits1);
+    if (dividend < divisor) return [divisor, dividend];
+
+    if (divisionType === 'with-remainder' && dividend % divisor === 0) {
+        if (dividend + 1 <= dividendMax) return [dividend + 1, divisor];
+        if (dividend - 1 >= dividendMin) return [dividend - 1, divisor];
+    }
+    
+    return [dividend, divisor];
+};
+
 
 // --- OLD ARITHMETIC SERVICE ---
 const questionTemplates = {
@@ -146,29 +260,6 @@ const questionTemplates = {
         "{n1} sayısının içinde kaç tane {n2} vardır?",
         "{n1} bölü {n2} kaçtır?"
     ]
-};
-
-
-const hasCarry = (n1: number, n2: number, n3: number = 0): boolean => {
-    const s1 = String(n1).padStart(5, '0');
-    const s2 = String(n2).padStart(5, '0');
-    const s3 = String(n3).padStart(5, '0');
-    let carry = 0;
-    for (let i = 4; i >= 0; i--) {
-        const sum = parseInt(s1[i]) + parseInt(s2[i]) + parseInt(s3[i]) + carry;
-        if (sum >= 10) return true;
-        carry = Math.floor(sum / 10);
-    }
-    return false;
-};
-
-const hasBorrow = (n1: number, n2: number): boolean => {
-    const s1 = String(n1);
-    const s2 = String(n2).padStart(s1.length, '0');
-    for (let i = s1.length - 1; i >= 0; i--) {
-        if (parseInt(s1[i]) < parseInt(s2[i])) return true;
-    }
-    return false;
 };
 
 const generateVerticalProblemHTML = (operands: (number | string)[], operator: string): string => {
@@ -207,7 +298,6 @@ const generateLongDivisionHTML = (dividend: number, divisor: number): string => 
 
 export const generateArithmeticProblem = (settings: ArithmeticSettings): { problem: Problem, title: string, error?: string } => {
     const { operation, format = 'inline', representation = 'number', n1: n1Override, n2: n2Override, operationOverride } = settings;
-    let attempts = 0;
     
     const operationNames: { [key in ArithmeticOperation]: string } = {
         [ArithmeticOperation.Addition]: 'Toplama',
@@ -227,121 +317,114 @@ export const generateArithmeticProblem = (settings: ArithmeticSettings): { probl
     }
 
     const title = `Aşağıdaki ${operationNames[currentOperation].toLowerCase()} işlemlerini yapınız.`;
-    
     const problemBase = { category: 'arithmetic', display: format };
+    
+    let n1=0, n2=0;
 
-    // --- STANDARD MODE LOGIC ---
-    while(attempts < 100){
-        attempts++;
-        let n1 = n1Override ?? getRandomByDigits(settings.digits1);
-        let n2 = n2Override ?? getRandomByDigits(settings.digits2);
-        let n3 = settings.hasThirdNumber ? getRandomByDigits(settings.digits3) : 0;
-        
-        const useWords = (representation === 'word' || (representation === 'mixed' && Math.random() < 0.5));
-        
-        const formatNumber = (num: number) => useWords ? numberToWords(num) : String(num);
+    switch(currentOperation) {
+        case ArithmeticOperation.Addition:
+            [n1, n2] = settings.carryBorrow === 'with' ? generateOperandsWithCarry(settings.digits1, settings.digits2)
+                     : settings.carryBorrow === 'without' ? generateOperandsWithoutCarry(settings.digits1, settings.digits2)
+                     : [getRandomByDigits(settings.digits1), getRandomByDigits(settings.digits2)];
+            break;
+        case ArithmeticOperation.Subtraction:
+            [n1, n2] = settings.carryBorrow === 'with' ? generateOperandsWithBorrow(settings.digits1, settings.digits2)
+                     : settings.carryBorrow === 'without' ? generateOperandsWithoutBorrow(settings.digits1, settings.digits2)
+                     : [getRandomByDigits(settings.digits1), getRandomByDigits(settings.digits2)];
+            if (n1 < n2) [n1, n2] = [n2, n1];
+            break;
+        case ArithmeticOperation.Division:
+            [n1, n2] = generateOperandsForDivision(settings.digits1, settings.digits2, settings.divisionType);
+            break;
+        default:
+            n1 = getRandomByDigits(settings.digits1);
+            n2 = getRandomByDigits(settings.digits2);
+    }
 
-        const generateNaturalQuestion = (op: ArithmeticOperation, num1: number, num2: number): string => {
-            const templates = questionTemplates[op];
-            if (!templates) return `${formatNumber(num1)} ? ${formatNumber(num2)} = ?`; // Fallback
-            const template = templates[getRandomInt(0, templates.length - 1)];
-            const n1Words = numberToWords(num1);
-            const n2Words = numberToWords(num2);
-            return template.replace('{n1}', n1Words).replace('{n2}', n2Words);
-        };
+    if (n1Override) n1 = n1Override;
+    if (n2Override) n2 = n2Override;
 
-        switch(currentOperation) {
-            case ArithmeticOperation.Addition: {
-                if(settings.hasThirdNumber) {
-                     const question = format === 'vertical-html' 
-                        ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2), formatNumber(n3)], '+')
-                        : `${formatNumber(n1)} + ${formatNumber(n2)} + ${formatNumber(n3)} = ?`;
-                     return { problem: { ...problemBase, question, answer: n1 + n2 + n3 }, title };
-                }
-                const carry = hasCarry(n1, n2);
-                if(settings.carryBorrow === 'with' && !carry) continue;
-                if(settings.carryBorrow === 'without' && carry) continue;
+    const useWords = (representation === 'word' || (representation === 'mixed' && Math.random() < 0.5));
+    const formatNumber = (num: number) => useWords ? numberToWords(num) : String(num);
 
-                let question: string;
-                if (useWords && format === 'inline') {
+    const generateNaturalQuestion = (op: ArithmeticOperation, num1: number, num2: number): string => {
+        const templates = questionTemplates[op];
+        if (!templates) return `${formatNumber(num1)} ? ${formatNumber(num2)} = ?`; // Fallback
+        const template = templates[getRandomInt(0, templates.length - 1)];
+        const n1Words = numberToWords(num1);
+        const n2Words = numberToWords(num2);
+        return template.replace('{n1}', n1Words).replace('{n2}', n2Words);
+    };
+
+    switch(currentOperation) {
+        case ArithmeticOperation.Addition: {
+            const n3 = settings.hasThirdNumber ? getRandomByDigits(settings.digits3) : 0;
+            if (settings.hasThirdNumber) {
+                 const question = format === 'vertical-html' 
+                    ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2), formatNumber(n3)], '+')
+                    : `${formatNumber(n1)} + ${formatNumber(n2)} + ${formatNumber(n3)} = ?`;
+                 return { problem: { ...problemBase, question, answer: n1 + n2 + n3 }, title };
+            }
+
+            let question: string;
+            if (useWords && format === 'inline') {
+                question = generateNaturalQuestion(currentOperation, n1, n2);
+            } else {
+                 question = format === 'vertical-html'
+                    ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2)], '+')
+                    : `${formatNumber(n1)} + ${formatNumber(n2)} = ?`;
+            }
+            return { problem: { ...problemBase, question, answer: n1 + n2 }, title };
+        }
+        case ArithmeticOperation.Subtraction: {
+            if (n1 === n2 && !n1Override) n1++; // Avoid 0 result unless specified by voice
+            let question: string;
+            if (useWords && format === 'inline') {
+                question = generateNaturalQuestion(currentOperation, n1, n2);
+            } else {
+                question = format === 'vertical-html'
+                    ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2)], '-')
+                    : `${formatNumber(n1)} - ${formatNumber(n2)} = ?`;
+            }
+            return { problem: { ...problemBase, question, answer: n1 - n2 }, title };
+        }
+        case ArithmeticOperation.Multiplication: {
+            let question: string;
+             if (useWords && format === 'inline') {
+                question = generateNaturalQuestion(currentOperation, n1, n2);
+            } else {
+                question = format === 'vertical-html'
+                    ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2)], '×')
+                    : `${formatNumber(n1)} × ${formatNumber(n2)} = ?`;
+            }
+            return { problem: { ...problemBase, question, answer: n1 * n2 }, title };
+        }
+        case ArithmeticOperation.Division: {
+            const remainder = n1 % n2;
+            const quotient = Math.floor(n1 / n2);
+
+            let question: string;
+             if (useWords && format === 'inline') {
+                if(remainder !== 0) {
+                     question = `${numberToWords(n1)} sayısını ${numberToWords(n2)} sayısına bölersek bölüm ve kalan kaç olur?`;
+                } else {
                     question = generateNaturalQuestion(currentOperation, n1, n2);
-                } else {
-                     question = format === 'vertical-html'
-                        ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2)], '+')
-                        : `${formatNumber(n1)} + ${formatNumber(n2)} = ?`;
                 }
-                return { problem: { ...problemBase, question, answer: n1 + n2 }, title };
+            } else {
+                question = format === 'long-division-html'
+                    ? generateLongDivisionHTML(n1, n2)
+                    : `${n1} ÷ ${n2} = ?`;
             }
-            case ArithmeticOperation.Subtraction: {
-                if (n1 < n2) [n1, n2] = [n2, n1];
-                if (n1 === n2 && !n1Override) continue; // Allow same numbers for voice command, e.g. "5 - 5"
-                if(settings.hasThirdNumber) {
-                    if (n1 < n2 + n3) continue;
-                    const question = format === 'vertical-html'
-                        ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2), formatNumber(n3)], '-')
-                        : `${formatNumber(n1)} - ${formatNumber(n2)} - ${formatNumber(n3)} = ?`;
-                    return { problem: { ...problemBase, question, answer: n1 - n2 - n3 }, title };
-                }
 
-                const borrow = hasBorrow(n1, n2);
-                if(settings.carryBorrow === 'with' && !borrow) continue;
-                if(settings.carryBorrow === 'without' && borrow) continue;
-                
-                let question: string;
-                if (useWords && format === 'inline') {
-                    question = generateNaturalQuestion(currentOperation, n1, n2);
-                } else {
-                    question = format === 'vertical-html'
-                        ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2)], '-')
-                        : `${formatNumber(n1)} - ${formatNumber(n2)} = ?`;
-                }
-                return { problem: { ...problemBase, question, answer: n1 - n2 }, title };
-            }
-            case ArithmeticOperation.Multiplication: {
-                let question: string;
-                 if (useWords && format === 'inline') {
-                    question = generateNaturalQuestion(currentOperation, n1, n2);
-                } else {
-                    question = format === 'vertical-html'
-                        ? generateVerticalProblemHTML([formatNumber(n1), formatNumber(n2)], '×')
-                        : `${formatNumber(n1)} × ${formatNumber(n2)} = ?`;
-                }
-                return { problem: { ...problemBase, question, answer: n1 * n2 }, title };
-            }
-            case ArithmeticOperation.Division: {
-                if (n2 === 0) continue;
-                if (n2 === 1 && !n2Override) continue;
-                if (n1 < n2 && !n1Override) [n1, n2] = [n2, n1];
-                
-                const remainder = n1 % n2;
-                const quotient = Math.floor(n1 / n2);
+            const answer = remainder === 0 ? `${quotient}` : `Bölüm: ${quotient}, Kalan: ${remainder}`;
 
-                if (settings.divisionType === 'without-remainder' && remainder !== 0 && !n1Override) continue;
-                if (settings.divisionType === 'with-remainder' && remainder === 0 && n1 !== n2 && !n1Override) continue;
-
-                let question: string;
-                 if (useWords && format === 'inline') {
-                    if(remainder !== 0) {
-                         question = `${numberToWords(n1)} sayısını ${numberToWords(n2)} sayısına bölersek bölüm ve kalan kaç olur?`;
-                    } else {
-                        question = generateNaturalQuestion(currentOperation, n1, n2);
-                    }
-                } else {
-                    question = format === 'long-division-html'
-                        ? generateLongDivisionHTML(n1, n2)
-                        : `${n1} ÷ ${n2} = ?`;
-                }
-
-                const answer = remainder === 0 ? `${quotient}` : `Bölüm: ${quotient}, Kalan: ${remainder}`;
-
-                return { problem: { ...problemBase, question, answer }, title };
-            }
+            return { problem: { ...problemBase, question, answer }, title };
         }
     }
+    // This part should be unreachable now
     return { 
         problem: { question: "Hata", answer: "Hata", category: 'arithmetic' }, 
-        title: "Hata",
-        error: "Mevcut ayarlarla uygun bir problem oluşturulamadı. Lütfen basamak sayılarını, eldeli/onluk bozmalı veya kalanlı bölme ayarlarını değiştirip tekrar deneyin." 
+        title: "Hata"
     };
 }
 

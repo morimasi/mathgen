@@ -99,12 +99,12 @@ export const generateContextualWordProblems = async (sourceModule: string, setti
         
     } catch (error) {
         console.error("Error generating contextual word problems:", error);
-        return [{
-            question: "Yapay zeka ile problem oluşturulurken bir hata oluştu. Lütfen API anahtarınızı kontrol edin ve tekrar deneyin.",
-            answer: "Hata",
-            category: 'error',
-            display: 'inline',
-        }];
+        // Throw a user-friendly error to be caught by the calling hook (useProblemGenerator)
+        // which will then display a toast message.
+        if (error instanceof Error && error.message.includes('API key not valid')) {
+             throw new Error("Yapay zeka API anahtarınız geçersiz. Lütfen kontrol edin.");
+        }
+        throw new Error("Yapay zeka ile problem oluşturulamadı. Lütfen API anahtarınızı ve internet bağlantınızı kontrol edin.");
     }
 };
 
