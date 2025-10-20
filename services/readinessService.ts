@@ -248,8 +248,9 @@ const generateVerbalArithmetic = (settings: any): { problem: Problem, title: str
 const generateMissingNumberPuzzles = (settings: any): { problem: Problem, title: string } => {
     const { operation, termCount, maxResult } = settings;
     const title = "Eksik Sayıyı Bulma";
-    const n1 = getRandomInt(1, maxResult - 1);
-    const n2 = getRandomInt(1, maxResult - n1);
+    // FIX: Changed const to let to allow reassignment.
+    let n1 = getRandomInt(1, maxResult - 1);
+    let n2 = getRandomInt(1, maxResult - n1);
     let question = '', answer: number;
 
     if (operation === 'addition') {

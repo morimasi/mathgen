@@ -39,7 +39,7 @@ const getModuleSpecificInstructions = (sourceModule: string, settings: any): str
     
     if (gradeLevel) instructions += `${gradeLevel}. sınıf seviyesine uygun,`;
     if (topic) instructions += ` "${topic}" temalı,`;
-    if (modulePrompts[sourceModule]) instructions += ` ${modulePrompts[sourceModule]}`;
+    if (modulePrompts[sourceModule] && sourceModule !== 'none') instructions += ` ${modulePrompts[sourceModule]}`;
     if (operationCount) instructions += ` ${operationCount > 1 ? `${operationCount} işlem gerektiren` : 'tek işlem gerektiren'} problemler oluştur.`;
     
     return instructions;
@@ -47,7 +47,7 @@ const getModuleSpecificInstructions = (sourceModule: string, settings: any): str
 
 export const generateContextualWordProblems = async (sourceModule: string, settings: any): Promise<Problem[]> => {
     try {
-        const { problemsPerPage, customPrompt, useVisuals } = settings;
+        const { problemsPerPage, customPrompt, useVisuals, layout } = settings;
         let userPrompt;
 
         if (customPrompt) {
@@ -93,7 +93,8 @@ export const generateContextualWordProblems = async (sourceModule: string, setti
             question: p.question || "Soru alınamadı",
             answer: p.answer || "Cevap alınamadı",
             category: sourceModule || 'word-problems',
-            display: 'inline'
+            display: 'inline',
+            layout: layout || 'default',
         }));
         
     } catch (error) {

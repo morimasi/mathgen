@@ -43,7 +43,7 @@ const createVisualUnitHTML = (num: number, emoji: string): string => {
 
 
 export const generateVisualProblem = (settings: VisualSupportSettings): { problem: Problem, title: string } => {
-    const { operation, maxNumber, theme } = settings;
+    const { operation, maxNumber, theme, emojiSize, numberSize, boxSize } = settings;
     const problemBase = { category: 'visual-support', display: 'inline' as const };
     const title = "Aşağıdaki nesneleri sayarak işlemleri yapınız.";
 
@@ -98,7 +98,18 @@ export const generateVisualProblem = (settings: VisualSupportSettings): { proble
             const operatorStyle = `font-size: calc(var(--visual-number-size) * 1.5); font-weight: bold;`;
             
             const q = `
-                <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <div style="
+                    --visual-emoji-size: ${emojiSize}px;
+                    --visual-number-size: ${numberSize}px;
+                    --visual-box-width: ${boxSize}px;
+                    --visual-box-height: ${numberSize * 2}px;
+                    --visual-container-min-width: ${Math.max(boxSize, 60)}px;
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    gap: 1rem; 
+                    flex-wrap: wrap;
+                ">
                     ${createVisualUnitHTML(n1, selectedEmoji)}
                     <span style="${operatorStyle}">${opSymbol}</span>
                     ${createVisualUnitHTML(n2, selectedEmoji)}
