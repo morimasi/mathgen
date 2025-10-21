@@ -505,10 +505,10 @@ const AppContent: React.FC = () => {
                  <div className="relative flex-shrink-0 print:hidden">
                     <button 
                         onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)}
-                        className="absolute top-1/2 -right-3 z-10 transform -translate-y-1/2 bg-white dark:bg-stone-700 p-1 rounded-full shadow-md hover:bg-stone-100 dark:hover:bg-stone-600 transition"
+                        className="absolute top-1/2 -right-6 z-10 transform -translate-y-1/2 bg-white dark:bg-stone-700 p-2 rounded-full shadow-md hover:bg-stone-100 dark:hover:bg-stone-600 transition"
                         title={isSettingsPanelCollapsed ? "Ayarları Göster" : "Ayarları Gizle"}
                     >
-                        <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
+                        <DoubleArrowLeftIcon className={`w-8 h-8 transition-transform duration-300 ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
                     </button>
                 </div>
 
