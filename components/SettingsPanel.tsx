@@ -34,6 +34,7 @@ const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNu
 const SymbolicArithmeticModule = React.lazy(() => import('../modules/SymbolicArithmeticModule.tsx'));
 // FIX: Changed to a named import for ProblemCreationModule to resolve a type error with React.lazy.
 const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx').then(module => ({ default: module.default })));
+const CustomizationCenterModule = React.lazy(() => import('../modules/CustomizationCenterModule.tsx'));
 
 
 const SettingsPanel: React.FC = () => {
@@ -41,6 +42,7 @@ const SettingsPanel: React.FC = () => {
 
     const renderActiveModule = () => {
         switch (activeTab) {
+            case 'customization-center': return <CustomizationCenterModule />;
             case 'arithmetic': return <ArithmeticModule />;
             case 'visual-support': return <VisualSupportModule />;
             case 'word-problems': return <WordProblemsModule />;

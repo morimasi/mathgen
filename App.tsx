@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
@@ -65,9 +66,8 @@ function useDebouncedCallback<A extends any[]>(
 
   useEffect(() => {
     return () => {
-      // FIX: Guard against undefined value for clearTimeout, although it's a no-op in JS.
-      // This may resolve a strict linting/type-checking error with a misleading message.
-      if (timeoutRef.current) {
+      // FIX: Guard against undefined value for clearTimeout, and handle timer ID 0 correctly.
+      if (timeoutRef.current !== undefined) {
         window.clearTimeout(timeoutRef.current);
       }
     };
@@ -75,8 +75,8 @@ function useDebouncedCallback<A extends any[]>(
 
   return useCallback(
     (...args: A) => {
-      // FIX: Guard against undefined value for clearTimeout before setting a new one.
-      if (timeoutRef.current) {
+      // FIX: Guard against undefined value for clearTimeout before setting a new one, and handle timer ID 0 correctly.
+      if (timeoutRef.current !== undefined) {
         window.clearTimeout(timeoutRef.current);
       }
       timeoutRef.current = window.setTimeout(() => {

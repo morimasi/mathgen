@@ -2,6 +2,12 @@
 
 export const TAB_GROUPS = [
     {
+        title: 'Genel',
+        tabs: [
+            { id: 'customization-center', label: 'Özelleştirme Merkezi' },
+        ]
+    },
+    {
         title: 'Matematiğe Hazırlık',
         tabs: [
             { id: 'matching-and-sorting', label: 'Eşleştirme ve Gruplama' },
