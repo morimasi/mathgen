@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
@@ -62,7 +63,8 @@ function useDebouncedCallback<A extends any[]>(
   callback: (...args: A) => void,
   delay: number
 ) {
-  const timeoutRef = useRef<number>();
+  // FIX: Changed useRef type to allow for an undefined initial value, which is the default for a ref without an argument.
+  const timeoutRef = useRef<number | undefined>();
 
   useEffect(() => {
     return () => {

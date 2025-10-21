@@ -24,12 +24,6 @@ const THEME_OBJECTS: { [key in MathReadinessTheme | 'measurement']: string[] } =
 };
 THEME_OBJECTS.mixed = [...THEME_OBJECTS.animals, ...THEME_OBJECTS.vehicles, ...THEME_OBJECTS.fruits, ...THEME_OBJECTS.shapes];
 
-const getThemeItems = (theme: MathReadinessTheme, count: number): string[] => {
-    const validThemes = Object.keys(THEME_OBJECTS).filter(k => k !== 'mixed' && k !== 'measurement') as MathReadinessTheme[];
-    const themeKey = theme === 'mixed' ? validThemes[getRandomInt(0, validThemes.length - 1)] : theme;
-    return shuffleArray(THEME_OBJECTS[themeKey]).slice(0, count);
-};
-
 const shapeSVGs: Record<ShapeType, string> = {
     [ShapeType.Square]: `<rect x="10" y="10" width="80" height="80" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>`,
     [ShapeType.Rectangle]: `<rect x="10" y="25" width="80" height="50" fill="#a5f3fc" stroke="#0891b2" stroke-width="2"/>`,
@@ -115,7 +109,8 @@ const generateComparingQuantities = (settings: any): { problem: Problem, title: 
 
 const generateNumberRecognition = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, numberRange } = settings;
-    const title = 'Rakam Tanıma ve Sayma';
+    // FIX: Changed 'const' to 'let' as it is reassigned in the switch statement.
+    let title = 'Rakam Tanıma ve Sayma';
     const rangeMap = { '1-5': 5, '1-10': 10, '1-20': 20 };
     const max = rangeMap[numberRange];
     const num = getRandomInt(1, max);
