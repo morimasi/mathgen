@@ -317,7 +317,7 @@
 @layer components {
   /* NEW BANNER STYLES */
   .top-banner {
-    @apply relative h-16 overflow-hidden print:hidden;
+    @apply relative h-32 overflow-hidden print:hidden;
     background: linear-gradient(160deg, #3a2d27 0%, #2a1d1d 100%);
     z-index: 25;
   }
