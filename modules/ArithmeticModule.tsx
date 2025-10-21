@@ -20,7 +20,7 @@ import { generateArithmeticProblem } from '../services/mathService.ts';
 // FIX: Add .ts extension to import path
 import { generateContextualWordProblems } from '../services/geminiService.ts';
 // FIX: Add .ts extension to import path
-import { TOPIC_SUGGESTIONS } from '../constants.ts';
+import { TOPIC_SUGGESTIONS, TUTORIAL_ELEMENT_IDS } from '../constants.ts';
 // FIX: Add .tsx extension to import path
 import HintButton from '../components/HintButton.tsx';
 // FIX: Add .ts extension to import path
@@ -263,7 +263,7 @@ const ArithmeticModule: React.FC = () => {
             </div>
              <SettingsPresetManager moduleKey="arithmetic" currentSettings={settings} onLoadSettings={setSettings}/>
             <div className="flex flex-wrap gap-2 pt-1.5">
-                <Button onClick={() => generate(true)} size="sm" enableFlyingLadybug>Oluştur</Button>
+                <Button id={TUTORIAL_ELEMENT_IDS.GENERATE_BUTTON} onClick={() => generate(true)} size="sm" enableFlyingLadybug>Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
             </div>
         </div>

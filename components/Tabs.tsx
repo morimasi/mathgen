@@ -31,6 +31,7 @@ import {
     ProblemCreationIcon,
 // FIX: Add .tsx extension to import path
 } from './icons/Icons.tsx';
+import { TUTORIAL_ELEMENT_IDS } from '../constants.ts';
 
 interface Tab {
     id: string;
@@ -130,7 +131,7 @@ const Tabs: React.FC<TabsProps> = ({ tabGroups, activeTab, onTabClick }) => {
     }, [openMenu]);
 
     return (
-        <nav ref={navRef} className="-mb-px flex space-x-2" aria-label="Tabs">
+        <nav ref={navRef} className="-mb-px flex space-x-2" aria-label="Tabs" id={TUTORIAL_ELEMENT_IDS.MODULE_MENU}>
             {tabGroups.map((group) => {
                 const GroupIcon = groupIconMap[group.title];
                 const isGroupActive = group.tabs.some(tab => tab.id === activeTab);

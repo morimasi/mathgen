@@ -29,6 +29,9 @@ import {
     SymbolicArithmeticIcon,
     ProblemCreationIcon
 } from './icons/Icons.tsx';
+import { useTutorial } from '../services/TutorialContext.tsx';
+import { TUTORIAL_STEPS } from '../tutorialSteps.ts';
+import Button from './form/Button.tsx';
 
 interface HowToUseModalProps {
     isVisible: boolean;
@@ -246,6 +249,7 @@ const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => 
     const panelRef = useRef<HTMLDivElement>(null);
     const navRef = useRef<HTMLElement>(null);
     const [activeSection, setActiveSection] = useState('overview');
+    const { startTutorial } = useTutorial();
 
     useEffect(() => {
         if (!isVisible) return;
@@ -310,6 +314,11 @@ const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => 
     const allModules = [{ id: 'overview', label: 'Genel Bakış' }, ...TAB_GROUPS.flatMap(g => g.tabs)];
     const { title, content } = moduleContent[activeSection] || { title: 'Yükleniyor...', content: '' };
 
+    const handleStartTour = () => {
+        onClose(); // Close the modal first
+        startTutorial(TUTORIAL_STEPS);
+    };
+
     return (
         <div
             className={`print:hidden fixed inset-0 z-40 flex items-center justify-center p-4 transition-opacity duration-300 ${isVisible ? 'bg-black/50' : 'bg-transparent pointer-events-none'}`}
@@ -355,6 +364,11 @@ const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => 
                         <div className="prose prose-stone dark:prose-invert max-w-none prose-h4:text-base prose-h4:mb-1 prose-ul:text-sm prose-ol:text-sm">
                             {content}
                         </div>
+                        {activeSection === 'overview' && (
+                             <Button onClick={handleStartTour} className="w-full mt-6">
+                                Uygulamalı Turu Başlat
+                            </Button>
+                        )}
                     </main>
                 </div>
             </div>

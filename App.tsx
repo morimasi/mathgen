@@ -9,6 +9,7 @@ import { ColorThemeProvider } from './services/ColorThemeContext.tsx';
 import { FontThemeProvider, useFontTheme, fontThemes } from './services/FontThemeContext.tsx';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext.tsx';
 import { ToastProvider, useToast } from './services/ToastContext.tsx';
+import { TutorialProvider } from './services/TutorialContext.tsx';
 import Tabs from './components/Tabs.tsx';
 import SettingsPanel from './components/SettingsPanel.tsx';
 import ProblemSheet from './components/ProblemSheet.tsx';
@@ -19,7 +20,9 @@ import ContactModal from './components/ContactModal.tsx';
 import FavoritesPanel from './components/FavoritesPanel.tsx';
 import AnimatedLogo from './components/AnimatedLogo.tsx';
 import ThemeSwitcher from './components/ThemeSwitcher.tsx';
-import { TAB_GROUPS } from './constants.ts';
+import TutorialGuide from './components/TutorialGuide.tsx';
+import FirstTimeUserBanner from './components/FirstTimeUserBanner.tsx';
+import { TAB_GROUPS, TUTORIAL_ELEMENT_IDS } from './constants.ts';
 import { 
     DoubleArrowLeftIcon,
     PrintIcon,
@@ -62,12 +65,12 @@ function useDebouncedCallback<A extends any[]>(
   callback: (...args: A) => void,
   delay: number
 ) {
-  // FIX: Changed `useRef<any>()` to a more specific and cross-environment compatible type for the timeout identifier to improve type safety and resolve a misleading linting error.
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
+    // On component unmount, clear any pending timeout to prevent memory leaks.
     return () => {
-      // FIX: Added a guard to ensure `clearTimeout` is only called with a valid timeout ID, resolving a potential runtime error and a misleading linter warning.
+      // FIX: clearTimeout must be called with a timeout ID to clear the correct timeout.
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -76,7 +79,7 @@ function useDebouncedCallback<A extends any[]>(
 
   return useCallback(
     (...args: A) => {
-      // FIX: Added a guard to ensure `clearTimeout` is only called with a valid timeout ID, resolving the "Expected 1 arguments, but got 0" error which can occur when `timeoutRef.current` is undefined.
+      // Clear any existing timeout before setting a new one.
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -241,7 +244,7 @@ const Header: React.FC = memo(() => {
                 </div>
 
                 {/* Desktop Action Buttons */}
-                <div className="hidden md:flex items-center gap-1">
+                <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center gap-1">
                     <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
                     <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
                     <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
@@ -292,56 +295,54 @@ const WorksheetToolbar: React.FC = memo(() => {
         }
     };
     
-    const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2 hidden md:block"></div>;
+    const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2 hidden lg:block"></div>;
 
     return (
-        <div className="flex-shrink-0 p-2 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 print:hidden flex-wrap md:flex-nowrap gap-2 md:gap-0">
-            <div className="flex items-center gap-3 flex-wrap">
-                {/* --- Scale --- */}
-                <div className="flex items-center gap-2">
-                    <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
-                    <input id="zoom-slider" type="range" min="20" max="200" value={localSettings.scale * 100} onChange={(e) => handleLocalChange('scale', parseInt(e.target.value, 10) / 100)} className="w-24 accent-primary"/>
-                    <span className="text-xs w-10 text-center">{Math.round(localSettings.scale * 100)}%</span>
-                    <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
-                </div>
-                <Separator />
-                {/* --- Layout --- */}
-                 <div className="flex items-center gap-2">
-                    <Select label="Düzen" id="layout-mode" value={localSettings.layoutMode} onChange={e => handleLocalChange('layoutMode', e.target.value as 'flow' | 'table')} options={[{ value: 'flow', label: 'Akış' }, { value: 'table', label: 'Tablo' }]}/>
-                    {localSettings.layoutMode === 'flow' ? (
-                        <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
-                    ) : (
-                        <>
-                             <NumberInput label="Satır" id="rows" min={1} max={20} value={localSettings.rows} onChange={e => handleLocalChange('rows', parseInt(e.target.value,10))} className="w-14"/>
-                            <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
-                        </>
-                    )}
-                </div>
-                 <Separator />
-                 {/* --- Style --- */}
-                <div className="flex items-center gap-3">
-                    <Select label="Hizalama" id="text-align" value={localSettings.textAlign} onChange={e => handleLocalChange('textAlign', e.target.value as 'left' | 'center' | 'right' )} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
-                    <Select label="Kenarlık" id="border-style" value={localSettings.borderStyle} onChange={e => handleLocalChange('borderStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
-                    <Select label="Defter Stili" id="notebook-style" value={localSettings.notebookStyle} onChange={e => handleLocalChange('notebookStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
-                    <Select label="Yazı Tipi" id="font-theme" value={fontTheme} onChange={e => setFontTheme(e.target.value as any)} options={fontThemeOptions}/>
-                </div>
-                 <Separator />
-                 {/* --- Spacing --- */}
-                 <div className="flex items-center gap-3">
-                    <div className="flex flex-col gap-0.5">
-                        <label htmlFor="problem-spacing-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Problem Aralığı</label>
-                        <input id="problem-spacing-slider" type="range" min="0" max="5" step="0.1" value={localSettings.problemSpacing} onChange={(e) => handleLocalChange('problemSpacing', parseFloat(e.target.value))} className="w-20 accent-primary"/>
-                    </div>
-                     <div className="flex flex-col gap-0.5">
-                        <label htmlFor="line-height-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Satır Yüksekliği</label>
-                        <input id="line-height-slider" type="range" min="1" max="2.5" step="0.1" value={localSettings.lineHeight} onChange={(e) => handleLocalChange('lineHeight', parseFloat(e.target.value))} className="w-20 accent-primary"/>
-                    </div>
-                     <div className="flex flex-col gap-0.5">
-                        <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
-                        <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
-                    </div>
-                 </div>
+        <div id={TUTORIAL_ELEMENT_IDS.WORKSHEET_TOOLBAR} className="flex-shrink-0 p-2 flex items-center justify-start border-b border-stone-200 dark:border-stone-700 print:hidden flex-wrap gap-x-4 gap-y-2">
+            {/* --- Scale --- */}
+            <div className="flex items-center gap-2">
+                <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
+                <input id="zoom-slider" type="range" min="20" max="200" value={localSettings.scale * 100} onChange={(e) => handleLocalChange('scale', parseInt(e.target.value, 10) / 100)} className="w-24 accent-primary"/>
+                <span className="text-xs w-10 text-center">{Math.round(localSettings.scale * 100)}%</span>
+                <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
             </div>
+            <Separator />
+            {/* --- Layout --- */}
+             <div className="flex items-center gap-2">
+                <Select label="Düzen" id="layout-mode" value={localSettings.layoutMode} onChange={e => handleLocalChange('layoutMode', e.target.value as 'flow' | 'table')} options={[{ value: 'flow', label: 'Akış' }, { value: 'table', label: 'Tablo' }]}/>
+                {localSettings.layoutMode === 'flow' ? (
+                    <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
+                ) : (
+                    <>
+                         <NumberInput label="Satır" id="rows" min={1} max={20} value={localSettings.rows} onChange={e => handleLocalChange('rows', parseInt(e.target.value,10))} className="w-14"/>
+                        <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
+                    </>
+                )}
+            </div>
+             <Separator />
+             {/* --- Style --- */}
+            <div className="flex items-center gap-2">
+                <Select label="Hizalama" id="text-align" value={localSettings.textAlign} onChange={e => handleLocalChange('textAlign', e.target.value as 'left' | 'center' | 'right' )} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
+                <Select label="Kenarlık" id="border-style" value={localSettings.borderStyle} onChange={e => handleLocalChange('borderStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
+                <Select label="Defter Stili" id="notebook-style" value={localSettings.notebookStyle} onChange={e => handleLocalChange('notebookStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
+                <Select label="Yazı Tipi" id="font-theme" value={fontTheme} onChange={e => setFontTheme(e.target.value as any)} options={fontThemeOptions}/>
+            </div>
+             <Separator />
+             {/* --- Spacing --- */}
+             <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-0.5">
+                    <label htmlFor="problem-spacing-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Problem Aralığı</label>
+                    <input id="problem-spacing-slider" type="range" min="0" max="10" step="0.2" value={localSettings.problemSpacing} onChange={(e) => handleLocalChange('problemSpacing', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                </div>
+                 <div className="flex flex-col gap-0.5">
+                    <label htmlFor="line-height-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Satır Yüksekliği</label>
+                    <input id="line-height-slider" type="range" min="1" max="4" step="0.1" value={localSettings.lineHeight} onChange={(e) => handleLocalChange('lineHeight', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                </div>
+                 <div className="flex flex-col gap-0.5">
+                    <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
+                    <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                </div>
+             </div>
         </div>
     );
 });
@@ -454,6 +455,7 @@ const AppContent: React.FC = () => {
 
             <div className="flex flex-grow overflow-hidden">
                 <aside 
+                    id={TUTORIAL_ELEMENT_IDS.SETTINGS_PANEL}
                     className={`print:hidden transition-all duration-300 ease-in-out shadow-lg bg-white dark:bg-stone-800 ${
                         isSettingsPanelCollapsed 
                             ? 'w-0 -translate-x-full opacity-0 p-0' 
@@ -517,8 +519,12 @@ const App: React.FC = () => {
         <FlyingLadybugProvider>
         <ToastProvider>
         <WorksheetProvider>
+        <TutorialProvider>
             <AppContent />
             <ToastContainer />
+            <TutorialGuide />
+            <FirstTimeUserBanner />
+        </TutorialProvider>
         </WorksheetProvider>
         </ToastProvider>
         </FlyingLadybugProvider>

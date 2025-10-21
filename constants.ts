@@ -74,3 +74,12 @@ export const TOPIC_SUGGESTIONS = [
     "Meslekler",
     "Mevsimler",
 ];
+
+export const TUTORIAL_ELEMENT_IDS = {
+    MODULE_MENU: 'tutorial-module-menu',
+    SETTINGS_PANEL: 'tutorial-settings-panel',
+    GENERATE_BUTTON: 'tutorial-generate-button',
+    WORKSHEET_AREA: 'worksheet-area', // This one already exists
+    WORKSHEET_TOOLBAR: 'tutorial-worksheet-toolbar',
+    HEADER_ACTIONS: 'tutorial-header-actions',
+};
