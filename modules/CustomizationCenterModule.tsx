@@ -7,6 +7,7 @@ import Button from '../components/form/Button';
 import Select from '../components/form/Select';
 import { RefreshIcon } from '../components/icons/Icons';
 import NumberInput from '../components/form/NumberInput';
+import { TAB_GROUPS } from '../constants';
 
 interface ModuleCardProps {
     moduleKey: ModuleKey;
@@ -90,18 +91,24 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ moduleKey }) => {
 
 const CustomizationCenterModule: React.FC = () => {
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold">Özelleştirme Merkezi</h2>
+                <h2 className="text-xl font-bold">Özelleştirme Merkezi</h2>
             </div>
             <p className="text-sm text-stone-600 dark:text-stone-400">
                 Tüm modüllerin temel ayarlarını buradan yönetin. Hızlıca değişiklik yapın, anlık önizlemeyi görün ve tam kontrol için ilgili modüle gidin.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {(Object.keys(moduleConfig) as ModuleKey[]).map(key => (
-                    <ModuleCard key={key} moduleKey={key} />
-                ))}
-            </div>
+
+            {TAB_GROUPS.filter(g => g.title !== 'Genel').map(group => (
+                <div key={group.title}>
+                    <h3 className="text-lg font-semibold mb-3 border-b border-stone-300 dark:border-stone-600 pb-2">{group.title}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {group.tabs.map(tab => (
+                            (moduleConfig as any)[tab.id] ? <ModuleCard key={tab.id} moduleKey={tab.id as ModuleKey} /> : null
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 };

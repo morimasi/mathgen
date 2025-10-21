@@ -8,7 +8,6 @@ import { FontThemeProvider, useFontTheme, fontThemes } from './services/FontThem
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext.tsx';
 import { ToastProvider, useToast } from './services/ToastContext.tsx';
 import Tabs from './components/Tabs.tsx';
-import SettingsPanel from './components/SettingsPanel.tsx';
 import ProblemSheet from './components/ProblemSheet.tsx';
 import ToastContainer from './components/ToastContainer.tsx';
 import PrintSettingsPanel from './components/PrintSettingsPanel.tsx';
@@ -19,7 +18,6 @@ import AnimatedLogo from './components/AnimatedLogo.tsx';
 import ThemeSwitcher from './components/ThemeSwitcher.tsx';
 import { TAB_GROUPS } from './constants.ts';
 import { 
-    DoubleArrowLeftIcon,
     PrintIcon,
     RefreshIcon,
     HelpIcon,
@@ -28,7 +26,8 @@ import {
     SettingsIcon,
     DownloadIcon,
     MenuIcon,
-    MoreVerticalIcon
+    MoreVerticalIcon,
+    LoadingIcon
 } from './components/icons/Icons.tsx';
 import Button from './components/form/Button.tsx';
 import Select from './components/form/Select.tsx';
@@ -38,7 +37,36 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
 import { PrintSettings } from './types.ts';
-import CustomizationCenterModule from './modules/CustomizationCenterModule.tsx';
+
+// --- LAZY LOADED MODULES ---
+const CustomizationCenterModule = React.lazy(() => import('./modules/CustomizationCenterModule.tsx'));
+const ArithmeticModule = React.lazy(() => import('./modules/ArithmeticModule.tsx'));
+const FractionsModule = React.lazy(() => import('./modules/FractionsModule.tsx'));
+const DecimalsModule = React.lazy(() => import('./modules/DecimalsModule.tsx'));
+const PlaceValueModule = React.lazy(() => import('./modules/PlaceValueModule.tsx'));
+const RhythmicCountingModule = React.lazy(() => import('./modules/RhythmicCountingModule.tsx').then(module => ({ default: module.RhythmicCountingModule })));
+const TimeModule = React.lazy(() => import('./modules/TimeModule.tsx'));
+const GeometryModule = React.lazy(() => import('./modules/GeometryModule.tsx'));
+const MeasurementModule = React.lazy(() => import('./modules/MeasurementModule.tsx'));
+const WordProblemsModule = React.lazy(() => import('./modules/WordProblemsModule.tsx'));
+const VisualSupportModule = React.lazy(() => import('./modules/VisualSupportModule.tsx'));
+const MatchingAndSortingModule = React.lazy(() => import('./modules/MatchingAndSortingModule.tsx'));
+const ComparingQuantitiesModule = React.lazy(() => import('./modules/ComparingQuantitiesModule.tsx'));
+const NumberRecognitionModule = React.lazy(() => import('./modules/NumberRecognitionModule.tsx'));
+const PatternsModule = React.lazy(() => import('./modules/PatternsModule.tsx'));
+const BasicShapesModule = React.lazy(() => import('./modules/BasicShapesModule.tsx'));
+const PositionalConceptsModule = React.lazy(() => import('./modules/PositionalConceptsModule.tsx'));
+const IntroToMeasurementModule = React.lazy(() => import('./modules/IntroToMeasurementModule.tsx').then(module => ({ default: module.IntroToMeasurementModule })));
+const SimpleGraphsModule = React.lazy(() => import('./modules/SimpleGraphsModule.tsx'));
+const DyslexiaModule = React.lazy(() => import('./modules/DyslexiaModule.tsx'));
+const DyscalculiaModule = React.lazy(() => import('./modules/DyscalculiaModule.tsx'));
+const DysgraphiaModule = React.lazy(() => import('./modules/DysgraphiaModule.tsx').then(module => ({ default: module.default })));
+const VisualAdditionSubtractionModule = React.lazy(() => import('./modules/VisualAdditionSubtractionModule.tsx'));
+const VerbalArithmeticModule = React.lazy(() => import('./modules/VerbalArithmeticModule.tsx'));
+const MissingNumberPuzzlesModule = React.lazy(() => import('./modules/MissingNumberPuzzlesModule.tsx'));
+const SymbolicArithmeticModule = React.lazy(() => import('./modules/SymbolicArithmeticModule.tsx'));
+const ProblemCreationModule = React.lazy(() => import('./modules/ProblemCreationModule.tsx').then(module => ({ default: module.default })));
+
 
 // Debounce hook for performance optimization
 function useDebounce<T>(value: T, delay: number): T {
@@ -62,7 +90,6 @@ function useDebouncedCallback<A extends any[]>(
   callback: (...args: A) => void,
   delay: number
 ) {
-  // FIX: Refactored to use `null` for the timeout ref, which is a common practice for refs that may not be set.
   const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -344,14 +371,50 @@ const WorksheetToolbar: React.FC = memo(() => {
     );
 });
 
+const SettingsRouter: React.FC = () => {
+    const { activeTab } = useUI();
+
+    switch (activeTab) {
+        case 'customization-center': return <CustomizationCenterModule />;
+        case 'worksheet': return null; // Worksheet is handled outside
+        case 'arithmetic': return <ArithmeticModule />;
+        case 'visual-support': return <VisualSupportModule />;
+        case 'word-problems': return <WordProblemsModule />;
+        case 'problem-creation': return <ProblemCreationModule />;
+        case 'fractions': return <FractionsModule />;
+        case 'decimals': return <DecimalsModule />;
+        case 'place-value': return <PlaceValueModule />;
+        case 'rhythmic-counting': return <RhythmicCountingModule />;
+        case 'time': return <TimeModule />;
+        case 'geometry': return <GeometryModule />;
+        case 'measurement': return <MeasurementModule />;
+        case 'matching-and-sorting': return <MatchingAndSortingModule />;
+        case 'comparing-quantities': return <ComparingQuantitiesModule />;
+        case 'number-recognition': return <NumberRecognitionModule />;
+        case 'patterns': return <PatternsModule />;
+        case 'basic-shapes': return <BasicShapesModule />;
+        case 'positional-concepts': return <PositionalConceptsModule />;
+        case 'intro-to-measurement': return <IntroToMeasurementModule />;
+        case 'simple-graphs': return <SimpleGraphsModule />;
+        case 'dyslexia': return <DyslexiaModule />;
+        case 'dyscalculia': return <DyscalculiaModule />;
+        case 'dysgraphia': return <DysgraphiaModule />;
+        case 'visual-addition-subtraction': return <VisualAdditionSubtractionModule />;
+        case 'verbal-arithmetic': return <VerbalArithmeticModule />;
+        case 'missing-number-puzzles': return <MissingNumberPuzzlesModule />;
+        case 'symbolic-arithmetic': return <SymbolicArithmeticModule />;
+        default: return <CustomizationCenterModule />;
+    }
+};
+
+
 const AppContent: React.FC = () => {
     const { 
         activeTab,
         isPrintSettingsVisible, closePrintSettings,
         isHowToUseVisible, closeHowToUse,
         isContactModalVisible, closeContactModal,
-        isFavoritesPanelVisible, closeFavoritesPanel,
-        isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
+        isFavoritesPanelVisible, closeFavoritesPanel
     } = useUI();
     const { isLoading } = useWorksheet();
     const { settings, setSettings } = usePrintSettings();
@@ -452,30 +515,8 @@ const AppContent: React.FC = () => {
             </header>
 
             <div className="flex flex-grow overflow-hidden">
-                <aside 
-                    className={`print:hidden transition-all duration-300 ease-in-out shadow-lg bg-white dark:bg-stone-800 ${
-                        isSettingsPanelCollapsed 
-                            ? 'w-0 -translate-x-full opacity-0 p-0' 
-                            : 'w-80 p-4'
-                    }`}
-                >
-                    <div className="overflow-y-auto h-full">
-                        <SettingsPanel />
-                    </div>
-                </aside>
-
-                 <div className="relative flex-shrink-0 print:hidden">
-                    <button 
-                        onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)}
-                        className="absolute top-1/2 -right-3 z-10 transform -translate-y-1/2 bg-white dark:bg-stone-700 p-1 rounded-full shadow-md hover:bg-stone-100 dark:hover:bg-stone-600 transition"
-                        title={isSettingsPanelCollapsed ? "Ayarları Göster" : "Ayarları Gizle"}
-                    >
-                        <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
-                    </button>
-                </div>
-
                 <main 
-                    className="flex-1 flex flex-col overflow-hidden relative"
+                    className="flex-grow flex flex-col overflow-hidden relative"
                 >
                     {isLoading && (
                         <div className="absolute inset-0 bg-black/40 dark:bg-stone-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-30 gap-4">
@@ -484,11 +525,7 @@ const AppContent: React.FC = () => {
                         </div>
                     )}
                     
-                    {activeTab === 'customization-center' ? (
-                        <div className="flex-grow overflow-auto p-4 md:p-8">
-                            <Suspense fallback={<LoadingDaisy />}><CustomizationCenterModule /></Suspense>
-                        </div>
-                    ) : (
+                   {activeTab === 'worksheet' ? (
                         <>
                             <WorksheetToolbar />
                             <div 
@@ -503,6 +540,18 @@ const AppContent: React.FC = () => {
                                 <ProblemSheet />
                             </div>
                         </>
+                    ) : (
+                        <div className="flex-grow overflow-y-auto p-4 md:p-6 bg-white dark:bg-stone-800">
+                             <Suspense fallback={
+                                <div className="flex items-center justify-center h-full">
+                                    <LoadingIcon className="w-8 h-8" />
+                                </div>
+                            }>
+                                <div className="max-w-4xl mx-auto">
+                                    <SettingsRouter />
+                                </div>
+                            </Suspense>
+                        </div>
                     )}
                 </main>
             </div>

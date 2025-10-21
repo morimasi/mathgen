@@ -29,6 +29,7 @@ import {
     MissingNumberIcon,
     SymbolicArithmeticIcon,
     ProblemCreationIcon,
+    WorksheetIcon,
 } from './icons/Icons.tsx';
 
 interface Tab {
@@ -48,6 +49,8 @@ interface TabsProps {
 }
 
 const itemIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
+    'customization-center': ReadinessIcon,
+    'worksheet': WorksheetIcon,
     'arithmetic': ArithmeticIcon,
     'visual-support': VisualSupportIcon,
     'fractions': FractionsIcon,
@@ -77,6 +80,7 @@ const itemIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = 
 };
 
 const groupIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
+    'Genel': ReadinessIcon,
     'Matematiğe Hazırlık': ReadinessIcon,
     'İşlemler': ArithmeticIcon,
     'Sayılar': RhythmicIcon,

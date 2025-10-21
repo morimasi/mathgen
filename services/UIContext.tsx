@@ -24,7 +24,7 @@ interface UIContextType {
 const UIContext = createContext<UIContextType | undefined>(undefined);
 
 export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [activeTab, setActiveTab] = useState('matching-and-sorting');
+    const [activeTab, setActiveTab] = useState('customization-center');
     const [isPrintSettingsVisible, setPrintSettingsVisible] = useState(false);
     const [isHowToUseVisible, setHowToUseVisible] = useState(false);
     const [isContactModalVisible, setContactModalVisible] = useState(false);
