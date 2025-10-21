@@ -65,13 +65,20 @@ function useDebouncedCallback<A extends any[]>(
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(timeoutRef.current);
+      // FIX: Guard against undefined value for clearTimeout, although it's a no-op in JS.
+      // This may resolve a strict linting/type-checking error with a misleading message.
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
     };
   }, []);
 
   return useCallback(
     (...args: A) => {
-      window.clearTimeout(timeoutRef.current);
+      // FIX: Guard against undefined value for clearTimeout before setting a new one.
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
       timeoutRef.current = window.setTimeout(() => {
         callback(...args);
       }, delay);
