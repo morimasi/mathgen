@@ -42,6 +42,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
 import { PrintSettings } from './types.ts';
+import Search from './components/Search.tsx';
 
 // Debounce hook for performance optimization
 function useDebounce<T>(value: T, delay: number): T {
@@ -244,7 +245,8 @@ const Header: React.FC = memo(() => {
                 </div>
 
                 {/* Desktop Action Buttons */}
-                <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center gap-1">
+                <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center gap-2">
+                    <Search />
                     <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
                     <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
                     <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
