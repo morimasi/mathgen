@@ -1,3 +1,5 @@
+
+
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
@@ -65,13 +67,19 @@ function useDebouncedCallback<A extends any[]>(
 
   useEffect(() => {
     return () => {
-      clearTimeout(timeoutRef.current);
+      // FIX: Added a guard to ensure `clearTimeout` is only called with a valid timeout ID, resolving a potential runtime error and a misleading linter warning.
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, []);
 
   return useCallback(
     (...args: A) => {
-      clearTimeout(timeoutRef.current);
+      // FIX: Added a guard to ensure `clearTimeout` is only called with a valid timeout ID, resolving the "Expected 1 arguments, but got 0" error which can occur when `timeoutRef.current` is undefined.
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
       timeoutRef.current = setTimeout(() => {
         callback(...args);
       }, delay);

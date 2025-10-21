@@ -88,7 +88,7 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
 
 const generateComparingQuantities = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, maxObjectCount } = settings;
-    // FIX: Changed `const` to `let` to allow reassignment within the switch statement.
+    // FIX: Changed the `title` variable declaration from `const` to `let`.
     let title = 'Miktarları Karşılaştırma';
     const items = getThemeItems(theme, 2);
     let question = '';
@@ -115,7 +115,7 @@ const generateComparingQuantities = (settings: any): { problem: Problem, title: 
 
 const generateNumberRecognition = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, numberRange } = settings;
-    const title = 'Rakam Tanıma ve Sayma';
+    let title = 'Rakam Tanıma ve Sayma';
     const rangeMap = { '1-5': 5, '1-10': 10, '1-20': 20 };
     const max = rangeMap[numberRange];
     const num = getRandomInt(1, max);
@@ -150,7 +150,7 @@ const generateNumberRecognition = (settings: any): { problem: Problem, title: st
 
 const generatePatterns = (settings: any): { problem: Problem, title: string } => {
     const { type, theme } = settings;
-    const title = 'Örüntüler';
+    let title = 'Örüntüler';
     const items = getThemeItems(theme, 3);
     let question = '', answer = '';
     

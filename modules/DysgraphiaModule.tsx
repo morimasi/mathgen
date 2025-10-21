@@ -1,3 +1,5 @@
+
+
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Problem, DysgraphiaSettings, DysgraphiaSubModuleType } from '../types.ts';
 import Button from '../components/form/Button.tsx';
@@ -35,7 +37,10 @@ import {
 } from '../components/icons/Icons.tsx';
 
 
-const subModuleGroups = [
+const subModuleGroups: {
+    title: string;
+    modules: { id: DysgraphiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>>; }[];
+}[] = [
     {
         title: "Sayısal El Becerileri",
         modules: [
@@ -87,7 +92,8 @@ const DysgraphiaModule: React.FC = () => {
     const contentRef = useRef<HTMLDivElement>(null);
     const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
 
-    const activeSubModuleId = settings.activeSubModule;
+    // FIX: Explicitly typing activeSubModuleId to prevent TypeScript from widening it to a generic 'string'.
+    const activeSubModuleId: DysgraphiaSubModuleType = settings.activeSubModule;
     // FIX: Corrected the regex to properly capitalize 'Ai' when converting from kebab-case to camelCase.
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()).replace(/ai$/, 'Ai') as keyof Omit<DysgraphiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];

@@ -1,5 +1,5 @@
 // FIX: Add .ts extension to import paths
-import { Problem, DecimalsOperation, ArithmeticOperation, CarryBorrowPreference, DivisionType, DecimalsSettings, ArithmeticSettings, VisualSupportSettings, MathReadinessTheme } from './types.ts';
+import { Problem, DecimalsOperation, ArithmeticOperation, CarryBorrowPreference, DivisionType, DecimalsSettings, ArithmeticSettings, VisualSupportSettings, MathReadinessTheme } from '../types.ts';
 import { numberToWords } from './utils.ts';
 
 // --- UTILS ---

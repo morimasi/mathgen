@@ -1,6 +1,6 @@
 // services/geminiService.ts
 import { GoogleGenAI } from "@google/genai";
-import { Problem, DyslexiaSubModuleType, DyscalculiaSubModuleType, DysgraphiaSubModuleType } from './types.ts';
+import { Problem, DyslexiaSubModuleType, DyscalculiaSubModuleType, DysgraphiaSubModuleType } from '../types.ts';
 
 // In a real scenario, this would be configured securely.
 // For this environment, we assume process.env.API_KEY is available.
