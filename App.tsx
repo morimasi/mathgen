@@ -4,8 +4,7 @@ import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext.tsx';
 import { ThemeProvider, useTheme } from './services/ThemeContext.tsx';
 import { ColorThemeProvider } from './services/ColorThemeContext.tsx';
-// FIX: Added FontTheme type for use in WorksheetToolbar
-import { FontThemeProvider, useFontTheme, fontThemes, FontTheme } from './services/FontThemeContext.tsx';
+import { FontThemeProvider, useFontTheme, fontThemes } from './services/FontThemeContext.tsx';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext.tsx';
 import { ToastProvider, useToast } from './services/ToastContext.tsx';
 import { TutorialProvider } from './services/TutorialContext.tsx';
@@ -101,7 +100,6 @@ const TopBanner: React.FC = memo(() => {
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            // FIX: Corrected typo from `actionMenu-ref` to `actionMenuRef` to fix reference and arithmetic operation errors.
             if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
                 setActionMenuOpen(false);
             }
@@ -207,13 +205,13 @@ const TopBanner: React.FC = memo(() => {
                 {Array.from({ length: 7 }).map((_, i) => <div key={i} className="star"></div>)}
             </div>
 
-            <div className="relative container mx-auto px-4 z-10 h-full">
-                <div className="flex items-start justify-end h-full pt-4">
+            <div className="relative container mx-auto px-4 z-10">
+                <div className="flex items-center justify-end h-32">
                     {/* Mobile Action Menu */}
                     <div className="md:hidden flex items-center gap-1 text-white">
                         <ThemeSwitcher />
                         <div ref={actionMenuRef} className="relative">
-                            <button onClick={() => setActionMenuOpen(p => !p)} className="p-3 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
+                            <button onClick={() => setActionMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
                              {isActionMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30 py-1">
                                     <ActionButtons />
@@ -241,7 +239,7 @@ const TopBanner: React.FC = memo(() => {
 });
 
 const Header: React.FC = memo(() => {
-    const { activeTab, setActiveTab, isSettingsPanelCollapsed, setIsSettingsPanelCollapsed } = useUI();
+    const { activeTab, setActiveTab } = useUI();
     const { clearWorksheet } = useWorksheet();
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -279,16 +277,9 @@ const Header: React.FC = memo(() => {
                 </div>
 
                 {/* Mobile Menu Buttons */}
-                <div className="md:hidden flex items-center gap-1">
-                    <button 
-                        onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)} 
-                        className="p-3 rounded-md hover:bg-white/10 text-white transition-colors" 
-                        title="Ayarları Göster/Gizle"
-                    >
-                        <SettingsIcon />
-                    </button>
+                <div className="md:hidden flex items-center">
                     <div ref={mobileMenuRef} className="relative">
-                        <button onClick={() => setMobileMenuOpen(p => !p)} className="p-3 rounded-md hover:bg-white/10 text-white transition-colors" title="Modüller"><MenuIcon /></button>
+                        <button onClick={() => setMobileMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Modüller"><MenuIcon /></button>
                         {isMobileMenuOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30">
                                 <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={(id) => { setActiveTab(id); setMobileMenuOpen(false); }} />
@@ -320,62 +311,77 @@ const WorksheetToolbar: React.FC = memo(() => {
         setLocalSettings(settings);
     }, [settings]);
     
-    // FIX: Completed the truncated `handleLocalChange` function.
     const handleLocalChange = (field: keyof PrintSettings, value: any) => {
         setLocalSettings(prev => ({ ...prev, [field]: value }));
     };
+    // --- End of debounce implementation ---
 
-    const isTableLayout = settings.layoutMode === 'table';
+    const fitToScreen = () => {
+        const area = document.getElementById('worksheet-area');
+        if (area) {
+            const scale = Math.min(
+                area.parentElement!.clientWidth / (area.clientWidth + 50),
+                area.parentElement!.clientHeight / (area.clientHeight + 50)
+            );
+            // Update global state directly for instant feedback from a button click
+            setSettings(s => ({ ...s, scale: Math.max(0.2, scale) }));
+        }
+    };
+    
+    const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2 hidden lg:block"></div>;
 
-    // FIX: Added the return statement and JSX for the component, which was missing.
     return (
-        <div id={TUTORIAL_ELEMENT_IDS.WORKSHEET_TOOLBAR} className="worksheet-toolbar print:hidden mb-4 p-2 bg-white dark:bg-stone-800/50 rounded-md shadow-sm border border-stone-200 dark:border-stone-700/50 flex flex-wrap items-end gap-4">
-            <Select
-                label="Yazı Tipi"
-                id="toolbar-font-theme"
-                options={fontThemeOptions}
-                value={fontTheme}
-                onChange={(e) => setFontTheme(e.target.value as FontTheme)}
-                containerClassName="w-32"
-            />
-            <NumberInput
-                label="Yazı Boyutu"
-                id="toolbar-font-size"
-                value={localSettings.fontSize}
-                onChange={e => handleLocalChange('fontSize', Number(e.target.value))}
-                min={8}
-                max={48}
-                containerClassName="w-20"
-            />
-            <div className="flex flex-col gap-0.5 w-32">
-                 <label htmlFor="toolbar-line-height" className="font-medium text-xs text-stone-700 dark:text-stone-300 flex justify-between">
-                    Satır Yüksekliği <span>{localSettings.lineHeight.toFixed(2)}</span>
-                </label>
-                <input
-                    type="range"
-                    id="toolbar-line-height"
-                    value={localSettings.lineHeight}
-                    onChange={e => handleLocalChange('lineHeight', Number(e.target.value))}
-                    min={1} max={3} step={0.05}
-                    className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-orange-700"
-                />
+        <div id={TUTORIAL_ELEMENT_IDS.WORKSHEET_TOOLBAR} className="flex-shrink-0 p-2 flex items-center justify-start border-b border-stone-200 dark:border-stone-700 print:hidden flex-wrap gap-x-4 gap-y-2">
+            {/* --- Scale --- */}
+            <div className="flex items-center gap-2">
+                <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
+                <input id="zoom-slider" type="range" min="20" max="200" value={localSettings.scale * 100} onChange={(e) => handleLocalChange('scale', parseInt(e.target.value, 10) / 100)} className="w-24 accent-primary"/>
+                <span className="text-xs w-10 text-center">{Math.round(localSettings.scale * 100)}%</span>
+                <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
             </div>
-             <NumberInput
-                label="Sütun Sayısı"
-                id="toolbar-columns"
-                value={localSettings.columns}
-                onChange={e => handleLocalChange('columns', Number(e.target.value))}
-                min={1} max={8}
-                disabled={isTableLayout}
-                containerClassName="w-20"
-            />
+            <Separator />
+            {/* --- Layout --- */}
+             <div className="flex items-center gap-2">
+                <Select label="Düzen" id="layout-mode" value={localSettings.layoutMode} onChange={e => handleLocalChange('layoutMode', e.target.value as 'flow' | 'table')} options={[{ value: 'flow', label: 'Akış' }, { value: 'table', label: 'Tablo' }]}/>
+                {localSettings.layoutMode === 'flow' ? (
+                    <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
+                ) : (
+                    <>
+                         <NumberInput label="Satır" id="rows" min={1} max={20} value={localSettings.rows} onChange={e => handleLocalChange('rows', parseInt(e.target.value,10))} className="w-14"/>
+                        <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
+                    </>
+                )}
+            </div>
+             <Separator />
+             {/* --- Style --- */}
+            <div className="flex items-center gap-2">
+                <Select label="Hizalama" id="text-align" value={localSettings.textAlign} onChange={e => handleLocalChange('textAlign', e.target.value as 'left' | 'center' | 'right' )} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
+                <Select label="Kenarlık" id="border-style" value={localSettings.borderStyle} onChange={e => handleLocalChange('borderStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
+                <Select label="Defter Stili" id="notebook-style" value={localSettings.notebookStyle} onChange={e => handleLocalChange('notebookStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
+                <Select label="Yazı Tipi" id="font-theme" value={fontTheme} onChange={e => setFontTheme(e.target.value as any)} options={fontThemeOptions}/>
+            </div>
+             <Separator />
+             {/* --- Spacing --- */}
+             <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-0.5">
+                    <label htmlFor="problem-spacing-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Problem Aralığı</label>
+                    <input id="problem-spacing-slider" type="range" min="0" max="10" step="0.2" value={localSettings.problemSpacing} onChange={(e) => handleLocalChange('problemSpacing', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                </div>
+                 <div className="flex flex-col gap-0.5">
+                    <label htmlFor="line-height-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Satır Yüksekliği</label>
+                    <input id="line-height-slider" type="range" min="1" max="4" step="0.1" value={localSettings.lineHeight} onChange={(e) => handleLocalChange('lineHeight', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                </div>
+                 <div className="flex flex-col gap-0.5">
+                    <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
+                    <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                </div>
+             </div>
         </div>
     );
 });
 
-// FIX: Added AppLayout and App components to provide a main app structure and a default export.
-const AppLayout: React.FC = () => {
-    const {
+const AppContent: React.FC = () => {
+    const { 
         isPrintSettingsVisible, closePrintSettings,
         isHowToUseVisible, closeHowToUse,
         isContactModalVisible, closeContactModal,
@@ -383,78 +389,186 @@ const AppLayout: React.FC = () => {
         isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
     } = useUI();
     const { isLoading } = useWorksheet();
+    const { settings, setSettings } = usePrintSettings();
+    
+    const panAreaRef = useRef<HTMLDivElement>(null);
+    const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
+    const lastSyncedScale = useRef(settings.scale);
+
+    useEffect(() => {
+        const el = panAreaRef.current;
+        if (el) {
+            el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+        }
+    }, []);
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        const el = panAreaRef.current;
+        if (!el) return;
+        panState.current = {
+            isPanning: true,
+            startX: e.clientX - el.offsetLeft,
+            startY: e.clientY - el.offsetTop,
+            scrollLeft: el.scrollLeft,
+            scrollTop: el.scrollTop,
+        };
+        el.classList.add('is-panning');
+    };
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!panState.current.isPanning) return;
+        e.preventDefault();
+        const el = panAreaRef.current;
+        if (!el) return;
+        const x = e.clientX - el.offsetLeft;
+        const y = e.clientY - el.offsetTop;
+        const walkX = (x - panState.current.startX);
+        const walkY = (y - panState.current.startY);
+        el.scrollLeft = panState.current.scrollLeft - walkX;
+        el.scrollTop = panState.current.scrollTop - walkY;
+    };
+
+    const stopPanning = () => {
+        panState.current.isPanning = false;
+        panAreaRef.current?.classList.remove('is-panning');
+    };
+
+    // --- Start of performance optimization for wheel zoom ---
+    useEffect(() => {
+        // If the global scale changes from an external source (like the slider),
+        // reset the inline transform to let the CSS variable take over again.
+        if (settings.scale !== lastSyncedScale.current) {
+            const worksheetArea = panAreaRef.current?.querySelector<HTMLElement>('#worksheet-area');
+            if (worksheetArea) {
+                worksheetArea.style.transform = '';
+            }
+            lastSyncedScale.current = settings.scale;
+        }
+    }, [settings.scale]);
+
+    const debouncedSetScale = useDebouncedCallback((newScale: number) => {
+        lastSyncedScale.current = newScale; // Update our ref when we sync the global state
+        setSettings(s => ({ ...s, scale: newScale }));
+    }, 200);
+
+    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+        if (e.ctrlKey || e.metaKey) { // Allow pinch-zoom on trackpads
+            e.preventDefault();
+            const worksheetArea = panAreaRef.current?.querySelector<HTMLElement>('#worksheet-area');
+            if (!worksheetArea) return;
+
+            // Get the current scale. If an inline transform is set, use that, otherwise use global state.
+            const transformMatch = worksheetArea.style.transform.match(/scale\(([^)]+)\)/);
+            const currentScale = transformMatch ? parseFloat(transformMatch[1]) : settings.scale;
+
+            const scaleAmount = 0.05;
+            const newScale = e.deltaY > 0
+                ? Math.max(0.2, currentScale - scaleAmount)
+                : Math.min(2.0, currentScale + scaleAmount);
+
+            // Update DOM directly for immediate visual feedback
+            worksheetArea.style.transform = `scale(${newScale})`;
+            worksheetArea.style.transformOrigin = 'top center'; // Ensure origin is consistent
+
+            // Schedule an update to the global React state
+            debouncedSetScale(newScale);
+        }
+        // If no ctrl/meta key, allow normal vertical scrolling of the pan area
+    };
+     // --- End of performance optimization ---
 
     return (
-        <div className="flex flex-col min-h-screen bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
+        <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
+            
             <TopBanner />
-            <header className="sticky top-0 z-20 bg-primary shadow-md print:hidden">
+            
+            <header className="flex-shrink-0 bg-primary text-white shadow-md z-20 print:hidden">
                 <Header />
             </header>
-            <div className="container mx-auto px-4 py-4 flex-grow w-full">
-                <div className="flex flex-col md:flex-row gap-6">
-                    <div className="relative md:w-80 lg:w-96 print:hidden">
-                        <button onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)} className="absolute -right-3 top-2 p-1.5 bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded-full shadow-md hidden md:flex items-center justify-center z-10" title={isSettingsPanelCollapsed ? 'Ayarları Göster' : 'Ayarları Gizle'}>
-                            <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
-                        </button>
-                        <aside 
-                            id={TUTORIAL_ELEMENT_IDS.SETTINGS_PANEL} 
-                            className={`bg-white dark:bg-stone-800/50 p-4 rounded-lg shadow-sm border border-stone-200 dark:border-stone-700/50 transition-all duration-300 ${isSettingsPanelCollapsed 
-                                ? 'hidden md:block md:w-0 md:p-0 md:opacity-0 md:invisible' 
-                                : 'w-full mb-4 md:mb-0'
-                            }`}
-                        >
-                            <div className={`${isSettingsPanelCollapsed ? 'hidden' : ''}`}>
-                                <SettingsPanel />
-                            </div>
-                        </aside>
+
+            <div className="flex flex-grow overflow-hidden">
+                <aside 
+                    id={TUTORIAL_ELEMENT_IDS.SETTINGS_PANEL}
+                    className={`print:hidden transition-all duration-300 ease-in-out shadow-lg bg-white dark:bg-stone-800 ${
+                        isSettingsPanelCollapsed 
+                            ? 'w-0 -translate-x-full opacity-0 p-0' 
+                            : 'w-80 p-4'
+                    }`}
+                >
+                    <div className="overflow-y-auto h-full">
+                        <SettingsPanel />
                     </div>
-                    
-                    <main className="flex-1 min-w-0">
-                        <WorksheetToolbar />
-                        <ProblemSheet />
-                    </main>
+                </aside>
+
+                 <div className="relative flex-shrink-0 print:hidden">
+                    <button 
+                        onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)}
+                        className="absolute top-1/2 -right-6 z-10 transform -translate-y-1/2 bg-white dark:bg-stone-700 p-2 rounded-full shadow-md hover:bg-stone-100 dark:hover:bg-stone-600 transition"
+                        title={isSettingsPanelCollapsed ? "Ayarları Göster" : "Ayarları Gizle"}
+                    >
+                        <DoubleArrowLeftIcon className={`w-8 h-8 transition-transform duration-300 ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
+                    </button>
                 </div>
+
+                <main 
+                    className="flex-1 flex flex-col overflow-hidden relative"
+                >
+                    {isLoading && (
+                        <div className="absolute inset-0 bg-black/40 dark:bg-stone-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-30 gap-4">
+                            <LoadingDaisy />
+                            <p className="text-white text-lg font-semibold animate-pulse">Etkinlik hazırlanıyor...</p>
+                        </div>
+                    )}
+                    <WorksheetToolbar />
+                    <div 
+                        ref={panAreaRef}
+                        className="flex-grow overflow-auto p-4 md:p-8 cursor-grab pan-area"
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={stopPanning}
+                        onMouseLeave={stopPanning}
+                        onWheel={handleWheel}
+                    >
+                        <ProblemSheet />
+                    </div>
+                </main>
             </div>
             
-            {isLoading && (
-                <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center">
-                    <LoadingDaisy />
-                </div>
-            )}
-
             <PrintSettingsPanel isVisible={isPrintSettingsVisible} onClose={closePrintSettings} />
             <HowToUseModal isVisible={isHowToUseVisible} onClose={closeHowToUse} />
             <ContactModal isVisible={isContactModalVisible} onClose={closeContactModal} />
             <FavoritesPanel isVisible={isFavoritesPanelVisible} onClose={closeFavoritesPanel} />
-            <ToastContainer />
-            <TutorialGuide />
-            <FirstTimeUserBanner />
         </div>
     );
 };
 
 const App: React.FC = () => {
     return (
+        <UIProvider>
         <ThemeProvider>
         <ColorThemeProvider>
         <FontThemeProvider>
-        <ToastProvider>
-        <UIProvider>
-        <WorksheetProvider>
         <PrintSettingsProvider>
         <FlyingLadybugProvider>
+        <ToastProvider>
+        <WorksheetProvider>
         <TutorialProvider>
-            <AppLayout />
+            <AppContent />
+            <ToastContainer />
+            <TutorialGuide />
+            <FirstTimeUserBanner />
         </TutorialProvider>
+        </WorksheetProvider>
+        </ToastProvider>
         </FlyingLadybugProvider>
         </PrintSettingsProvider>
-        </WorksheetProvider>
-        </UIProvider>
-        </ToastProvider>
         </FontThemeProvider>
         </ColorThemeProvider>
         </ThemeProvider>
+        </UIProvider>
     );
-};
+}
 
 export default App;
