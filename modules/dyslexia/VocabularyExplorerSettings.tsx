@@ -20,7 +20,7 @@ const VocabularyExplorerSettings: React.FC<Props> = ({ settings, onChange }) => 
                     label="Sınıf Seviyesi"
                     id="ve-gradeLevel"
                     value={settings.gradeLevel}
-                    onChange={e => onChange({ gradeLevel: e.target.value })}
+                    onChange={e => onChange({ gradeLevel: e.target.value as VocabularyExplorerSettings['gradeLevel'] })}
                     options={[
                         { value: '1', label: '1. Sınıf' },
                         { value: '2', label: '2. Sınıf' },

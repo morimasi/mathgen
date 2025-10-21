@@ -60,19 +60,19 @@ function useDebouncedCallback<A extends any[]>(
   callback: (...args: A) => void,
   delay: number
 ) {
-  // FIX: Changed `useRef<number>()` to `useRef<any>()` to resolve a type mismatch with `window.setTimeout` and `window.clearTimeout`, which can have different return/parameter types in different JavaScript environments (browser vs. Node).
-  const timeoutRef = useRef<any>();
+  // FIX: Changed `useRef<any>()` to a more specific and cross-environment compatible type for the timeout identifier to improve type safety and resolve a misleading linting error.
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current);
     };
   }, []);
 
   return useCallback(
     (...args: A) => {
-      window.clearTimeout(timeoutRef.current);
-      timeoutRef.current = window.setTimeout(() => {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
         callback(...args);
       }, delay);
     },

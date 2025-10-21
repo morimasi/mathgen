@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
-// FIX: Add .ts extension to import path
 import { generateReadinessProblem } from '../services/readinessService.ts';
-import { ProblemCreationSettings, MathReadinessTheme } from '../types.ts';
+import { ProblemCreationSettings, MathReadinessTheme, Difficulty } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -104,7 +103,7 @@ const ProblemCreationModule: React.FC = () => {
                     label="Zorluk (Sayı Büyüklüğü)"
                     id="pc-difficulty"
                     value={settings.difficulty}
-                    onChange={e => handleSettingChange('difficulty', e.target.value as 'easy' | 'medium' | 'hard')}
+                    onChange={e => handleSettingChange('difficulty', e.target.value as Difficulty)}
                     options={[
                         { value: 'easy', label: 'Kolay (Sonuç < 20)' },
                         { value: 'medium', label: 'Orta (Sonuç < 100)' },
@@ -122,4 +121,35 @@ const ProblemCreationModule: React.FC = () => {
                         { value: 'vehicles', label: 'Taşıtlar' },
                         { value: 'fruits', label: 'Meyveler/Yiyecekler' },
                     ]}
-                    containerClassName="col-
+                />
+                <NumberInput 
+                    label="Sayfa Başına Problem"
+                    id="problems-per-page"
+                    min={1} max={8}
+                    value={settings.problemsPerPage}
+                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
+                    disabled={isTableLayout}
+                />
+                <NumberInput 
+                    label="Sayfa Sayısı"
+                    id="page-count"
+                    min={1} max={20}
+                    value={settings.pageCount}
+                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
+                    disabled={isTableLayout}
+                />
+            </div>
+            <SettingsPresetManager 
+                moduleKey="problem-creation"
+                currentSettings={settings}
+                onLoadSettings={setSettings}
+            />
+            <div className="flex flex-wrap gap-2 pt-2">
+                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
+                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
+            </div>
+        </div>
+    );
+};
+
+export default ProblemCreationModule;

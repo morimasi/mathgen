@@ -9,7 +9,8 @@ const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule.tsx'))
 const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule.tsx'));
 const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule.tsx').then(module => ({ default: module.RhythmicCountingModule })));
 const TimeModule = React.lazy(() => import('../modules/TimeModule.tsx'));
-const GeometryModule = React.lazy(() => import('../modules/GeometryModule.tsx'));
+// FIX: Updated the lazy import for GeometryModule to correctly handle a named export.
+const GeometryModule = React.lazy(() => import('../modules/GeometryModule.tsx').then(module => ({ default: module.GeometryModule })));
 const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule.tsx'));
 const WordProblemsModule = React.lazy(() => import('../modules/WordProblemsModule.tsx'));
 const VisualSupportModule = React.lazy(() => import('../modules/VisualSupportModule.tsx'));

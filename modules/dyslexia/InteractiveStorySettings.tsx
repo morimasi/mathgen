@@ -32,7 +32,7 @@ const InteractiveStorySettings: React.FC<Props> = ({ settings, onChange }) => {
                     label="Sınıf Seviyesi"
                     id="is-gradeLevel"
                     value={settings.gradeLevel}
-                    onChange={e => onChange({ gradeLevel: e.target.value })}
+                    onChange={e => onChange({ gradeLevel: e.target.value as InteractiveStorySettings['gradeLevel'] })}
                     options={[
                         { value: '2', label: '2. Sınıf' },
                         { value: '3', label: '3. Sınıf' },

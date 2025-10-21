@@ -233,4 +233,11 @@ const GeometryModule: React.FC = () => {
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
                 <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
-                    <ShuffleIcon className="w-4 h-4"
+                    <ShuffleIcon className="w-4 h-4"/>
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+export default GeometryModule;

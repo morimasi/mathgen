@@ -143,14 +143,20 @@ const generateFillBetweenSheetHTML = (settings: RhythmicCountingSettings, min: n
         p2 = getRandomInt(p1 + 2, BOXES_PER_ROW - 1 - afterCount);
 
         const num1 = startNum + p1 * effectiveStep;
-        // FIX: Corrected a typo from `effective` to `effectiveStep` to use the defined variable.
         const num2 = startNum + p2 * effectiveStep;
+        
+        let boxes = [];
+        for(let j=0; j < BOXES_PER_ROW; j++) {
+            if (j === p1) boxes.push(`<span style="${BOX_STYLE}">${num1}</span>`);
+            else if (j === p2) boxes.push(`<span style="${BOX_STYLE}">${num2}</span>`);
+            else boxes.push(`<span style="${BOX_STYLE}"></span>`);
+        }
+        
+        htmlRows.push(`<div style="${ROW_STYLE}">${boxes.join(SEPARATOR)}</div>`);
     }
-    // FIX: Added a return statement to ensure the function always returns a string as declared.
     return `<div class="practice-sheet" style="display: flex; flex-direction: column; gap: 1rem;">${htmlRows.join('')}</div>`;
 };
 
-// FIX: Added the missing `generateRhythmicCountingProblem` function and exported it to resolve an import error.
 export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettings): { problem: Problem, title: string, error?: string } => {
     const { type, digits, step, direction, useMultiplesOnly, patternLength, missingCount, orderCount, orderDirection } = settings;
     const problemBase = { category: 'rhythmic-counting', display: 'flow' as const };

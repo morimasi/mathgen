@@ -88,7 +88,8 @@ const DysgraphiaModule: React.FC = () => {
     const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
 
     const activeSubModuleId = settings.activeSubModule;
-    const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()).replace(/Ai$/, 'Ai') as keyof Omit<DysgraphiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
+    // FIX: Corrected the regex to properly capitalize 'Ai' when converting from kebab-case to camelCase.
+    const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()).replace(/ai$/, 'Ai') as keyof Omit<DysgraphiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
     const activeSubModuleSettings = (settings as any)[activeSubModuleKey];
     
     useEffect(() => {

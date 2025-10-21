@@ -21,7 +21,7 @@ const ReadingFluencyCoachSettingsComponent: React.FC<Props> = ({ settings, onCha
                     label="Sınıf Seviyesi"
                     id="rfc-gradeLevel"
                     value={settings.gradeLevel}
-                    onChange={e => onChange({ gradeLevel: e.target.value })}
+                    onChange={e => onChange({ gradeLevel: e.target.value as ReadingFluencyCoachSettings['gradeLevel'] })}
                     options={[
                         { value: '1', label: '1. Sınıf' },
                         { value: '2', label: '2. Sınıf' },
