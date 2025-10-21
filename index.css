@@ -437,6 +437,38 @@
     padding-left: 50vw;
     padding-right: 50vw;
   }
+  
+  /* Dyscalculia specific styles */
+  .dyscalculia-box { @apply border-2 border-dashed border-stone-400 rounded-md p-4 min-h-[60px] flex items-center justify-center text-2xl tracking-widest; }
+  .ordering-container { @apply flex justify-around items-end gap-4 mt-2; }
+  .dyscalculia-card { @apply flex flex-col items-center p-2 border-2 border-stone-300 rounded-lg; }
+  .dyscalculia-card div { @apply text-2xl; }
+  .dyscalculia-card span { @apply font-bold text-lg; }
+  .visual-arithmetic-container { @apply flex items-center justify-center gap-4 text-3xl font-bold; }
+  .ten-frame { @apply grid grid-cols-5 gap-2 p-2 border-4 border-stone-600 rounded-md w-48 mx-auto mt-2; }
+  .ten-frame-dot { @apply w-6 h-6 rounded-full bg-stone-300; }
+  .ten-frame-dot.filled { @apply bg-blue-500; }
+  .symbol-options { @apply flex justify-around mt-4 text-3xl font-bold; }
+  .dyscalculia-fraction-container { @apply flex items-center justify-center gap-8 mt-2; }
+  .dyscalculia-fraction-container .options { @apply flex flex-col gap-2 text-xl font-mono; }
+  .dyscalculia-clock-container, .estimation-container { @apply flex flex-col items-center gap-4; }
+  .dyscalculia-clock-container .options.vertical { @apply flex flex-col items-start gap-2 text-lg; }
+  .dyscalculia-measurement-container { @apply flex flex-col items-center gap-4; }
+  .ruler { @apply h-4 bg-yellow-300 border-2 border-yellow-600; }
+  .ruler.short { @apply w-24; }
+  .ruler.long { @apply w-40; }
+  .dyscalculia-shape-container { @apply flex justify-around items-center gap-2; }
+  .dyscalculia-shape-container svg { @apply w-16 h-16; }
+  .pattern-container { @apply flex justify-center gap-2 mt-2; }
+  .pattern-block { @apply w-10 h-10 rounded-md; }
+  .pattern-container.empty > div { @apply w-10 h-10 rounded-md border-2 border-dashed border-stone-400; }
+  .base-ten-blocks { @apply flex items-end gap-1; }
+  .ten-rod { @apply w-4 h-16 bg-red-400; }
+  .one-block { @apply w-4 h-4 bg-blue-400; }
+  .dyscalculia-dots { @apply text-3xl text-blue-500 leading-none; }
+  .finger-count { @apply text-3xl; }
+  .crossed-out { @apply relative text-gray-400; }
+  .crossed-out::after { content: 'X'; @apply absolute inset-0 flex items-center justify-center text-red-500 font-bold text-4xl; }
 }
 
 @media print {

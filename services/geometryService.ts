@@ -32,6 +32,8 @@ export const generateGeometryProblem = (settings: GeometrySettings): { problem: 
                 [ShapeType.Pentagon]: "düzgün beşgenin",
                 [ShapeType.Hexagon]: "düzgün altıgenin",
                 [ShapeType.Rhombus]: "eşkenar dörtgenin",
+                // FIX: Add 'Star' to the shapeNames object to match the ShapeType enum.
+                [ShapeType.Star]: "yıldızın",
             };
 
             title = `Aşağıdaki ${shapeNames[shape]} ${isPerimeter ? 'çevresini' : 'alanını'} hesaplayınız.`;
