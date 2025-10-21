@@ -1,6 +1,6 @@
 // services/dyslexiaService.ts
 
-import { Problem, DyslexiaSubModuleType, SoundWizardSettings, VisualMasterSettings, MapReadingSettings } from '../types.ts';
+import { Problem, DyslexiaSubModuleType } from './types.ts';
 import { generateDyslexiaAIProblem } from './geminiService.ts';
 import { maps } from './map/mapData.ts';
 
@@ -18,7 +18,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 // --- Local Generator Functions ---
 
-const generateSoundWizardLocal = (settings: SoundWizardSettings): { problem: Problem; title: string; } => {
+const generateSoundWizardLocal = (settings: any): { problem: Problem; title: string; } => {
     const { type } = settings;
     let question = "", answer = "", title = "Ses Büyücüsü";
 
@@ -43,7 +43,7 @@ const generateSoundWizardLocal = (settings: SoundWizardSettings): { problem: Pro
     return { problem: { question, answer, category: 'dyslexia' }, title };
 };
 
-const generateVisualMasterLocal = (settings: VisualMasterSettings): { problem: Problem, title: string } => {
+const generateVisualMasterLocal = (settings: any): { problem: Problem, title: string } => {
     const { type, pair } = settings;
     let title = "Görsel Usta";
     let question = "", answer = "";
@@ -59,7 +59,7 @@ const generateVisualMasterLocal = (settings: VisualMasterSettings): { problem: P
     return { problem: { question, answer, category: 'dyslexia' }, title };
 };
 
-const generateMapReadingLocal = (settings: MapReadingSettings): { problem: Problem, title: string, preamble: string } => {
+const generateMapReadingLocal = (settings: any): { problem: Problem, title: string, preamble: string } => {
     const { mapType, task } = settings;
     const map = maps.find(m => m.id === mapType)!;
     const preamble = `${map.name}'nı incele ve soruyu cevapla.`;
@@ -103,13 +103,13 @@ export const generateDyslexiaProblem = async (subModuleId: DyslexiaSubModuleType
         let result: { problem: Problem; title: string; preamble?: string };
         switch(subModuleId) {
              case 'sound-wizard':
-                result = generateSoundWizardLocal(settings as SoundWizardSettings);
+                result = generateSoundWizardLocal(settings);
                 break;
             case 'visual-master':
-                result = generateVisualMasterLocal(settings as VisualMasterSettings);
+                result = generateVisualMasterLocal(settings);
                 break;
             case 'map-reading':
-                result = generateMapReadingLocal(settings as MapReadingSettings);
+                result = generateMapReadingLocal(settings);
                 break;
             // Add other local generators here
             default:

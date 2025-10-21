@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+// FIX: Add .ts extension to import path
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { BasicShapesSettings, ShapeRecognitionType, ShapeType, ModuleKey } from '../types.ts';
+import { BasicShapesSettings, ShapeRecognitionType, ShapeType } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,16 +14,21 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const BasicShapesModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.basicShapes;
-    const moduleKey: ModuleKey = 'basicShapes';
+    const [settings, setSettings] = useState<BasicShapesSettings>({
+        type: ShapeRecognitionType.ColorShape,
+        shapes: [ShapeType.Circle, ShapeType.Square, ShapeType.Triangle],
+        problemsPerPage: 6,
+        pageCount: 1,
+        autoFit: false,
+        useWordProblems: false,
+        topic: '',
+    });
 
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'basic-shapes',
         settings,
         generatorFn: (s) => generateReadinessProblem('basic-shapes', s),
         aiGeneratorFn: generateContextualWordProblems,
@@ -30,7 +36,7 @@ const BasicShapesModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof BasicShapesSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
     
     const handleRandomTopic = () => {
@@ -114,9 +120,9 @@ const BasicShapesModule: React.FC = () => {
                 />
             </div>
             <SettingsPresetManager 
-                moduleKey="basicShapes"
+                moduleKey="basic-shapes"
                 currentSettings={settings}
-                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
+                onLoadSettings={setSettings}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>

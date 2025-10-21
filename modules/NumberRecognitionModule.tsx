@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+// FIX: Add .ts extension to import path
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { NumberRecognitionSettings, NumberRecognitionType, MathReadinessTheme, ModuleKey } from '../types.ts';
+import { NumberRecognitionSettings, NumberRecognitionType, MathReadinessTheme } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,16 +14,22 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const NumberRecognitionModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.numberRecognition;
-    const moduleKey: ModuleKey = 'numberRecognition';
+    const [settings, setSettings] = useState<NumberRecognitionSettings>({
+        type: NumberRecognitionType.CountAndWrite,
+        theme: 'mixed',
+        numberRange: '1-10',
+        problemsPerPage: 6,
+        pageCount: 1,
+        autoFit: false,
+        useWordProblems: false,
+        topic: '',
+    });
 
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'number-recognition',
         settings,
         generatorFn: (s) => generateReadinessProblem('number-recognition', s),
         aiGeneratorFn: generateContextualWordProblems,
@@ -30,7 +37,7 @@ const NumberRecognitionModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof NumberRecognitionSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
 
     const handleRandomTopic = () => {
@@ -137,9 +144,9 @@ const NumberRecognitionModule: React.FC = () => {
                 />
             </div>
             <SettingsPresetManager 
-                moduleKey="numberRecognition"
+                moduleKey="number-recognition"
                 currentSettings={settings}
-                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
+                onLoadSettings={setSettings}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>

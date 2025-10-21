@@ -1,4 +1,4 @@
-import { ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType, ModuleKey } from '../types.ts';
+import { ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -15,7 +15,6 @@ import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 import { useToast } from '../services/ToastContext.tsx';
 import { parseSpokenMath } from '../services/utils.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 declare global {
     interface Window {
@@ -31,25 +30,30 @@ const ArithmeticModule: React.FC = () => {
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef<any>(null);
     const [isSpeechApiSupported, setIsSpeechApiSupported] = useState(true);
-    
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.arithmetic;
-    const moduleKey: ModuleKey = 'arithmetic';
 
-    const handleSettingChange = (field: keyof ArithmeticSettings, value: any) => {
-        const newState: Partial<ArithmeticSettings> = { [field]: value };
-        if (field === 'allowNegativeNumbers' && value === true) {
-            newState.format = 'inline';
-            newState.representation = 'number';
-            newState.useVisuals = false;
-            newState.hasThirdNumber = false;
-            newState.useWordProblems = false;
-        }
-        setContextSettings(moduleKey, newState);
-    };
+    const [settings, setSettings] = useState<ArithmeticSettings>({
+        gradeLevel: 2,
+        operation: ArithmeticOperation.Addition,
+        digits1: 2,
+        digits2: 2,
+        digits3: 2,
+        hasThirdNumber: false,
+        carryBorrow: 'mixed',
+        divisionType: 'mixed',
+        format: 'vertical-html',
+        representation: 'number',
+        problemsPerPage: 20,
+        pageCount: 1,
+        useWordProblems: false,
+        operationCount: 1,
+        useVisuals: false,
+        topic: '',
+        autoFit: false,
+        allowNegativeNumbers: false,
+    });
     
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'arithmetic',
         settings,
         generatorFn: generateArithmeticProblem,
         aiGeneratorFn: generateContextualWordProblems,
@@ -113,6 +117,20 @@ const ArithmeticModule: React.FC = () => {
     };
 
 
+    const handleSettingChange = (field: keyof ArithmeticSettings, value: any) => {
+        setSettings(prev => {
+            const newState = { ...prev, [field]: value };
+            if (field === 'allowNegativeNumbers' && value === true) {
+                newState.format = 'inline';
+                newState.representation = 'number';
+                newState.useVisuals = false;
+                newState.hasThirdNumber = false;
+                newState.useWordProblems = false;
+            }
+            return newState;
+        });
+    };
+
     const handleRandomTopic = () => {
         const randomTopic = TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)];
         handleSettingChange('topic', randomTopic);
@@ -129,7 +147,7 @@ const ArithmeticModule: React.FC = () => {
             case 4: newSettings = { ...newSettings, digits1: 4, digits2: 3, operation: ArithmeticOperation.Division }; break;
             case 5: newSettings = { ...newSettings, digits1: 5, digits2: 4, operation: ArithmeticOperation.MixedAll }; break;
         }
-        setContextSettings(moduleKey, newSettings);
+        setSettings(prev => ({ ...prev, ...newSettings }));
     };
 
     useEffect(() => {
@@ -230,7 +248,7 @@ const ArithmeticModule: React.FC = () => {
                     </div>
                 </details>
             </div>
-             <SettingsPresetManager moduleKey="arithmetic" currentSettings={settings} onLoadSettings={(s) => setContextSettings(moduleKey, s)}/>
+             <SettingsPresetManager moduleKey="arithmetic" currentSettings={settings} onLoadSettings={setSettings}/>
             <div className="flex flex-wrap gap-2 pt-1.5">
                 <Button onClick={() => generate(true)} size="sm" enableFlyingLadybug>Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>

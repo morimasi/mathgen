@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateFractionsProblem } from '../services/fractionsService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty, ModuleKey } from '../types.ts';
+import { FractionsSettings, FractionsProblemType, FractionsOperation, Difficulty } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,16 +13,29 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const FractionsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.fractions;
-    const moduleKey: ModuleKey = 'fractions';
-
+    const [settings, setSettings] = useState<FractionsSettings>({
+        gradeLevel: 3,
+        type: FractionsProblemType.FourOperations,
+        operation: FractionsOperation.Addition,
+        difficulty: 'easy',
+        maxSetSize: 30,
+        problemsPerPage: 20,
+        pageCount: 1,
+        format: 'vertical-html',
+        representation: 'number',
+        useWordProblems: false,
+        operationCount: 1,
+        useVisuals: false,
+        topic: '',
+        useMixedNumbers: true,
+        autoFit: false,
+    });
+    
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'fractions',
         settings,
         generatorFn: generateFractionsProblem,
         aiGeneratorFn: generateContextualWordProblems,
@@ -30,7 +43,7 @@ const FractionsModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof FractionsSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
 
     const handleRandomTopic = () => {
@@ -56,7 +69,7 @@ const FractionsModule: React.FC = () => {
                 newSettings.difficulty = 'easy';
                 break;
         }
-        setContextSettings(moduleKey, newSettings);
+        setSettings(prev => ({ ...prev, ...newSettings }));
     };
 
     const isFourOps = settings.type === FractionsProblemType.FourOperations;
@@ -228,7 +241,7 @@ const FractionsModule: React.FC = () => {
                 </details>
 
             </div>
-            <SettingsPresetManager moduleKey="fractions" currentSettings={settings} onLoadSettings={(s) => setContextSettings(moduleKey, s)} />
+            <SettingsPresetManager moduleKey="fractions" currentSettings={settings} onLoadSettings={setSettings} />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>

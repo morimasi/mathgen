@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+// FIX: Add .ts extension to import path
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { IntroToMeasurementSettings, IntroMeasurementType, MathReadinessTheme, Difficulty, ModuleKey } from '../types.ts';
+import { IntroToMeasurementSettings, IntroMeasurementType, MathReadinessTheme, Difficulty } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,16 +14,22 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
 
-const IntroToMeasurementModule: React.FC = () => {
+export const IntroToMeasurementModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.introToMeasurement;
-    const moduleKey: ModuleKey = 'introToMeasurement';
+    const [settings, setSettings] = useState<IntroToMeasurementSettings>({
+        type: IntroMeasurementType.CompareLength,
+        theme: 'mixed',
+        difficulty: 'easy',
+        problemsPerPage: 8,
+        pageCount: 1,
+        autoFit: false,
+        useWordProblems: false,
+        topic: '',
+    });
 
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'intro-to-measurement',
         settings,
         generatorFn: (s) => generateReadinessProblem('intro-to-measurement', s),
         aiGeneratorFn: generateContextualWordProblems,
@@ -30,7 +37,7 @@ const IntroToMeasurementModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof IntroToMeasurementSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
 
      const handleRandomTopic = () => {
@@ -138,9 +145,9 @@ const IntroToMeasurementModule: React.FC = () => {
                 />
             </div>
             <SettingsPresetManager 
-                moduleKey="introToMeasurement"
+                moduleKey="intro-to-measurement"
                 currentSettings={settings}
-                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
+                onLoadSettings={setSettings}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
@@ -149,6 +156,3 @@ const IntroToMeasurementModule: React.FC = () => {
         </div>
     );
 };
-
-// FIX: Use default export to be compatible with React.lazy in SettingsPanel.tsx
-export default IntroToMeasurementModule;

@@ -1,36 +1,36 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { Problem, DysgraphiaSettings, DysgraphiaSubModuleType, ModuleKey } from '../types.ts';
-import Button from '../components/form/Button.tsx';
-import NumberInput from '../components/form/NumberInput.tsx';
-import { ShuffleIcon } from '../components/icons/Icons.tsx';
-import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
-import { calculateMaxProblems } from '../services/layoutService.ts';
-import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
-import { generateDysgraphiaProblem } from '../services/dysgraphiaService.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
-import Checkbox from '../components/form/Checkbox.tsx';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Problem, DysgraphiaSettings, DysgraphiaSubModuleType } from '../types';
+import Button from '../components/form/Button';
+import NumberInput from '../components/form/NumberInput';
+import { ShuffleIcon } from '../components/icons/Icons';
+import { usePrintSettings } from '../services/PrintSettingsContext';
+import { calculateMaxProblems } from '../services/layoutService';
+import SettingsPresetManager from '../components/SettingsPresetManager';
+import { generateDysgraphiaProblem } from '../services/dysgraphiaService';
+import { useWorksheet } from '../services/WorksheetContext';
+import Checkbox from '../components/form/Checkbox';
 
 
 // Import all sub-module setting components
-import FineMotorSkillsSettings from './dysgraphia/FineMotorSkillsSettings.tsx';
-import LetterFormationSettings from './dysgraphia/LetterFormationSettings.tsx';
-import LetterFormRecognitionSettings from './dysgraphia/LetterFormRecognitionSettings.tsx';
-import LegibleWritingSettings from './dysgraphia/LegibleWritingSettings.tsx';
-import PictureSequencingSettings from './dysgraphia/PictureSequencingSettings.tsx';
-import WritingSpeedSettings from './dysgraphia/WritingSpeedSettings.tsx';
-import SentenceConstructionSettings from './dysgraphia/SentenceConstructionSettings.tsx';
-import PunctuationSettings from './dysgraphia/PunctuationSettings.tsx';
-import WritingPlanningSettings from './dysgraphia/WritingPlanningSettings.tsx';
-import CreativeWritingSettings from './dysgraphia/CreativeWritingSettings.tsx';
-import KeyboardSkillsSettings from './dysgraphia/KeyboardSkillsSettings.tsx';
-import InteractiveStoryDgSettings from './dysgraphia/InteractiveStorySettings.tsx';
+import FineMotorSkillsSettings from './dysgraphia/FineMotorSkillsSettings';
+import LetterFormationSettings from './dysgraphia/LetterFormationSettings';
+import LetterFormRecognitionSettings from './dysgraphia/LetterFormRecognitionSettings';
+import LegibleWritingSettings from './dysgraphia/LegibleWritingSettings';
+import PictureSequencingSettings from './dysgraphia/PictureSequencingSettings';
+import WritingSpeedSettings from './dysgraphia/WritingSpeedSettings';
+import SentenceConstructionSettings from './dysgraphia/SentenceConstructionSettings';
+import PunctuationSettings from './dysgraphia/PunctuationSettings';
+import WritingPlanningSettings from './dysgraphia/WritingPlanningSettings';
+import CreativeWritingSettings from './dysgraphia/CreativeWritingSettings';
+import KeyboardSkillsSettings from './dysgraphia/KeyboardSkillsSettings';
+import InteractiveStoryDgSettings from './dysgraphia/InteractiveStorySettings';
 
 // Import all sub-module icons
 import {
     FineMotorSkillsIcon, LetterFormationIcon, LetterFormRecognitionIcon, LegibleWritingIcon, PictureSequencingIcon,
     WritingSpeedIcon, SentenceConstructionIcon, PunctuationIcon, WritingPlanningIcon, CreativeWritingIcon,
     KeyboardSkillsIcon, InteractiveStoryIcon
-} from '../components/icons/Icons.tsx';
+} from '../components/icons/Icons';
 
 const subModules: { id: DysgraphiaSubModuleType; label: string; icon: React.FC<React.SVGProps<SVGSVGElement>> }[] = [
     { id: 'fine-motor-skills', label: 'İnce Motor Becerileri', icon: FineMotorSkillsIcon },
@@ -47,12 +47,27 @@ const subModules: { id: DysgraphiaSubModuleType; label: string; icon: React.FC<R
     { id: 'interactive-story-dg', label: 'Hikaye Macerası (AI)', icon: InteractiveStoryIcon },
 ];
 
+const defaultSettings: DysgraphiaSettings = {
+    activeSubModule: 'fine-motor-skills',
+    problemsPerPage: 10, pageCount: 1, autoFit: true,
+    fineMotorSkills: { type: 'line-trace' },
+    letterFormation: { letter: 'a', case: 'lower' },
+    letterFormRecognition: { targetLetter: 'b', difficulty: 'easy' },
+    legibleWriting: { type: 'spacing' },
+    pictureSequencing: { storyLength: 3, topic: 'Parkta bir gün' },
+    writingSpeed: { duration: 1 },
+    sentenceConstruction: { wordCount: 5 },
+    punctuation: { type: 'end-of-sentence' },
+    writingPlanning: { topic: 'Tatil anılarım' },
+    creativeWriting: { promptType: 'story-starter', topic: 'Gizemli bir anahtar' },
+    keyboardSkills: { level: 'home-row' },
+    interactiveStoryDg: { genre: 'adventure', gradeLevel: '3' },
+};
+
 const DysgraphiaModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings, updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
-    const settings = allSettings.dysgraphia;
-    const moduleKey: ModuleKey = 'dysgraphia';
-
+    const [settings, setSettings] = useState<DysgraphiaSettings>(defaultSettings);
+    const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
     const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
     const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
@@ -125,20 +140,20 @@ const DysgraphiaModule: React.FC = () => {
     }, [settings, printSettings, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
     const handleSubModuleChange = (id: DysgraphiaSubModuleType) => {
-        setContextSettings(moduleKey, { activeSubModule: id });
+        setSettings(prev => ({ ...prev, activeSubModule: id }));
     };
 
     const handleSettingChange = (field: keyof DysgraphiaSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
     
     const handleSubModuleSettingChange = (subModuleSettings: any) => {
-        const currentSubModuleSettings = (settings as any)[activeSubModuleKey];
-        setContextSettings(moduleKey, { [activeSubModuleKey]: { ...currentSubModuleSettings, ...subModuleSettings } });
+        setSettings(prev => ({
+            ...prev,
+            [activeSubModuleKey]: { ...(prev as any)[activeSubModuleKey], ...subModuleSettings }
+        }));
     };
 
-    // FIX: Completed the renderSettingsPanel function and the component's return statement.
-    // The component was previously incomplete, causing a type error because it didn't return a valid ReactNode.
     const renderSettingsPanel = () => {
         const props = { settings: activeSubModuleSettings, onChange: handleSubModuleSettingChange };
         switch (activeSubModuleId) {

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { generateMeasurementProblem } from '../services/measurementService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { MeasurementSettings, MeasurementProblemType, Difficulty, ModuleKey } from '../types.ts';
+import { MeasurementSettings, MeasurementProblemType, Difficulty } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,16 +13,23 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const MeasurementModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.measurement;
-    const moduleKey: ModuleKey = 'measurement';
+    const [settings, setSettings] = useState<MeasurementSettings>({
+        gradeLevel: 2,
+        type: MeasurementProblemType.Mixed,
+        difficulty: 'easy',
+        problemsPerPage: 20,
+        pageCount: 1,
+        useWordProblems: false,
+        autoFit: false,
+        useVisuals: false,
+        topic: '',
+    });
 
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'measurement',
         settings,
         generatorFn: generateMeasurementProblem,
         aiGeneratorFn: generateContextualWordProblems,
@@ -30,7 +37,7 @@ const MeasurementModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof MeasurementSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
 
     const handleRandomTopic = () => {
@@ -54,7 +61,7 @@ const MeasurementModule: React.FC = () => {
                 newSettings.difficulty = 'hard';
                 break;
         }
-        setContextSettings(moduleKey, newSettings);
+        setSettings(prev => ({ ...prev, ...newSettings }));
     };
     
     const isTableLayout = printSettings.layoutMode === 'table';
@@ -149,7 +156,7 @@ const MeasurementModule: React.FC = () => {
                     </div>
                 </details>
             </div>
-             <SettingsPresetManager moduleKey="measurement" currentSettings={settings} onLoadSettings={(s) => setContextSettings(moduleKey, s)} />
+             <SettingsPresetManager moduleKey="measurement" currentSettings={settings} onLoadSettings={setSettings} />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>

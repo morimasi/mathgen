@@ -239,7 +239,7 @@ export enum ShapeType {
     Pentagon = 'pentagon',
     Hexagon = 'hexagon',
     Rhombus = 'rhombus',
-// FIX: Added 'Star' to the ShapeType enum.
+    // FIX: Added 'Star' to the ShapeType enum.
     Star = 'star',
 }
 export interface GeometrySettings {
@@ -567,34 +567,3 @@ export interface DysgraphiaSettings {
     keyboardSkills: KeyboardSkillsSettings;
     interactiveStoryDg: InteractiveStoryDgSettings;
 }
-
-// D. Central Settings Hub
-export interface AllSettings {
-    arithmetic: ArithmeticSettings;
-    fractions: FractionsSettings;
-    decimals: DecimalsSettings;
-    placeValue: PlaceValueSettings;
-    rhythmicCounting: RhythmicCountingSettings;
-    time: TimeSettings;
-    geometry: GeometrySettings;
-    measurement: MeasurementSettings;
-    wordProblems: WordProblemSettings;
-    matchingAndSorting: MatchingAndSortingSettings;
-    comparingQuantities: ComparingQuantitiesSettings;
-    numberRecognition: NumberRecognitionSettings;
-    patterns: PatternsSettings;
-    basicShapes: BasicShapesSettings;
-    positionalConcepts: PositionalConceptsSettings;
-    introToMeasurement: IntroToMeasurementSettings;
-    simpleGraphs: SimpleGraphsSettings;
-    visualAdditionSubtraction: VisualAdditionSubtractionSettings;
-    verbalArithmetic: VerbalArithmeticSettings;
-    missingNumberPuzzles: MissingNumberPuzzlesSettings;
-    symbolicArithmetic: SymbolicArithmeticSettings;
-    problemCreation: ProblemCreationSettings;
-    dyslexia: DyslexiaSettings;
-    dyscalculia: DyscalculiaSettings;
-    dysgraphia: DysgraphiaSettings;
-}
-
-export type ModuleKey = keyof AllSettings;

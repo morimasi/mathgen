@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+// FIX: Add .ts extension to import path
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { PositionalConceptsSettings, PositionalConceptType, MathReadinessTheme, ModuleKey } from '../types.ts';
+import { PositionalConceptsSettings, PositionalConceptType, MathReadinessTheme } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,16 +14,22 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const PositionalConceptsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.positionalConcepts;
-    const moduleKey: ModuleKey = 'positionalConcepts';
+    const [settings, setSettings] = useState<PositionalConceptsSettings>({
+        type: PositionalConceptType.AboveBelow,
+        theme: 'mixed',
+        itemCount: 3,
+        problemsPerPage: 4,
+        pageCount: 1,
+        autoFit: false,
+        useWordProblems: false,
+        topic: '',
+    });
 
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'positional-concepts',
         settings,
         generatorFn: (s) => generateReadinessProblem('positional-concepts', s),
         aiGeneratorFn: generateContextualWordProblems,
@@ -30,7 +37,7 @@ const PositionalConceptsModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof PositionalConceptsSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
 
     const handleRandomTopic = () => {
@@ -131,9 +138,9 @@ const PositionalConceptsModule: React.FC = () => {
                 />
             </div>
             <SettingsPresetManager 
-                moduleKey="positionalConcepts"
+                moduleKey="positional-concepts"
                 currentSettings={settings}
-                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
+                onLoadSettings={setSettings}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>

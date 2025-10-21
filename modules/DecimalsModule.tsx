@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { generateDecimalProblem } from '../services/mathService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { DecimalsSettings, DecimalsProblemType, DecimalsOperation, Difficulty, ModuleKey } from '../types.ts';
+import { DecimalsSettings, DecimalsProblemType, DecimalsOperation, Difficulty } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,16 +13,27 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const DecimalsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.decimals;
-    const moduleKey: ModuleKey = 'decimals';
-
+    const [settings, setSettings] = useState<DecimalsSettings>({
+        gradeLevel: 4,
+        type: DecimalsProblemType.FourOperations,
+        operation: DecimalsOperation.Addition,
+        difficulty: 'easy',
+        problemsPerPage: 20,
+        pageCount: 1,
+        format: 'inline',
+        representation: 'number',
+        useWordProblems: false,
+        operationCount: 1,
+        useVisuals: false,
+        topic: '',
+        autoFit: false,
+    });
+    
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'decimals',
         settings,
         generatorFn: generateDecimalProblem,
         aiGeneratorFn: generateContextualWordProblems,
@@ -30,7 +41,7 @@ const DecimalsModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof DecimalsSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
 
     const handleRandomTopic = () => {
@@ -53,7 +64,7 @@ const DecimalsModule: React.FC = () => {
                  newSettings.difficulty = 'easy';
                  break;
         }
-        setContextSettings(moduleKey, newSettings);
+        setSettings(prev => ({ ...prev, ...newSettings }));
     };
 
     const isFourOps = settings.type === DecimalsProblemType.FourOperations;
@@ -196,7 +207,7 @@ const DecimalsModule: React.FC = () => {
                     </div>
                 </div>
             </details>
-             <SettingsPresetManager moduleKey="decimals" currentSettings={settings} onLoadSettings={(s) => setContextSettings(moduleKey, s)} />
+             <SettingsPresetManager moduleKey="decimals" currentSettings={settings} onLoadSettings={setSettings} />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { Problem, DyscalculiaSettings, DyscalculiaSubModuleType, ModuleKey } from '../types';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Problem, DyscalculiaSettings, DyscalculiaSubModuleType } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import { ShuffleIcon } from '../components/icons/Icons';
@@ -47,12 +47,28 @@ const subModules: { id: DyscalculiaSubModuleType; label: string; icon: React.FC<
     { id: 'interactive-story-dc', label: 'Hikaye Macerası (AI)', icon: InteractiveStoryIcon },
 ];
 
+const defaultSettings: DyscalculiaSettings = {
+    activeSubModule: 'number-sense',
+    problemsPerPage: 10, pageCount: 1, autoFit: true,
+    numberSense: { type: 'number-line', maxNumber: 20 },
+    arithmeticFluency: { operation: 'addition', difficulty: 'easy' },
+    numberGrouping: { maxNumber: 10 },
+    problemSolving: { gradeLevel: '1', topic: 'Oyuncaklar' },
+    mathLanguage: { type: 'symbol-match' },
+    timeMeasurementGeometry: { category: 'time' },
+    spatialReasoning: { type: 'pattern-copy' },
+    estimationSkills: { type: 'quantity' },
+    fractionsDecimalsIntro: { type: 'visual-match' },
+    visualNumberRepresentation: { maxNumber: 10, representation: 'dots' },
+    visualArithmetic: { operation: 'addition', maxNumber: 10 },
+    interactiveStoryDc: { genre: 'market', gradeLevel: '1' },
+};
+
+
 const DyscalculiaModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings, updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
-    const settings = allSettings.dyscalculia;
-    const moduleKey: ModuleKey = 'dyscalculia';
-
+    const [settings, setSettings] = useState<DyscalculiaSettings>(defaultSettings);
+    const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
     const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
     const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
@@ -125,16 +141,18 @@ const DyscalculiaModule: React.FC = () => {
     }, [settings, printSettings, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
     const handleSubModuleChange = (id: DyscalculiaSubModuleType) => {
-        setContextSettings(moduleKey, { activeSubModule: id });
+        setSettings(prev => ({ ...prev, activeSubModule: id }));
     };
 
     const handleSettingChange = (field: keyof DyscalculiaSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
     
     const handleSubModuleSettingChange = (subModuleSettings: any) => {
-        const currentSubModuleSettings = (settings as any)[activeSubModuleKey];
-        setContextSettings(moduleKey, { [activeSubModuleKey]: { ...currentSubModuleSettings, ...subModuleSettings } });
+        setSettings(prev => ({
+            ...prev,
+            [activeSubModuleKey]: { ...(prev as any)[activeSubModuleKey], ...subModuleSettings }
+        }));
     };
 
     const renderSettingsPanel = () => {

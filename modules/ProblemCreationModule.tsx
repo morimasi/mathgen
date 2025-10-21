@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+// FIX: Add .ts extension to import path
 import { generateReadinessProblem } from '../services/readinessService.ts';
-import { ProblemCreationSettings, MathReadinessTheme, ModuleKey } from '../types.ts';
+import { ProblemCreationSettings, MathReadinessTheme } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,16 +14,22 @@ import TextInput from '../components/form/TextInput.tsx';
 import { ShuffleIcon } from '../components/icons/Icons.tsx';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
-import { useWorksheet } from '../services/WorksheetContext.tsx';
+
 
 const ProblemCreationModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
-    const settings = allSettings.problemCreation;
-    const moduleKey: ModuleKey = 'problemCreation';
-    
+    const [settings, setSettings] = useState<ProblemCreationSettings>({
+        operation: 'addition',
+        difficulty: 'easy',
+        theme: 'mixed',
+        problemsPerPage: 4,
+        pageCount: 1,
+        useWordProblems: false, 
+        topic: ''
+    });
+
     const { generate } = useProblemGenerator({
-        moduleKey,
+        moduleKey: 'problem-creation',
         settings: {...settings, autoFit: false}, // This module has a larger fixed size, autofit isn't ideal
         generatorFn: (s) => generateReadinessProblem('problem-creation', s),
         aiGeneratorFn: generateContextualWordProblems,
@@ -30,7 +37,7 @@ const ProblemCreationModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof ProblemCreationSettings, value: any) => {
-        setContextSettings(moduleKey, { [field]: value });
+        setSettings(prev => ({ ...prev, [field]: value }));
     };
     
     const handleRandomTopic = () => {
@@ -135,9 +142,9 @@ const ProblemCreationModule: React.FC = () => {
                 />
             </div>
             <SettingsPresetManager 
-                moduleKey="problemCreation"
+                moduleKey="problem-creation"
                 currentSettings={settings}
-                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
+                onLoadSettings={setSettings}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>

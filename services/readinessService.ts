@@ -1,10 +1,6 @@
 // services/readinessService.ts
 
-import { 
-    Problem, MathReadinessTheme, MatchingType, ComparisonType, NumberRecognitionType, PatternType, ShapeRecognitionType, PositionalConceptType, IntroMeasurementType, SimpleGraphType, SimpleGraphTaskType, ShapeType,
-    MatchingAndSortingSettings, ComparingQuantitiesSettings, NumberRecognitionSettings, PatternsSettings, BasicShapesSettings, PositionalConceptsSettings, IntroToMeasurementSettings, SimpleGraphsSettings,
-    VisualAdditionSubtractionSettings, VerbalArithmeticSettings, MissingNumberPuzzlesSettings, SymbolicArithmeticSettings, ProblemCreationSettings
-} from '../types.ts';
+import { Problem, MathReadinessTheme, MatchingType, ComparisonType, NumberRecognitionType, PatternType, ShapeRecognitionType, PositionalConceptType, IntroMeasurementType, SimpleGraphType, SimpleGraphTaskType, ShapeType } from '../types.ts';
 import { numberToWords } from './utils.ts';
 import { draw2DShape, drawSymmetryLine } from './svgService.ts';
 
@@ -28,22 +24,10 @@ const THEME_OBJECTS: { [key in MathReadinessTheme | 'measurement']: string[] } =
 };
 THEME_OBJECTS.mixed = [...THEME_OBJECTS.animals, ...THEME_OBJECTS.vehicles, ...THEME_OBJECTS.fruits, ...THEME_OBJECTS.shapes];
 
-// FIX: Added missing getThemeItems function to resolve multiple errors.
-const getThemeItems = (theme: MathReadinessTheme | 'measurement', count: number): string[] => {
-    const source = theme === 'mixed' ? THEME_OBJECTS.mixed : THEME_OBJECTS[theme];
-    if (!source || source.length === 0) return Array(count).fill('?');
-    
-    // If we need more items than available, we can repeat them.
-    if (count > source.length) {
-        const items = [];
-        for (let i = 0; i < count; i++) {
-            items.push(source[i % source.length]);
-        }
-        return shuffleArray(items); // shuffle to not make it obvious
-    }
-
-    // Otherwise, pick unique items
-    return shuffleArray(source).slice(0, count);
+const getThemeItems = (theme: MathReadinessTheme, count: number): string[] => {
+    const validThemes = Object.keys(THEME_OBJECTS).filter(k => k !== 'mixed' && k !== 'measurement') as MathReadinessTheme[];
+    const themeKey = theme === 'mixed' ? validThemes[getRandomInt(0, validThemes.length - 1)] : theme;
+    return shuffleArray(THEME_OBJECTS[themeKey]).slice(0, count);
 };
 
 const shapeSVGs: Record<ShapeType, string> = {
@@ -63,7 +47,7 @@ const shapeSVGs: Record<ShapeType, string> = {
 
 // --- GENERATOR FUNCTIONS ---
 
-const generateMatchingAndSorting = (settings: MatchingAndSortingSettings): { problem: Problem, title: string } => {
+const generateMatchingAndSorting = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, itemCount } = settings;
     let title = 'Eşleştirme ve Gruplama';
     const items = getThemeItems(theme, itemCount);
@@ -102,9 +86,9 @@ const generateMatchingAndSorting = (settings: MatchingAndSortingSettings): { pro
     return { problem: { question, answer: "Eşleştirme", category: 'matching-and-sorting', display: 'flow' }, title };
 };
 
-const generateComparingQuantities = (settings: ComparingQuantitiesSettings): { problem: Problem, title: string } => {
+const generateComparingQuantities = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, maxObjectCount } = settings;
-    // FIX: Changed 'const' to 'let' to allow reassignment within the switch statement, resolving the error.
+    // FIX: Change 'const' to 'let' to allow reassignment within the switch statement.
     let title = 'Miktarları Karşılaştırma';
     const items = getThemeItems(theme, 2);
     let question = '';
@@ -129,10 +113,9 @@ const generateComparingQuantities = (settings: ComparingQuantitiesSettings): { p
     return { problem: { question, answer: "Karşılaştırma", category: 'comparing-quantities', display: 'flow' }, title };
 }
 
-const generateNumberRecognition = (settings: NumberRecognitionSettings): { problem: Problem, title: string } => {
+const generateNumberRecognition = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, numberRange } = settings;
-    // FIX: Changed 'const' to 'let' as it is reassigned in the switch statement.
-    let title = 'Rakam Tanıma ve Sayma';
+    const title = 'Rakam Tanıma ve Sayma';
     const rangeMap = { '1-5': 5, '1-10': 10, '1-20': 20 };
     const max = rangeMap[numberRange];
     const num = getRandomInt(1, max);
@@ -165,7 +148,7 @@ const generateNumberRecognition = (settings: NumberRecognitionSettings): { probl
     return { problem: { question, answer: String(num), category: 'number-recognition', display: 'flow' }, title };
 }
 
-const generatePatterns = (settings: PatternsSettings): { problem: Problem, title: string } => {
+const generatePatterns = (settings: any): { problem: Problem, title: string } => {
     const { type, theme } = settings;
     const title = 'Örüntüler';
     const items = getThemeItems(theme, 3);
@@ -190,7 +173,7 @@ const generatePatterns = (settings: PatternsSettings): { problem: Problem, title
      return { problem: { question: `<p>Örüntüyü tamamla.</p><div class="pattern-container">${question}</div>`, answer, category: 'patterns', display: 'flow' }, title };
 };
 
-const generateBasicShapes = (settings: BasicShapesSettings): { problem: Problem, title: string } => {
+const generateBasicShapes = (settings: any): { problem: Problem, title: string } => {
     const { type, shapes: availableShapes } = settings;
     let title = 'Temel Geometrik Şekiller';
     const allShapes = [ShapeType.Circle, ShapeType.Square, ShapeType.Triangle, ShapeType.Rectangle, ShapeType.Star];
@@ -227,7 +210,7 @@ const generateBasicShapes = (settings: BasicShapesSettings): { problem: Problem,
     return { problem: { question, answer, category: 'basic-shapes', display: 'flow' }, title };
 };
 
-const generatePositionalConcepts = (settings: PositionalConceptsSettings): { problem: Problem, title: string } => {
+const generatePositionalConcepts = (settings: any): { problem: Problem, title: string } => {
     const { type } = settings;
     let title = 'Konum ve Yön Kavramları';
     let question = '', answer = '';
@@ -250,7 +233,7 @@ const generatePositionalConcepts = (settings: PositionalConceptsSettings): { pro
     return { problem: { question, answer, category: 'positional-concepts', display: 'flow' }, title };
 }
 
-const generateIntroToMeasurement = (settings: IntroToMeasurementSettings): { problem: Problem, title: string } => {
+const generateIntroToMeasurement = (settings: any): { problem: Problem, title: string } => {
     const { type } = settings;
     let title = 'Ölçmeye Giriş';
     let question = '', answer = '';
@@ -277,7 +260,7 @@ const generateIntroToMeasurement = (settings: IntroToMeasurementSettings): { pro
     return { problem: { question, answer, category: 'intro-to-measurement', display: 'flow' }, title };
 }
 
-const generateSimpleGraphs = (settings: SimpleGraphsSettings): { problem: Problem, title: string } => {
+const generateSimpleGraphs = (settings: any): { problem: Problem, title: string } => {
     const { taskType, theme, categoryCount, maxItemCount } = settings;
     let title = 'Basit Grafikler';
     const categories = getThemeItems(theme, categoryCount);
@@ -299,7 +282,7 @@ const generateSimpleGraphs = (settings: SimpleGraphsSettings): { problem: Proble
     return { problem: { question, answer, category: 'simple-graphs', display: 'flow' }, title };
 };
 
-const generateVisualAdditionSubtraction = (settings: VisualAdditionSubtractionSettings): { problem: Problem, title: string } => {
+const generateVisualAdditionSubtraction = (settings: any): { problem: Problem, title: string } => {
     const { operation, theme, maxNumber } = settings;
     const title = 'Şekillerle Toplama/Çıkarma';
     const item = getThemeItems(theme, 1)[0];
@@ -321,7 +304,7 @@ const generateVisualAdditionSubtraction = (settings: VisualAdditionSubtractionSe
     return { problem: { question, answer, category: 'visual-addition-subtraction', display: 'flow' }, title };
 };
 
-const generateVerbalArithmetic = (settings: VerbalArithmeticSettings): { problem: Problem, title: string } => {
+const generateVerbalArithmetic = (settings: any): { problem: Problem, title: string } => {
     const { operation, maxResult } = settings;
     const title = "İşlemi Sözel İfade Etme";
     let n1 = getRandomInt(1, maxResult-1);
@@ -340,7 +323,7 @@ const generateVerbalArithmetic = (settings: VerbalArithmeticSettings): { problem
     return { problem: { question, answer, category: 'verbal-arithmetic', display: 'flow' }, title };
 };
 
-const generateMissingNumberPuzzles = (settings: MissingNumberPuzzlesSettings): { problem: Problem, title: string } => {
+const generateMissingNumberPuzzles = (settings: any): { problem: Problem, title: string } => {
     const { operation, termCount, maxResult } = settings;
     const title = "Eksik Sayıyı Bulma";
     let n1 = getRandomInt(1, maxResult - 1);
@@ -373,7 +356,7 @@ const generateMissingNumberPuzzles = (settings: MissingNumberPuzzlesSettings): {
     return { problem: { question: `<div class="puzzle-container">${question}</div>`, answer, category: 'missing-number-puzzles', display: 'flow' }, title };
 };
 
-const generateSymbolicArithmetic = (settings: SymbolicArithmeticSettings): { problem: Problem, title: string, preamble: string } => {
+const generateSymbolicArithmetic = (settings: any): { problem: Problem, title: string, preamble: string } => {
     const { operation, theme, maxNumber } = settings;
     const title = "Simgelerle İşlemler";
     const symbols = getThemeItems(theme, maxNumber);
@@ -403,7 +386,7 @@ const generateSymbolicArithmetic = (settings: SymbolicArithmeticSettings): { pro
     return { problem: { question: `<div class="symbolic-math">${question}</div>`, answer, category: 'symbolic-arithmetic', display: 'flow' }, title, preamble };
 };
 
-const generateProblemCreation = (settings: ProblemCreationSettings): { problem: Problem, title: string } => {
+const generateProblemCreation = (settings: any): { problem: Problem, title: string } => {
     const { operation, difficulty, theme } = settings;
     const title = 'Problem Kurma';
     const maxMap = { easy: 20, medium: 100, hard: 1000 };
@@ -435,31 +418,31 @@ const generateProblemCreation = (settings: ProblemCreationSettings): { problem: 
 export const generateReadinessProblem = (moduleKey: string, settings: any): { problem: Problem, title: string, preamble?: string, error?: string } => {
     switch (moduleKey) {
         case 'matching-and-sorting':
-            return generateMatchingAndSorting(settings as MatchingAndSortingSettings);
+            return generateMatchingAndSorting(settings);
         case 'comparing-quantities':
-            return generateComparingQuantities(settings as ComparingQuantitiesSettings);
+            return generateComparingQuantities(settings);
         case 'number-recognition':
-            return generateNumberRecognition(settings as NumberRecognitionSettings);
+            return generateNumberRecognition(settings);
         case 'patterns':
-            return generatePatterns(settings as PatternsSettings);
+            return generatePatterns(settings);
         case 'basic-shapes':
-            return generateBasicShapes(settings as BasicShapesSettings);
+            return generateBasicShapes(settings);
         case 'positional-concepts':
-            return generatePositionalConcepts(settings as PositionalConceptsSettings);
+            return generatePositionalConcepts(settings);
         case 'intro-to-measurement':
-            return generateIntroToMeasurement(settings as IntroToMeasurementSettings);
+            return generateIntroToMeasurement(settings);
         case 'simple-graphs':
-            return generateSimpleGraphs(settings as SimpleGraphsSettings);
+            return generateSimpleGraphs(settings);
         case 'visual-addition-subtraction':
-            return generateVisualAdditionSubtraction(settings as VisualAdditionSubtractionSettings);
+            return generateVisualAdditionSubtraction(settings);
         case 'verbal-arithmetic':
-            return generateVerbalArithmetic(settings as VerbalArithmeticSettings);
+            return generateVerbalArithmetic(settings);
         case 'missing-number-puzzles':
-            return generateMissingNumberPuzzles(settings as MissingNumberPuzzlesSettings);
+            return generateMissingNumberPuzzles(settings);
         case 'symbolic-arithmetic':
-            return generateSymbolicArithmetic(settings as SymbolicArithmeticSettings);
+            return generateSymbolicArithmetic(settings);
         case 'problem-creation':
-            return generateProblemCreation(settings as ProblemCreationSettings);
+            return generateProblemCreation(settings);
         default:
             return { problem: { question: 'Bilinmeyen hazırlık modülü', answer: 'Hata', category: 'error' }, title: 'Hata', error: `Modül bulunamadı: ${moduleKey}` };
     }

@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
-import { Problem, VisualSupportSettings, ArithmeticOperation, AllSettings, ModuleKey } from '../types.ts';
-import { initialSettings } from './initialSettings.ts';
+import { Problem, VisualSupportSettings, ArithmeticOperation } from '../types';
 
 interface UpdateWorksheetArgs {
     newProblems: Problem[];
@@ -26,14 +25,12 @@ interface WorksheetContextType {
     autoRefreshTrigger: number;
     lastGeneratorModule: string | null;
     presetToLoad: PresetToLoad | null;
-    allSettings: AllSettings;
     updateWorksheet: (args: UpdateWorksheetArgs) => void;
     clearWorksheet: () => void;
     setIsLoading: (loading: boolean) => void;
     triggerAutoRefresh: () => void;
     setVisualSupportSettings: (settings: VisualSupportSettings) => void;
     setPresetToLoad: (preset: PresetToLoad | null) => void;
-    handleSettingsChange: <K extends ModuleKey>(module: K, newSettings: Partial<AllSettings[K]>) => void;
 }
 
 const WorksheetContext = createContext<WorksheetContextType | undefined>(undefined);
@@ -60,18 +57,6 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [autoRefreshTrigger, setAutoRefreshTrigger] = useState(0);
     const [lastGeneratorModule, setLastGeneratorModule] = useState<string | null>(null);
     const [presetToLoad, setPresetToLoad] = useState<PresetToLoad | null>(null);
-    const [allSettings, setAllSettings] = useState<AllSettings>(initialSettings);
-
-
-    const handleSettingsChange = useCallback(<K extends ModuleKey>(module: K, newSettings: Partial<AllSettings[K]>) => {
-        setAllSettings(prev => ({
-            ...prev,
-            [module]: {
-                ...prev[module],
-                ...newSettings
-            }
-        }));
-    }, []);
 
     const updateWorksheet = useCallback(({ newProblems, clearPrevious, title: newTitle, preamble: newPreamble, generatorModule, pageCount: newPageCount }: UpdateWorksheetArgs) => {
         setProblems(prev => clearPrevious ? newProblems : [...prev, ...newProblems]);
@@ -103,14 +88,12 @@ export const WorksheetProvider: React.FC<{ children: ReactNode }> = ({ children 
             autoRefreshTrigger,
             lastGeneratorModule,
             presetToLoad,
-            allSettings,
             updateWorksheet,
             clearWorksheet,
             setIsLoading,
             triggerAutoRefresh,
             setVisualSupportSettings,
-            setPresetToLoad,
-            handleSettingsChange
+            setPresetToLoad
         }}>
             {children}
         </WorksheetContext.Provider>
