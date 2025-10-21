@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { generateTimeProblem } from '../services/timeService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { TimeSettings, TimeProblemType, Difficulty, ClockFaceDetail } from '../types.ts';
+import { TimeSettings, TimeProblemType, Difficulty, ClockFaceDetail, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,24 +13,16 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const TimeModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<TimeSettings>({
-        gradeLevel: 1,
-        type: TimeProblemType.ReadAnalog,
-        difficulty: 'easy',
-        clockFace: 'full',
-        digitalClockDisplay: 'show',
-        problemsPerPage: 12,
-        pageCount: 1,
-        useWordProblems: false,
-        topic: '',
-        autoFit: false,
-    });
-    
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.time;
+    const moduleKey: ModuleKey = 'time';
+
     const { generate } = useProblemGenerator({
-        moduleKey: 'time',
+        moduleKey,
         settings,
         generatorFn: generateTimeProblem,
         aiGeneratorFn: generateContextualWordProblems,
@@ -38,7 +30,7 @@ const TimeModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof TimeSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
 
     const handleRandomTopic = () => {
@@ -58,7 +50,7 @@ const TimeModule: React.FC = () => {
             case 5:
                 newSettings.difficulty = 'hard'; break;
         }
-        setSettings(prev => ({ ...prev, ...newSettings }));
+        setContextSettings(moduleKey, newSettings);
     };
 
     const isAnalogClock = [TimeProblemType.ReadAnalog, TimeProblemType.DrawTime].includes(settings.type);
@@ -115,7 +107,7 @@ const TimeModule: React.FC = () => {
                     </div>
                 </details>
             </div>
-             <SettingsPresetManager moduleKey="time" currentSettings={settings} onLoadSettings={setSettings}/>
+             <SettingsPresetManager moduleKey="time" currentSettings={settings} onLoadSettings={(s) => setContextSettings(moduleKey, s)}/>
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>

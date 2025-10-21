@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { WordProblemSettings, Problem } from '../types.ts';
+import { WordProblemSettings, Problem, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -12,6 +12,7 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TABS, TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const moduleOptions = [
     { value: 'none', label: 'Genel Konu' },
@@ -23,21 +24,12 @@ const moduleOptions = [
 
 const WordProblemsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<WordProblemSettings>({
-        topic: 'Dört İşlem',
-        gradeLevel: '4',
-        problemsPerPage: 5,
-        pageCount: 1,
-        operationCount: 1,
-        customPrompt: '',
-        autoFit: false,
-        sourceModule: 'none',
-        useVisuals: false,
-        layout: 'default',
-    });
-    
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.wordProblems;
+    const moduleKey: ModuleKey = 'wordProblems';
+
     const { generate } = useProblemGenerator({
-        moduleKey: 'word-problems',
+        moduleKey,
         settings: { ...settings, useWordProblems: true }, // Force useWordProblems for this module
         // This module ONLY uses AI, so provide a dummy local generator
         generatorFn: () => ({ problem: { question: '', answer: '', category: '' }, title: '' }),
@@ -46,7 +38,7 @@ const WordProblemsModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof WordProblemSettings, value: string | number | boolean) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
 
     const handleRandomTopic = () => {
@@ -191,7 +183,7 @@ const WordProblemsModule: React.FC = () => {
                      />
                 </div>
             </div>
-            <SettingsPresetManager moduleKey="word-problems" currentSettings={settings} onLoadSettings={setSettings} />
+            <SettingsPresetManager moduleKey="wordProblems" currentSettings={settings} onLoadSettings={(s) => setContextSettings(moduleKey, s)} />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>

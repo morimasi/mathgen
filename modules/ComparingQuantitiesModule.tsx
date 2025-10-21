@@ -1,8 +1,7 @@
-import React, { useState, useCallback } from 'react';
-// FIX: Add .ts extension to import path
+import React, { useCallback } from 'react';
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { ComparingQuantitiesSettings, ComparisonType, MathReadinessTheme } from '../types.ts';
+import { ComparingQuantitiesSettings, ComparisonType, MathReadinessTheme, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -14,22 +13,16 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const ComparingQuantitiesModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<ComparingQuantitiesSettings>({
-        type: ComparisonType.MoreLess,
-        theme: 'mixed',
-        maxObjectCount: 10,
-        problemsPerPage: 8,
-        pageCount: 1,
-        autoFit: false,
-        useWordProblems: false,
-        topic: '',
-    });
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.comparingQuantities;
+    const moduleKey: ModuleKey = 'comparingQuantities';
 
     const { generate } = useProblemGenerator({
-        moduleKey: 'comparing-quantities',
+        moduleKey,
         settings,
         generatorFn: (s) => generateReadinessProblem('comparing-quantities', s),
         aiGeneratorFn: generateContextualWordProblems,
@@ -37,7 +30,7 @@ const ComparingQuantitiesModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof ComparingQuantitiesSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
 
      const handleRandomTopic = () => {
@@ -140,9 +133,9 @@ const ComparingQuantitiesModule: React.FC = () => {
                 />
             </div>
             <SettingsPresetManager 
-                moduleKey="comparing-quantities"
+                moduleKey="comparingQuantities"
                 currentSettings={settings}
-                onLoadSettings={setSettings}
+                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>

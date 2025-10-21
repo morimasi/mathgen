@@ -27,7 +27,8 @@ const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeas
 const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule.tsx'));
 const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
 const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule.tsx'));
-const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule.tsx'));
+// FIX: Changed to a dynamic import with `.then` to resolve a type error with React.lazy for default exports.
+const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule.tsx').then(module => ({ default: module.default })));
 const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/VisualAdditionSubtractionModule.tsx'));
 const VerbalArithmeticModule = React.lazy(() => import('../modules/VerbalArithmeticModule.tsx'));
 const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNumberPuzzlesModule.tsx'));

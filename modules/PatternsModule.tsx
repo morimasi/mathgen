@@ -1,8 +1,7 @@
-import React, { useState, useCallback } from 'react';
-// FIX: Add .ts extension to import path
+import React, { useCallback } from 'react';
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { PatternsSettings, PatternType, MathReadinessTheme } from '../types.ts';
+import { PatternsSettings, PatternType, MathReadinessTheme, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -14,22 +13,16 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const PatternsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<PatternsSettings>({
-        type: PatternType.RepeatingAB,
-        theme: 'shapes',
-        difficulty: 'easy',
-        problemsPerPage: 8,
-        pageCount: 1,
-        autoFit: false,
-        useWordProblems: false,
-        topic: '',
-    });
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.patterns;
+    const moduleKey: ModuleKey = 'patterns';
 
     const { generate } = useProblemGenerator({
-        moduleKey: 'patterns',
+        moduleKey,
         settings,
         generatorFn: (s) => generateReadinessProblem('patterns', s),
         aiGeneratorFn: generateContextualWordProblems,
@@ -37,7 +30,7 @@ const PatternsModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof PatternsSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
 
     const handleRandomTopic = () => {
@@ -135,7 +128,7 @@ const PatternsModule: React.FC = () => {
             <SettingsPresetManager 
                 moduleKey="patterns"
                 currentSettings={settings}
-                onLoadSettings={setSettings}
+                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>

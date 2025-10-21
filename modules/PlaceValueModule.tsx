@@ -1,8 +1,7 @@
-import React, { useState, useMemo } from 'react';
-// FIX: Add .ts extension to import path
+import React, { useMemo } from 'react';
 import { generatePlaceValueProblem } from '../services/placeValueService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace } from '../types.ts';
+import { PlaceValueSettings, PlaceValueProblemType, RoundingPlace, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -14,25 +13,16 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const PlaceValueModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<PlaceValueSettings>({
-        gradeLevel: 2,
-        type: PlaceValueProblemType.Identification,
-        digits: 3,
-        roundingPlace: 'auto',
-        problemsPerPage: 20,
-        pageCount: 1,
-        useWordProblems: false,
-        topic: '',
-        autoFit: false,
-        fromWordsOrder: 'ordered',
-        fromWordsFormat: 'inline',
-    });
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.placeValue;
+    const moduleKey: ModuleKey = 'placeValue';
 
     const { generate } = useProblemGenerator({
-        moduleKey: 'place-value',
+        moduleKey,
         settings,
         generatorFn: generatePlaceValueProblem,
         aiGeneratorFn: generateContextualWordProblems,
@@ -40,21 +30,21 @@ const PlaceValueModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof PlaceValueSettings, value: any) => {
-        const newSettings: PlaceValueSettings = { ...settings, [field]: value };
+        const newSettings: Partial<PlaceValueSettings> = { [field]: value };
 
         if (field === 'digits') {
             const newDigits = Number(value);
-            if (newDigits < 4 && newSettings.roundingPlace === 'thousands') {
+            if (newDigits < 4 && settings.roundingPlace === 'thousands') {
                 newSettings.roundingPlace = 'auto';
             }
-            if (newDigits < 3 && newSettings.roundingPlace === 'hundreds') {
+            if (newDigits < 3 && settings.roundingPlace === 'hundreds') {
                 newSettings.roundingPlace = 'auto';
             }
-            if (newDigits < 2 && newSettings.roundingPlace === 'tens') {
+            if (newDigits < 2 && settings.roundingPlace === 'tens') {
                 newSettings.roundingPlace = 'auto';
             }
         }
-        setSettings(newSettings);
+        setContextSettings(moduleKey, newSettings);
     };
 
     const handleRandomTopic = () => {
@@ -83,7 +73,7 @@ const PlaceValueModule: React.FC = () => {
                 newSettings = { ...newSettings, type: PlaceValueProblemType.FromExpanded, digits: 7 };
                 break;
         }
-        setSettings(prev => ({ ...prev, ...newSettings }));
+        setContextSettings(moduleKey, newSettings);
     };
 
     const isWordProblemCompatible = [
@@ -233,7 +223,7 @@ const PlaceValueModule: React.FC = () => {
                     </div>
                 </details>
             </div>
-             <SettingsPresetManager moduleKey="place-value" currentSettings={settings} onLoadSettings={setSettings} />
+             <SettingsPresetManager moduleKey="placeValue" currentSettings={settings} onLoadSettings={(s) => setContextSettings(moduleKey, s)} />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => generate(true)} size="sm">Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>

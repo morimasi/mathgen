@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Problem, DyslexiaSettings, DyslexiaSubModuleType } from '../types.ts';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { Problem, DyslexiaSettings, DyslexiaSubModuleType, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import { ShuffleIcon } from '../components/icons/Icons.tsx';
@@ -25,9 +25,6 @@ import InteractiveStorySettings from './dyslexia/InteractiveStorySettings.tsx';
 import AttentionQuestionSettings from './dyslexia/AttentionQuestionSettings.tsx';
 import MapReadingSettings from './dyslexia/MapReadingSettings.tsx';
 
-
-// Import all sub-module icons
-// FIX: Corrected imports to use actual icon components instead of settings components.
 import {
     NumberSenseIcon,
     LetterFormationIcon,
@@ -61,33 +58,15 @@ const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<Rea
     { id: 'map-reading', label: 'Harita Okuma', icon: MapIcon },
 ];
 
-const defaultSettings: DyslexiaSettings = {
-    activeSubModule: 'sound-wizard',
-    problemsPerPage: 10, pageCount: 1, autoFit: true,
-    soundWizard: { type: 'rhyme', difficulty: 'easy', wordLength: 4 },
-    letterDetective: { letterGroup: 'vowels', difficulty: 'easy' },
-    readingFluencyCoach: { gradeLevel: '1', topic: 'Hayvanlar' },
-    comprehensionExplorer: { gradeLevel: '2', textLength: 'short', questionType: 'main_idea' },
-    vocabularyExplorer: { gradeLevel: '2', difficulty: 'easy' },
-    visualMaster: { type: 'letter', pair: 'b-d' },
-    wordHunter: { focus: 'suffix', difficulty: 'easy' },
-    spellingChampion: { category: 'common_errors', difficulty: 'easy' },
-    memoryGamer: { type: 'digit_span', sequenceLength: 3 },
-    auditoryWriting: { type: 'single_words', difficulty: 'easy' },
-    interactiveStory: { genre: 'adventure', gradeLevel: '2' },
-    attentionQuestion: { questionType: 'numerical', difficulty: 'easy', numberRange: '1-50' },
-    mapReading: { mapType: 'zoo', task: 'find-place' },
-};
-
-
 const DyslexiaModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<DyslexiaSettings>(defaultSettings);
-    const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
+    const { allSettings, handleSettingsChange: setContextSettings, updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
+    const settings = allSettings.dyslexia;
+    const moduleKey: ModuleKey = 'dyslexia';
+    
     const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
     const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
-
 
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyslexiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
@@ -157,18 +136,16 @@ const DyslexiaModule: React.FC = () => {
     }, [settings, printSettings, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
     const handleSubModuleChange = (id: DyslexiaSubModuleType) => {
-        setSettings(prev => ({ ...prev, activeSubModule: id }));
+        setContextSettings(moduleKey, { activeSubModule: id });
     };
 
     const handleSettingChange = (field: keyof DyslexiaSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
     
     const handleSubModuleSettingChange = (subModuleSettings: any) => {
-        setSettings(prev => ({
-            ...prev,
-            [activeSubModuleKey]: { ...(prev as any)[activeSubModuleKey], ...subModuleSettings }
-        }));
+        const currentSubModuleSettings = (settings as any)[activeSubModuleKey];
+        setContextSettings(moduleKey, { [activeSubModuleKey]: { ...currentSubModuleSettings, ...subModuleSettings } });
     };
 
     const renderSettingsPanel = () => {

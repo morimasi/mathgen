@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Problem, DysgraphiaSettings, DysgraphiaSubModuleType } from '../types';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { Problem, DysgraphiaSettings, DysgraphiaSubModuleType, ModuleKey } from '../types';
 import Button from '../components/form/Button';
 import NumberInput from '../components/form/NumberInput';
 import { ShuffleIcon } from '../components/icons/Icons';
@@ -47,27 +47,12 @@ const subModules: { id: DysgraphiaSubModuleType; label: string; icon: React.FC<R
     { id: 'interactive-story-dg', label: 'Hikaye Macerası (AI)', icon: InteractiveStoryIcon },
 ];
 
-const defaultSettings: DysgraphiaSettings = {
-    activeSubModule: 'fine-motor-skills',
-    problemsPerPage: 10, pageCount: 1, autoFit: true,
-    fineMotorSkills: { type: 'line-trace' },
-    letterFormation: { letter: 'a', case: 'lower' },
-    letterFormRecognition: { targetLetter: 'b', difficulty: 'easy' },
-    legibleWriting: { type: 'spacing' },
-    pictureSequencing: { storyLength: 3, topic: 'Parkta bir gün' },
-    writingSpeed: { duration: 1 },
-    sentenceConstruction: { wordCount: 5 },
-    punctuation: { type: 'end-of-sentence' },
-    writingPlanning: { topic: 'Tatil anılarım' },
-    creativeWriting: { promptType: 'story-starter', topic: 'Gizemli bir anahtar' },
-    keyboardSkills: { level: 'home-row' },
-    interactiveStoryDg: { genre: 'adventure', gradeLevel: '3' },
-};
-
 const DysgraphiaModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<DysgraphiaSettings>(defaultSettings);
-    const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
+    const { allSettings, handleSettingsChange: setContextSettings, updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
+    const settings = allSettings.dysgraphia;
+    const moduleKey: ModuleKey = 'dysgraphia';
+
     const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
     const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
@@ -140,20 +125,20 @@ const DysgraphiaModule: React.FC = () => {
     }, [settings, printSettings, lastGeneratorModule, handleGenerate, activeSubModuleId]);
 
     const handleSubModuleChange = (id: DysgraphiaSubModuleType) => {
-        setSettings(prev => ({ ...prev, activeSubModule: id }));
+        setContextSettings(moduleKey, { activeSubModule: id });
     };
 
     const handleSettingChange = (field: keyof DysgraphiaSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
     
     const handleSubModuleSettingChange = (subModuleSettings: any) => {
-        setSettings(prev => ({
-            ...prev,
-            [activeSubModuleKey]: { ...(prev as any)[activeSubModuleKey], ...subModuleSettings }
-        }));
+        const currentSubModuleSettings = (settings as any)[activeSubModuleKey];
+        setContextSettings(moduleKey, { [activeSubModuleKey]: { ...currentSubModuleSettings, ...subModuleSettings } });
     };
 
+    // FIX: Completed the renderSettingsPanel function and the component's return statement.
+    // The component was previously incomplete, causing a type error because it didn't return a valid ReactNode.
     const renderSettingsPanel = () => {
         const props = { settings: activeSubModuleSettings, onChange: handleSubModuleSettingChange };
         switch (activeSubModuleId) {

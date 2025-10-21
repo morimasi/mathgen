@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { generateRhythmicCountingProblem } from '../services/rhythmicCountingService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { RhythmicCountingSettings, RhythmicProblemType } from '../types.ts';
+import { RhythmicCountingSettings, RhythmicProblemType, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,32 +13,18 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 export const RhythmicCountingModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<RhythmicCountingSettings>({
-        type: RhythmicProblemType.Pattern,
-        step: 2,
-        direction: 'forward',
-        useMultiplesOnly: false,
-        digits: 2,
-        patternLength: 5,
-        missingCount: 1,
-        orderCount: 5,
-        beforeCount: 3,
-        afterCount: 3,
-        problemsPerPage: 20,
-        pageCount: 1,
-        useWordProblems: false,
-        topic: '',
-        orderDirection: 'ascending',
-        autoFit: false,
-    });
-
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.rhythmicCounting;
+    const moduleKey: ModuleKey = 'rhythmicCounting';
+    
     const isPracticeSheet = [RhythmicProblemType.PracticeSheet, RhythmicProblemType.FillBeforeAfter, RhythmicProblemType.FillBetween].includes(settings.type);
 
     const { generate } = useProblemGenerator({
-        moduleKey: 'rhythmic-counting',
+        moduleKey,
         settings,
         generatorFn: generateRhythmicCountingProblem,
         aiGeneratorFn: generateContextualWordProblems,
@@ -47,7 +33,7 @@ export const RhythmicCountingModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof RhythmicCountingSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
 
     const handleRandomTopic = () => {
@@ -192,7 +178,7 @@ export const RhythmicCountingModule: React.FC = () => {
                     </div>
                 </details>
             </div>
-             <SettingsPresetManager moduleKey="rhythmic-counting" currentSettings={settings} onLoadSettings={setSettings}/>
+             <SettingsPresetManager moduleKey="rhythmicCounting" currentSettings={settings} onLoadSettings={(s) => setContextSettings(moduleKey, s)}/>
             <div className="flex flex-wrap gap-2 pt-1.5">
                 <Button onClick={() => generate(true)} size="sm" enableFlyingLadybug>Oluştur</Button>
                 <Button onClick={() => generate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>

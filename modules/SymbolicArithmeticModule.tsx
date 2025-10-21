@@ -1,7 +1,6 @@
-import React, { useState, useCallback } from 'react';
-// FIX: Add .ts extension to import path
+import React, { useCallback } from 'react';
 import { generateReadinessProblem } from '../services/readinessService.ts';
-import { SymbolicArithmeticSettings, MathReadinessTheme } from '../types.ts';
+import { SymbolicArithmeticSettings, MathReadinessTheme, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -9,25 +8,22 @@ import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const SymbolicArithmeticModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<SymbolicArithmeticSettings>({
-        operation: 'addition',
-        theme: 'animals',
-        maxNumber: 10,
-        problemsPerPage: 6,
-        pageCount: 1,
-    });
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.symbolicArithmetic;
+    const moduleKey: ModuleKey = 'symbolicArithmetic';
 
     const { generate } = useProblemGenerator({
-        moduleKey: 'symbolic-arithmetic',
+        moduleKey,
         settings: {...settings, autoFit: false},
         generatorFn: (s) => generateReadinessProblem('symbolic-arithmetic', s),
     });
 
     const handleSettingChange = (field: keyof SymbolicArithmeticSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
 
     const isTableLayout = printSettings.layoutMode === 'table';
@@ -93,9 +89,9 @@ const SymbolicArithmeticModule: React.FC = () => {
                 />
             </div>
             <SettingsPresetManager 
-                moduleKey="symbolic-arithmetic"
+                moduleKey="symbolicArithmetic"
                 currentSettings={settings}
-                onLoadSettings={setSettings}
+                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>

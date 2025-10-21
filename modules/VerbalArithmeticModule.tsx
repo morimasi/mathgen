@@ -1,7 +1,6 @@
-import React, { useState, useCallback } from 'react';
-// FIX: Add .ts extension to import path
+import React, { useCallback } from 'react';
 import { generateReadinessProblem } from '../services/readinessService.ts';
-import { VerbalArithmeticSettings } from '../types.ts';
+import { VerbalArithmeticSettings, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -9,24 +8,22 @@ import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const VerbalArithmeticModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<VerbalArithmeticSettings>({
-        operation: 'mixed',
-        maxResult: 10,
-        problemsPerPage: 10,
-        pageCount: 1,
-    });
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.verbalArithmetic;
+    const moduleKey: ModuleKey = 'verbalArithmetic';
 
     const { generate } = useProblemGenerator({
-        moduleKey: 'verbal-arithmetic',
+        moduleKey,
         settings: {...settings, autoFit: false},
         generatorFn: (s) => generateReadinessProblem('verbal-arithmetic', s),
     });
 
     const handleSettingChange = (field: keyof VerbalArithmeticSettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
 
     const isTableLayout = printSettings.layoutMode === 'table';
@@ -79,9 +76,9 @@ const VerbalArithmeticModule: React.FC = () => {
                 />
             </div>
             <SettingsPresetManager 
-                moduleKey="verbal-arithmetic"
+                moduleKey="verbalArithmetic"
                 currentSettings={settings}
-                onLoadSettings={setSettings}
+                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>

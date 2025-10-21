@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { generateGeometryProblem } from '../services/geometryService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { GeometrySettings, GeometryProblemType, ShapeType } from '../types.ts';
+import { GeometrySettings, GeometryProblemType, ShapeType, ModuleKey } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -13,22 +13,16 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
 
 const GeometryModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
-    const [settings, setSettings] = useState<GeometrySettings>({
-        gradeLevel: 1,
-        type: GeometryProblemType.ShapeRecognition,
-        shape: ShapeType.Rectangle,
-        problemsPerPage: 12,
-        pageCount: 1,
-        useWordProblems: false,
-        autoFit: false,
-        topic: '',
-    });
+    const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
+    const settings = allSettings.geometry;
+    const moduleKey: ModuleKey = 'geometry';
 
     const { generate } = useProblemGenerator({
-        moduleKey: 'geometry',
+        moduleKey,
         settings,
         generatorFn: generateGeometryProblem,
         aiGeneratorFn: generateContextualWordProblems,
@@ -36,7 +30,7 @@ const GeometryModule: React.FC = () => {
     });
 
     const handleSettingChange = (field: keyof GeometrySettings, value: any) => {
-        setSettings(prev => ({ ...prev, [field]: value }));
+        setContextSettings(moduleKey, { [field]: value });
     };
 
     const handleRandomTopic = () => {
@@ -65,7 +59,7 @@ const GeometryModule: React.FC = () => {
                 newSettings = { ...newSettings, type: GeometryProblemType.SolidRecognition };
                 break;
         }
-        setSettings(prev => ({ ...prev, ...newSettings }));
+        setContextSettings(moduleKey, newSettings);
     };
 
     const showShapeSelector = [GeometryProblemType.Perimeter, GeometryProblemType.Area].includes(settings.type);
@@ -85,7 +79,6 @@ const GeometryModule: React.FC = () => {
         [ShapeType.Pentagon]: 'Beşgen',
         [ShapeType.Hexagon]: 'Altıgen',
         [ShapeType.Rhombus]: 'Eşkenar Dörtgen',
-        // FIX: Add 'Star' to the shapeTurkishNames object to match the ShapeType enum.
         [ShapeType.Star]: 'Yıldız',
     };
     
@@ -181,11 +174,12 @@ const GeometryModule: React.FC = () => {
                     value={settings.type}
                     onChange={e => {
                         const newType = e.target.value as GeometryProblemType;
+                        let newSettings: Partial<GeometrySettings> = { type: newType };
                         // Reset shape if it's not applicable to the new type
                         if (newType === GeometryProblemType.Area && !areaShapes.includes(settings.shape!)) {
-                            handleSettingChange('shape', ShapeType.Rectangle);
+                            newSettings.shape = ShapeType.Rectangle;
                         }
-                        handleSettingChange('type', newType);
+                        setContextSettings(moduleKey, newSettings);
                     }}
                     options={[
                         { value: GeometryProblemType.Perimeter, label: 'Çevre Hesaplama' },
@@ -228,7 +222,7 @@ const GeometryModule: React.FC = () => {
              <SettingsPresetManager 
                 moduleKey="geometry"
                 currentSettings={settings}
-                onLoadSettings={setSettings}
+                onLoadSettings={(s) => setContextSettings(moduleKey, s)}
             />
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
