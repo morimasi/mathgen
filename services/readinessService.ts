@@ -24,10 +24,14 @@ const THEME_OBJECTS: { [key in MathReadinessTheme | 'measurement']: string[] } =
 };
 THEME_OBJECTS.mixed = [...THEME_OBJECTS.animals, ...THEME_OBJECTS.vehicles, ...THEME_OBJECTS.fruits, ...THEME_OBJECTS.shapes];
 
-const getThemeItems = (theme: MathReadinessTheme, count: number): string[] => {
+const getThemeItems = (theme: MathReadinessTheme, count: number, allowDuplicates = false): string[] => {
     const validThemes = Object.keys(THEME_OBJECTS).filter(k => k !== 'mixed' && k !== 'measurement') as MathReadinessTheme[];
     const themeKey = theme === 'mixed' ? validThemes[getRandomInt(0, validThemes.length - 1)] : theme;
-    return shuffleArray(THEME_OBJECTS[themeKey]).slice(0, count);
+    const source = THEME_OBJECTS[themeKey];
+    if(allowDuplicates) {
+        return Array.from({ length: count }, () => source[getRandomInt(0, source.length - 1)]);
+    }
+    return shuffleArray(source).slice(0, count);
 };
 
 const shapeSVGs: Record<ShapeType, string> = {
@@ -40,7 +44,6 @@ const shapeSVGs: Record<ShapeType, string> = {
     [ShapeType.Pentagon]: `<polygon points="50,10 95,40 75,90 25,90 5,40" fill="#bfdbfe" stroke="#3b82f6" stroke-width="2"/>`,
     [ShapeType.Hexagon]: `<polygon points="30,25 70,25 90,50 70,75 30,75 10,50" fill="#fbcfe8" stroke="#db2777" stroke-width="2"/>`,
     [ShapeType.Rhombus]: `<polygon points="50,10 90,50 50,90 10,50" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/>`,
-    // FIX: Add 'Star' SVG to the shapeSVGs object to match the ShapeType enum.
     [ShapeType.Star]: `<polygon points="50,10 60,40 95,40 65,60 75,95 50,75 25,95 35,60 5,40 40,40" fill="#fef08a" stroke="#eab308" stroke-width="2"/>`,
 };
 
@@ -72,15 +75,15 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
             
         case MatchingType.ByProperty:
             title = 'Özelliğe Göre Gruplama';
-            const colorItems = [
-                { emoji: '🍎', color: 'kırmızı', type: 'meyve' }, { emoji: '🍓', color: 'kırmızı', type: 'meyve' },
-                { emoji: '🐸', color: 'yeşil', type: 'hayvan' }, { emoji: '🥬', color: 'yeşil', type: 'sebze' },
-                { emoji: '🍌', color: 'sarı', type: 'meyve' }, { emoji: '🍋', color: 'sarı', type: 'meyve' },
-                { emoji: '🚗', color: 'kırmızı', type: 'taşıt' }, { emoji: '🌳', color: 'yeşil', type: 'bitki' },
-            ];
-            const groupableItems = shuffleArray(colorItems).slice(0, 6);
-            const targetColor = ['kırmızı', 'yeşil', 'sarı'][getRandomInt(0, 2)];
-            question = `<p><b>${targetColor}</b> renkli olanları daire içine al.</p><div class="grouping-container">${groupableItems.map(item => `<div>${item.emoji}</div>`).join('')}</div>`;
+            const category1Items = getThemeItems('animals', 3, true);
+            const category2Items = getThemeItems('vehicles', 3, true);
+            const allItems = shuffleArray([...category1Items, ...category2Items]);
+            question = `<p>Nesneleri doğru gruplara ayır.</p>
+                        <div class="grouping-container">${allItems.map(i => `<span>${i}</span>`).join('')}</div>
+                        <div class="matching-container">
+                            <div class="grouping-box"><b>Hayvanlar</b></div>
+                            <div class="grouping-box"><b>Taşıtlar</b></div>
+                        </div>`;
             break;
     }
     return { problem: { question, answer: "Eşleştirme", category: 'matching-and-sorting', display: 'flow' }, title };
@@ -88,7 +91,6 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
 
 const generateComparingQuantities = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, maxObjectCount } = settings;
-    // FIX: Changed the `title` variable declaration from `const` to `let`.
     let title = 'Miktarları Karşılaştırma';
     const items = getThemeItems(theme, 2);
     let question = '';
@@ -99,18 +101,37 @@ const generateComparingQuantities = (settings: any): { problem: Problem, title: 
             const count1 = getRandomInt(1, maxObjectCount);
             let count2 = getRandomInt(1, maxObjectCount);
             while(count1 === count2) count2 = getRandomInt(1, maxObjectCount);
-            question = `<p>Hangi kutuda <b>daha çok</b> nesne var? İşaretle.</p><div class="comparison-container"><div class="comparison-group">${items[0].repeat(count1)}</div><div class="comparison-group">${items[1].repeat(count2)}</div></div>`;
+            const moreIsLeft = count1 > count2;
+            question = `<p>Hangi kutuda <b>daha ${moreIsLeft ? 'az' : 'çok'}</b> nesne var? İşaretle.</p><div class="comparison-container"><div class="comparison-group">${items[0].repeat(count1)}</div><div class="comparison-group">${items[1].repeat(count2)}</div></div>`;
             break;
         case ComparisonType.BiggerSmaller:
             title = 'Büyük - Küçük';
-            question = `<p><b>Daha büyük</b> olanı işaretle.</p><div class="comparison-container"><div class="comparison-item" style="font-size: 3rem;">${items[0]}</div><div class="comparison-item" style="font-size: 1.5rem;">${items[1]}</div></div>`;
+            const isBiggerLeft = Math.random() < 0.5;
+            question = `<p><b>Daha ${isBiggerLeft ? 'küçük' : 'büyük'}</b> olanı işaretle.</p><div class="comparison-container"><div class="comparison-item" style="transform: scale(1.5);">${items[0]}</div><div class="comparison-item">${items[1]}</div></div>`;
             break;
         case ComparisonType.TallerShorter:
              title = 'Uzun - Kısa';
-             question = `<p><b>Daha uzun</b> olanı işaretle.</p><div class="comparison-container" style="align-items: flex-end;"><div class="comparison-item-svg">${draw2DShape({ type: 'rectangle', w: 20, h: 80 })}</div><div class="comparison-item-svg">${draw2DShape({ type: 'rectangle', w: 20, h: 40 })}</div></div>`;
+             const isTallerLeft = Math.random() < 0.5;
+             const tallItem = '🦒';
+             const shortItem = '🐈';
+             question = `<p><b>Daha ${isTallerLeft ? 'kısa' : 'uzun'}</b> olanı işaretle.</p><div class="comparison-container" style="align-items: flex-end; font-size: 3rem;"><div class="comparison-item">${isTallerLeft ? tallItem : shortItem}</div><div class="comparison-item">${isTallerLeft ? shortItem : tallItem}</div></div>`;
             break;
     }
     return { problem: { question, answer: "Karşılaştırma", category: 'comparing-quantities', display: 'flow' }, title };
+}
+
+const getDotPattern = (num: number): {x:number, y:number}[] => {
+    switch(num) {
+        case 3: return [{x:50, y:10}, {x:90, y:80}, {x:10, y:80}]; // Triangle
+        case 4: return [{x:10, y:10}, {x:90, y:10}, {x:90, y:90}, {x:10, y:90}]; // Square
+        case 5: return [{x:50,y:10}, {x:95,y:40}, {x:75,y:90}, {x:25,y:90}, {x:5,y:40}]; // Star/Pentagon
+        default: // Default spiral
+            return Array.from({length: num}, (_, i) => {
+                const angle = i * 2.5;
+                const r = 10 + i * 3;
+                return { x: 50 + r * Math.cos(angle), y: 50 + r * Math.sin(angle) };
+            });
+    }
 }
 
 const generateNumberRecognition = (settings: any): { problem: Problem, title: string } => {
@@ -124,24 +145,19 @@ const generateNumberRecognition = (settings: any): { problem: Problem, title: st
     switch(type) {
         case NumberRecognitionType.CountAndWrite:
             title = "Nesneleri Say ve Yaz";
-            const items = getThemeItems(theme, num);
+            const items = getThemeItems(theme, num, true);
             question = `<p>Resimdeki nesneleri say ve kutuya yaz.</p><div class="count-container">${items.map(i => `<span>${i}</span>`).join(' ')}</div> <div class="answer-box-large"></div>`;
             break;
         case NumberRecognitionType.CountAndColor:
             title = "İstenen Kadar Boya";
-            const totalItems = Math.max(num + 2, 5);
-            const displayItems = getThemeItems(theme, totalItems).map(item => `<div class="coloring-item">${item}</div>`).join('');
+            const totalItems = Math.min(10, Math.max(num + 2, 5));
+            const displayItems = getThemeItems(theme, totalItems, true).map(item => `<div class="coloring-item">${item}</div>`).join('');
             question = `<p>Aşağıdaki nesnelerden <b>${num}</b> tanesini boya.</p><div class="count-container">${displayItems}</div>`;
             break;
         case NumberRecognitionType.ConnectTheDots:
             title = "Noktaları Birleştir";
-            // Simple logic for generating a shape
-            const points = Array.from({length: num}, (_, i) => {
-                const angle = (i / (num - 1)) * Math.PI * 1.5 - Math.PI * 1.25;
-                const r = 40 + (i % 2 === 0 ? 5 : -5);
-                return { x: 50 + r * Math.cos(angle), y: 50 + r * Math.sin(angle) };
-            });
-            const dots = points.map((p, i) => `<circle cx="${p.x}" cy="${p.y}" r="2" fill="black" /><text x="${p.x}" y="${p.y-5}" font-size="8" text-anchor="middle">${i+1}</text>`).join('');
+            const points = getDotPattern(num);
+            const dots = points.map((p, i) => `<circle cx="${p.x}" cy="${p.y}" r="2" fill="black" /><text x="${p.x+2}" y="${p.y-2}" font-size="8" text-anchor="middle">${i+1}</text>`).join('');
             question = `<p>Sayıları sırayla birleştirerek resmi tamamla.</p><svg viewBox="0 0 100 100" class="connect-the-dots-svg">${dots}</svg>`;
             break;
     }
@@ -151,23 +167,25 @@ const generateNumberRecognition = (settings: any): { problem: Problem, title: st
 const generatePatterns = (settings: any): { problem: Problem, title: string } => {
     const { type, theme } = settings;
     let title = 'Örüntüler';
-    const items = getThemeItems(theme, 3);
     let question = '', answer = '';
     
     switch(type) {
         case PatternType.RepeatingAB:
-            question = [items[0], items[1], items[0], items[1], '___'].map(i => `<div class="pattern-item">${i}</div>`).join('');
-            answer = items[0];
+            const itemsAB = getThemeItems(theme, 2);
+            question = [itemsAB[0], itemsAB[1], itemsAB[0], itemsAB[1], '___'].map(i => `<div class="pattern-item">${i}</div>`).join('');
+            answer = itemsAB[0];
             break;
         case PatternType.RepeatingABC:
-            question = [items[0], items[1], items[2], items[0], '___', items[2]].map(i => `<div class="pattern-item">${i}</div>`).join('');
-            answer = items[1];
+            const itemsABC = getThemeItems(theme, 3);
+            question = [itemsABC[0], itemsABC[1], itemsABC[2], itemsABC[0], '___', itemsABC[2]].map(i => `<div class="pattern-item">${i}</div>`).join('');
+            answer = itemsABC[1];
             break;
         case PatternType.Growing:
-            const start = getRandomInt(1, 4);
-            const sequence = [start, start + 1, start + 2, '___'];
-            question = sequence.map(i => `<div class="pattern-item numeric">${i}</div>`).join('');
-            answer = String(start + 3);
+            const item = getThemeItems(theme, 1)[0];
+            const start = getRandomInt(1, 3);
+            const sequence = [item.repeat(start), item.repeat(start + 1), item.repeat(start + 2), '___'];
+            question = sequence.map(i => `<div class="pattern-item">${i}</div>`).join('');
+            answer = item.repeat(start + 3);
             break;
     }
      return { problem: { question: `<p>Örüntüyü tamamla.</p><div class="pattern-container">${question}</div>`, answer, category: 'patterns', display: 'flow' }, title };
@@ -178,21 +196,21 @@ const generateBasicShapes = (settings: any): { problem: Problem, title: string }
     let title = 'Temel Geometrik Şekiller';
     const allShapes = [ShapeType.Circle, ShapeType.Square, ShapeType.Triangle, ShapeType.Rectangle, ShapeType.Star];
     const targetShape = availableShapes[getRandomInt(0, availableShapes.length - 1)];
-    const shapeMap: Record<string, string> = { ...shapeSVGs, [ShapeType.Star]: `<polygon points="50,10 60,40 95,40 65,60 75,95 50,75 25,95 35,60 5,40 40,40" fill="#fef08a" stroke="#eab308" stroke-width="2"/>`};
-    const shapeNameMap = { [ShapeType.Circle]: 'Daire', [ShapeType.Square]: 'Kare', [ShapeType.Triangle]: 'Üçgen', [ShapeType.Rectangle]: 'Dikdörtgen', [ShapeType.Star]: 'Yıldız' };
+    const shapeMap: Record<string, string> = { ...shapeSVGs };
+    const shapeNameMap: Record<string, string> = { [ShapeType.Circle]: 'Daire', [ShapeType.Square]: 'Kare', [ShapeType.Triangle]: 'Üçgen', [ShapeType.Rectangle]: 'Dikdörtgen', [ShapeType.Star]: 'Yıldız' };
 
     let question = '', answer = '';
 
     switch(type) {
         case ShapeRecognitionType.ColorShape:
             title = 'Şekil Boyama';
-            const shapePool = shuffleArray(allShapes).slice(0, 5);
-            question = `<p>Tüm <b>${(shapeNameMap as any)[targetShape] || 'şekilleri'}</b> boya.</p><div class="shape-container">${shapePool.map(s => `<div class="shape-item">${(shapeMap as any)[s]}</div>`).join('')}</div>`;
+            const shapePool = shuffleArray(allShapes.concat(allShapes)).slice(0, 8);
+            question = `<p>Tüm <b>${(shapeNameMap as any)[targetShape] || 'şekilleri'}</b> boya.</p><div class="shape-scene">${shapePool.map(s => `<div class="shape-item">${(shapeMap as any)[s]}</div>`).join('')}</div>`;
             answer = `Tüm ${(shapeNameMap as any)[targetShape]} boyanır.`;
             break;
         case ShapeRecognitionType.MatchObjectShape:
             title = 'Nesne-Şekil Eşleştirme';
-            const objectMap = {'🍕': ShapeType.Triangle, '🏠': ShapeType.Square, '☀️': ShapeType.Circle, '✉️': ShapeType.Rectangle};
+            const objectMap: Record<string, ShapeType> = {'🍕': ShapeType.Triangle, '🏠': ShapeType.Square, '☀️': ShapeType.Circle, '✉️': ShapeType.Rectangle, '⭐': ShapeType.Star, '🍉': ShapeType.Circle};
             const targetObject = Object.keys(objectMap)[getRandomInt(0, Object.keys(objectMap).length - 1)];
             const correctShape = (objectMap as any)[targetObject];
             question = `<p>Bu nesne hangi şekle benziyor? Eşleştir.</p><div class="matching-container"><div class="matching-col"><div class="matching-item">${targetObject}</div></div><div class="matching-col">${allShapes.map(s => `<div class="matching-item">${(shapeMap as any)[s]}</div>`).join('')}</div></div>`;
@@ -240,20 +258,20 @@ const generateIntroToMeasurement = (settings: any): { problem: Problem, title: s
 
     switch(type) {
         case IntroMeasurementType.CompareLength:
-            question = `<p><b>Daha uzun</b> olanı işaretle.</p><div class="side-by-side-container vertical"><svg viewBox="0 0 50 100" height="100"><rect x="20" y="10" width="10" height="80" fill="#f97316"/></svg><svg viewBox="0 0 50 100" height="60"><rect x="20" y="10" width="10" height="80" fill="#f97316"/></svg></div>`;
+            question = `<p><b>Daha uzun</b> olanı işaretle.</p><div class="side-by-side-container vertical"><div style="font-size: 4rem;">✏️</div><div style="font-size: 2rem;">✏️</div></div>`;
             answer = 'Soldaki';
             break;
         case IntroMeasurementType.CompareWeight:
-            question = `<p><b>Daha ağır</b> olanı işaretle.</p><div class="side-by-side-container"><span style="font-size: 3rem">🐘</span><span style="font-size: 1.5rem"> Feather: 🪶</span></div>`;
+            question = `<p><b>Daha ağır</b> olanı işaretle.</p><div class="side-by-side-container"><span style="font-size: 3rem">🐘</span><span style="font-size: 1.5rem"> 🐁</span></div>`;
             answer = '🐘';
             break;
         case IntroMeasurementType.CompareCapacity:
-            question = `<p><b>Daha çok</b> su alan hangisidir?</p><div class="side-by-side-container vertical"><svg viewBox="0 0 50 100" height="100"><rect x="10" y="10" width="30" height="80" fill="#a5f3fc" stroke="#0891b2"/></svg><svg viewBox="0 0 50 100" height="50"><rect x="10" y="10" width="30" height="80" fill="#a5f3fc" stroke="#0891b2"/></svg></div>`;
+            question = `<p><b>Daha çok</b> su alan hangisidir?</p><div class="side-by-side-container vertical"><span style="font-size: 4rem">🪣</span><span style="font-size: 2rem">🥛</span></div>`;
             answer = 'Soldaki';
             break;
         case IntroMeasurementType.NonStandardLength:
             const itemCount = getRandomInt(3, 6);
-            question = `<p>Kalem kaç ataş uzunluğundadır?</p><div class="non-standard-measure"><span class="object-to-measure">✏️</span><div class="measuring-units">${'📎'.repeat(itemCount)}</div></div>`;
+            question = `<p>Kalem kaç ataş uzunluğundadır?</p><div class="non-standard-measure"><span class="object-to-measure">✏️</span><div class="measuring-units">${'📎'.repeat(itemCount)}</div></div><div class="answer-box-large"></div>`;
             answer = `${itemCount}`;
             break;
     }
@@ -275,9 +293,20 @@ const generateSimpleGraphs = (settings: any): { problem: Problem, title: string 
     } else {
         title = 'Grafik Okuma';
         const graphHTML = `<div class="bar-chart">${data.map(d => `<div class="bar-row"><span class="bar-label">${d.category}</span><div class="bar" style="width: ${d.value * 20}px;">${d.value}</div></div>`).join('')}</div>`;
-        const targetCategory = data[getRandomInt(0, data.length - 1)];
-        question = `<p>Grafiğe göre, kaç tane ${targetCategory.category} vardır?</p>${graphHTML}`;
-        answer = String(targetCategory.value);
+        const qType = getRandomInt(1, 3);
+        if (qType === 1) { // How many
+            const targetCategory = data[getRandomInt(0, data.length - 1)];
+            question = `<p>Grafiğe göre, kaç tane ${targetCategory.category} vardır?</p>${graphHTML}`;
+            answer = String(targetCategory.value);
+        } else if (qType === 2) { // Most
+            const most = data.reduce((max, d) => d.value > max.value ? d : max);
+            question = `<p>Grafiğe göre, en çok hangisinden vardır?</p>${graphHTML}`;
+            answer = most.category;
+        } else { // Least
+             const least = data.reduce((min, d) => d.value < min.value ? d : min);
+            question = `<p>Grafiğe göre, en az hangisinden vardır?</p>${graphHTML}`;
+            answer = least.category;
+        }
     }
     return { problem: { question, answer, category: 'simple-graphs', display: 'flow' }, title };
 };

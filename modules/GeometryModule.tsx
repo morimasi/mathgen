@@ -85,7 +85,6 @@ const GeometryModule: React.FC = () => {
         [ShapeType.Pentagon]: 'Beşgen',
         [ShapeType.Hexagon]: 'Altıgen',
         [ShapeType.Rhombus]: 'Eşkenar Dörtgen',
-        // FIX: Add 'Star' to the shapeTurkishNames object to match the ShapeType enum.
         [ShapeType.Star]: 'Yıldız',
     };
     
