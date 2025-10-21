@@ -213,7 +213,7 @@ const TopBanner: React.FC = memo(() => {
                     <div className="md:hidden flex items-center gap-1 text-white">
                         <ThemeSwitcher />
                         <div ref={actionMenuRef} className="relative">
-                            <button onClick={() => setActionMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
+                            <button onClick={() => setActionMenuOpen(p => !p)} className="p-3 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
                              {isActionMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30 py-1">
                                     <ActionButtons />
@@ -241,7 +241,7 @@ const TopBanner: React.FC = memo(() => {
 });
 
 const Header: React.FC = memo(() => {
-    const { activeTab, setActiveTab } = useUI();
+    const { activeTab, setActiveTab, isSettingsPanelCollapsed, setIsSettingsPanelCollapsed } = useUI();
     const { clearWorksheet } = useWorksheet();
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -279,9 +279,16 @@ const Header: React.FC = memo(() => {
                 </div>
 
                 {/* Mobile Menu Buttons */}
-                <div className="md:hidden flex items-center">
+                <div className="md:hidden flex items-center gap-1">
+                    <button 
+                        onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)} 
+                        className="p-3 rounded-md hover:bg-white/10 text-white transition-colors" 
+                        title="Ayarları Göster/Gizle"
+                    >
+                        <SettingsIcon />
+                    </button>
                     <div ref={mobileMenuRef} className="relative">
-                        <button onClick={() => setMobileMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Modüller"><MenuIcon /></button>
+                        <button onClick={() => setMobileMenuOpen(p => !p)} className="p-3 rounded-md hover:bg-white/10 text-white transition-colors" title="Modüller"><MenuIcon /></button>
                         {isMobileMenuOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30">
                                 <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={(id) => { setActiveTab(id); setMobileMenuOpen(false); }} />
@@ -389,22 +396,17 @@ const AppLayout: React.FC = () => {
                         <button onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)} className="absolute -right-3 top-2 p-1.5 bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded-full shadow-md hidden md:flex items-center justify-center z-10" title={isSettingsPanelCollapsed ? 'Ayarları Göster' : 'Ayarları Gizle'}>
                             <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
                         </button>
-                        <aside id={TUTORIAL_ELEMENT_IDS.SETTINGS_PANEL} className={`bg-white dark:bg-stone-800/50 p-4 rounded-lg shadow-sm border border-stone-200 dark:border-stone-700/50 transition-all duration-300 ${isSettingsPanelCollapsed ? 'hidden md:block md:w-0 md:p-0 md:opacity-0 md:invisible' : 'w-full'}`}>
+                        <aside 
+                            id={TUTORIAL_ELEMENT_IDS.SETTINGS_PANEL} 
+                            className={`bg-white dark:bg-stone-800/50 p-4 rounded-lg shadow-sm border border-stone-200 dark:border-stone-700/50 transition-all duration-300 ${isSettingsPanelCollapsed 
+                                ? 'hidden md:block md:w-0 md:p-0 md:opacity-0 md:invisible' 
+                                : 'w-full mb-4 md:mb-0'
+                            }`}
+                        >
                             <div className={`${isSettingsPanelCollapsed ? 'hidden' : ''}`}>
                                 <SettingsPanel />
                             </div>
                         </aside>
-                    </div>
-
-                    <div className="md:hidden">
-                        {!isSettingsPanelCollapsed && (
-                             <aside id={TUTORIAL_ELEMENT_IDS.SETTINGS_PANEL} className={`bg-white dark:bg-stone-800/50 p-4 rounded-lg shadow-sm border border-stone-200 dark:border-stone-700/50 mb-4`}>
-                                <SettingsPanel />
-                            </aside>
-                        )}
-                        <Button onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)} className="w-full">
-                            {isSettingsPanelCollapsed ? 'Ayarları Göster' : 'Ayarları Gizle'}
-                        </Button>
                     </div>
                     
                     <main className="flex-1 min-w-0">
