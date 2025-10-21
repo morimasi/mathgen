@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, memo } from 'react';
+import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext.tsx';
@@ -54,6 +54,30 @@ function useDebounce<T>(value: T, delay: number): T {
   }, [value, delay]);
 
   return debouncedValue;
+}
+
+// Debounced callback hook for performance optimization
+function useDebouncedCallback<A extends any[]>(
+  callback: (...args: A) => void,
+  delay: number
+) {
+  const timeoutRef = useRef<number>();
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  return useCallback(
+    (...args: A) => {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = window.setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
 }
 
 const Header: React.FC = memo(() => {
@@ -327,6 +351,7 @@ const AppContent: React.FC = () => {
     
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
+    const lastSyncedScale = useRef(settings.scale);
 
     useEffect(() => {
         const el = panAreaRef.current;
@@ -368,17 +393,49 @@ const AppContent: React.FC = () => {
         panAreaRef.current?.classList.remove('is-panning');
     };
 
+    // --- Start of performance optimization for wheel zoom ---
+    useEffect(() => {
+        // If the global scale changes from an external source (like the slider),
+        // reset the inline transform to let the CSS variable take over again.
+        if (settings.scale !== lastSyncedScale.current) {
+            const worksheetArea = panAreaRef.current?.querySelector<HTMLElement>('#worksheet-area');
+            if (worksheetArea) {
+                worksheetArea.style.transform = '';
+            }
+            lastSyncedScale.current = settings.scale;
+        }
+    }, [settings.scale]);
+
+    const debouncedSetScale = useDebouncedCallback((newScale: number) => {
+        lastSyncedScale.current = newScale; // Update our ref when we sync the global state
+        setSettings(s => ({ ...s, scale: newScale }));
+    }, 200);
+
     const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
         if (e.ctrlKey || e.metaKey) { // Allow pinch-zoom on trackpads
             e.preventDefault();
+            const worksheetArea = panAreaRef.current?.querySelector<HTMLElement>('#worksheet-area');
+            if (!worksheetArea) return;
+
+            // Get the current scale. If an inline transform is set, use that, otherwise use global state.
+            const transformMatch = worksheetArea.style.transform.match(/scale\(([^)]+)\)/);
+            const currentScale = transformMatch ? parseFloat(transformMatch[1]) : settings.scale;
+
             const scaleAmount = 0.05;
             const newScale = e.deltaY > 0
-                ? Math.max(0.2, settings.scale - scaleAmount)
-                : Math.min(2.0, settings.scale + scaleAmount);
-            setSettings(s => ({ ...s, scale: newScale }));
+                ? Math.max(0.2, currentScale - scaleAmount)
+                : Math.min(2.0, currentScale + scaleAmount);
+
+            // Update DOM directly for immediate visual feedback
+            worksheetArea.style.transform = `scale(${newScale})`;
+            worksheetArea.style.transformOrigin = 'top center'; // Ensure origin is consistent
+
+            // Schedule an update to the global React state
+            debouncedSetScale(newScale);
         }
         // If no ctrl/meta key, allow normal vertical scrolling of the pan area
     };
+     // --- End of performance optimization ---
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
