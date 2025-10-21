@@ -3,16 +3,28 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 interface UIContextType {
     activeTab: string;
     setActiveTab: (tabId: string) => void;
+    isCustomizationCenterVisible: boolean;
+    openCustomizationCenter: () => void;
+    closeCustomizationCenter: () => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
 
 export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    // FIX: Default active tab changed to 'customization-center' for a better initial user experience.
-    const [activeTab, setActiveTab] = useState('customization-center'); 
+    const [activeTab, setActiveTab] = useState('matching-and-sorting'); 
+    const [isCustomizationCenterVisible, setCustomizationCenterVisible] = useState(false);
+
+    const openCustomizationCenter = () => setCustomizationCenterVisible(true);
+    const closeCustomizationCenter = () => setCustomizationCenterVisible(false);
 
     return (
-        <UIContext.Provider value={{ activeTab, setActiveTab }}>
+        <UIContext.Provider value={{ 
+            activeTab, 
+            setActiveTab, 
+            isCustomizationCenterVisible, 
+            openCustomizationCenter, 
+            closeCustomizationCenter 
+        }}>
             {children}
         </UIContext.Provider>
     );

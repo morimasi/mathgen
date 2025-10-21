@@ -15,16 +15,17 @@ import { useWorksheet } from './services/WorksheetContext.tsx';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext.tsx';
 import { ToastProvider } from './services/ToastContext.tsx';
 import ToastContainer from './components/ToastContainer.tsx';
-import { HelpIcon, PrintIcon, FavoriteIcon, ContactIcon, RefreshIcon } from './components/icons/Icons.tsx';
+import { HelpIcon, PrintIcon, FavoriteIcon, ContactIcon, RefreshIcon, SquaresIcon } from './components/icons/Icons.tsx';
 import Button from './components/form/Button.tsx';
 import PrintSettingsPanel from './components/PrintSettingsPanel.tsx';
 import FavoritesPanel from './components/FavoritesPanel.tsx';
 import HowToUseModal from './components/HowToUseModal.tsx';
 import ContactModal from './components/ContactModal.tsx';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
+import CustomizationCenterModal from './components/CustomizationCenterModal.tsx';
 
 const AppContent = () => {
-    const { activeTab, setActiveTab } = useUI();
+    const { activeTab, setActiveTab, isCustomizationCenterVisible, openCustomizationCenter, closeCustomizationCenter } = useUI();
     const { clearWorksheet, isLoading, triggerAutoRefresh } = useWorksheet();
     const [isPrintPanelVisible, setPrintPanelVisible] = React.useState(false);
     const [isFavoritesPanelVisible, setFavoritesPanelVisible] = React.useState(false);
@@ -37,6 +38,7 @@ const AppContent = () => {
                 <AnimatedLogo onReset={clearWorksheet} />
                 <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={setActiveTab} />
                 <div className="ml-auto flex items-center gap-2">
+                     <Button variant="secondary" size="sm" onClick={openCustomizationCenter}><SquaresIcon className="w-4 h-4" /> Merkez</Button>
                      <Button variant="secondary" size="sm" onClick={() => setFavoritesPanelVisible(true)}><FavoriteIcon className="w-4 h-4" /> Favorilerim</Button>
                      <Button variant="secondary" size="sm" onClick={triggerAutoRefresh} title="Mevcut ayarları koruyarak soruları yenile"><RefreshIcon className="w-4 h-4" /> Yenile</Button>
                     <Button variant="secondary" size="sm" onClick={() => setPrintPanelVisible(true)}><PrintIcon className="w-4 h-4" /> Yazdırma Ayarları</Button>
@@ -61,7 +63,8 @@ const AppContent = () => {
                     </div>
                 </section>
             </main>
-
+            
+            <CustomizationCenterModal isVisible={isCustomizationCenterVisible} onClose={closeCustomizationCenter} />
             <PrintSettingsPanel isVisible={isPrintPanelVisible} onClose={() => setPrintPanelVisible(false)} />
             <FavoritesPanel isVisible={isFavoritesPanelVisible} onClose={() => setFavoritesPanelVisible(false)} />
             <HowToUseModal isVisible={isHowToUseModalVisible} onClose={() => setHowToUseModalVisible(false)} />

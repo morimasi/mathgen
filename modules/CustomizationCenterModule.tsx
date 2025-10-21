@@ -1,18 +1,19 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { useWorksheet } from '../services/WorksheetContext';
-import { useUI } from '../services/UIContext';
-import { ModuleKey, Problem } from '../types';
-import { moduleConfig, getModuleStats, generateModulePreview } from '../services/customizationCenterService';
-import Button from '../components/form/Button';
-import Select from '../components/form/Select';
-import { RefreshIcon } from '../components/icons/Icons';
-import NumberInput from '../components/form/NumberInput';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { useUI } from '../services/UIContext.tsx';
+import { ModuleKey, Problem } from '../types.ts';
+import { moduleConfig, getModuleStats, generateModulePreview } from '../services/customizationCenterService.ts';
+import Button from '../components/form/Button.tsx';
+import Select from '../components/form/Select.tsx';
+import { RefreshIcon } from '../components/icons/Icons.tsx';
+import NumberInput from '../components/form/NumberInput.tsx';
 
 interface ModuleCardProps {
     moduleKey: ModuleKey;
+    onClose: () => void;
 }
 
-const ModuleCard: React.FC<ModuleCardProps> = ({ moduleKey }) => {
+const ModuleCard: React.FC<ModuleCardProps> = ({ moduleKey, onClose }) => {
     const { allSettings, handleSettingsChange } = useWorksheet();
     const { setActiveTab } = useUI();
     const [preview, setPreview] = useState<Problem | null>(null);
@@ -35,12 +36,17 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ moduleKey }) => {
         generatePreview();
     }, [generatePreview]);
 
+    const handleGoToModule = () => {
+        setActiveTab(moduleKey);
+        onClose();
+    };
+
     return (
         <div className="bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg p-4 flex flex-col h-full">
             <div className="flex items-start gap-3">
                 <div className="w-8 h-8 flex-shrink-0 text-primary"><config.icon /></div>
                 <h3 className="text-base font-bold text-stone-800 dark:text-stone-200 flex-grow">{config.title}</h3>
-                <Button onClick={() => setActiveTab(moduleKey)} size="sm" variant="secondary">Modüle Git</Button>
+                <Button onClick={handleGoToModule} size="sm" variant="secondary">Modüle Git</Button>
             </div>
             <div className="flex-grow space-y-3 mt-3">
                 <div className="grid grid-cols-2 gap-2">
@@ -88,7 +94,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ moduleKey }) => {
     );
 };
 
-const CustomizationCenterModule: React.FC = () => {
+const CustomizationCenterModule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     return (
         <div className="space-y-4">
              <div className="flex items-center gap-2">
@@ -99,7 +105,7 @@ const CustomizationCenterModule: React.FC = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {(Object.keys(moduleConfig) as ModuleKey[]).map(key => (
-                    <ModuleCard key={key} moduleKey={key} />
+                    <ModuleCard key={key} moduleKey={key} onClose={onClose} />
                 ))}
             </div>
         </div>

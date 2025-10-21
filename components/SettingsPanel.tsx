@@ -29,7 +29,6 @@ const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreatio
 const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
 const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule.tsx'));
 const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule.tsx'));
-const CustomizationCenterModule = React.lazy(() => import('../modules/CustomizationCenterModule.tsx'));
 
 
 // FIX: Changed type from React.FC<{}> to React.ComponentType<any> to match the return type of React.lazy.
@@ -60,12 +59,19 @@ const moduleMap: { [key: string]: React.LazyExoticComponent<React.ComponentType<
     'dyslexia': DyslexiaModule,
     'dyscalculia': DyscalculiaModule,
     'dysgraphia': DysgraphiaModule,
-    'customization-center': CustomizationCenterModule,
 };
 
 const SettingsPanel: React.FC = () => {
     const { activeTab } = useUI();
-    const ActiveModule = moduleMap[activeTab] || moduleMap['customization-center'];
+    const ActiveModule = moduleMap[activeTab];
+
+    if (!ActiveModule) {
+        return (
+            <div className="flex justify-center items-center h-full">
+                <p className="text-stone-500">Lütfen geçerli bir modül seçin.</p>
+            </div>
+        );
+    }
 
     return (
         <React.Suspense fallback={<div className="flex justify-center items-center h-full"><LoadingDaisy /></div>}>

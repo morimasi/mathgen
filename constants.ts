@@ -6,7 +6,6 @@ export const TOPIC_SUGGESTIONS = [
 ];
 
 export const TABS = [
-    { id: 'customization-center', label: 'Özelleştirme Merkezi' },
     { id: 'visual-support', label: 'Görsel Destek' },
     { id: 'arithmetic', label: 'Dört İşlem' },
     { id: 'fractions', label: 'Kesirler' },
@@ -36,12 +35,6 @@ export const TABS = [
 ];
 
 export const TAB_GROUPS = [
-    {
-        title: 'Özelleştirme',
-        tabs: [
-             { id: 'customization-center', label: 'Özelleştirme Merkezi' },
-        ]
-    },
     {
         title: 'Matematiğe Hazırlık',
         tabs: [
