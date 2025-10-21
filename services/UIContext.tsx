@@ -17,8 +17,6 @@ interface UIContextType {
     isFavoritesPanelVisible: boolean;
     openFavoritesPanel: () => void;
     closeFavoritesPanel: () => void;
-    isSettingsPanelCollapsed: boolean;
-    setIsSettingsPanelCollapsed: (collapsed: boolean) => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -29,7 +27,6 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isHowToUseVisible, setHowToUseVisible] = useState(false);
     const [isContactModalVisible, setContactModalVisible] = useState(false);
     const [isFavoritesPanelVisible, setFavoritesPanelVisible] = useState(false);
-    const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(window.innerWidth < 768); // Collapse on mobile by default
     
     const openPrintSettings = useCallback(() => setPrintSettingsVisible(true), []);
     const closePrintSettings = useCallback(() => setPrintSettingsVisible(false), []);
@@ -47,7 +44,6 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             isHowToUseVisible, openHowToUse, closeHowToUse,
             isContactModalVisible, openContactModal, closeContactModal,
             isFavoritesPanelVisible, openFavoritesPanel, closeFavoritesPanel,
-            isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
         }}>
             {children}
         </UIContext.Provider>

@@ -27,7 +27,8 @@ import {
     DownloadIcon,
     MenuIcon,
     MoreVerticalIcon,
-    LoadingIcon
+    LoadingIcon,
+    DoubleArrowLeftIcon
 } from './components/icons/Icons.tsx';
 import Button from './components/form/Button.tsx';
 import Select from './components/form/Select.tsx';
@@ -37,35 +38,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
 import { PrintSettings } from './types.ts';
-
-// --- LAZY LOADED MODULES ---
-const CustomizationCenterModule = React.lazy(() => import('./modules/CustomizationCenterModule.tsx'));
-const ArithmeticModule = React.lazy(() => import('./modules/ArithmeticModule.tsx'));
-const FractionsModule = React.lazy(() => import('./modules/FractionsModule.tsx'));
-const DecimalsModule = React.lazy(() => import('./modules/DecimalsModule.tsx'));
-const PlaceValueModule = React.lazy(() => import('./modules/PlaceValueModule.tsx'));
-const RhythmicCountingModule = React.lazy(() => import('./modules/RhythmicCountingModule.tsx').then(module => ({ default: module.RhythmicCountingModule })));
-const TimeModule = React.lazy(() => import('./modules/TimeModule.tsx'));
-const GeometryModule = React.lazy(() => import('./modules/GeometryModule.tsx'));
-const MeasurementModule = React.lazy(() => import('./modules/MeasurementModule.tsx'));
-const WordProblemsModule = React.lazy(() => import('./modules/WordProblemsModule.tsx'));
-const VisualSupportModule = React.lazy(() => import('./modules/VisualSupportModule.tsx'));
-const MatchingAndSortingModule = React.lazy(() => import('./modules/MatchingAndSortingModule.tsx'));
-const ComparingQuantitiesModule = React.lazy(() => import('./modules/ComparingQuantitiesModule.tsx'));
-const NumberRecognitionModule = React.lazy(() => import('./modules/NumberRecognitionModule.tsx'));
-const PatternsModule = React.lazy(() => import('./modules/PatternsModule.tsx'));
-const BasicShapesModule = React.lazy(() => import('./modules/BasicShapesModule.tsx'));
-const PositionalConceptsModule = React.lazy(() => import('./modules/PositionalConceptsModule.tsx'));
-const IntroToMeasurementModule = React.lazy(() => import('./modules/IntroToMeasurementModule.tsx').then(module => ({ default: module.IntroToMeasurementModule })));
-const SimpleGraphsModule = React.lazy(() => import('./modules/SimpleGraphsModule.tsx'));
-const DyslexiaModule = React.lazy(() => import('./modules/DyslexiaModule.tsx'));
-const DyscalculiaModule = React.lazy(() => import('./modules/DyscalculiaModule.tsx'));
-const DysgraphiaModule = React.lazy(() => import('./modules/DysgraphiaModule.tsx').then(module => ({ default: module.default })));
-const VisualAdditionSubtractionModule = React.lazy(() => import('./modules/VisualAdditionSubtractionModule.tsx'));
-const VerbalArithmeticModule = React.lazy(() => import('./modules/VerbalArithmeticModule.tsx'));
-const MissingNumberPuzzlesModule = React.lazy(() => import('./modules/MissingNumberPuzzlesModule.tsx'));
-const SymbolicArithmeticModule = React.lazy(() => import('./modules/SymbolicArithmeticModule.tsx'));
-const ProblemCreationModule = React.lazy(() => import('./modules/ProblemCreationModule.tsx').then(module => ({ default: module.default })));
+import SettingsPanel from './components/SettingsPanel.tsx';
 
 
 // Debounce hook for performance optimization
@@ -281,136 +254,8 @@ const Header: React.FC = memo(() => {
     );
 });
 
-const WorksheetToolbar: React.FC = memo(() => {
-    const { settings, setSettings } = usePrintSettings();
-    const { fontTheme, setFontTheme } = useFontTheme();
-    const fontThemeOptions = Object.entries(fontThemes).map(([key, value]) => ({ value: key, label: value.name }));
-    
-    // --- Start of debounce implementation for performance ---
-    const [localSettings, setLocalSettings] = useState(settings);
-    const debouncedSettings = useDebounce(localSettings, 200);
-
-    useEffect(() => {
-        if (JSON.stringify(settings) !== JSON.stringify(debouncedSettings)) {
-            setSettings(debouncedSettings);
-        }
-    }, [debouncedSettings, setSettings]);
-
-    useEffect(() => {
-        setLocalSettings(settings);
-    }, [settings]);
-    
-    const handleLocalChange = (field: keyof PrintSettings, value: any) => {
-        setLocalSettings(prev => ({ ...prev, [field]: value }));
-    };
-    // --- End of debounce implementation ---
-
-    const fitToScreen = () => {
-        const area = document.getElementById('worksheet-area');
-        if (area) {
-            const scale = Math.min(
-                area.parentElement!.clientWidth / (area.clientWidth + 50),
-                area.parentElement!.clientHeight / (area.clientHeight + 50)
-            );
-            // Update global state directly for instant feedback from a button click
-            setSettings(s => ({ ...s, scale: Math.max(0.2, scale) }));
-        }
-    };
-    
-    const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2 hidden md:block"></div>;
-
-    return (
-        <div className="flex-shrink-0 p-2 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 print:hidden flex-wrap md:flex-nowrap gap-2 md:gap-0">
-            <div className="flex items-center gap-3 flex-wrap">
-                {/* --- Scale --- */}
-                <div className="flex items-center gap-2">
-                    <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
-                    <input id="zoom-slider" type="range" min="20" max="200" value={localSettings.scale * 100} onChange={(e) => handleLocalChange('scale', parseInt(e.target.value, 10) / 100)} className="w-24 accent-primary"/>
-                    <span className="text-xs w-10 text-center">{Math.round(localSettings.scale * 100)}%</span>
-                    <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
-                </div>
-                <Separator />
-                {/* --- Layout --- */}
-                 <div className="flex items-center gap-2">
-                    <Select label="Düzen" id="layout-mode" value={localSettings.layoutMode} onChange={e => handleLocalChange('layoutMode', e.target.value as 'flow' | 'table')} options={[{ value: 'flow', label: 'Akış' }, { value: 'table', label: 'Tablo' }]}/>
-                    {localSettings.layoutMode === 'flow' ? (
-                        <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
-                    ) : (
-                        <>
-                             <NumberInput label="Satır" id="rows" min={1} max={20} value={localSettings.rows} onChange={e => handleLocalChange('rows', parseInt(e.target.value,10))} className="w-14"/>
-                            <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
-                        </>
-                    )}
-                </div>
-                 <Separator />
-                 {/* --- Style --- */}
-                <div className="flex items-center gap-3">
-                    <Select label="Hizalama" id="text-align" value={localSettings.textAlign} onChange={e => handleLocalChange('textAlign', e.target.value as 'left' | 'center' | 'right' )} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
-                    <Select label="Kenarlık" id="border-style" value={localSettings.borderStyle} onChange={e => handleLocalChange('borderStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
-                    <Select label="Defter Stili" id="notebook-style" value={localSettings.notebookStyle} onChange={e => handleLocalChange('notebookStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
-                    <Select label="Yazı Tipi" id="font-theme" value={fontTheme} onChange={e => setFontTheme(e.target.value as any)} options={fontThemeOptions}/>
-                </div>
-                 <Separator />
-                 {/* --- Spacing --- */}
-                 <div className="flex items-center gap-3">
-                    <div className="flex flex-col gap-0.5">
-                        <label htmlFor="problem-spacing-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Problem Aralığı</label>
-                        <input id="problem-spacing-slider" type="range" min="0" max="5" step="0.1" value={localSettings.problemSpacing} onChange={(e) => handleLocalChange('problemSpacing', parseFloat(e.target.value))} className="w-20 accent-primary"/>
-                    </div>
-                     <div className="flex flex-col gap-0.5">
-                        <label htmlFor="line-height-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Satır Yüksekliği</label>
-                        <input id="line-height-slider" type="range" min="1" max="2.5" step="0.1" value={localSettings.lineHeight} onChange={(e) => handleLocalChange('lineHeight', parseFloat(e.target.value))} className="w-20 accent-primary"/>
-                    </div>
-                     <div className="flex flex-col gap-0.5">
-                        <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
-                        <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
-                    </div>
-                 </div>
-            </div>
-        </div>
-    );
-});
-
-const SettingsRouter: React.FC = () => {
-    const { activeTab } = useUI();
-
-    switch (activeTab) {
-        case 'customization-center': return <CustomizationCenterModule />;
-        case 'worksheet': return null; // Worksheet is handled outside
-        case 'arithmetic': return <ArithmeticModule />;
-        case 'visual-support': return <VisualSupportModule />;
-        case 'word-problems': return <WordProblemsModule />;
-        case 'problem-creation': return <ProblemCreationModule />;
-        case 'fractions': return <FractionsModule />;
-        case 'decimals': return <DecimalsModule />;
-        case 'place-value': return <PlaceValueModule />;
-        case 'rhythmic-counting': return <RhythmicCountingModule />;
-        case 'time': return <TimeModule />;
-        case 'geometry': return <GeometryModule />;
-        case 'measurement': return <MeasurementModule />;
-        case 'matching-and-sorting': return <MatchingAndSortingModule />;
-        case 'comparing-quantities': return <ComparingQuantitiesModule />;
-        case 'number-recognition': return <NumberRecognitionModule />;
-        case 'patterns': return <PatternsModule />;
-        case 'basic-shapes': return <BasicShapesModule />;
-        case 'positional-concepts': return <PositionalConceptsModule />;
-        case 'intro-to-measurement': return <IntroToMeasurementModule />;
-        case 'simple-graphs': return <SimpleGraphsModule />;
-        case 'dyslexia': return <DyslexiaModule />;
-        case 'dyscalculia': return <DyscalculiaModule />;
-        case 'dysgraphia': return <DysgraphiaModule />;
-        case 'visual-addition-subtraction': return <VisualAdditionSubtractionModule />;
-        case 'verbal-arithmetic': return <VerbalArithmeticModule />;
-        case 'missing-number-puzzles': return <MissingNumberPuzzlesModule />;
-        case 'symbolic-arithmetic': return <SymbolicArithmeticModule />;
-        default: return <CustomizationCenterModule />;
-    }
-};
-
-
 const AppContent: React.FC = () => {
     const { 
-        activeTab,
         isPrintSettingsVisible, closePrintSettings,
         isHowToUseVisible, closeHowToUse,
         isContactModalVisible, closeContactModal,
@@ -419,6 +264,52 @@ const AppContent: React.FC = () => {
     const { isLoading } = useWorksheet();
     const { settings, setSettings } = usePrintSettings();
     
+    // --- Panel Resizing Logic ---
+    const [panelWidth, setPanelWidth] = useState(384); // Corresponds to w-96
+    const [isResizing, setIsResizing] = useState(false);
+    const resizeState = useRef({ startingX: 0, startingWidth: 0 });
+    const MIN_PANEL_WIDTH = 320;
+    const MAX_PANEL_WIDTH = 800;
+
+    const handleMouseDownOnResizer = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsResizing(true);
+        resizeState.current = {
+            startingX: e.clientX,
+            startingWidth: panelWidth,
+        };
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isResizing) return;
+            const deltaX = e.clientX - resizeState.current.startingX;
+            const newWidth = resizeState.current.startingWidth + deltaX;
+            const clampedWidth = Math.max(MIN_PANEL_WIDTH, Math.min(newWidth, MAX_PANEL_WIDTH));
+            setPanelWidth(clampedWidth);
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+        };
+
+        if (isResizing) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+    }, [isResizing]);
+    
+    // --- End Panel Resizing Logic ---
+
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
     const lastSyncedScale = useRef(settings.scale);
@@ -431,7 +322,7 @@ const AppContent: React.FC = () => {
     }, []);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.button !== 0) return;
+        if (e.button !== 0 || (e.target as HTMLElement).closest('.problem-item')) return;
         e.preventDefault();
         const el = panAreaRef.current;
         if (!el) return;
@@ -463,10 +354,7 @@ const AppContent: React.FC = () => {
         panAreaRef.current?.classList.remove('is-panning');
     };
 
-    // --- Start of performance optimization for wheel zoom ---
     useEffect(() => {
-        // If the global scale changes from an external source (like the slider),
-        // reset the inline transform to let the CSS variable take over again.
         if (settings.scale !== lastSyncedScale.current) {
             const worksheetArea = panAreaRef.current?.querySelector<HTMLElement>('#worksheet-area');
             if (worksheetArea) {
@@ -477,17 +365,16 @@ const AppContent: React.FC = () => {
     }, [settings.scale]);
 
     const debouncedSetScale = useDebouncedCallback((newScale: number) => {
-        lastSyncedScale.current = newScale; // Update our ref when we sync the global state
+        lastSyncedScale.current = newScale;
         setSettings(s => ({ ...s, scale: newScale }));
     }, 200);
 
     const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-        if (e.ctrlKey || e.metaKey) { // Allow pinch-zoom on trackpads
+        if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
             const worksheetArea = panAreaRef.current?.querySelector<HTMLElement>('#worksheet-area');
             if (!worksheetArea) return;
 
-            // Get the current scale. If an inline transform is set, use that, otherwise use global state.
             const transformMatch = worksheetArea.style.transform.match(/scale\(([^)]+)\)/);
             const currentScale = transformMatch ? parseFloat(transformMatch[1]) : settings.scale;
 
@@ -496,16 +383,12 @@ const AppContent: React.FC = () => {
                 ? Math.max(0.2, currentScale - scaleAmount)
                 : Math.min(2.0, currentScale + scaleAmount);
 
-            // Update DOM directly for immediate visual feedback
             worksheetArea.style.transform = `scale(${newScale})`;
-            worksheetArea.style.transformOrigin = 'top center'; // Ensure origin is consistent
+            worksheetArea.style.transformOrigin = 'top center';
 
-            // Schedule an update to the global React state
             debouncedSetScale(newScale);
         }
-        // If no ctrl/meta key, allow normal vertical scrolling of the pan area
     };
-     // --- End of performance optimization ---
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
@@ -515,6 +398,21 @@ const AppContent: React.FC = () => {
             </header>
 
             <div className="flex flex-grow overflow-hidden">
+                <aside 
+                    className="flex-shrink-0 bg-white dark:bg-stone-800 border-r border-stone-200 dark:border-stone-700 flex flex-col print:hidden"
+                    style={{ width: `${panelWidth}px` }}
+                >
+                    <div className="p-4 overflow-y-auto">
+                        <SettingsPanel />
+                    </div>
+                </aside>
+
+                <div 
+                    onMouseDown={handleMouseDownOnResizer}
+                    className="flex-shrink-0 w-2 cursor-col-resize bg-stone-200 dark:bg-stone-700 hover:bg-primary dark:hover:bg-primary transition-colors duration-200 print:hidden"
+                    title="Paneli yeniden boyutlandır"
+                />
+
                 <main 
                     className="flex-grow flex flex-col overflow-hidden relative"
                 >
@@ -525,34 +423,17 @@ const AppContent: React.FC = () => {
                         </div>
                     )}
                     
-                   {activeTab === 'worksheet' ? (
-                        <>
-                            <WorksheetToolbar />
-                            <div 
-                                ref={panAreaRef}
-                                className="flex-grow overflow-auto p-4 md:p-8 cursor-grab pan-area"
-                                onMouseDown={handleMouseDown}
-                                onMouseMove={handleMouseMove}
-                                onMouseUp={stopPanning}
-                                onMouseLeave={stopPanning}
-                                onWheel={handleWheel}
-                            >
-                                <ProblemSheet />
-                            </div>
-                        </>
-                    ) : (
-                        <div className="flex-grow overflow-y-auto p-4 md:p-6 bg-white dark:bg-stone-800">
-                             <Suspense fallback={
-                                <div className="flex items-center justify-center h-full">
-                                    <LoadingIcon className="w-8 h-8" />
-                                </div>
-                            }>
-                                <div className="max-w-4xl mx-auto">
-                                    <SettingsRouter />
-                                </div>
-                            </Suspense>
-                        </div>
-                    )}
+                    <div 
+                        ref={panAreaRef}
+                        className="flex-grow overflow-auto p-4 md:p-8 cursor-grab pan-area bg-stone-100 dark:bg-stone-900"
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={stopPanning}
+                        onMouseLeave={stopPanning}
+                        onWheel={handleWheel}
+                    >
+                        <ProblemSheet />
+                    </div>
                 </main>
             </div>
             

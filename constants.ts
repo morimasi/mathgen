@@ -5,7 +5,6 @@ export const TAB_GROUPS = [
         title: 'Genel',
         tabs: [
             { id: 'customization-center', label: 'Özelleştirme Merkezi' },
-            { id: 'worksheet', label: 'Çalışma Kağıdı' },
         ]
     },
     {
