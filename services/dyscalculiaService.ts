@@ -1,5 +1,3 @@
-
-
 // services/dyscalculiaService.ts
 
 // FIX: Add .ts extension to import paths
