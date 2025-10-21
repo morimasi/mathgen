@@ -256,6 +256,7 @@ const Header: React.FC = memo(() => {
 
 const AppContent: React.FC = () => {
     const { 
+        activeTab, isSettingsPanelCollapsed, toggleSettingsPanel,
         isPrintSettingsVisible, closePrintSettings,
         isHowToUseVisible, closeHowToUse,
         isContactModalVisible, closeContactModal,
@@ -264,51 +265,15 @@ const AppContent: React.FC = () => {
     const { isLoading } = useWorksheet();
     const { settings, setSettings } = usePrintSettings();
     
-    // --- Panel Resizing Logic ---
-    const [panelWidth, setPanelWidth] = useState(384); // Corresponds to w-96
-    const [isResizing, setIsResizing] = useState(false);
-    const resizeState = useRef({ startingX: 0, startingWidth: 0 });
-    const MIN_PANEL_WIDTH = 320;
-    const MAX_PANEL_WIDTH = 800;
-
-    const handleMouseDownOnResizer = (e: React.MouseEvent) => {
-        e.preventDefault();
-        setIsResizing(true);
-        resizeState.current = {
-            startingX: e.clientX,
-            startingWidth: panelWidth,
-        };
-    };
-
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!isResizing) return;
-            const deltaX = e.clientX - resizeState.current.startingX;
-            const newWidth = resizeState.current.startingWidth + deltaX;
-            const clampedWidth = Math.max(MIN_PANEL_WIDTH, Math.min(newWidth, MAX_PANEL_WIDTH));
-            setPanelWidth(clampedWidth);
-        };
-
-        const handleMouseUp = () => {
-            setIsResizing(false);
-        };
-
-        if (isResizing) {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
-            document.body.style.cursor = 'col-resize';
-            document.body.style.userSelect = 'none';
-        }
-
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-        };
-    }, [isResizing]);
+    // --- Panel Width & Visibility Logic ---
+    const isCustomizationCenter = activeTab === 'customization-center';
+    const panelDefaultWidth = '384px';
+    const panelExpandedWidth = '50%';
     
-    // --- End Panel Resizing Logic ---
+    const panelWidth = isCustomizationCenter ? panelExpandedWidth : panelDefaultWidth;
+    const isPanelVisible = isCustomizationCenter || !isSettingsPanelCollapsed;
+    const containerWidth = isPanelVisible ? panelWidth : '0px';
+    // --- End Panel Logic ---
 
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
@@ -398,20 +363,31 @@ const AppContent: React.FC = () => {
             </header>
 
             <div className="flex flex-grow overflow-hidden">
-                <aside 
-                    className="flex-shrink-0 bg-white dark:bg-stone-800 border-r border-stone-200 dark:border-stone-700 flex flex-col print:hidden"
-                    style={{ width: `${panelWidth}px` }}
-                >
-                    <div className="p-4 overflow-y-auto">
-                        <SettingsPanel />
-                    </div>
-                </aside>
-
                 <div 
-                    onMouseDown={handleMouseDownOnResizer}
-                    className="flex-shrink-0 w-2 cursor-col-resize bg-stone-200 dark:bg-stone-700 hover:bg-primary dark:hover:bg-primary transition-colors duration-200 print:hidden"
-                    title="Paneli yeniden boyutlandır"
-                />
+                    className="relative flex-shrink-0 print:hidden transition-all duration-300 ease-in-out" 
+                    style={{ width: containerWidth }}
+                >
+                    <aside 
+                        className="h-full bg-white dark:bg-stone-800 border-r border-stone-200 dark:border-stone-700 flex flex-col w-full overflow-hidden"
+                    >
+                        <div className="p-4 overflow-y-auto">
+                            <SettingsPanel />
+                        </div>
+                    </aside>
+
+                    {!isCustomizationCenter && (
+                        <div className="absolute top-1/2 -right-4 -translate-y-1/2 z-10">
+                            <button
+                                onClick={toggleSettingsPanel}
+                                className="p-1.5 bg-primary text-white rounded-full shadow-lg hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-focus dark:focus:ring-offset-stone-800"
+                                title={isSettingsPanelCollapsed ? "Ayarları Göster" : "Ayarları Gizle"}
+                                aria-expanded={!isSettingsPanelCollapsed}
+                            >
+                                <DoubleArrowLeftIcon className={`w-5 h-5 transition-transform duration-300 ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
+                            </button>
+                        </div>
+                    )}
+                </div>
 
                 <main 
                     className="flex-grow flex flex-col overflow-hidden relative"

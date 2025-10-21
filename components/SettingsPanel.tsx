@@ -43,11 +43,7 @@ const SettingsPanel: React.FC = () => {
 
     const renderActiveModule = () => {
         switch (activeTab) {
-            case 'customization-center': return (
-                <div className="p-4 text-center text-sm text-stone-500 dark:text-stone-400">
-                    Özelleştirme Merkezi ana ekranda gösteriliyor. Tüm ayarları oradan yönetebilirsiniz.
-                </div>
-            );
+            case 'customization-center': return <CustomizationCenterModule />;
             case 'arithmetic': return <ArithmeticModule />;
             case 'visual-support': return <VisualSupportModule />;
             case 'word-problems': return <WordProblemsModule />;
