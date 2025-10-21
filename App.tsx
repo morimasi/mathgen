@@ -1,6 +1,4 @@
-
-
-import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
+import React, { useState, useRef, useEffect, memo, useCallback, Suspense } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext.tsx';
@@ -40,6 +38,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
 import { PrintSettings } from './types.ts';
+import CustomizationCenterModule from './modules/CustomizationCenterModule.tsx';
 
 // Debounce hook for performance optimization
 function useDebounce<T>(value: T, delay: number): T {
@@ -222,7 +221,7 @@ const Header: React.FC = memo(() => {
                 <div className="md:hidden flex items-center gap-1">
                     <ThemeSwitcher />
                     <div ref={actionMenuRef} className="relative">
-                        <button onClick={() => setActionMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
+                        <button onClick={() => setActionMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon className="w-6 h-6"/></button>
                          {isActionMenuOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30 py-1">
                                 <ActionButtons />
@@ -230,7 +229,7 @@ const Header: React.FC = memo(() => {
                          )}
                     </div>
                     <div ref={mobileMenuRef} className="relative">
-                        <button onClick={() => setMobileMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Modüller"><MenuIcon /></button>
+                        <button onClick={() => setMobileMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Modüller"><MenuIcon className="w-6 h-6"/></button>
                         {isMobileMenuOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30">
                                 <Tabs tabGroups={TAB_GROUPS} activeTab={activeTab} onTabClick={(id) => { setActiveTab(id); setMobileMenuOpen(false); }} />
@@ -240,15 +239,15 @@ const Header: React.FC = memo(() => {
                 </div>
 
                 {/* Desktop Action Buttons */}
-                <div className="hidden md:flex items-center gap-1">
-                    <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
-                    <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
-                    <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
-                    <button onClick={handlePrint} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon /></button>
-                    <button onClick={handleDownloadPDF} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
+                <div className="hidden md:flex items-center gap-2">
+                    <button onClick={triggerAutoRefresh} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon className="w-6 h-6"/></button>
+                    <button onClick={openPrintSettings} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon className="w-6 h-6"/></button>
+                    <button onClick={openFavoritesPanel} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon className="w-6 h-6"/></button>
+                    <button onClick={handlePrint} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon className="w-6 h-6"/></button>
+                    <button onClick={handleDownloadPDF} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon className="w-6 h-6"/></button>
                     <ThemeSwitcher />
-                    <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
-                    <button onClick={openContactModal} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon /></button>
+                    <button onClick={openHowToUse} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon className="w-6 h-6"/></button>
+                    <button onClick={openContactModal} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon className="w-6 h-6"/></button>
                 </div>
             </div>
         </div>
@@ -347,6 +346,7 @@ const WorksheetToolbar: React.FC = memo(() => {
 
 const AppContent: React.FC = () => {
     const { 
+        activeTab,
         isPrintSettingsVisible, closePrintSettings,
         isHowToUseVisible, closeHowToUse,
         isContactModalVisible, closeContactModal,
@@ -483,18 +483,27 @@ const AppContent: React.FC = () => {
                             <p className="text-white text-lg font-semibold animate-pulse">Etkinlik hazırlanıyor...</p>
                         </div>
                     )}
-                    <WorksheetToolbar />
-                    <div 
-                        ref={panAreaRef}
-                        className="flex-grow overflow-auto p-4 md:p-8 cursor-grab pan-area"
-                        onMouseDown={handleMouseDown}
-                        onMouseMove={handleMouseMove}
-                        onMouseUp={stopPanning}
-                        onMouseLeave={stopPanning}
-                        onWheel={handleWheel}
-                    >
-                        <ProblemSheet />
-                    </div>
+                    
+                    {activeTab === 'customization-center' ? (
+                        <div className="flex-grow overflow-auto p-4 md:p-8">
+                            <Suspense fallback={<LoadingDaisy />}><CustomizationCenterModule /></Suspense>
+                        </div>
+                    ) : (
+                        <>
+                            <WorksheetToolbar />
+                            <div 
+                                ref={panAreaRef}
+                                className="flex-grow overflow-auto p-4 md:p-8 cursor-grab pan-area"
+                                onMouseDown={handleMouseDown}
+                                onMouseMove={handleMouseMove}
+                                onMouseUp={stopPanning}
+                                onMouseLeave={stopPanning}
+                                onWheel={handleWheel}
+                            >
+                                <ProblemSheet />
+                            </div>
+                        </>
+                    )}
                 </main>
             </div>
             

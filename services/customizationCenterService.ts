@@ -14,7 +14,7 @@ import {
     IntroToMeasurementIcon, SimpleGraphsIcon, VisualAdditionSubtractionIcon, VerbalArithmeticIcon, MissingNumberIcon,
     SymbolicArithmeticIcon, ProblemCreationIcon, WordProblemsIcon, DyslexiaIcon, DyscalculiaIcon, DysgraphiaIcon
 } from '../components/icons/Icons';
-import { generateArithmeticProblem } from './mathService';
+import { generateArithmeticProblem, generateDecimalProblem } from './mathService';
 import { generateFractionsProblem } from './fractionsService';
 import { generatePlaceValueProblem } from './placeValueService';
 import { generateRhythmicCountingProblem } from './rhythmicCountingService';
@@ -40,7 +40,7 @@ interface ModuleConfig {
 }
 
 // FIX: Completed the moduleConfig object to satisfy the Record<ModuleKey, ModuleConfig> type.
-export const moduleConfig: Record<keyof AllSettings, ModuleConfig> = {
+export const moduleConfig: Partial<Record<keyof AllSettings, ModuleConfig>> = {
     arithmetic: {
         title: 'Dört İşlem',
         icon: ArithmeticIcon,
@@ -176,7 +176,6 @@ export const moduleConfig: Record<keyof AllSettings, ModuleConfig> = {
             }
         ]
     },
-    wordProblems: { title: 'AI Problemler', icon: WordProblemsIcon, controls: [] },
     matchingAndSorting: {
         title: 'Eşleştirme & Gruplama',
         icon: MatchingIcon,
@@ -201,80 +200,6 @@ export const moduleConfig: Record<keyof AllSettings, ModuleConfig> = {
             { key: 'numberRange', label: 'Aralık', type: 'select', options: [{ value: '1-5', label: '1-5' }, { value: '1-10', label: '1-10' }, { value: '1-20', label: '1-20' }] }
         ]
     },
-    patterns: {
-        title: 'Örüntüler',
-        icon: PatternsIcon,
-        controls: [
-            { key: 'type', label: 'Tür', type: 'select', options: [{ value: PatternType.RepeatingAB, label: 'AB' }, { value: PatternType.RepeatingABC, label: 'ABC' }, { value: PatternType.Growing, label: 'Büyüyen' }] },
-            { key: 'difficulty', label: 'Zorluk', type: 'select', options: [{ value: 'easy', label: 'Kolay' }, { value: 'medium', label: 'Orta' }] }
-        ]
-    },
-    basicShapes: {
-        title: 'Temel Şekiller',
-        icon: BasicShapesIcon,
-        controls: [
-            { key: 'type', label: 'Tür', type: 'select', options: [{ value: ShapeRecognitionType.ColorShape, label: 'Şekil Boya' }, { value: ShapeRecognitionType.CountShapes, label: 'Şekil Say' }] }
-        ]
-    },
-    positionalConcepts: {
-        title: 'Konum Kavramları',
-        icon: PositionalConceptsIcon,
-        controls: [
-            { key: 'type', label: 'Tür', type: 'select', options: [{ value: PositionalConceptType.AboveBelow, label: 'Alt/Üst' }, { value: PositionalConceptType.LeftRight, label: 'Sağ/Sol' }] }
-        ]
-    },
-    introToMeasurement: {
-        title: 'Ölçmeye Giriş',
-        icon: IntroToMeasurementIcon,
-        controls: [
-            { key: 'type', label: 'Tür', type: 'select', options: [{ value: IntroMeasurementType.CompareLength, label: 'Uzunluk' }, { value: IntroMeasurementType.CompareWeight, label: 'Ağırlık' }] }
-        ]
-    },
-    simpleGraphs: {
-        title: 'Basit Grafikler',
-        icon: SimpleGraphsIcon,
-        controls: [
-            { key: 'taskType', label: 'Görev', type: 'select', options: [{ value: SimpleGraphTaskType.Create, label: 'Oluştur' }, { value: SimpleGraphTaskType.Read, label: 'Oku' }] }
-        ]
-    },
-    visualAdditionSubtraction: {
-        title: 'Görsel Toplama/Çıkarma',
-        icon: VisualAdditionSubtractionIcon,
-        controls: [
-            { key: 'operation', label: 'İşlem', type: 'select', options: [{ value: 'addition', label: 'Toplama' }, { value: 'subtraction', label: 'Çıkarma' }] }
-        ]
-    },
-    verbalArithmetic: {
-        title: 'Sözel Aritmetik',
-        icon: VerbalArithmeticIcon,
-        controls: [
-            { key: 'maxResult', label: 'Max Sonuç', type: 'number', min: 10, max: 100 }
-        ]
-    },
-    missingNumberPuzzles: {
-        title: 'Eksik Sayı Bulmaca',
-        icon: MissingNumberIcon,
-        controls: [
-            { key: 'operation', label: 'İşlem', type: 'select', options: [{ value: 'addition', label: 'Toplama' }, { value: 'subtraction', label: 'Çıkarma' }] }
-        ]
-    },
-    symbolicArithmetic: {
-        title: 'Simgesel Aritmetik',
-        icon: SymbolicArithmeticIcon,
-        controls: [
-            { key: 'maxNumber', label: 'Max Sayı', type: 'number', min: 5, max: 10 }
-        ]
-    },
-    problemCreation: {
-        title: 'Problem Kurma',
-        icon: ProblemCreationIcon,
-        controls: [
-            { key: 'operation', label: 'İşlem', type: 'select', options: [{ value: 'addition', label: 'Toplama' }, { value: 'subtraction', label: 'Çıkarma' }] }
-        ]
-    },
-    dyslexia: { title: 'Disleksi', icon: DyslexiaIcon, controls: [] },
-    dyscalculia: { title: 'Diskalkuli', icon: DyscalculiaIcon, controls: [] },
-    dysgraphia: { title: 'Disgrafi', icon: DysgraphiaIcon, controls: [] },
 };
 
 export const getModuleStats = (moduleKey: ModuleKey, settings: any): Record<string, string> => {
@@ -326,7 +251,7 @@ export const generateModulePreview = async (moduleKey: ModuleKey, settings: any)
             case 'geometry': return generateGeometryProblem(settings);
             case 'measurement': return generateMeasurementProblem(settings);
             case 'time': return generateTimeProblem(settings);
-            case 'decimals': return (await import('./mathService')).generateDecimalProblem(settings);
+            case 'decimals': return generateDecimalProblem(settings);
             
             // Readiness modules
             case 'matchingAndSorting': return generateReadinessProblem('matching-and-sorting', settings);
