@@ -11,7 +11,7 @@ import { ShuffleIcon } from '../components/icons/Icons.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
-import HintButton from '../components/HintButton.tsx';
+import HintButton from '../components/form/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
 const MeasurementModule: React.FC = () => {

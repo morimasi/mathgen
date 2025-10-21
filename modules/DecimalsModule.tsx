@@ -22,7 +22,7 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 // FIX: Add .ts extension to import path
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 // FIX: Add .tsx extension to import path
-import HintButton from '../components/HintButton.tsx';
+import HintButton from '../components/form/HintButton.tsx';
 // FIX: Add .ts extension to import path
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 

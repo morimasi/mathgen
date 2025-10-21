@@ -62,6 +62,32 @@ const generateVerticalFractionHTML = (f1Str: string, f2Str: string, operator: st
     `;
 };
 
+const generateVerticalFractionOfSetHTML = (whole: number, fStr: string): string => {
+    const fractionContainerStyle = "display: inline-flex; align-items: center; gap: 0.2em;";
+    const fractionStyle = "display: inline-block; text-align: center; line-height: 1.1;";
+    const numStyle = "padding: 0 0.2em;";
+    const denStyle = "border-top: 2px solid black; padding: 0 0.2em;";
+    
+    const [num, den] = fStr.split('/');
+
+    const fractionPart = `
+        <div style="${fractionStyle}">
+            <div style="${numStyle}">${num}</div>
+            <div style="${denStyle}">${den}</div>
+        </div>
+    `;
+
+    const containerStyle = "display: flex; flex-direction: column; align-items: center; gap: 0.5rem; font-size: 1.2em; font-family: monospace;";
+
+    return `
+        <div style="${containerStyle}">
+            <span>${whole} sayısının</span>
+            <div style="${fractionContainerStyle}">${fractionPart}</div>
+            <span>kadarı kaçtır?</span>
+        </div>
+    `;
+};
+
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
@@ -194,7 +220,7 @@ export const generateFractionsProblem = (settings: FractionsSettings): { problem
             const num = getRandomInt(1, den);
             const question = drawFractionPie(num, den);
             const answer = `${num}/${den}`;
-            problem = { ...problemBase, question, answer };
+            problem = { ...problemBase, display: format, question, answer };
             break;
         }
 
@@ -204,9 +230,18 @@ export const generateFractionsProblem = (settings: FractionsSettings): { problem
             let f2 = generateFraction('medium');
             while(f1.num/f1.den === f2.num/f2.den) f2 = generateFraction('medium');
 
-            const question = `<span style="font-size: 1.5em; font-family: monospace;">${f1.num}/${f1.den} ___ ${f2.num}/${f2.den}</span>`;
+            let question = "";
+            const f1Str = `${f1.num}/${f1.den}`;
+            const f2Str = `${f2.num}/${f2.den}`;
+
+            if (format === 'vertical-html') {
+                question = generateVerticalFractionHTML(f1Str, f2Str, '___');
+            } else {
+                question = `<span style="font-size: 1.5em; font-family: monospace;">${f1Str} ___ ${f2Str}</span>`;
+            }
+
             const answer = (f1.num/f1.den) > (f2.num/f2.den) ? '>' : '<';
-            problem = { ...problemBase, question, answer };
+            problem = { ...problemBase, display: format, question, answer };
             break;
         }
 
@@ -215,9 +250,30 @@ export const generateFractionsProblem = (settings: FractionsSettings): { problem
             const f1 = simplify(generateFraction('medium'));
             const multiplier = getRandomInt(2, 5);
             const f2 = { num: f1.num * multiplier, den: f1.den * multiplier };
-            const question = `<span style="font-size: 1.5em; font-family: monospace;">${f1.num}/${f1.den} = ${f2.num}/?</span>`;
-            const answer = String(f2.den);
-            problem = { ...problemBase, question, answer };
+            
+            let question = "";
+            const f1Str = `${f1.num}/${f1.den}`;
+            const f2StrWithBlank = `${f2.num}/?`;
+            const f2StrFull = `${f2.num}/${f2.den}`;
+
+            if (format === 'vertical-html') {
+                // Randomly hide numerator or denominator
+                if (Math.random() < 0.5) {
+                     question = generateVerticalFractionHTML(f1Str, `?/${f2.den}`, '=');
+                     problem = { ...problemBase, display: format, question, answer: String(f2.num) };
+                } else {
+                     question = generateVerticalFractionHTML(f1Str, `${f2.num}/?`, '=');
+                     problem = { ...problemBase, display: format, question, answer: String(f2.den) };
+                }
+            } else {
+                 if (Math.random() < 0.5) {
+                    question = `<span style="font-size: 1.5em; font-family: monospace;">${f1Str} = ?/${f2.den}</span>`;
+                    problem = { ...problemBase, display: format, question, answer: String(f2.num) };
+                } else {
+                    question = `<span style="font-size: 1.5em; font-family: monospace;">${f1Str} = ${f2.num}/?</span>`;
+                    problem = { ...problemBase, display: format, question, answer: String(f2.den) };
+                }
+            }
             break;
         }
 
@@ -228,9 +284,17 @@ export const generateFractionsProblem = (settings: FractionsSettings): { problem
             const multiplier = getRandomInt(2, Math.floor(maxSetSize / den));
             const whole = den * multiplier;
             
-            const question = `<span style="font-size: 1.2em;">${whole} sayısının ${num}/${den} kadarı kaçtır?</span>`;
+            let question = "";
+            const fStr = `${num}/${den}`;
+
+            if (format === 'vertical-html') {
+                question = generateVerticalFractionOfSetHTML(whole, fStr);
+            } else {
+                question = `<span style="font-size: 1.2em;">${whole} sayısının ${fStr} kadarı kaçtır?</span>`;
+            }
+
             const answer = (whole / den) * num;
-            problem = { ...problemBase, question, answer };
+            problem = { ...problemBase, display: format, question, answer };
             break;
         }
 

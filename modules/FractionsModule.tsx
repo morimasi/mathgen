@@ -22,7 +22,7 @@ import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 // FIX: Add .ts extension to import path
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
 // FIX: Add .tsx extension to import path
-import HintButton from '../components/HintButton.tsx';
+import HintButton from '../components/form/HintButton.tsx';
 // FIX: Add .ts extension to import path
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
@@ -199,34 +199,6 @@ const FractionsModule: React.FC = () => {
                                     { value: FractionsOperation.Mixed, label: 'Karışık (Tümü)' },
                                 ]}
                             />
-                            <Select
-                                label="Format"
-                                id="fractions-format"
-                                value={settings.format}
-                                onChange={e => handleSettingChange('format', e.target.value as 'inline' | 'vertical-html')}
-                                disabled={isWordProblemMode}
-                                options={[{ value: 'inline', label: 'Yan Yana' },{ value: 'vertical-html', label: 'Alt Alta' }]}
-                            />
-                            <Select
-                                label="Gösterim"
-                                id="fractions-representation"
-                                value={settings.representation}
-                                onChange={e => handleSettingChange('representation', e.target.value)}
-                                disabled={isWordProblemMode || settings.format === 'vertical-html'}
-                                title={settings.format === 'vertical-html' ? "Bu özellik 'Alt Alta' formatında kullanılamaz." : ""}
-                                options={[{ value: 'number', label: 'Rakamla' },{ value: 'word', label: 'Yazıyla' },{ value: 'mixed', label: 'Karışık' }]}
-                            />
-                             <div className="flex items-center pt-5">
-                                {settings.difficulty === 'hard' && (
-                                    <Checkbox
-                                        label="Tam Sayılı Kesir Kullan"
-                                        id="use-mixed-numbers"
-                                        checked={settings.useMixedNumbers ?? true}
-                                        onChange={e => handleSettingChange('useMixedNumbers', e.target.checked)}
-                                        disabled={isWordProblemMode}
-                                    />
-                                )}
-                            </div>
                         </>
                     )}
                      {isFractionOfSet && (
@@ -237,8 +209,38 @@ const FractionsModule: React.FC = () => {
                             max={200}
                             value={settings.maxSetSize}
                             onChange={e => handleSettingChange('maxSetSize', parseInt(e.target.value))}
+                            containerClassName="col-span-2"
                         />
                      )}
+                     <Select
+                        label="Format"
+                        id="fractions-format"
+                        value={settings.format}
+                        onChange={e => handleSettingChange('format', e.target.value as 'inline' | 'vertical-html')}
+                        disabled={isWordProblemMode || settings.type === FractionsProblemType.Recognition}
+                        options={[{ value: 'inline', label: 'Yan Yana' },{ value: 'vertical-html', label: 'Alt Alta' }]}
+                        title={settings.type === FractionsProblemType.Recognition ? "Bu etkinlik türü için format değiştirilemez." : ""}
+                    />
+                    <Select
+                        label="Gösterim"
+                        id="fractions-representation"
+                        value={settings.representation}
+                        onChange={e => handleSettingChange('representation', e.target.value)}
+                        disabled={isWordProblemMode || settings.format === 'vertical-html' || settings.type === FractionsProblemType.Recognition}
+                        title={settings.format === 'vertical-html' ? "Bu özellik 'Alt Alta' formatında kullanılamaz." : (settings.type === FractionsProblemType.Recognition ? "Bu etkinlik türü için gösterim değiştirilemez." : "")}
+                        options={[{ value: 'number', label: 'Rakamla' },{ value: 'word', label: 'Yazıyla' },{ value: 'mixed', label: 'Karışık' }]}
+                    />
+                    {isFourOps && settings.difficulty === 'hard' && (
+                        <div className="flex items-center pt-3 col-span-2">
+                            <Checkbox
+                                label="Tam Sayılı Kesir Kullan"
+                                id="use-mixed-numbers"
+                                checked={settings.useMixedNumbers ?? true}
+                                onChange={e => handleSettingChange('useMixedNumbers', e.target.checked)}
+                                disabled={isWordProblemMode}
+                            />
+                        </div>
+                    )}
                 </div>
 
                  <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
