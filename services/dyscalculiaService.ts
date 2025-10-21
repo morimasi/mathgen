@@ -1,7 +1,11 @@
 // services/dyscalculiaService.ts
 
 // FIX: Add .ts extension to import paths
-import { Problem, DyscalculiaSubModuleType } from '../types.ts';
+import { 
+    Problem, DyscalculiaSubModuleType, NumberSenseSettings, ArithmeticFluencySettings, NumberGroupingSettings,
+    MathLanguageSettings, TimeMeasurementGeometrySettings, SpatialReasoningSettings, EstimationSkillsSettings,
+    FractionsDecimalsIntroSettings, VisualNumberRepresentationSettings, VisualArithmeticSettings
+} from '../types.ts';
 import { generateDyscalculiaAIProblem } from './geminiService.ts';
 import { drawFractionPie, drawAnalogClock } from './svgService.ts';
 
@@ -19,7 +23,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 // --- Local Generator Functions ---
 
-const generateNumberSenseLocal = (settings: any): { problem: Problem, title: string } => {
+const generateNumberSenseLocal = (settings: NumberSenseSettings): { problem: Problem, title: string } => {
     const { type, maxNumber } = settings;
     let question = "", answer: string | number = "", title = "Sayı Hissi";
 
@@ -65,7 +69,7 @@ const generateNumberSenseLocal = (settings: any): { problem: Problem, title: str
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
 
-const generateArithmeticFluencyLocal = (settings: any): { problem: Problem, title: string } => {
+const generateArithmeticFluencyLocal = (settings: ArithmeticFluencySettings): { problem: Problem, title: string } => {
     const { operation, difficulty } = settings;
     const max = difficulty === 'easy' ? 9 : 20;
     let n1 = getRandomInt(1, max);
@@ -89,7 +93,7 @@ const generateArithmeticFluencyLocal = (settings: any): { problem: Problem, titl
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
 
-const generateVisualArithmeticLocal = (settings: any): { problem: Problem, title: string } => {
+const generateVisualArithmeticLocal = (settings: VisualArithmeticSettings): { problem: Problem, title: string } => {
     const { operation, maxNumber } = settings;
     const item = '🍎';
     let n1 = getRandomInt(1, maxNumber - 1);
@@ -108,7 +112,7 @@ const generateVisualArithmeticLocal = (settings: any): { problem: Problem, title
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
 
-const generateFractionsDecimalsIntroLocal = (settings: any): { problem: Problem, title: string } => {
+const generateFractionsDecimalsIntroLocal = (settings: FractionsDecimalsIntroSettings): { problem: Problem, title: string } => {
     const { type } = settings;
     let question = "", answer = "", title = "Kesirlere Giriş";
     
@@ -124,7 +128,7 @@ const generateFractionsDecimalsIntroLocal = (settings: any): { problem: Problem,
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
 
-const generateNumberGroupingLocal = (settings: any): { problem: Problem; title: string; } => {
+const generateNumberGroupingLocal = (settings: NumberGroupingSettings): { problem: Problem; title: string; } => {
     const { maxNumber } = settings;
     const title = "Onluk Çerçeve ile Gruplama";
     const number = getRandomInt(1, 10);
@@ -134,7 +138,7 @@ const generateNumberGroupingLocal = (settings: any): { problem: Problem; title: 
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
 
-const generateMathLanguageLocal = (settings: any): { problem: Problem; title: string; } => {
+const generateMathLanguageLocal = (settings: MathLanguageSettings): { problem: Problem; title: string; } => {
     const title = "Matematiksel Dil";
     const map = { '+': 'topla', '-': 'çıkar', '=': 'eşittir' };
     const symbol = Object.keys(map)[getRandomInt(0, 2)];
@@ -144,7 +148,7 @@ const generateMathLanguageLocal = (settings: any): { problem: Problem; title: st
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
 
-const generateTimeMeasurementGeometryLocal = (settings: any): { problem: Problem; title: string; } => {
+const generateTimeMeasurementGeometryLocal = (settings: TimeMeasurementGeometrySettings): { problem: Problem; title: string; } => {
     const { category } = settings;
     if (category === 'time') {
         const title = "Saat Okuma";
@@ -166,7 +170,7 @@ const generateTimeMeasurementGeometryLocal = (settings: any): { problem: Problem
     }
 };
 
-const generateSpatialReasoningLocal = (settings: any): { problem: Problem; title: string; } => {
+const generateSpatialReasoningLocal = (settings: SpatialReasoningSettings): { problem: Problem; title: string; } => {
     const title = "Uzamsal Akıl Yürütme";
     // FIX: Declare 'question' and 'answer' variables before use.
     let question = "", answer = "";
@@ -177,7 +181,7 @@ const generateSpatialReasoningLocal = (settings: any): { problem: Problem; title
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
 
-const generateEstimationSkillsLocal = (settings: any): { problem: Problem; title: string; } => {
+const generateEstimationSkillsLocal = (settings: EstimationSkillsSettings): { problem: Problem; title: string; } => {
     const title = "Tahmin Becerileri";
     // FIX: Declare 'question' and 'answer' variables before use.
     let question = "", answer = "";
@@ -190,7 +194,7 @@ const generateEstimationSkillsLocal = (settings: any): { problem: Problem; title
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
 
-const generateVisualNumberRepresentationLocal = (settings: any): { problem: Problem; title: string; } => {
+const generateVisualNumberRepresentationLocal = (settings: VisualNumberRepresentationSettings): { problem: Problem; title: string; } => {
     const { maxNumber, representation } = settings;
     const title = "Sayıların Görsel Temsili";
     const number = getRandomInt(1, maxNumber);
@@ -204,7 +208,8 @@ const generateVisualNumberRepresentationLocal = (settings: any): { problem: Prob
     } else { // fingers
         representationHtml = `<div class="finger-count">${'🖐️'.repeat(Math.floor(number/5))}${'☝️'.repeat(number%5)}</div>`;
     }
-    question = `<p>Aşağıdaki görsel hangi sayıyı temsil ediyor?</p>${representationHtml}`;
+    // FIX: Declare 'question' variable before use.
+    let question = `<p>Aşağıdaki görsel hangi sayıyı temsil ediyor?</p>${representationHtml}`;
     const answer = String(number);
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
@@ -225,34 +230,34 @@ export const generateDyscalculiaProblem = async (subModuleId: DyscalculiaSubModu
         let result: { problem: Problem; title: string; };
         switch(subModuleId) {
             case 'number-sense':
-                result = generateNumberSenseLocal(settings);
+                result = generateNumberSenseLocal(settings as NumberSenseSettings);
                 break;
             case 'arithmetic-fluency':
-                result = generateArithmeticFluencyLocal(settings);
+                result = generateArithmeticFluencyLocal(settings as ArithmeticFluencySettings);
                 break;
             case 'visual-arithmetic':
-                result = generateVisualArithmeticLocal(settings);
+                result = generateVisualArithmeticLocal(settings as VisualArithmeticSettings);
                 break;
             case 'fractions-decimals-intro':
-                result = generateFractionsDecimalsIntroLocal(settings);
+                result = generateFractionsDecimalsIntroLocal(settings as FractionsDecimalsIntroSettings);
                 break;
             case 'number-grouping':
-                result = generateNumberGroupingLocal(settings);
+                result = generateNumberGroupingLocal(settings as NumberGroupingSettings);
                 break;
             case 'math-language':
-                result = generateMathLanguageLocal(settings);
+                result = generateMathLanguageLocal(settings as MathLanguageSettings);
                 break;
             case 'time-measurement-geometry':
-                result = generateTimeMeasurementGeometryLocal(settings);
+                result = generateTimeMeasurementGeometryLocal(settings as TimeMeasurementGeometrySettings);
                 break;
             case 'spatial-reasoning':
-                result = generateSpatialReasoningLocal(settings);
+                result = generateSpatialReasoningLocal(settings as SpatialReasoningSettings);
                 break;
             case 'estimation-skills':
-                result = generateEstimationSkillsLocal(settings);
+                result = generateEstimationSkillsLocal(settings as EstimationSkillsSettings);
                 break;
             case 'visual-number-representation':
-                result = generateVisualNumberRepresentationLocal(settings);
+                result = generateVisualNumberRepresentationLocal(settings as VisualNumberRepresentationSettings);
                 break;
             default:
                 result = { 

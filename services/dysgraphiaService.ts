@@ -1,6 +1,6 @@
 // services/dysgraphiaService.ts
 
-import { Problem, DysgraphiaSubModuleType } from './types.ts';
+import { Problem, DysgraphiaSubModuleType, FineMotorSkillsSettings } from './types.ts';
 import { generateDysgraphiaAIProblem } from './geminiService.ts';
 
 // --- UTILS ---
@@ -17,7 +17,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 // --- LOCAL GENERATOR FUNCTIONS ---
 
-const generateFineMotorSkillsLocal = (settings: any): { problem: Problem, title: string } => {
+const generateFineMotorSkillsLocal = (settings: FineMotorSkillsSettings): { problem: Problem, title: string } => {
     const { type } = settings;
     let title = "İnce Motor Becerileri";
     let question = "", answer = "Çizgileri takip et.";
@@ -76,7 +76,7 @@ export const generateDysgraphiaProblem = async (subModuleId: DysgraphiaSubModule
         let result: { problem: Problem; title: string; preamble?: string };
         switch(subModuleId) {
              case 'fine-motor-skills':
-                result = generateFineMotorSkillsLocal(settings);
+                result = generateFineMotorSkillsLocal(settings as FineMotorSkillsSettings);
                 break;
             // Add other local generators here
             default:
