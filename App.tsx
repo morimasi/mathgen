@@ -206,7 +206,7 @@ const TopBanner: React.FC = memo(() => {
             </div>
 
             <div className="relative container mx-auto px-4 z-10">
-                <div className="flex items-center justify-end h-32">
+                <div className="flex items-start pt-4 justify-end h-16">
                     {/* Mobile Action Menu */}
                     <div className="md:hidden flex items-center gap-1 text-white">
                         <ThemeSwitcher />
