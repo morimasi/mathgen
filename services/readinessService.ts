@@ -24,6 +24,24 @@ const THEME_OBJECTS: { [key in MathReadinessTheme | 'measurement']: string[] } =
 };
 THEME_OBJECTS.mixed = [...THEME_OBJECTS.animals, ...THEME_OBJECTS.vehicles, ...THEME_OBJECTS.fruits, ...THEME_OBJECTS.shapes];
 
+// FIX: Added missing getThemeItems function to resolve multiple errors.
+const getThemeItems = (theme: MathReadinessTheme | 'measurement', count: number): string[] => {
+    const source = theme === 'mixed' ? THEME_OBJECTS.mixed : THEME_OBJECTS[theme];
+    if (!source || source.length === 0) return Array(count).fill('?');
+    
+    // If we need more items than available, we can repeat them.
+    if (count > source.length) {
+        const items = [];
+        for (let i = 0; i < count; i++) {
+            items.push(source[i % source.length]);
+        }
+        return shuffleArray(items); // shuffle to not make it obvious
+    }
+
+    // Otherwise, pick unique items
+    return shuffleArray(source).slice(0, count);
+};
+
 const shapeSVGs: Record<ShapeType, string> = {
     [ShapeType.Square]: `<rect x="10" y="10" width="80" height="80" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>`,
     [ShapeType.Rectangle]: `<rect x="10" y="25" width="80" height="50" fill="#a5f3fc" stroke="#0891b2" stroke-width="2"/>`,

@@ -63,13 +63,12 @@ function useDebouncedCallback<A extends any[]>(
   callback: (...args: A) => void,
   delay: number
 ) {
-  // FIX: Changed useRef type to allow for an undefined initial value, which is the default for a ref without an argument.
-  const timeoutRef = useRef<number | undefined>();
+  // FIX: Refactored to use `null` for the timeout ref, which is a common practice for refs that may not be set.
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
-      // FIX: Guard against undefined value for clearTimeout, and handle timer ID 0 correctly.
-      if (timeoutRef.current !== undefined) {
+      if (timeoutRef.current !== null) {
         window.clearTimeout(timeoutRef.current);
       }
     };
@@ -77,8 +76,7 @@ function useDebouncedCallback<A extends any[]>(
 
   return useCallback(
     (...args: A) => {
-      // FIX: Guard against undefined value for clearTimeout before setting a new one, and handle timer ID 0 correctly.
-      if (timeoutRef.current !== undefined) {
+      if (timeoutRef.current !== null) {
         window.clearTimeout(timeoutRef.current);
       }
       timeoutRef.current = window.setTimeout(() => {
