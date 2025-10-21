@@ -315,6 +315,46 @@
 }
 
 @layer components {
+  /* NEW BANNER STYLES */
+  .top-banner {
+    @apply relative h-16 overflow-hidden print:hidden;
+    background: linear-gradient(160deg, #3a2d27 0%, #2a1d1d 100%);
+    z-index: 25;
+  }
+  .constellation {
+    @apply absolute top-1/2 left-1/2 w-[400px] h-[150px] pointer-events-none;
+    transform: translate(-50%, -50%) rotate(-20deg);
+  }
+  .star {
+    @apply absolute w-0.5 h-0.5 bg-white rounded-full;
+    box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.7);
+    animation: shimmer 3s infinite alternate;
+  }
+  .star:nth-child(1) { top: 30%; left: 0%; }
+  .star:nth-child(2) { top: 80%; left: 10%; animation-delay: 0.5s; }
+  .star:nth-child(3) { top: 70%; left: 30%; animation-delay: 1s; }
+  .star:nth-child(4) { top: 30%; left: 40%; animation-delay: 1.5s; }
+  .star:nth-child(5) { top: 0%; left: 60%; animation-delay: 0.2s; }
+  .star:nth-child(6) { top: 10%; left: 80%; animation-delay: 0.8s; }
+  .star:nth-child(7) { top: 30%; left: 100%; animation-delay: 1.2s; }
+
+  .shooting-stars {
+    @apply absolute top-0 left-0 w-full h-full pointer-events-none;
+  }
+  .shooting-star {
+    @apply absolute h-0.5 rounded-full;
+    background: linear-gradient(-45deg, rgba(255, 255, 255, 1), rgba(0, 0, 0, 0));
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+    animation: shooting-star-anim 7s linear infinite;
+  }
+  .shooting-star-1 { top: 20%; left: -50%; width: 100px; animation-delay: 0s; }
+  .shooting-star-2 { top: 80%; left: -50%; width: 150px; animation-delay: 2.3s; animation-duration: 5s; }
+  .shooting-star-3 { top: 50%; left: -50%; width: 80px; animation-delay: 4.1s; animation-duration: 8s; }
+  
+  .action-button {
+    @apply w-full text-left flex items-center gap-3 px-4 py-2 text-sm transition-colors text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700;
+  }
+  
   .worksheet-area {
     @apply flex flex-col items-center;
     transform: scale(var(--scale, 1));
@@ -558,6 +598,17 @@
   @keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+}
+
+@layer utilities {
+  @keyframes shimmer {
+    from { opacity: 0.4; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1.2); }
+  }
+  @keyframes shooting-star-anim {
+    0% { transform: translateX(0) rotate(-45deg); opacity: 1; }
+    100% { transform: translateX(200vw) rotate(-45deg); opacity: 0; }
   }
 }
 

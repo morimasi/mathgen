@@ -1,5 +1,3 @@
-
-
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
@@ -92,21 +90,16 @@ function useDebouncedCallback<A extends any[]>(
   );
 }
 
-const Header: React.FC = memo(() => {
-    const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
-    const { clearWorksheet, triggerAutoRefresh, setIsLoading } = useWorksheet();
+const TopBanner: React.FC = memo(() => {
+    const { openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
+    const { triggerAutoRefresh, setIsLoading } = useWorksheet();
     const { settings: printSettings } = usePrintSettings();
     const { addToast } = useToast();
-    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isActionMenuOpen, setActionMenuOpen] = useState(false);
-    const mobileMenuRef = useRef<HTMLDivElement>(null);
     const actionMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
-                setMobileMenuOpen(false);
-            }
             if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
                 setActionMenuOpen(false);
             }
@@ -114,15 +107,6 @@ const Header: React.FC = memo(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-
-
-    const onReset = () => {
-        if (window.confirm('Tüm ayarları ve çalışma kağıdını sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
-            clearWorksheet();
-            localStorage.clear();
-            window.location.reload();
-        }
-    };
 
     const handlePrint = () => {
         window.print();
@@ -197,7 +181,7 @@ const Header: React.FC = memo(() => {
             setIsLoading(false);
         });
     };
-    
+
     const ActionButtons = () => (
         <>
             <button onClick={triggerAutoRefresh} className="action-button" title="Soruları Yenile"><RefreshIcon /><span>Soruları Yenile</span></button>
@@ -210,6 +194,75 @@ const Header: React.FC = memo(() => {
         </>
     );
 
+    return (
+        <div className="top-banner print:hidden">
+            <div className="shooting-stars">
+                <div className="shooting-star shooting-star-1"></div>
+                <div className="shooting-star shooting-star-2"></div>
+                <div className="shooting-star shooting-star-3"></div>
+            </div>
+            <div className="constellation">
+                {Array.from({ length: 7 }).map((_, i) => <div key={i} className="star"></div>)}
+            </div>
+
+            <div className="relative container mx-auto px-4 z-10">
+                <div className="flex items-center justify-end h-16">
+                    {/* Mobile Action Menu */}
+                    <div className="md:hidden flex items-center gap-1 text-white">
+                        <ThemeSwitcher />
+                        <div ref={actionMenuRef} className="relative">
+                            <button onClick={() => setActionMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
+                             {isActionMenuOpen && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30 py-1">
+                                    <ActionButtons />
+                                </div>
+                             )}
+                        </div>
+                    </div>
+
+                    {/* Desktop Action Buttons */}
+                    <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center gap-2 text-white">
+                        <Search />
+                        <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
+                        <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
+                        <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
+                        <button onClick={handlePrint} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon /></button>
+                        <button onClick={handleDownloadPDF} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
+                        <ThemeSwitcher />
+                        <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
+                        <button onClick={openContactModal} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon /></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+const Header: React.FC = memo(() => {
+    const { activeTab, setActiveTab } = useUI();
+    const { clearWorksheet } = useWorksheet();
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+                setMobileMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+
+    const onReset = () => {
+        if (window.confirm('Tüm ayarları ve çalışma kağıdını sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+            clearWorksheet();
+            localStorage.clear();
+            window.location.reload();
+        }
+    };
+    
     return (
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-14">
@@ -224,16 +277,7 @@ const Header: React.FC = memo(() => {
                 </div>
 
                 {/* Mobile Menu Buttons */}
-                <div className="md:hidden flex items-center gap-1">
-                    <ThemeSwitcher />
-                    <div ref={actionMenuRef} className="relative">
-                        <button onClick={() => setActionMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
-                         {isActionMenuOpen && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-30 py-1">
-                                <ActionButtons />
-                            </div>
-                         )}
-                    </div>
+                <div className="md:hidden flex items-center">
                     <div ref={mobileMenuRef} className="relative">
                         <button onClick={() => setMobileMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Modüller"><MenuIcon /></button>
                         {isMobileMenuOpen && (
@@ -242,19 +286,6 @@ const Header: React.FC = memo(() => {
                             </div>
                         )}
                     </div>
-                </div>
-
-                {/* Desktop Action Buttons */}
-                <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center gap-2">
-                    <Search />
-                    <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
-                    <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
-                    <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
-                    <button onClick={handlePrint} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon /></button>
-                    <button onClick={handleDownloadPDF} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
-                    <ThemeSwitcher />
-                    <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
-                    <button onClick={openContactModal} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon /></button>
                 </div>
             </div>
         </div>
@@ -450,6 +481,8 @@ const AppContent: React.FC = () => {
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
+            
+            <TopBanner />
             
             <header className="flex-shrink-0 bg-primary text-white shadow-md z-20 print:hidden">
                 <Header />
