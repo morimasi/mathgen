@@ -35,7 +35,7 @@ const ThemeSwitcher: React.FC = () => {
                 aria-haspopup="true"
                 aria-expanded={isOpen}
             >
-                <PaletteIcon className="w-6 h-6"/>
+                <PaletteIcon className="w-5 h-5"/>
             </button>
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-72 origin-top-right bg-white dark:bg-stone-800 rounded-lg shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none z-10 p-2">

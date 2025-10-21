@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect, memo, useCallback, Suspense } from 'react';
+
+
+import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
 import { PrintSettingsProvider, usePrintSettings } from './services/PrintSettingsContext.tsx';
@@ -8,6 +10,7 @@ import { FontThemeProvider, useFontTheme, fontThemes } from './services/FontThem
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext.tsx';
 import { ToastProvider, useToast } from './services/ToastContext.tsx';
 import Tabs from './components/Tabs.tsx';
+import SettingsPanel from './components/SettingsPanel.tsx';
 import ProblemSheet from './components/ProblemSheet.tsx';
 import ToastContainer from './components/ToastContainer.tsx';
 import PrintSettingsPanel from './components/PrintSettingsPanel.tsx';
@@ -18,6 +21,7 @@ import AnimatedLogo from './components/AnimatedLogo.tsx';
 import ThemeSwitcher from './components/ThemeSwitcher.tsx';
 import { TAB_GROUPS } from './constants.ts';
 import { 
+    DoubleArrowLeftIcon,
     PrintIcon,
     RefreshIcon,
     HelpIcon,
@@ -26,9 +30,7 @@ import {
     SettingsIcon,
     DownloadIcon,
     MenuIcon,
-    MoreVerticalIcon,
-    LoadingIcon,
-    DoubleArrowLeftIcon
+    MoreVerticalIcon
 } from './components/icons/Icons.tsx';
 import Button from './components/form/Button.tsx';
 import Select from './components/form/Select.tsx';
@@ -38,8 +40,6 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
 import { PrintSettings } from './types.ts';
-import SettingsPanel from './components/SettingsPanel.tsx';
-
 
 // Debounce hook for performance optimization
 function useDebounce<T>(value: T, delay: number): T {
@@ -63,6 +63,7 @@ function useDebouncedCallback<A extends any[]>(
   callback: (...args: A) => void,
   delay: number
 ) {
+  // FIX: Refactored to use `null` for the timeout ref, which is a common practice for refs that may not be set.
   const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -240,15 +241,105 @@ const Header: React.FC = memo(() => {
 
                 {/* Desktop Action Buttons */}
                 <div className="hidden md:flex items-center gap-2">
-                    <button onClick={triggerAutoRefresh} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon className="w-6 h-6"/></button>
-                    <button onClick={openPrintSettings} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon className="w-6 h-6"/></button>
-                    <button onClick={openFavoritesPanel} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon className="w-6 h-6"/></button>
-                    <button onClick={handlePrint} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon className="w-6 h-6"/></button>
-                    <button onClick={handleDownloadPDF} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon className="w-6 h-6"/></button>
+                    <button onClick={triggerAutoRefresh} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon className="w-5 h-5"/></button>
+                    <button onClick={openPrintSettings} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon className="w-5 h-5"/></button>
+                    <button onClick={openFavoritesPanel} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon className="w-5 h-5"/></button>
+                    <button onClick={handlePrint} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon className="w-5 h-5"/></button>
+                    <button onClick={handleDownloadPDF} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon className="w-5 h-5"/></button>
                     <ThemeSwitcher />
-                    <button onClick={openHowToUse} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon className="w-6 h-6"/></button>
-                    <button onClick={openContactModal} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon className="w-6 h-6"/></button>
+                    <button onClick={openHowToUse} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon className="w-5 h-5"/></button>
+                    <button onClick={openContactModal} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon className="w-5 h-5"/></button>
                 </div>
+            </div>
+        </div>
+    );
+});
+
+const WorksheetToolbar: React.FC = memo(() => {
+    const { settings, setSettings } = usePrintSettings();
+    const { fontTheme, setFontTheme } = useFontTheme();
+    const fontThemeOptions = Object.entries(fontThemes).map(([key, value]) => ({ value: key, label: value.name }));
+    
+    // --- Start of debounce implementation for performance ---
+    const [localSettings, setLocalSettings] = useState(settings);
+    const debouncedSettings = useDebounce(localSettings, 200);
+
+    useEffect(() => {
+        if (JSON.stringify(settings) !== JSON.stringify(debouncedSettings)) {
+            setSettings(debouncedSettings);
+        }
+    }, [debouncedSettings, setSettings]);
+
+    useEffect(() => {
+        setLocalSettings(settings);
+    }, [settings]);
+    
+    const handleLocalChange = (field: keyof PrintSettings, value: any) => {
+        setLocalSettings(prev => ({ ...prev, [field]: value }));
+    };
+    // --- End of debounce implementation ---
+
+    const fitToScreen = () => {
+        const area = document.getElementById('worksheet-area');
+        if (area) {
+            const scale = Math.min(
+                area.parentElement!.clientWidth / (area.clientWidth + 50),
+                area.parentElement!.clientHeight / (area.clientHeight + 50)
+            );
+            // Update global state directly for instant feedback from a button click
+            setSettings(s => ({ ...s, scale: Math.max(0.2, scale) }));
+        }
+    };
+    
+    const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2 hidden md:block"></div>;
+
+    return (
+        <div className="flex-shrink-0 p-2 flex items-center justify-between border-b border-stone-200 dark:border-stone-700 print:hidden flex-wrap md:flex-nowrap gap-2 md:gap-0">
+            <div className="flex items-center gap-3 flex-wrap">
+                {/* --- Scale --- */}
+                <div className="flex items-center gap-2">
+                    <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
+                    <input id="zoom-slider" type="range" min="20" max="200" value={localSettings.scale * 100} onChange={(e) => handleLocalChange('scale', parseInt(e.target.value, 10) / 100)} className="w-24 accent-primary"/>
+                    <span className="text-xs w-10 text-center">{Math.round(localSettings.scale * 100)}%</span>
+                    <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
+                </div>
+                <Separator />
+                {/* --- Layout --- */}
+                 <div className="flex items-center gap-2">
+                    <Select label="Düzen" id="layout-mode" value={localSettings.layoutMode} onChange={e => handleLocalChange('layoutMode', e.target.value as 'flow' | 'table')} options={[{ value: 'flow', label: 'Akış' }, { value: 'table', label: 'Tablo' }]}/>
+                    {localSettings.layoutMode === 'flow' ? (
+                        <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
+                    ) : (
+                        <>
+                             <NumberInput label="Satır" id="rows" min={1} max={20} value={localSettings.rows} onChange={e => handleLocalChange('rows', parseInt(e.target.value,10))} className="w-14"/>
+                            <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
+                        </>
+                    )}
+                </div>
+                 <Separator />
+                 {/* --- Style --- */}
+                <div className="flex items-center gap-3">
+                    <Select label="Hizalama" id="text-align" value={localSettings.textAlign} onChange={e => handleLocalChange('textAlign', e.target.value as 'left' | 'center' | 'right' )} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
+                    <Select label="Kenarlık" id="border-style" value={localSettings.borderStyle} onChange={e => handleLocalChange('borderStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
+                    <Select label="Defter Stili" id="notebook-style" value={localSettings.notebookStyle} onChange={e => handleLocalChange('notebookStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
+                    <Select label="Yazı Tipi" id="font-theme" value={fontTheme} onChange={e => setFontTheme(e.target.value as any)} options={fontThemeOptions}/>
+                </div>
+                 <Separator />
+                 {/* --- Spacing --- */}
+                 <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-0.5">
+                        <label htmlFor="problem-spacing-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Problem Aralığı</label>
+                        <input id="problem-spacing-slider" type="range" min="0" max="5" step="0.1" value={localSettings.problemSpacing} onChange={(e) => handleLocalChange('problemSpacing', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                    </div>
+                     <div className="flex flex-col gap-0.5">
+                        <label htmlFor="line-height-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Satır Yüksekliği</label>
+                        <input id="line-height-slider" type="range" min="1" max="2.5" step="0.1" value={localSettings.lineHeight} onChange={(e) => handleLocalChange('lineHeight', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                    </div>
+                     <div className="flex flex-col gap-0.5">
+                        <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
+                        <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                    </div>
+                 </div>
             </div>
         </div>
     );
@@ -256,25 +347,15 @@ const Header: React.FC = memo(() => {
 
 const AppContent: React.FC = () => {
     const { 
-        activeTab, isSettingsPanelCollapsed, toggleSettingsPanel,
         isPrintSettingsVisible, closePrintSettings,
         isHowToUseVisible, closeHowToUse,
         isContactModalVisible, closeContactModal,
-        isFavoritesPanelVisible, closeFavoritesPanel
+        isFavoritesPanelVisible, closeFavoritesPanel,
+        isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
     } = useUI();
     const { isLoading } = useWorksheet();
     const { settings, setSettings } = usePrintSettings();
     
-    // --- Panel Width & Visibility Logic ---
-    const isCustomizationCenter = activeTab === 'customization-center';
-    const panelDefaultWidth = '384px';
-    const panelExpandedWidth = '50%';
-    
-    const panelWidth = isCustomizationCenter ? panelExpandedWidth : panelDefaultWidth;
-    const isPanelVisible = isCustomizationCenter || !isSettingsPanelCollapsed;
-    const containerWidth = isPanelVisible ? panelWidth : '0px';
-    // --- End Panel Logic ---
-
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
     const lastSyncedScale = useRef(settings.scale);
@@ -287,7 +368,7 @@ const AppContent: React.FC = () => {
     }, []);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.button !== 0 || (e.target as HTMLElement).closest('.problem-item')) return;
+        if (e.button !== 0) return;
         e.preventDefault();
         const el = panAreaRef.current;
         if (!el) return;
@@ -319,7 +400,10 @@ const AppContent: React.FC = () => {
         panAreaRef.current?.classList.remove('is-panning');
     };
 
+    // --- Start of performance optimization for wheel zoom ---
     useEffect(() => {
+        // If the global scale changes from an external source (like the slider),
+        // reset the inline transform to let the CSS variable take over again.
         if (settings.scale !== lastSyncedScale.current) {
             const worksheetArea = panAreaRef.current?.querySelector<HTMLElement>('#worksheet-area');
             if (worksheetArea) {
@@ -330,16 +414,17 @@ const AppContent: React.FC = () => {
     }, [settings.scale]);
 
     const debouncedSetScale = useDebouncedCallback((newScale: number) => {
-        lastSyncedScale.current = newScale;
+        lastSyncedScale.current = newScale; // Update our ref when we sync the global state
         setSettings(s => ({ ...s, scale: newScale }));
     }, 200);
 
     const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-        if (e.ctrlKey || e.metaKey) {
+        if (e.ctrlKey || e.metaKey) { // Allow pinch-zoom on trackpads
             e.preventDefault();
             const worksheetArea = panAreaRef.current?.querySelector<HTMLElement>('#worksheet-area');
             if (!worksheetArea) return;
 
+            // Get the current scale. If an inline transform is set, use that, otherwise use global state.
             const transformMatch = worksheetArea.style.transform.match(/scale\(([^)]+)\)/);
             const currentScale = transformMatch ? parseFloat(transformMatch[1]) : settings.scale;
 
@@ -348,12 +433,16 @@ const AppContent: React.FC = () => {
                 ? Math.max(0.2, currentScale - scaleAmount)
                 : Math.min(2.0, currentScale + scaleAmount);
 
+            // Update DOM directly for immediate visual feedback
             worksheetArea.style.transform = `scale(${newScale})`;
-            worksheetArea.style.transformOrigin = 'top center';
+            worksheetArea.style.transformOrigin = 'top center'; // Ensure origin is consistent
 
+            // Schedule an update to the global React state
             debouncedSetScale(newScale);
         }
+        // If no ctrl/meta key, allow normal vertical scrolling of the pan area
     };
+     // --- End of performance optimization ---
 
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
@@ -363,34 +452,30 @@ const AppContent: React.FC = () => {
             </header>
 
             <div className="flex flex-grow overflow-hidden">
-                <div 
-                    className="relative flex-shrink-0 print:hidden transition-all duration-300 ease-in-out" 
-                    style={{ width: containerWidth }}
+                <aside 
+                    className={`print:hidden transition-all duration-300 ease-in-out shadow-lg bg-white dark:bg-stone-800 ${
+                        isSettingsPanelCollapsed 
+                            ? 'w-0 -translate-x-full opacity-0 p-0' 
+                            : 'w-80 p-4'
+                    }`}
                 >
-                    <aside 
-                        className="h-full bg-white dark:bg-stone-800 border-r border-stone-200 dark:border-stone-700 flex flex-col w-full overflow-hidden"
-                    >
-                        <div className="p-4 overflow-y-auto">
-                            <SettingsPanel />
-                        </div>
-                    </aside>
+                    <div className="overflow-y-auto h-full">
+                        <SettingsPanel />
+                    </div>
+                </aside>
 
-                    {!isCustomizationCenter && (
-                        <div className="absolute top-1/2 -right-4 -translate-y-1/2 z-10">
-                            <button
-                                onClick={toggleSettingsPanel}
-                                className="p-1.5 bg-primary text-white rounded-full shadow-lg hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-focus dark:focus:ring-offset-stone-800"
-                                title={isSettingsPanelCollapsed ? "Ayarları Göster" : "Ayarları Gizle"}
-                                aria-expanded={!isSettingsPanelCollapsed}
-                            >
-                                <DoubleArrowLeftIcon className={`w-5 h-5 transition-transform duration-300 ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
-                            </button>
-                        </div>
-                    )}
+                 <div className="relative flex-shrink-0 print:hidden">
+                    <button 
+                        onClick={() => setIsSettingsPanelCollapsed(!isSettingsPanelCollapsed)}
+                        className="absolute top-1/2 -right-3 z-10 transform -translate-y-1/2 bg-white dark:bg-stone-700 p-1 rounded-full shadow-md hover:bg-stone-100 dark:hover:bg-stone-600 transition"
+                        title={isSettingsPanelCollapsed ? "Ayarları Göster" : "Ayarları Gizle"}
+                    >
+                        <DoubleArrowLeftIcon className={`w-4 h-4 transition-transform duration-300 ${isSettingsPanelCollapsed ? 'rotate-180' : ''}`} />
+                    </button>
                 </div>
 
                 <main 
-                    className="flex-grow flex flex-col overflow-hidden relative"
+                    className="flex-1 flex flex-col overflow-hidden relative"
                 >
                     {isLoading && (
                         <div className="absolute inset-0 bg-black/40 dark:bg-stone-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-30 gap-4">
@@ -398,10 +483,10 @@ const AppContent: React.FC = () => {
                             <p className="text-white text-lg font-semibold animate-pulse">Etkinlik hazırlanıyor...</p>
                         </div>
                     )}
-                    
+                    <WorksheetToolbar />
                     <div 
                         ref={panAreaRef}
-                        className="flex-grow overflow-auto p-4 md:p-8 cursor-grab pan-area bg-stone-100 dark:bg-stone-900"
+                        className="flex-grow overflow-auto p-4 md:p-8 cursor-grab pan-area"
                         onMouseDown={handleMouseDown}
                         onMouseMove={handleMouseMove}
                         onMouseUp={stopPanning}
