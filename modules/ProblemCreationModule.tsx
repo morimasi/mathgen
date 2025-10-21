@@ -122,36 +122,4 @@ const ProblemCreationModule: React.FC = () => {
                         { value: 'vehicles', label: 'Taşıtlar' },
                         { value: 'fruits', label: 'Meyveler/Yiyecekler' },
                     ]}
-                    containerClassName="col-span-2"
-                />
-                <NumberInput 
-                    label="Sayfa Başına Problem"
-                    id="problems-per-page"
-                    min={1} max={10}
-                    value={settings.problemsPerPage}
-                    onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value))}
-                    disabled={isTableLayout}
-                />
-                <NumberInput 
-                    label="Sayfa Sayısı"
-                    id="page-count"
-                    min={1} max={20}
-                    value={settings.pageCount}
-                    onChange={e => handleSettingChange('pageCount', parseInt(e.target.value))}
-                    disabled={isTableLayout}
-                />
-            </div>
-            <SettingsPresetManager 
-                moduleKey="problem-creation"
-                currentSettings={settings}
-                onLoadSettings={setSettings}
-            />
-            <div className="flex flex-wrap gap-2 pt-2">
-                <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
-            </div>
-        </div>
-    );
-};
-
-export default ProblemCreationModule;
+                    containerClassName="col-

@@ -32,8 +32,7 @@ const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/Visu
 const VerbalArithmeticModule = React.lazy(() => import('../modules/VerbalArithmeticModule.tsx'));
 const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNumberPuzzlesModule.tsx'));
 const SymbolicArithmeticModule = React.lazy(() => import('../modules/SymbolicArithmeticModule.tsx'));
-// FIX: Changed to a named import for ProblemCreationModule to resolve a type error with React.lazy.
-const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx').then(module => ({ default: module.default })));
+const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx'));
 
 
 const SettingsPanel: React.FC = () => {
