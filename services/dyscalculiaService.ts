@@ -204,7 +204,7 @@ const generateVisualNumberRepresentationLocal = (settings: any): { problem: Prob
     } else { // fingers
         representationHtml = `<div class="finger-count">${'🖐️'.repeat(Math.floor(number/5))}${'☝️'.repeat(number%5)}</div>`;
     }
-    question = `<p>Aşağıdaki görsel hangi sayıyı temsil ediyor?</p>${representationHtml}`;
+    const question = `<p>Aşağıdaki görsel hangi sayıyı temsil ediyor?</p>${representationHtml}`;
     const answer = String(number);
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };
