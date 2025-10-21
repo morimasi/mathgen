@@ -8,6 +8,7 @@ import { calculateMaxProblems } from '../services/layoutService';
 import SettingsPresetManager from '../components/SettingsPresetManager';
 import { generateDyscalculiaProblem } from '../services/dyscalculiaService';
 import { useWorksheet } from '../services/WorksheetContext';
+import Checkbox from '../components/form/Checkbox';
 
 // Import all sub-module setting components
 import NumberSenseSettings from './dyscalculia/NumberSenseSettings';
@@ -70,6 +71,8 @@ const DyscalculiaModule: React.FC = () => {
     const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
     const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
+    const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
+
     
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyscalculiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
@@ -116,10 +119,12 @@ const DyscalculiaModule: React.FC = () => {
     }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
 
     useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === `dyscalculia-${activeSubModuleId}`) {
+        if (autoRefreshTrigger > autoRefreshTriggerRef.current && lastGeneratorModule === `dyscalculia-${activeSubModuleId}`) {
+            autoRefreshTriggerRef.current = autoRefreshTrigger;
             handleGenerate(true);
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate, activeSubModuleId]);
+
 
     // Live update for non-AI modules
     useEffect(() => {
@@ -168,6 +173,8 @@ const DyscalculiaModule: React.FC = () => {
             default: return null;
         }
     };
+    
+    const isTableLayout = printSettings.layoutMode === 'table';
 
     return (
         <div className="flex gap-4">
@@ -189,14 +196,18 @@ const DyscalculiaModule: React.FC = () => {
             
             <main className="w-2/3 space-y-3">
                 {renderSettingsPanel()}
-                <div className="pt-2 border-t border-stone-200 dark:border-stone-700">
-                    <div className="grid grid-cols-2 gap-2">
-                         <NumberInput label="Problem Sayısı" id="dc-problems-per-page" min={1} max={50}
-                            value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit} />
-                         <NumberInput label="Sayfa Sayısı" id="dc-page-count" min={1} max={20}
-                            value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} />
+                <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
+                    <div className="mt-2 space-y-2">
+                        <Checkbox label="Otomatik Sığdır" id="autoFit-dyscalculia" checked={settings.autoFit} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
+                        <div className="grid grid-cols-2 gap-2">
+                             <NumberInput label="Sayfa Başına Problem" id="dc-problems-per-page" min={1} max={50}
+                                value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit || isTableLayout} />
+                             <NumberInput label="Sayfa Sayısı" id="dc-page-count" min={1} max={20}
+                                value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} disabled={isTableLayout} />
+                        </div>
                     </div>
-                </div>
+                </details>
                 <SettingsPresetManager currentSettings={activeSubModuleSettings} onLoadSettings={handleSubModuleSettingChange} moduleKey={`dyscalculia-${activeSubModuleId}`} />
                 <div className="flex flex-wrap gap-2 pt-2">
                     <Button onClick={() => handleGenerate(true)} size="sm">Oluştur</Button>

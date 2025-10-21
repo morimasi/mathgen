@@ -13,6 +13,7 @@ import { useWorksheet } from '../services/WorksheetContext.tsx';
 const VisualSupportModule: React.FC = () => {
     const { visualSupportSettings: settings, setVisualSupportSettings: setSettings } = useWorksheet();
     const { settings: printSettings, setSettings: setPrintSettings } = usePrintSettings();
+    const isTableLayout = printSettings.layoutMode === 'table';
 
     const { generate } = useProblemGenerator({
         moduleKey: 'visual-support',
@@ -95,46 +96,36 @@ const VisualSupportModule: React.FC = () => {
                         />
                     </div>
 
-                    <div className="p-1.5 bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 rounded-lg space-y-2">
-                         <Checkbox
-                            label="Otomatik Sığdır"
-                            id="auto-fit-visual"
-                            checked={settings.autoFit}
-                            onChange={e => handleSettingChange('autoFit', e.target.checked)}
-                        />
-                        <div className={`transition-opacity ${settings.autoFit ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-                           <div className="flex items-end gap-2">
+                    <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                        <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
+                        <div className="mt-2 space-y-2">
+                            <Checkbox 
+                                label="Otomatik Sığdır" 
+                                id="auto-fit-visual" 
+                                checked={settings.autoFit} 
+                                onChange={e => handleSettingChange('autoFit', e.target.checked)} 
+                                disabled={isTableLayout}
+                            />
+                            <div className={`grid grid-cols-2 gap-2 transition-opacity ${settings.autoFit || isTableLayout ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                                 <NumberInput 
-                                    containerClassName="flex-grow"
                                     label="Problem Sayısı"
                                     id="problems-per-page-visual"
                                     min={1} max={50}
                                     value={settings.problemsPerPage}
                                     onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10) || 1)}
-                                    disabled={settings.autoFit}
+                                    disabled={settings.autoFit || isTableLayout}
                                 />
                                 <NumberInput 
-                                    containerClassName="flex-grow"
                                     label="Sayfa Sayısı"
                                     id="page-count-visual"
                                     min={1} max={20}
                                     value={settings.pageCount}
                                     onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10) || 1)}
-                                    disabled={settings.autoFit}
+                                    disabled={isTableLayout}
                                 />
-                                <Button
-                                    onClick={() => generate(true)}
-                                    disabled={settings.autoFit}
-                                    size="sm"
-                                    variant="secondary"
-                                    className="h-[27px]"
-                                    title="Manuel sayfa ve problem sayısını uygula"
-                                >
-                                    Uygula
-                                </Button>
                             </div>
                         </div>
-                    </div>
+                    </details>
                 </div>
 
                 <div className="flex flex-col justify-around gap-y-1">

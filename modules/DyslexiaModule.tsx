@@ -8,6 +8,7 @@ import { calculateMaxProblems } from '../services/layoutService.ts';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { generateDyslexiaProblem } from '../services/dyslexiaService.ts';
 import { useWorksheet } from '../services/WorksheetContext.tsx';
+import Checkbox from '../components/form/Checkbox.tsx';
 
 // Import all sub-module setting components
 import SoundWizardSettings from './dyslexia/SoundWizardSettings.tsx';
@@ -85,6 +86,8 @@ const DyslexiaModule: React.FC = () => {
     const { updateWorksheet, setIsLoading, autoRefreshTrigger, lastGeneratorModule } = useWorksheet();
     const contentRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
+    const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
+
 
     const activeSubModuleId = settings.activeSubModule;
     const activeSubModuleKey = activeSubModuleId.replace(/-(\w)/g, (_, c) => c.toUpperCase()) as keyof Omit<DyslexiaSettings, 'activeSubModule' | 'problemsPerPage' | 'pageCount' | 'autoFit'>;
@@ -132,10 +135,12 @@ const DyslexiaModule: React.FC = () => {
     }, [settings, printSettings, updateWorksheet, setIsLoading, activeSubModuleId, activeSubModuleSettings]);
 
     useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === `dyslexia-${activeSubModuleId}`) {
+        if (autoRefreshTrigger > autoRefreshTriggerRef.current && lastGeneratorModule === `dyslexia-${activeSubModuleId}`) {
+            autoRefreshTriggerRef.current = autoRefreshTrigger;
             handleGenerate(true);
         }
     }, [autoRefreshTrigger, lastGeneratorModule, handleGenerate, activeSubModuleId]);
+
 
     // Live update for non-AI modules
     useEffect(() => {
@@ -186,6 +191,8 @@ const DyslexiaModule: React.FC = () => {
         }
     };
 
+    const isTableLayout = printSettings.layoutMode === 'table';
+
     return (
         <div className="flex gap-4">
             <aside className="w-1/3 pr-2 border-r border-stone-200 dark:border-stone-700">
@@ -206,14 +213,18 @@ const DyslexiaModule: React.FC = () => {
             
             <main className="w-2/3 space-y-3">
                 {renderSettingsPanel()}
-                <div className="pt-2 border-t border-stone-200 dark:border-stone-700">
-                    <div className="grid grid-cols-2 gap-2">
-                         <NumberInput label="Problem Sayısı" id="dx-problems-per-page" min={1} max={50}
-                            value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit} />
-                         <NumberInput label="Sayfa Sayısı" id="dx-page-count" min={1} max={20}
-                            value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} />
+                <details className="p-2 bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-lg" open>
+                    <summary className="text-xs font-semibold cursor-pointer select-none">Sayfa Düzeni</summary>
+                    <div className="mt-2 space-y-2">
+                        <Checkbox label="Otomatik Sığdır" id="autoFit-dyslexia" checked={settings.autoFit} onChange={e => handleSettingChange('autoFit', e.target.checked)} disabled={isTableLayout} />
+                        <div className="grid grid-cols-2 gap-2">
+                             <NumberInput label="Sayfa Başına Problem" id="dx-problems-per-page" min={1} max={50}
+                                value={settings.problemsPerPage} onChange={e => handleSettingChange('problemsPerPage', parseInt(e.target.value, 10))} disabled={settings.autoFit || isTableLayout} />
+                             <NumberInput label="Sayfa Sayısı" id="dx-page-count" min={1} max={20}
+                                value={settings.pageCount} onChange={e => handleSettingChange('pageCount', parseInt(e.target.value, 10))} disabled={isTableLayout} />
+                        </div>
                     </div>
-                </div>
+                </details>
                 <SettingsPresetManager currentSettings={activeSubModuleSettings} onLoadSettings={handleSubModuleSettingChange} moduleKey={`dyslexia-${activeSubModuleId}`} />
                 <div className="flex flex-wrap gap-2 pt-2">
                     <Button onClick={() => handleGenerate(true)} size="sm">Oluştur</Button>

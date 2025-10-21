@@ -29,6 +29,8 @@ export const useProblemGenerator = <S,>({
     const { addToast } = useToast();
     const contentRef = useRef<HTMLDivElement | null>(null);
     const isInitialMount = useRef(true);
+    const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
+
 
     useEffect(() => {
         if (!contentRef.current) {
@@ -130,10 +132,12 @@ export const useProblemGenerator = <S,>({
 
     // Handle auto refresh on print settings change
     useEffect(() => {
-        if (autoRefreshTrigger > 0 && lastGeneratorModule === moduleKey) {
+        if (autoRefreshTrigger > autoRefreshTriggerRef.current && lastGeneratorModule === moduleKey) {
+            autoRefreshTriggerRef.current = autoRefreshTrigger;
             generate(true);
         }
     }, [autoRefreshTrigger, lastGeneratorModule, generate, moduleKey]);
+
 
     return { generate };
 };
