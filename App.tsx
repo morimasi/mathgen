@@ -206,9 +206,9 @@ const TopBanner: React.FC = memo(() => {
             </div>
 
             <div className="relative container mx-auto px-4 z-10">
-                <div className="flex items-start pt-4 justify-end h-32">
+                <div className="flex items-center justify-end h-32">
                     {/* Mobile Action Menu */}
-                    <div className="md:hidden flex items-start pt-4 gap-1 text-white">
+                    <div className="md:hidden flex items-center gap-1 text-white">
                         <ThemeSwitcher />
                         <div ref={actionMenuRef} className="relative">
                             <button onClick={() => setActionMenuOpen(p => !p)} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Eylemler"><MoreVerticalIcon /></button>
@@ -221,7 +221,7 @@ const TopBanner: React.FC = memo(() => {
                     </div>
 
                     {/* Desktop Action Buttons */}
-                    <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-start pt-4 gap-2 text-white">
+                    <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center gap-2 text-white">
                         <Search />
                         <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
                         <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
