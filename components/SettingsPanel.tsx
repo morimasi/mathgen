@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { useUI } from '../services/UIContext.tsx';
+// FIX: Add .tsx extension to import path
 import { LoadingIcon } from './icons/Icons.tsx';
 
 // Lazily import all module components for code-splitting
@@ -32,6 +33,7 @@ const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/Visu
 const VerbalArithmeticModule = React.lazy(() => import('../modules/VerbalArithmeticModule.tsx'));
 const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNumberPuzzlesModule.tsx'));
 const SymbolicArithmeticModule = React.lazy(() => import('../modules/SymbolicArithmeticModule.tsx'));
+// FIX: Correctly handle default export with React.lazy to fix type error.
 const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx'));
 
 

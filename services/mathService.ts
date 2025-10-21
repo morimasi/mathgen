@@ -1,5 +1,5 @@
 // FIX: Add .ts extension to import paths
-import { Problem, DecimalsOperation, ArithmeticOperation, CarryBorrowPreference, DivisionType, DecimalsSettings, ArithmeticSettings, VisualSupportSettings } from '../types.ts';
+import { Problem, DecimalsOperation, ArithmeticOperation, CarryBorrowPreference, DivisionType, DecimalsSettings, ArithmeticSettings, VisualSupportSettings, MathReadinessTheme } from './types.ts';
 import { numberToWords } from './utils.ts';
 
 // --- UTILS ---
@@ -91,7 +91,7 @@ export const generateVisualProblem = (settings: VisualSupportSettings): { proble
         }
 
         if (n1 > 0 && n2 > 0) {
-            const themeKey = theme === 'mixed' ? Object.keys(THEME_OBJECTS)[getRandomInt(0, Object.keys(THEME_OBJECTS).length - 1)] : theme;
+            const themeKey = theme === 'mixed' ? Object.keys(THEME_OBJECTS)[getRandomInt(0, Object.keys(THEME_OBJECTS).length - 1)] as MathReadinessTheme : theme;
             const emojiList = THEME_OBJECTS[themeKey as keyof typeof THEME_OBJECTS] || ['❔'];
             const selectedEmoji = emojiList[getRandomInt(0, emojiList.length - 1)];
 

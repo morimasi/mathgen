@@ -1,7 +1,9 @@
 // services/fractionsService.ts
 
+// FIX: Add .ts extension to import path
 import { Problem, FractionsOperation, FractionsSettings, FractionsProblemType } from '../types.ts';
 import { drawFractionPie } from './svgService.ts';
+// FIX: Add .ts extension to import path
 import { formatFractionAsWords } from './utils.ts';
 
 interface Fraction {

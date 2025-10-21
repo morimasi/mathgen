@@ -29,6 +29,7 @@ import {
     MissingNumberIcon,
     SymbolicArithmeticIcon,
     ProblemCreationIcon,
+// FIX: Add .tsx extension to import path
 } from './icons/Icons.tsx';
 
 interface Tab {

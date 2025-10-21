@@ -1,6 +1,8 @@
 // services/placeValueService.ts
 
+// FIX: Add .ts extension to import path
 import { Problem, PlaceValueSettings, PlaceValueProblemType } from '../types.ts';
+// FIX: Add .ts extension to import path
 import { numberToWords } from './utils.ts';
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;

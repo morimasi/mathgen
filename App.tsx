@@ -17,6 +17,7 @@ import ContactModal from './components/ContactModal.tsx';
 import FavoritesPanel from './components/FavoritesPanel.tsx';
 import AnimatedLogo from './components/AnimatedLogo.tsx';
 import ThemeSwitcher from './components/ThemeSwitcher.tsx';
+// FIX: Add .ts extension to import path
 import { TAB_GROUPS } from './constants.ts';
 import { 
     DoubleArrowLeftIcon,
@@ -29,14 +30,15 @@ import {
     DownloadIcon,
     MenuIcon,
     MoreVerticalIcon
+// FIX: Add .tsx extension to import path
 } from './components/icons/Icons.tsx';
 import Button from './components/form/Button.tsx';
 import Select from './components/form/Select.tsx';
 import NumberInput from './components/form/NumberInput.tsx';
-import { useFlyingLadybugs } from './services/FlyingLadybugContext.tsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
+// FIX: Add .ts extension to import path
 import { PrintSettings } from './types.ts';
 
 // Debounce hook for performance optimization

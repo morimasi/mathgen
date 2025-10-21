@@ -1,19 +1,32 @@
+// FIX: Add .ts extension to import path
 import { ArithmeticSettings, ArithmeticOperation, CarryBorrowPreference, DivisionType } from '../types.ts';
+// FIX: Add .tsx extension to import path
 import Button from '../components/form/Button.tsx';
+// FIX: Add .tsx extension to import path
 import NumberInput from '../components/form/NumberInput.tsx';
+// FIX: Add .tsx extension to import path
 import Select from '../components/form/Select.tsx';
+// FIX: Add .tsx extension to import path
 import Checkbox from '../components/form/Checkbox.tsx';
+// FIX: Add .tsx extension to import path
 import TextInput from '../components/form/TextInput.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+// FIX: Add .tsx extension to import path
 import { ShuffleIcon, MicrophoneIcon, MicrophoneOffIcon } from '../components/icons/Icons.tsx';
+// FIX: Add .tsx extension to import path
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import React, { useState, useEffect, useRef } from 'react';
 import { generateArithmeticProblem } from '../services/mathService.ts';
+// FIX: Add .ts extension to import path
 import { generateContextualWordProblems } from '../services/geminiService.ts';
+// FIX: Add .ts extension to import path
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
+// FIX: Add .tsx extension to import path
 import HintButton from '../components/HintButton.tsx';
+// FIX: Add .ts extension to import path
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 import { useToast } from '../services/ToastContext.tsx';
+// FIX: Add .ts extension to import path
 import { parseSpokenMath } from '../services/utils.ts';
 
 declare global {
