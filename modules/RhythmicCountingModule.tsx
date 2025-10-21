@@ -15,7 +15,7 @@ import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 import { useWorksheet } from '../services/WorksheetContext.tsx';
 
-export const RhythmicCountingModule: React.FC = () => {
+const RhythmicCountingModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
     const settings = allSettings.rhythmicCounting;
@@ -186,3 +186,6 @@ export const RhythmicCountingModule: React.FC = () => {
         </div>
     );
 };
+
+// FIX: Use default export to be compatible with React.lazy in SettingsPanel.tsx
+export default RhythmicCountingModule;

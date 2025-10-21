@@ -1,6 +1,6 @@
 // services/dysgraphiaService.ts
 
-import { Problem, DysgraphiaSubModuleType, FineMotorSkillsSettings } from './types.ts';
+import { Problem, DysgraphiaSubModuleType, FineMotorSkillsSettings } from '../types.ts';
 import { generateDysgraphiaAIProblem } from './geminiService.ts';
 
 // --- UTILS ---

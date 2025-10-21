@@ -258,7 +258,7 @@ const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => 
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
         
-        // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+// FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
         if (firstElement instanceof HTMLElement) firstElement.focus();
 
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -270,13 +270,13 @@ const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => 
 
             if (event.shiftKey) { // Shift+Tab
                 if (document.activeElement === firstElement) {
-                    // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+// FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
                     if (lastElement instanceof HTMLElement) lastElement.focus();
                     event.preventDefault();
                 }
             } else { // Tab
                 if (document.activeElement === lastElement) {
-                    // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+// FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
                     if (firstElement instanceof HTMLElement) firstElement.focus();
                     event.preventDefault();
                 }
@@ -298,7 +298,7 @@ const HowToUseModal: React.FC<HowToUseModalProps> = ({ isVisible, onClose }) => 
             nextIndex = currentIndex > 0 ? currentIndex - 1 : focusableButtons.length - 1;
         }
         if (nextIndex !== -1) {
-            // FIX: Use instanceof check to ensure element is an HTMLButtonElement before calling focus.
+// FIX: Use instanceof check to ensure element is an HTMLButtonElement before calling focus.
             const nextButton = focusableButtons[nextIndex];
             if (nextButton instanceof HTMLButtonElement) {
                 nextButton.focus();

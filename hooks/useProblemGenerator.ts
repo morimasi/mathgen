@@ -34,7 +34,7 @@ export const useProblemGenerator = <S,>({
 
     useEffect(() => {
         if (!contentRef.current) {
-            // FIX: Cast the result of getElementById to HTMLDivElement to match the ref's type.
+// FIX: Cast the result of getElementById to HTMLDivElement to match the ref's type.
             contentRef.current = document.getElementById('worksheet-container-0') as HTMLDivElement;
         }
     }, []);
@@ -60,9 +60,9 @@ export const useProblemGenerator = <S,>({
                 } else if (printSettings.layoutMode === 'table') {
                     totalCount = printSettings.rows * printSettings.columns;
                 } else if (finalSettings.autoFit) {
-                    //FIX: contentRef can be null, provide fallback
-                    const problemsPerPage = contentRef.current ? calculateMaxProblems(contentRef, printSettings) : finalSettings.problemsPerPage!;
-                    totalCount = (problemsPerPage || finalSettings.problemsPerPage!) * (finalSettings.pageCount ?? 1);
+//FIX: contentRef can be null, provide fallback
+                    const problemsPerPage = calculateMaxProblems(contentRef, printSettings);
+                    totalCount = (problemsPerPage || finalSettings.problemsPerPage || 20) * (finalSettings.pageCount ?? 1);
                 } else if (overrideSettings) {
                     totalCount = 1;
                 }

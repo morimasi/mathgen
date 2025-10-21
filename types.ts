@@ -239,7 +239,7 @@ export enum ShapeType {
     Pentagon = 'pentagon',
     Hexagon = 'hexagon',
     Rhombus = 'rhombus',
-    // FIX: Added 'Star' to the ShapeType enum.
+// FIX: Added 'Star' to the ShapeType enum.
     Star = 'star',
 }
 export interface GeometrySettings {

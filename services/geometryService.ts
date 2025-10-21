@@ -106,13 +106,17 @@ export const generateGeometryProblem = (settings: GeometrySettings): { problem: 
                 }
                 case ShapeType.Pentagon:
                 case ShapeType.Hexagon:
-                case ShapeType.Rhombus: {
+                case ShapeType.Rhombus:
+                case ShapeType.Star: {
                     const s = getRandomInt(5, 50);
                     svg = draw2DShape({ type: shape, s });
-                     if (type === GeometryProblemType.Area && (shape === ShapeType.Pentagon || shape === ShapeType.Hexagon || shape === ShapeType.Rhombus)) {
+                     if (type === GeometryProblemType.Area && (shape === ShapeType.Pentagon || shape === ShapeType.Hexagon || shape === ShapeType.Rhombus || shape === ShapeType.Star)) {
                         answer = "Bu şeklin alanı için daha fazla bilgi gereklidir.";
                     } else if (shape === ShapeType.Rhombus) {
                         answer = `${4 * s} birim`;
+                    }
+                     else if (shape === ShapeType.Star) {
+                        answer = `${10 * s} birim`; // Assuming a simple 5-pointed star
                     }
                     else {
                         answer = `${(shape === ShapeType.Pentagon ? 5 : 6) * s} birim`;

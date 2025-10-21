@@ -1,6 +1,6 @@
 // services/dyslexiaService.ts
 
-import { Problem, DyslexiaSubModuleType, SoundWizardSettings, VisualMasterSettings, MapReadingSettings } from './types.ts';
+import { Problem, DyslexiaSubModuleType, SoundWizardSettings, VisualMasterSettings, MapReadingSettings } from '../types.ts';
 import { generateDyslexiaAIProblem } from './geminiService.ts';
 import { maps } from './map/mapData.ts';
 

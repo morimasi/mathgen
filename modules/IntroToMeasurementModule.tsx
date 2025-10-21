@@ -15,7 +15,7 @@ import HintButton from '../components/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 import { useWorksheet } from '../services/WorksheetContext.tsx';
 
-export const IntroToMeasurementModule: React.FC = () => {
+const IntroToMeasurementModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const { allSettings, handleSettingsChange: setContextSettings } = useWorksheet();
     const settings = allSettings.introToMeasurement;
@@ -149,3 +149,6 @@ export const IntroToMeasurementModule: React.FC = () => {
         </div>
     );
 };
+
+// FIX: Use default export to be compatible with React.lazy in SettingsPanel.tsx
+export default IntroToMeasurementModule;

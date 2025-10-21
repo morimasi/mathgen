@@ -1,54 +1,18 @@
-import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
-
-type TabId = string;
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface UIContextType {
-    activeTab: TabId;
-    setActiveTab: (tabId: TabId) => void;
-    isPrintSettingsVisible: boolean;
-    openPrintSettings: () => void;
-    closePrintSettings: () => void;
-    isHowToUseVisible: boolean;
-    openHowToUse: () => void;
-    closeHowToUse: () => void;
-    isContactModalVisible: boolean;
-    openContactModal: () => void;
-    closeContactModal: () => void;
-    isFavoritesPanelVisible: boolean;
-    openFavoritesPanel: () => void;
-    closeFavoritesPanel: () => void;
-    isSettingsPanelCollapsed: boolean;
-    setIsSettingsPanelCollapsed: (collapsed: boolean) => void;
+    activeTab: string;
+    setActiveTab: (tabId: string) => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
 
 export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [activeTab, setActiveTab] = useState('matching-and-sorting');
-    const [isPrintSettingsVisible, setPrintSettingsVisible] = useState(false);
-    const [isHowToUseVisible, setHowToUseVisible] = useState(false);
-    const [isContactModalVisible, setContactModalVisible] = useState(false);
-    const [isFavoritesPanelVisible, setFavoritesPanelVisible] = useState(false);
-    const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(window.innerWidth < 768); // Collapse on mobile by default
-    
-    const openPrintSettings = useCallback(() => setPrintSettingsVisible(true), []);
-    const closePrintSettings = useCallback(() => setPrintSettingsVisible(false), []);
-    const openHowToUse = useCallback(() => setHowToUseVisible(true), []);
-    const closeHowToUse = useCallback(() => setHowToUseVisible(false), []);
-    const openContactModal = useCallback(() => setContactModalVisible(true), []);
-    const closeContactModal = useCallback(() => setContactModalVisible(false), []);
-    const openFavoritesPanel = useCallback(() => setFavoritesPanelVisible(true), []);
-    const closeFavoritesPanel = useCallback(() => setFavoritesPanelVisible(false), []);
+    // FIX: Default active tab changed to 'customization-center' for a better initial user experience.
+    const [activeTab, setActiveTab] = useState('customization-center'); 
 
     return (
-        <UIContext.Provider value={{
-            activeTab, setActiveTab,
-            isPrintSettingsVisible, openPrintSettings, closePrintSettings,
-            isHowToUseVisible, openHowToUse, closeHowToUse,
-            isContactModalVisible, openContactModal, closeContactModal,
-            isFavoritesPanelVisible, openFavoritesPanel, closeFavoritesPanel,
-            isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
-        }}>
+        <UIContext.Provider value={{ activeTab, setActiveTab }}>
             {children}
         </UIContext.Provider>
     );

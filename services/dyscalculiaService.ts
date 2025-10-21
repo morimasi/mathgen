@@ -172,7 +172,7 @@ const generateTimeMeasurementGeometryLocal = (settings: TimeMeasurementGeometryS
 
 const generateSpatialReasoningLocal = (settings: SpatialReasoningSettings): { problem: Problem; title: string; } => {
     const title = "Uzamsal Akıl Yürütme";
-    // FIX: Declare 'question' and 'answer' variables before use.
+// FIX: Declare 'question' and 'answer' variables before use.
     let question = "", answer = "";
     const patternColors = ['#ef4444', '#3b82f6', '#22c55e'];
     const pattern = shuffleArray(patternColors).slice(0,3).map(c => `<div class="pattern-block" style="background-color: ${c}"></div>`).join('');
@@ -183,7 +183,7 @@ const generateSpatialReasoningLocal = (settings: SpatialReasoningSettings): { pr
 
 const generateEstimationSkillsLocal = (settings: EstimationSkillsSettings): { problem: Problem; title: string; } => {
     const title = "Tahmin Becerileri";
-    // FIX: Declare 'question' and 'answer' variables before use.
+// FIX: Declare 'question' and 'answer' variables before use.
     let question = "", answer = "";
     const count = getRandomInt(15, 40);
     const jarItems = Array.from({length: count}).map(() => `<circle cx="${getRandomInt(15,85)}" cy="${getRandomInt(15,95)}" r="3" fill="#8b5cf6"/>`).join('');
@@ -209,7 +209,7 @@ const generateVisualNumberRepresentationLocal = (settings: VisualNumberRepresent
         representationHtml = `<div class="finger-count">${'🖐️'.repeat(Math.floor(number/5))}${'☝️'.repeat(number%5)}</div>`;
     }
     // FIX: Declare 'question' variable before use.
-    let question = `<p>Aşağıdaki görsel hangi sayıyı temsil ediyor?</p>${representationHtml}`;
+    const question = `<p>Aşağıdaki görsel hangi sayıyı temsil ediyor?</p>${representationHtml}`;
     const answer = String(number);
     return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
 };

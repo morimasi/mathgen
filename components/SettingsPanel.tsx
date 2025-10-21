@@ -1,16 +1,13 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { useUI } from '../services/UIContext.tsx';
-import { LoadingIcon } from './icons/Icons.tsx';
+import LoadingDaisy from './LoadingDaisy.tsx';
 
-// Lazily import all module components for code-splitting
-// FIX: Added file extensions (.tsx) to all lazy-loaded module imports to resolve module resolution errors.
+// Lazy load modules
 const ArithmeticModule = React.lazy(() => import('../modules/ArithmeticModule.tsx'));
 const FractionsModule = React.lazy(() => import('../modules/FractionsModule.tsx'));
 const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule.tsx'));
 const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule.tsx'));
-// FIX: Changed to a named import to resolve a type error with React.lazy.
-const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule.tsx').then(module => ({ default: module.RhythmicCountingModule })));
-// FIX: Add .tsx extension to import path
+const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule.tsx'));
 const TimeModule = React.lazy(() => import('../modules/TimeModule.tsx'));
 const GeometryModule = React.lazy(() => import('../modules/GeometryModule.tsx'));
 const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule.tsx'));
@@ -22,66 +19,58 @@ const NumberRecognitionModule = React.lazy(() => import('../modules/NumberRecogn
 const PatternsModule = React.lazy(() => import('../modules/PatternsModule.tsx'));
 const BasicShapesModule = React.lazy(() => import('../modules/BasicShapesModule.tsx'));
 const PositionalConceptsModule = React.lazy(() => import('../modules/PositionalConceptsModule.tsx'));
-// FIX: Changed to a named import for IntroToMeasurementModule to resolve a type error with React.lazy, similar to the fix for RhythmicCountingModule.
-const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule.tsx').then(module => ({ default: module.IntroToMeasurementModule })));
+const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule.tsx'));
 const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule.tsx'));
-const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
-const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule.tsx'));
-// FIX: Changed to a dynamic import with `.then` to resolve a type error with React.lazy for default exports.
-const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule.tsx').then(module => ({ default: module.default })));
 const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/VisualAdditionSubtractionModule.tsx'));
 const VerbalArithmeticModule = React.lazy(() => import('../modules/VerbalArithmeticModule.tsx'));
 const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNumberPuzzlesModule.tsx'));
 const SymbolicArithmeticModule = React.lazy(() => import('../modules/SymbolicArithmeticModule.tsx'));
-// FIX: Changed to a named import for ProblemCreationModule to resolve a type error with React.lazy.
-const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx').then(module => ({ default: module.default })));
+const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx'));
+const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
+const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule.tsx'));
+const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule.tsx'));
 const CustomizationCenterModule = React.lazy(() => import('../modules/CustomizationCenterModule.tsx'));
 
 
+// FIX: Changed type from React.FC<{}> to React.ComponentType<any> to match the return type of React.lazy.
+const moduleMap: { [key: string]: React.LazyExoticComponent<React.ComponentType<any>> } = {
+    'arithmetic': ArithmeticModule,
+    'fractions': FractionsModule,
+    'decimals': DecimalsModule,
+    'place-value': PlaceValueModule,
+    'rhythmic-counting': RhythmicCountingModule,
+    'time': TimeModule,
+    'geometry': GeometryModule,
+    'measurement': MeasurementModule,
+    'word-problems': WordProblemsModule,
+    'visual-support': VisualSupportModule,
+    'matching-and-sorting': MatchingAndSortingModule,
+    'comparing-quantities': ComparingQuantitiesModule,
+    'number-recognition': NumberRecognitionModule,
+    'patterns': PatternsModule,
+    'basic-shapes': BasicShapesModule,
+    'positional-concepts': PositionalConceptsModule,
+    'intro-to-measurement': IntroToMeasurementModule,
+    'simple-graphs': SimpleGraphsModule,
+    'visual-addition-subtraction': VisualAdditionSubtractionModule,
+    'verbal-arithmetic': VerbalArithmeticModule,
+    'missing-number-puzzles': MissingNumberPuzzlesModule,
+    'symbolic-arithmetic': SymbolicArithmeticModule,
+    'problem-creation': ProblemCreationModule,
+    'dyslexia': DyslexiaModule,
+    'dyscalculia': DyscalculiaModule,
+    'dysgraphia': DysgraphiaModule,
+    'customization-center': CustomizationCenterModule,
+};
+
 const SettingsPanel: React.FC = () => {
     const { activeTab } = useUI();
-
-    const renderActiveModule = () => {
-        switch (activeTab) {
-            case 'customization-center': return <CustomizationCenterModule />;
-            case 'arithmetic': return <ArithmeticModule />;
-            case 'visual-support': return <VisualSupportModule />;
-            case 'word-problems': return <WordProblemsModule />;
-            case 'problem-creation': return <ProblemCreationModule />;
-            case 'fractions': return <FractionsModule />;
-            case 'decimals': return <DecimalsModule />;
-            case 'place-value': return <PlaceValueModule />;
-            case 'rhythmic-counting': return <RhythmicCountingModule />;
-            case 'time': return <TimeModule />;
-            case 'geometry': return <GeometryModule />;
-            case 'measurement': return <MeasurementModule />;
-            case 'matching-and-sorting': return <MatchingAndSortingModule />;
-            case 'comparing-quantities': return <ComparingQuantitiesModule />;
-            case 'number-recognition': return <NumberRecognitionModule />;
-            case 'patterns': return <PatternsModule />;
-            case 'basic-shapes': return <BasicShapesModule />;
-            case 'positional-concepts': return <PositionalConceptsModule />;
-            case 'intro-to-measurement': return <IntroToMeasurementModule />;
-            case 'simple-graphs': return <SimpleGraphsModule />;
-            case 'dyslexia': return <DyslexiaModule />;
-            case 'dyscalculia': return <DyscalculiaModule />;
-            case 'dysgraphia': return <DysgraphiaModule />;
-            case 'visual-addition-subtraction': return <VisualAdditionSubtractionModule />;
-            case 'verbal-arithmetic': return <VerbalArithmeticModule />;
-            case 'missing-number-puzzles': return <MissingNumberPuzzlesModule />;
-            case 'symbolic-arithmetic': return <SymbolicArithmeticModule />;
-            default: return <div>Lütfen yukarıdaki menüden bir modül seçin.</div>;
-        }
-    };
+    const ActiveModule = moduleMap[activeTab] || moduleMap['customization-center'];
 
     return (
-        <Suspense fallback={
-            <div className="flex items-center justify-center h-48">
-                <LoadingIcon className="w-8 h-8" />
-            </div>
-        }>
-            {renderActiveModule()}
-        </Suspense>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full"><LoadingDaisy /></div>}>
+            <ActiveModule />
+        </React.Suspense>
     );
 };
 

@@ -54,7 +54,7 @@ export const calculateMaxProblems = (
     }
 
     const containerHeight = container.clientHeight;
-    // FIX: Problem spacing is in `rem`, need to convert to px for calculation.
+// FIX: Problem spacing is in `rem`, need to convert to px for calculation.
     // Approximate 1rem = 16px. This is not perfect but better than nothing.
     const problemSpacingPx = printSettings.problemSpacing * 16;
     const problemsPerColumn = Math.floor(containerHeight / (totalProblemHeight + problemSpacingPx));
