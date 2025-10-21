@@ -1,6 +1,5 @@
 // services/rhythmicCountingService.ts
 
-// FIX: Add .ts extension to import path
 import { Problem, RhythmicProblemType, RhythmicCountingSettings } from '../types.ts';
 
 const getRandomInt = (min: number, max: number): number => {
@@ -144,4 +143,66 @@ const generateFillBetweenSheetHTML = (settings: RhythmicCountingSettings, min: n
         p2 = getRandomInt(p1 + 2, BOXES_PER_ROW - 1 - afterCount);
 
         const num1 = startNum + p1 * effectiveStep;
-        const num2 = startNum + p2 * effective
+        // FIX: Corrected a typo from `effective` to `effectiveStep` to use the defined variable.
+        const num2 = startNum + p2 * effectiveStep;
+    }
+    // FIX: Added a return statement to ensure the function always returns a string as declared.
+    return `<div class="practice-sheet" style="display: flex; flex-direction: column; gap: 1rem;">${htmlRows.join('')}</div>`;
+};
+
+// FIX: Added the missing `generateRhythmicCountingProblem` function and exported it to resolve an import error.
+export const generateRhythmicCountingProblem = (settings: RhythmicCountingSettings): { problem: Problem, title: string, error?: string } => {
+    const { type, digits, step, direction, useMultiplesOnly, patternLength, missingCount, orderCount, orderDirection } = settings;
+    const problemBase = { category: 'rhythmic-counting', display: 'flow' as const };
+    let title = 'Ritmik Sayma';
+    const min = Math.pow(10, digits - 1);
+    const max = Math.pow(10, digits) - 1;
+
+    switch (type) {
+        case RhythmicProblemType.PracticeSheet:
+            return { problem: { ...problemBase, question: generatePracticeSheetHTML(settings, min, max), answer: 'Alıştırma' }, title: 'Ritmik Sayma Alıştırma Kağıdı' };
+        case RhythmicProblemType.FillBeforeAfter:
+            return { problem: { ...problemBase, question: generateFillBeforeAfterSheetHTML(settings, min, max), answer: 'Alıştırma' }, title: 'Öncesini ve Sonrasını Doldur' };
+        case RhythmicProblemType.FillBetween:
+            return { problem: { ...problemBase, question: generateFillBetweenSheetHTML(settings, min, max), answer: 'Alıştırma' }, title: 'Arasını Doldur' };
+        case RhythmicProblemType.Pattern: {
+            title = 'Örüntü Tamamlama';
+            const currentDirection = direction === 'mixed' ? (getRandomInt(0, 1) === 0 ? 'forward' : 'backward') : direction;
+            const currentStep = currentDirection === 'backward' ? -step : step;
+            const maxStart = max - ((patternLength - 1) * step);
+            const minStart = min + ((patternLength - 1) * (currentDirection === 'backward' ? step : 0));
+            let start = useMultiplesOnly 
+                ? getRandomInt(Math.ceil(minStart / step), Math.floor(maxStart / step)) * step
+                : getRandomInt(minStart, maxStart);
+
+            const sequence = Array.from({ length: patternLength }, (_, i) => start + i * currentStep);
+            const missingIndexes = shuffleArray(Array.from({length: patternLength}, (_, i) => i)).slice(0, missingCount);
+            const answer = missingIndexes.map(i => sequence[i]).join(', ');
+            
+            const questionHTML = sequence.map((num, i) => 
+                missingIndexes.includes(i) ? `<span style="${BOX_STYLE}"></span>` : `<span style="${BOX_STYLE}">${num}</span>`
+            ).join(SEPARATOR);
+            
+            return { problem: { ...problemBase, question: `<div style="${ROW_STYLE}">${questionHTML}</div>`, answer }, title };
+        }
+        case RhythmicProblemType.Ordering: {
+            title = 'Sayıları Sıralama';
+            const numbers = Array.from({ length: orderCount }, () => getRandomInt(min, max));
+            const currentOrder = orderDirection === 'mixed' ? (getRandomInt(0,1) === 0 ? 'ascending' : 'descending') : orderDirection;
+            const sorted = currentOrder === 'ascending' ? [...numbers].sort((a,b) => a-b) : [...numbers].sort((a,b) => b-a);
+            const questionText = currentOrder === 'ascending' ? 'küçükten büyüğe' : 'büyükten küçüğe';
+            
+            const question = `<p>Sayıları <b>${questionText}</b> sırala.</p><div class="ordering-container">${numbers.map(n => `<div class="ordering-item">${n}</div>`).join('')}</div>`;
+            return { problem: { ...problemBase, question, answer: sorted.join(', ') }, title };
+        }
+         case RhythmicProblemType.OddEven: {
+            title = 'Tek ve Çift Sayılar';
+            const number = getRandomInt(min, max);
+            const isOdd = number % 2 !== 0;
+            const question = `<b>${number}</b> sayısı tek mi çift mi?`;
+            return { problem: { ...problemBase, question, answer: isOdd ? 'Tek' : 'Çift' }, title };
+        }
+        default:
+            return { problem: { ...problemBase, question: 'Bu alıştırma türü henüz oluşturulmadı.', answer: '...' }, title: 'Bilinmeyen Alıştırma' };
+    }
+};

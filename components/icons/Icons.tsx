@@ -96,4 +96,29 @@ export const FractionsDecimalsIntroIcon = DummyIcon;
 export const VisualNumberRepresentationIcon = DummyIcon;
 export const VisualArithmeticIcon = DummyIcon;
 
+export const NumberTraceIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M7 20l4-16 4 16"/>
+        <path d="M5 16h14"/>
+        <path d="M17 4l-3 4-3-4"/>
+    </svg>
+);
+export const GeometricTraceIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21 12L12 3 3 12l9 9 9-9z"/>
+        <path d="M3 12h18"/>
+    </svg>
+);
+export const DigitTraceIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M9.9 5.9a1 1 0 00-1.8 0L3.5 16.2A.9.9 0 004.2 18h16.4a.9.9 0 00.7-1.8L15.9 5.9a1 1 0 00-1.8 0L12 10.4z"/>
+    </svg>
+);
+export const SymbolTraceIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M12 5v14M5 12h14"/>
+    </svg>
+);
+
+
 export default DummyIcon;

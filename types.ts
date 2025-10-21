@@ -609,4 +609,39 @@ export interface DyscalculiaSettings {
 }
 
 // --- DYSGRAPHIA ---
-// ... Add dysgraphia types when defined ...
+export type DysgraphiaSubModuleType =
+  | 'number-trace'
+  | 'geometric-doodling'
+  | 'math-connect-the-dots'
+  | 'digit-calligraphy'
+  | 'symbol-studio'
+  | 'word-form-writer'
+  | 'listing-the-givens-ai'
+  | 'step-by-step-scribe-ai'
+  | 'story-problem-creator-ai';
+
+export interface NumberTraceSettings { digits: number; }
+export interface GeometricDoodlingSettings { shape: 'square' | 'triangle' | 'circle' | 'star'; }
+export interface MathConnectTheDotsSettings { countingType: 'sequential' | 'by-twos' | 'by-fives'; }
+export interface DigitCalligraphySettings { digit: number; }
+export interface SymbolStudioSettings { symbol: 'plus' | 'minus' | 'multiply' | 'divide' | 'equals'; }
+export interface WordFormWriterSettings { digits: number; }
+export interface ListingTheGivensSettings { gradeLevel: number; }
+export interface StepByStepScribeSettings { operation: 'addition' | 'subtraction' | 'multiplication'; difficulty: 'easy' | 'medium'; }
+export interface StoryProblemCreatorSettings { difficulty: 'easy' | 'medium'; topic: string; }
+
+export interface DysgraphiaSettings {
+    activeSubModule: DysgraphiaSubModuleType;
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    numberTrace: NumberTraceSettings;
+    geometricDoodling: GeometricDoodlingSettings;
+    mathConnectTheDots: MathConnectTheDotsSettings;
+    digitCalligraphy: DigitCalligraphySettings;
+    symbolStudio: SymbolStudioSettings;
+    wordFormWriter: WordFormWriterSettings;
+    listingTheGivensAi: ListingTheGivensSettings;
+    stepByStepScribeAi: StepByStepScribeSettings;
+    storyProblemCreatorAi: StoryProblemCreatorSettings;
+}

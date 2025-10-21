@@ -88,7 +88,7 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
 
 const generateComparingQuantities = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, maxObjectCount } = settings;
-    // FIX: Change 'const' to 'let' to allow reassignment within the switch statement.
+    // FIX: Changed `const` to `let` to allow reassignment within the switch statement.
     let title = 'Miktarları Karşılaştırma';
     const items = getThemeItems(theme, 2);
     let question = '';

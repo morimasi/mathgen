@@ -1,29 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import { generateGeometryProblem } from '../services/geometryService.ts';
-// FIX: Add .ts extension to import path
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-// FIX: Add .ts extension to import path
 import { GeometrySettings, GeometryProblemType, ShapeType } from '../types.ts';
-// FIX: Add .tsx extension to import path
 import Button from '../components/form/Button.tsx';
-// FIX: Add .tsx extension to import path
 import NumberInput from '../components/form/NumberInput.tsx';
-// FIX: Add .tsx extension to import path
 import Select from '../components/form/Select.tsx';
-// FIX: Add .tsx extension to import path
 import Checkbox from '../components/form/Checkbox.tsx';
-// FIX: Add .tsx extension to import path
 import TextInput from '../components/form/TextInput.tsx';
-// FIX: Add .tsx extension to import path
 import { ShuffleIcon } from '../components/icons/Icons.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
-// FIX: Add .tsx extension to import path
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
-// FIX: Add .ts extension to import path
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
-// FIX: Add .tsx extension to import path
 import HintButton from '../components/HintButton.tsx';
-// FIX: Add .ts extension to import path
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
 const GeometryModule: React.FC = () => {
@@ -245,13 +233,4 @@ const GeometryModule: React.FC = () => {
             <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={() => handleGenerate(true)} size="sm">Oluştur (Temizle)</Button>
                 <Button onClick={() => handleGenerate(true)} variant="secondary" title="Ayarları koruyarak soruları yenile" size="sm">
-                    <ShuffleIcon className="w-4 h-4" />
-                    Yenile
-                </Button>
-                <Button onClick={() => handleGenerate(false)} variant="secondary" size="sm">Mevcuta Ekle</Button>
-            </div>
-        </div>
-    );
-};
-
-export default GeometryModule;
+                    <ShuffleIcon className="w-4 h-4"

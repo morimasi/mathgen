@@ -1,17 +1,13 @@
 import React, { Suspense } from 'react';
 import { useUI } from '../services/UIContext.tsx';
-// FIX: Add .tsx extension to import path
 import { LoadingIcon } from './icons/Icons.tsx';
 
 // Lazily import all module components for code-splitting
-// FIX: Added file extensions (.tsx) to all lazy-loaded module imports to resolve module resolution errors.
 const ArithmeticModule = React.lazy(() => import('../modules/ArithmeticModule.tsx'));
 const FractionsModule = React.lazy(() => import('../modules/FractionsModule.tsx'));
 const DecimalsModule = React.lazy(() => import('../modules/DecimalsModule.tsx'));
 const PlaceValueModule = React.lazy(() => import('../modules/PlaceValueModule.tsx'));
-// FIX: Changed to a named import to resolve a type error with React.lazy.
 const RhythmicCountingModule = React.lazy(() => import('../modules/RhythmicCountingModule.tsx').then(module => ({ default: module.RhythmicCountingModule })));
-// FIX: Add .tsx extension to import path
 const TimeModule = React.lazy(() => import('../modules/TimeModule.tsx'));
 const GeometryModule = React.lazy(() => import('../modules/GeometryModule.tsx'));
 const MeasurementModule = React.lazy(() => import('../modules/MeasurementModule.tsx'));
@@ -23,7 +19,6 @@ const NumberRecognitionModule = React.lazy(() => import('../modules/NumberRecogn
 const PatternsModule = React.lazy(() => import('../modules/PatternsModule.tsx'));
 const BasicShapesModule = React.lazy(() => import('../modules/BasicShapesModule.tsx'));
 const PositionalConceptsModule = React.lazy(() => import('../modules/PositionalConceptsModule.tsx'));
-// FIX: Changed to a named import for IntroToMeasurementModule to resolve a type error with React.lazy, similar to the fix for RhythmicCountingModule.
 const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule.tsx').then(module => ({ default: module.IntroToMeasurementModule })));
 const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule.tsx'));
 const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
@@ -33,8 +28,8 @@ const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/Visu
 const VerbalArithmeticModule = React.lazy(() => import('../modules/VerbalArithmeticModule.tsx'));
 const MissingNumberPuzzlesModule = React.lazy(() => import('../modules/MissingNumberPuzzlesModule.tsx'));
 const SymbolicArithmeticModule = React.lazy(() => import('../modules/SymbolicArithmeticModule.tsx'));
-// FIX: Correctly handle default export with React.lazy to fix type error.
-const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx'));
+// FIX: Changed the lazy import for `ProblemCreationModule` to explicitly handle the `default` export. This resolves a type error where React.lazy couldn't find the default exported component, likely due to a build tool or TypeScript configuration issue.
+const ProblemCreationModule = React.lazy(() => import('../modules/ProblemCreationModule.tsx').then(module => ({ default: module.default })));
 
 
 const SettingsPanel: React.FC = () => {
