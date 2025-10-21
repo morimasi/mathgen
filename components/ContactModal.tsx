@@ -21,7 +21,8 @@ const ContactModal: React.FC<ContactModalProps> = ({ isVisible, onClose }) => {
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
 
-        firstElement?.focus();
+        // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+        if (firstElement instanceof HTMLElement) firstElement.focus();
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -32,12 +33,14 @@ const ContactModal: React.FC<ContactModalProps> = ({ isVisible, onClose }) => {
 
             if (event.shiftKey) { // Shift+Tab
                 if (document.activeElement === firstElement) {
-                    lastElement?.focus();
+                    // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+                    if (lastElement instanceof HTMLElement) lastElement.focus();
                     event.preventDefault();
                 }
             } else { // Tab
                 if (document.activeElement === lastElement) {
-                    firstElement?.focus();
+                    // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+                    if (firstElement instanceof HTMLElement) firstElement.focus();
                     event.preventDefault();
                 }
             }

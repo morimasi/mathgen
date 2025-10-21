@@ -37,6 +37,24 @@ import { useFlyingLadybugs } from './services/FlyingLadybugContext.tsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
+import { PrintSettings } from './types.ts';
+
+// Debounce hook for performance optimization
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 const Header: React.FC = memo(() => {
     const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
@@ -75,55 +93,73 @@ const Header: React.FC = memo(() => {
         setActionMenuOpen(false);
     };
 
-    const handleDownloadPDF = async () => {
+    const handleDownloadPDF = () => {
         setActionMenuOpen(false);
         setIsLoading(true);
         addToast('PDF oluşturma işlemi başlatılıyor...', 'info');
-        try {
-            const pages = document.querySelectorAll<HTMLElement>('.worksheet-page');
-            if (pages.length === 0) {
-                addToast('İndirilecek içerik bulunamadı.', 'warning');
+
+        const pages = Array.from(document.querySelectorAll<HTMLElement>('.worksheet-page'));
+        if (pages.length === 0) {
+            addToast('İndirilecek içerik bulunamadı.', 'warning');
+            setIsLoading(false);
+            return;
+        }
+
+        const pdf = new jsPDF({
+            orientation: printSettings.orientation,
+            unit: 'mm',
+            format: 'a4',
+        });
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const processPage = async (pageIndex: number) => {
+            if (pageIndex >= pages.length) {
+                addToast('PDF dosyası oluşturuluyor...', 'info');
+                pdf.save('MathGen_Calisma_Kagidi.pdf');
+                addToast('PDF başarıyla indirildi!', 'success');
                 setIsLoading(false);
                 return;
             }
 
-            const pdf = new jsPDF({
-                orientation: printSettings.orientation,
-                unit: 'mm',
-                format: 'a4',
-            });
-            
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const page = pages[pageIndex];
+            addToast(`Sayfa ${pageIndex + 1}/${pages.length} işleniyor...`, 'info');
 
-            for (let i = 0; i < pages.length; i++) {
-                addToast(`Sayfa ${i + 1}/${pages.length} taranıyor...`, 'info');
-                const page = pages[i];
-                if (i > 0) {
-                    pdf.addPage();
-                }
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            try {
                 const canvas = await html2canvas(page, {
-                    scale: 1.5, // OPTIMIZATION: Reduced scale from 2 to 1.5 for faster rendering.
+                    scale: 1.5,
                     useCORS: true,
-                    logging: false, // OPTIMIZATION: Disable logging for a minor performance boost.
+                    logging: false,
                     width: page.offsetWidth,
                     height: page.offsetHeight,
                     windowWidth: page.scrollWidth,
                     windowHeight: page.scrollHeight
                 });
+
+                if (pageIndex > 0) {
+                    pdf.addPage();
+                }
+
                 const imgData = canvas.toDataURL('image/png');
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+                await processPage(pageIndex + 1);
+
+            } catch (error) {
+                console.error(`PDF oluşturma hatası - Sayfa ${pageIndex + 1}:`, error);
+                addToast(`Sayfa ${pageIndex + 1} işlenirken bir hata oluştu.`, 'error');
+                setIsLoading(false);
             }
-            
-            addToast('PDF dosyası oluşturuluyor...', 'info');
-            pdf.save('MathGen_Calisma_Kagidi.pdf');
-            addToast('PDF başarıyla indirildi!', 'success');
-        } catch (error) {
-            console.error("PDF oluşturma hatası:", error);
-            addToast('PDF oluşturulurken bir hata oluştu.', 'error');
-        } finally {
+        };
+
+        processPage(0).catch(error => {
+            console.error("PDF oluşturma işlemi başarısız oldu:", error);
+            addToast('PDF oluşturulurken genel bir hata oluştu.', 'error');
             setIsLoading(false);
-        }
+        });
     };
     
     const ActionButtons = () => (
@@ -192,6 +228,25 @@ const WorksheetToolbar: React.FC = memo(() => {
     const { settings, setSettings } = usePrintSettings();
     const { fontTheme, setFontTheme } = useFontTheme();
     const fontThemeOptions = Object.entries(fontThemes).map(([key, value]) => ({ value: key, label: value.name }));
+    
+    // --- Start of debounce implementation for performance ---
+    const [localSettings, setLocalSettings] = useState(settings);
+    const debouncedSettings = useDebounce(localSettings, 200);
+
+    useEffect(() => {
+        if (JSON.stringify(settings) !== JSON.stringify(debouncedSettings)) {
+            setSettings(debouncedSettings);
+        }
+    }, [debouncedSettings, setSettings]);
+
+    useEffect(() => {
+        setLocalSettings(settings);
+    }, [settings]);
+    
+    const handleLocalChange = (field: keyof PrintSettings, value: any) => {
+        setLocalSettings(prev => ({ ...prev, [field]: value }));
+    };
+    // --- End of debounce implementation ---
 
     const fitToScreen = () => {
         const area = document.getElementById('worksheet-area');
@@ -200,6 +255,7 @@ const WorksheetToolbar: React.FC = memo(() => {
                 area.parentElement!.clientWidth / (area.clientWidth + 50),
                 area.parentElement!.clientHeight / (area.clientHeight + 50)
             );
+            // Update global state directly for instant feedback from a button click
             setSettings(s => ({ ...s, scale: Math.max(0.2, scale) }));
         }
     };
@@ -212,29 +268,29 @@ const WorksheetToolbar: React.FC = memo(() => {
                 {/* --- Scale --- */}
                 <div className="flex items-center gap-2">
                     <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
-                    <input id="zoom-slider" type="range" min="20" max="200" value={settings.scale * 100} onChange={(e) => setSettings(s => ({ ...s, scale: parseInt(e.target.value, 10) / 100 }))} className="w-24 accent-primary"/>
-                    <span className="text-xs w-10 text-center">{Math.round(settings.scale * 100)}%</span>
+                    <input id="zoom-slider" type="range" min="20" max="200" value={localSettings.scale * 100} onChange={(e) => handleLocalChange('scale', parseInt(e.target.value, 10) / 100)} className="w-24 accent-primary"/>
+                    <span className="text-xs w-10 text-center">{Math.round(localSettings.scale * 100)}%</span>
                     <Button onClick={fitToScreen} size="sm" variant="secondary">Sığdır</Button>
                 </div>
                 <Separator />
                 {/* --- Layout --- */}
                  <div className="flex items-center gap-2">
-                    <Select label="Düzen" id="layout-mode" value={settings.layoutMode} onChange={e => setSettings(s => ({...s, layoutMode: e.target.value as 'flow' | 'table'}))} options={[{ value: 'flow', label: 'Akış' }, { value: 'table', label: 'Tablo' }]}/>
-                    {settings.layoutMode === 'flow' ? (
-                        <NumberInput label="Sütun" id="columns" min={1} max={5} value={settings.columns} onChange={e => setSettings(s => ({...s, columns: parseInt(e.target.value,10)}))} className="w-14"/>
+                    <Select label="Düzen" id="layout-mode" value={localSettings.layoutMode} onChange={e => handleLocalChange('layoutMode', e.target.value as 'flow' | 'table')} options={[{ value: 'flow', label: 'Akış' }, { value: 'table', label: 'Tablo' }]}/>
+                    {localSettings.layoutMode === 'flow' ? (
+                        <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
                     ) : (
                         <>
-                             <NumberInput label="Satır" id="rows" min={1} max={20} value={settings.rows} onChange={e => setSettings(s => ({...s, rows: parseInt(e.target.value,10)}))} className="w-14"/>
-                            <NumberInput label="Sütun" id="columns" min={1} max={5} value={settings.columns} onChange={e => setSettings(s => ({...s, columns: parseInt(e.target.value,10)}))} className="w-14"/>
+                             <NumberInput label="Satır" id="rows" min={1} max={20} value={localSettings.rows} onChange={e => handleLocalChange('rows', parseInt(e.target.value,10))} className="w-14"/>
+                            <NumberInput label="Sütun" id="columns" min={1} max={5} value={localSettings.columns} onChange={e => handleLocalChange('columns', parseInt(e.target.value,10))} className="w-14"/>
                         </>
                     )}
                 </div>
                  <Separator />
                  {/* --- Style --- */}
                 <div className="flex items-center gap-3">
-                    <Select label="Hizalama" id="text-align" value={settings.textAlign} onChange={e => setSettings(s => ({ ...s, textAlign: e.target.value as 'left' | 'center' | 'right' }))} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
-                    <Select label="Kenarlık" id="border-style" value={settings.borderStyle} onChange={e => setSettings(s => ({ ...s, borderStyle: e.target.value as any }))} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
-                    <Select label="Defter Stili" id="notebook-style" value={settings.notebookStyle} onChange={e => setSettings(s => ({ ...s, notebookStyle: e.target.value as any }))} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
+                    <Select label="Hizalama" id="text-align" value={localSettings.textAlign} onChange={e => handleLocalChange('textAlign', e.target.value as 'left' | 'center' | 'right' )} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
+                    <Select label="Kenarlık" id="border-style" value={localSettings.borderStyle} onChange={e => handleLocalChange('borderStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
+                    <Select label="Defter Stili" id="notebook-style" value={localSettings.notebookStyle} onChange={e => handleLocalChange('notebookStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
                     <Select label="Yazı Tipi" id="font-theme" value={fontTheme} onChange={e => setFontTheme(e.target.value as any)} options={fontThemeOptions}/>
                 </div>
                  <Separator />
@@ -242,15 +298,15 @@ const WorksheetToolbar: React.FC = memo(() => {
                  <div className="flex items-center gap-3">
                     <div className="flex flex-col gap-0.5">
                         <label htmlFor="problem-spacing-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Problem Aralığı</label>
-                        <input id="problem-spacing-slider" type="range" min="0" max="5" step="0.1" value={settings.problemSpacing} onChange={(e) => setSettings(s => ({ ...s, problemSpacing: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
+                        <input id="problem-spacing-slider" type="range" min="0" max="5" step="0.1" value={localSettings.problemSpacing} onChange={(e) => handleLocalChange('problemSpacing', parseFloat(e.target.value))} className="w-20 accent-primary"/>
                     </div>
                      <div className="flex flex-col gap-0.5">
                         <label htmlFor="line-height-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Satır Yüksekliği</label>
-                        <input id="line-height-slider" type="range" min="1" max="2.5" step="0.1" value={settings.lineHeight} onChange={(e) => setSettings(s => ({ ...s, lineHeight: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
+                        <input id="line-height-slider" type="range" min="1" max="2.5" step="0.1" value={localSettings.lineHeight} onChange={(e) => handleLocalChange('lineHeight', parseFloat(e.target.value))} className="w-20 accent-primary"/>
                     </div>
                      <div className="flex flex-col gap-0.5">
                         <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
-                        <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={settings.pageMargin} onChange={(e) => setSettings(s => ({ ...s, pageMargin: parseFloat(e.target.value) }))} className="w-20 accent-primary"/>
+                        <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
                     </div>
                  </div>
             </div>

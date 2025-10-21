@@ -26,20 +26,21 @@ import MapReadingSettings from './dyslexia/MapReadingSettings.tsx';
 
 
 // Import all sub-module icons
+// FIX: Corrected imports to use actual icon components instead of settings components.
 import {
-    NumberSenseIcon, // Placeholder, replace with actual icons if available
+    NumberSenseIcon,
     LetterFormationIcon,
-    ReadingFluencyCoachSettings as ReadingIcon,
-    ComprehensionExplorerSettings as ComprehensionIcon,
-    VocabularyExplorerSettings as VocabularyIcon,
-    VisualMasterSettings as VisualIcon,
-    WordHunterSettings as WordHunterIcon,
-    SpellingChampionSettings as SpellingIcon,
-    MemoryGamerSettings as MemoryIcon,
-    AuditoryWritingSettings as AuditoryIcon,
+    VerbalArithmeticIcon as ReadingIcon,
+    LetterFormRecognitionIcon as ComprehensionIcon,
+    ReadinessIcon as VocabularyIcon,
+    VisualSupportIcon as VisualIcon,
+    LetterFormRecognitionIcon as WordHunterIcon,
+    CreativeWritingIcon as SpellingIcon,
+    RhythmicIcon as MemoryIcon,
+    MicrophoneIcon as AuditoryIcon,
     InteractiveStoryIcon,
-    AttentionQuestionSettings as AttentionIcon,
-    MapReadingSettings as MapIcon,
+    ProblemCreationIcon as AttentionIcon,
+    PositionalConceptsIcon as MapIcon,
 } from '../components/icons/Icons.tsx';
 
 
