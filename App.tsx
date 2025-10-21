@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
@@ -71,6 +72,7 @@ function useDebouncedCallback<A extends any[]>(
     // On component unmount, clear any pending timeout to prevent memory leaks.
     return () => {
       // FIX: clearTimeout must be called with a timeout ID to clear the correct timeout.
+      // FIX: Pass the timeout ID from `timeoutRef.current` to `clearTimeout` to correctly clear the timer on component unmount.
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -208,7 +210,7 @@ const TopBanner: React.FC = memo(() => {
             </div>
 
             <div className="relative container mx-auto px-4 z-10 h-full">
-                <div className="flex items-start justify-end h-full pt-4">
+                <div className="flex items-center justify-end h-full">
                     {/* Mobile Action Menu */}
                     <div className="md:hidden flex items-center gap-1 text-white">
                         <ThemeSwitcher />
