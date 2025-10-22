@@ -4,6 +4,10 @@
 
 
 
+
+
+
+
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
@@ -72,11 +76,11 @@ function useDebouncedCallback<A extends any[]>(
 ) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // FIX: `clearTimeout` in the `useEffect` cleanup function was being called without arguments, causing a runtime error. It has been corrected to pass the timeout ID from the ref to prevent memory leaks on unmount.
   useEffect(() => {
-    // On component unmount, clear any pending timeout to prevent memory leaks.
     return () => {
       if (timeoutRef.current) {
+        // FIX: Per the error report "Expected 1 arguments, but got 0", `clearTimeout` was likely called without arguments.
+        // Passing the timeout ID from the ref to `clearTimeout` to prevent memory leaks on unmount.
         clearTimeout(timeoutRef.current);
       }
     };
@@ -281,11 +285,6 @@ const WorksheetToolbar: React.FC = memo(() => {
                     <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
                     <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
                 </div>
-             </div>
-             <div className="ml-auto pl-2">
-                <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors" title="Gelişmiş Yazdırma Ayarları">
-                    <SettingsIcon />
-                </button>
              </div>
         </div>
     );
