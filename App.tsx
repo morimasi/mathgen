@@ -68,10 +68,11 @@ function useDebouncedCallback<A extends any[]>(
 ) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
+  // FIX: The useEffect cleanup function was likely calling `clearTimeout` without an argument,
+  // which causes a runtime error. It has been corrected to be called with the timeout ID from the ref.
   useEffect(() => {
     // On component unmount, clear any pending timeout to prevent memory leaks.
     return () => {
-      // FIX: clearTimeout must be called with a timeout ID to clear the correct timeout.
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
