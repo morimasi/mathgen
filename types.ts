@@ -324,6 +324,7 @@ export enum MatchingType {
     OneToOne = 'one-to-one',
     Shadow = 'shadow',
     ByProperty = 'by-property',
+    LetterMatching = 'letter-matching',
 }
 
 export interface MatchingAndSortingSettings {

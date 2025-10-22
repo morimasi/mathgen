@@ -53,12 +53,12 @@ const shapeSVGs: Record<ShapeType, string> = {
 const generateMatchingAndSorting = (settings: any): { problem: Problem, title: string } => {
     const { type, theme, itemCount } = settings;
     let title = 'Eşleştirme ve Gruplama';
-    const items = getThemeItems(theme, itemCount);
     let question = '';
 
     switch(type) {
         case MatchingType.OneToOne:
             title = 'Bire Bir Eşleştirme';
+            const items = getThemeItems(theme, itemCount);
             const shuffledItems = shuffleArray(items);
             const leftCol = items.map(item => `<div class="matching-item">${item}</div>`).join('');
             const rightCol = shuffledItems.map(item => `<div class="matching-item">${item}</div>`).join('');
@@ -67,8 +67,9 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
 
         case MatchingType.Shadow:
              title = 'Gölge Eşleştirme';
-             const shuffledShadows = shuffleArray(items);
-             const leftColItems = items.map(item => `<div class="matching-item">${item}</div>`).join('');
+             const shadowItems = getThemeItems(theme, itemCount);
+             const shuffledShadows = shuffleArray(shadowItems);
+             const leftColItems = shadowItems.map(item => `<div class="matching-item">${item}</div>`).join('');
              const rightColShadows = shuffledShadows.map(item => `<div class="matching-item shadow">${item}</div>`).join('');
              question = `<p>Soldaki nesneleri sağdaki gölgeleriyle eşleştir.</p><div class="matching-container"><div class="matching-col">${leftColItems}</div><div class="matching-col">${rightColShadows}</div></div>`;
             break;
@@ -84,6 +85,17 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
                             <div class="grouping-box"><b>Hayvanlar</b></div>
                             <div class="grouping-box"><b>Taşıtlar</b></div>
                         </div>`;
+            break;
+        
+        case MatchingType.LetterMatching:
+            title = 'Harf Eşleştirme';
+            const alphabet = 'ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ'.split('');
+            const letters = shuffleArray(alphabet).slice(0, itemCount);
+            const shuffledLetters = shuffleArray(letters);
+            const letterStyle = "font-size: 2.5rem; font-weight: bold; font-family: sans-serif;";
+            const leftColLetters = letters.map(letter => `<div class="matching-item" style="${letterStyle}">${letter}</div>`).join('');
+            const rightColLetters = shuffledLetters.map(letter => `<div class="matching-item" style="${letterStyle}">${letter}</div>`).join('');
+            question = `<p>Soldaki harfleri sağdaki aynı harflerle eşleştir.</p><div class="matching-container"><div class="matching-col">${leftColLetters}</div><div class="matching-col">${rightColLetters}</div></div>`;
             break;
     }
     return { problem: { question, answer: "Eşleştirme", category: 'matching-and-sorting', display: 'flow' }, title };

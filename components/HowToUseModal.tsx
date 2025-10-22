@@ -108,6 +108,18 @@ const moduleContent: { [key: string]: { title: string; content: React.ReactNode 
             title: tab.label,
             content: (
                 <>
+                    {tab.id === 'matching-and-sorting' && 
+                        <>
+                            <p>Okul öncesi dönem için temel olan görsel ayrım, gruplama ve eşleştirme becerilerini geliştirir.</p>
+                            <h4 className="font-semibold mt-3">Etkinlik Türleri:</h4>
+                            <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>Bire Bir Eşleştirme:</strong> Aynı nesneleri bulup eşleştirmeyi hedefler.</li>
+                                <li><strong>Gölge Eşleştirme:</strong> Nesneleri silüetleriyle eşleştirerek form algısını güçlendirir.</li>
+                                <li><strong>Özelliğe Göre Gruplama:</strong> Nesneleri ortak özelliklerine (örn: hayvanlar, taşıtlar) göre sınıflandırma becerisi kazandırır.</li>
+                                <li><strong>Harf Eşleştirme:</strong> Büyük harfleri tanıma ve eşleştirme alıştırması sunar. Harf öğreniminin ilk adımları için idealdir.</li>
+                            </ul>
+                        </>
+                    }
                     {tab.id === 'arithmetic' && 
                         <>
                             <p>Toplama, çıkarma, çarpma ve bölme işlemleri için temel modül. Hem basit alıştırmalar hem de yapay zeka destekli metin problemleri oluşturabilirsiniz.</p>

@@ -47,6 +47,7 @@ const MatchingAndSortingModule: React.FC = () => {
     };
 
     const isTableLayout = printSettings.layoutMode === 'table';
+    const isLetterMatching = settings.type === MatchingType.LetterMatching;
 
     const handleGenerate = useCallback((clearPrevious: boolean) => {
         generate(clearPrevious);
@@ -56,7 +57,7 @@ const MatchingAndSortingModule: React.FC = () => {
         <div className="space-y-2">
             <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold">Eşleştirme ve Gruplama Ayarları</h2>
-                <HintButton text="'Bire Bir Eşleştirme' görsel algıyı, 'Gölge Eşleştirme' form tanımayı, 'Özelliğe Göre Gruplama' ise kategorizasyon becerisini geliştirir." />
+                <HintButton text="'Bire Bir Eşleştirme' görsel algıyı, 'Gölge Eşleştirme' form tanımayı, 'Özelliğe Göre Gruplama' ise kategorizasyon becerisini, 'Harf Eşleştirme' ise harf tanımayı geliştirir." />
             </div>
             <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Checkbox
@@ -98,6 +99,7 @@ const MatchingAndSortingModule: React.FC = () => {
                         { value: MatchingType.OneToOne, label: 'Bire Bir Eşleştirme' },
                         { value: MatchingType.Shadow, label: 'Gölge Eşleştirme' },
                         { value: MatchingType.ByProperty, label: 'Özelliğe Göre Gruplama' },
+                        { value: MatchingType.LetterMatching, label: 'Harf Eşleştirme' },
                     ]}
                 />
                 <Select
@@ -112,9 +114,11 @@ const MatchingAndSortingModule: React.FC = () => {
                         { value: 'fruits', label: 'Meyveler' },
                         { value: 'shapes', label: 'Şekiller' },
                     ]}
+                    disabled={isLetterMatching}
+                    title={isLetterMatching ? "Harf Eşleştirme için tema seçilemez." : ""}
                 />
                  <NumberInput 
-                    label="Nesne Sayısı"
+                    label="Nesne/Harf Sayısı"
                     id="item-count"
                     min={3} max={8}
                     value={settings.itemCount}
