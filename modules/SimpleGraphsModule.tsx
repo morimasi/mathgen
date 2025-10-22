@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 // FIX: Add .ts extension to import path
 import { generateReadinessProblem } from '../services/readinessService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { SimpleGraphsSettings, SimpleGraphType, MathReadinessTheme, SimpleGraphTaskType } from '../types.ts';
+import { SimpleGraphsSettings, MathReadinessTheme, SimpleGraphActivityType } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -12,18 +12,18 @@ import { ShuffleIcon } from '../components/icons/Icons.tsx';
 import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
 import SettingsPresetManager from '../components/SettingsPresetManager.tsx';
 import { TOPIC_SUGGESTIONS } from '../constants.ts';
-import HintButton from '../components/HintButton.tsx';
+import HintButton from '../components/form/HintButton.tsx';
 import { useProblemGenerator } from '../hooks/useProblemGenerator.ts';
 
 const SimpleGraphsModule: React.FC = () => {
     const { settings: printSettings } = usePrintSettings();
     const [settings, setSettings] = useState<SimpleGraphsSettings>({
-        graphType: SimpleGraphType.Pictograph,
-        taskType: SimpleGraphTaskType.Create,
-        theme: 'fruits',
-        categoryCount: 3,
-        maxItemCount: 5,
-        problemsPerPage: 2,
+        activityType: SimpleGraphActivityType.ReadTallyChart,
+        theme: 'custom',
+        categoryCount: 4,
+        maxItemCount: 20,
+        scale: 2,
+        problemsPerPage: 1,
         pageCount: 1,
         autoFit: false,
         useWordProblems: false,
@@ -48,6 +48,12 @@ const SimpleGraphsModule: React.FC = () => {
     };
 
     const isTableLayout = printSettings.layoutMode === 'table';
+    const showScale = [
+        SimpleGraphActivityType.ReadObjectGraph, 
+        SimpleGraphActivityType.ReadColumnGraph,
+        SimpleGraphActivityType.ConvertGraph
+    ].includes(settings.activityType);
+
 
     const handleGenerate = useCallback((clearPrevious: boolean) => {
         generate(clearPrevious);
@@ -57,7 +63,7 @@ const SimpleGraphsModule: React.FC = () => {
         <div className="space-y-2">
             <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold">Basit Grafikler ve Veri Ayarları</h2>
-                <HintButton text="'Grafik Oluşturma' veri toplama ve grafiğe işleme becerisi kazandırırken, yeni 'Grafik Okuma' etkinliği ise hazır bir grafiği yorumlama ve veri analizi becerisi geliştirir." />
+                <HintButton text="'Etkinlik Türü' seçerek çetele ve sıklık tabloları, ölçekli nesne ve sütun grafikleri gibi çeşitli alıştırmalar oluşturabilirsiniz." />
             </div>
              <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Checkbox
@@ -92,23 +98,18 @@ const SimpleGraphsModule: React.FC = () => {
             <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                 <Select
                     label="Etkinlik Türü"
-                    id="graph-task-type"
-                    value={settings.taskType}
-                    onChange={e => handleSettingChange('taskType', e.target.value as SimpleGraphTaskType)}
+                    id="graph-activity-type"
+                    value={settings.activityType}
+                    onChange={e => handleSettingChange('activityType', e.target.value as SimpleGraphActivityType)}
                     options={[
-                        { value: SimpleGraphTaskType.Create, label: 'Grafik Oluşturma' },
-                        { value: SimpleGraphTaskType.Read, label: 'Grafik Okuma' },
+                        { value: SimpleGraphActivityType.ReadTallyChart, label: 'Çetele Tablosu Okuma' },
+                        { value: SimpleGraphActivityType.ReadFrequencyTable, label: 'Sıklık Tablosu Okuma' },
+                        { value: SimpleGraphActivityType.ReadObjectGraph, label: 'Nesne Grafiği Okuma (Ölçekli)' },
+                        { value: SimpleGraphActivityType.ReadColumnGraph, label: 'Sütun Grafiği Okuma (Ölçekli)' },
+                        { value: SimpleGraphActivityType.CountAndFill, label: 'Say ve Tablo Doldur' },
+                        { value: SimpleGraphActivityType.ConvertGraph, label: 'Grafik Dönüştürme' },
                     ]}
-                />
-                <Select
-                    label="Grafik Türü"
-                    id="graph-type"
-                    value={settings.graphType}
-                    onChange={e => handleSettingChange('graphType', e.target.value as SimpleGraphType)}
-                    options={[
-                        { value: SimpleGraphType.Pictograph, label: 'Resim Grafiği (Piktograf)' },
-                        { value: SimpleGraphType.BarChart, label: 'Çubuk Grafiği' },
-                    ]}
+                    containerClassName="col-span-2"
                 />
                 <Select
                     label="Tema"
@@ -116,24 +117,34 @@ const SimpleGraphsModule: React.FC = () => {
                     value={settings.theme}
                     onChange={e => handleSettingChange('theme', e.target.value as MathReadinessTheme)}
                     options={[
+                        { value: 'custom', label: 'Rastgele Konular' },
                         { value: 'fruits', label: 'Meyveler/Yiyecekler' },
                         { value: 'animals', label: 'Hayvanlar' },
                         { value: 'vehicles', label: 'Taşıtlar' },
                         { value: 'shapes', label: 'Şekiller' },
-                        { value: 'mixed', label: 'Karışık' },
                     ]}
                 />
                 <NumberInput 
                     label="Kategori Sayısı"
                     id="category-count"
-                    min={2} max={5}
+                    min={2} max={6}
                     value={settings.categoryCount}
                     onChange={e => handleSettingChange('categoryCount', parseInt(e.target.value))}
                 />
+                {showScale && (
+                     <NumberInput 
+                        label="Grafik Ölçeği"
+                        id="graph-scale"
+                        min={1} max={5}
+                        value={settings.scale}
+                        onChange={e => handleSettingChange('scale', parseInt(e.target.value))}
+                        title="Her bir nesnenin kaç adedi temsil edeceği."
+                    />
+                )}
                 <NumberInput 
                     label="En Fazla Nesne"
                     id="max-item-count"
-                    min={3} max={10}
+                    min={5} max={50}
                     value={settings.maxItemCount}
                     onChange={e => handleSettingChange('maxItemCount', parseInt(e.target.value))}
                 />

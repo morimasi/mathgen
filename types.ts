@@ -446,26 +446,28 @@ export interface IntroToMeasurementSettings {
 }
 
 // Simple Graphs
-export enum SimpleGraphType {
-    Pictograph = 'pictograph',
-    BarChart = 'bar-chart',
+export enum SimpleGraphActivityType {
+    ReadTallyChart = 'read-tally-chart',
+    ReadFrequencyTable = 'read-frequency-table',
+    ReadObjectGraph = 'read-object-graph',
+    ReadColumnGraph = 'read-column-graph',
+    CountAndFill = 'count-and-fill',
+    ConvertGraph = 'convert-graph',
 }
-export enum SimpleGraphTaskType {
-    Create = 'create',
-    Read = 'read',
-}
+
 export interface SimpleGraphsSettings {
-    graphType: SimpleGraphType;
-    taskType: SimpleGraphTaskType;
-    theme: MathReadinessTheme;
+    activityType: SimpleGraphActivityType;
+    theme: MathReadinessTheme | 'custom';
     categoryCount: number;
     maxItemCount: number;
+    scale: number;
     problemsPerPage: number;
     pageCount: number;
     autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
 }
+
 
 // --- Special Learning Modules ---
 
