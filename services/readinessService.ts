@@ -51,7 +51,7 @@ const shapeSVGs: Record<ShapeType, string> = {
 // --- GENERATOR FUNCTIONS ---
 
 const generateMatchingAndSorting = (settings: any): { problem: Problem, title: string } => {
-    const { type, theme, itemCount } = settings;
+    const { type, theme, itemCount, letterSpacing, letterHorizontalSpacing } = settings;
     let title = 'Eşleştirme ve Gruplama';
     let question = '';
 
@@ -93,11 +93,21 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
             const letters = shuffleArray(alphabet).slice(0, itemCount);
             const shuffledLetters = shuffleArray(letters);
             const finalLetterStyle = `font-size: 4rem; font-weight: bold; font-family: sans-serif; padding: 0.5rem;`;
-            const colStyle = `gap: 2rem;`;
+            const colStyle = `gap: ${letterSpacing ?? 2}rem;`;
             const finalLeftColLetters = letters.map(letter => `<div class="matching-item" style="${finalLetterStyle}">${letter}</div>`).join('');
             const finalRightColLetters = shuffledLetters.map(letter => `<div class="matching-item" style="${finalLetterStyle}">${letter}</div>`).join('');
+            
+            const horizontalPadding = letterHorizontalSpacing ?? 4;
+            const containerWrapperStyle = `padding: 0 ${horizontalPadding}rem;`;
             const finalContainerStyle = `display: flex; justify-content: space-between; width: 100%;`;
-            question = `<p>Soldaki harfleri sağdaki aynı harflerle eşleştir.</p><div style="${finalContainerStyle}"><div class="matching-col" style="${colStyle}">${finalLeftColLetters}</div><div class="matching-col" style="${colStyle}">${finalRightColLetters}</div></div>`;
+
+            question = `<p>Soldaki harfleri sağdaki aynı harflerle eşleştir.</p>
+                        <div style="${containerWrapperStyle}">
+                            <div style="${finalContainerStyle}">
+                                <div class="matching-col" style="${colStyle}">${finalLeftColLetters}</div>
+                                <div class="matching-col" style="${colStyle}">${finalRightColLetters}</div>
+                            </div>
+                        </div>`;
             break;
     }
     return { problem: { question, answer: "Eşleştirme", category: 'matching-and-sorting', display: 'flow' }, title };

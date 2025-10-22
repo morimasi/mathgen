@@ -338,6 +338,8 @@ export interface MatchingAndSortingSettings {
     autoFit: boolean;
     useWordProblems: boolean;
     topic: string;
+    letterSpacing?: number;
+    letterHorizontalSpacing?: number;
 }
 
 // Comparing Quantities
