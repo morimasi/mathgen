@@ -92,11 +92,14 @@ function useDebouncedCallback<A extends any[]>(
   );
 }
 
-const Header: React.FC = memo(() => {
+interface HeaderProps {
+    onPrint: () => void;
+    onDownloadPDF: () => void;
+}
+
+const Header: React.FC<HeaderProps> = memo(({ onPrint, onDownloadPDF }) => {
     const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
-    const { clearWorksheet, triggerAutoRefresh, setIsLoading } = useWorksheet();
-    const { settings: printSettings } = usePrintSettings();
-    const { addToast } = useToast();
+    const { clearWorksheet, triggerAutoRefresh } = useWorksheet();
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isActionMenuOpen, setActionMenuOpen] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -123,88 +126,14 @@ const Header: React.FC = memo(() => {
             window.location.reload();
         }
     };
-
-    const handlePrint = () => {
-        window.print();
-        setActionMenuOpen(false);
-    };
-
-    const handleDownloadPDF = () => {
-        setActionMenuOpen(false);
-        setIsLoading(true);
-        addToast('PDF oluşturma işlemi başlatılıyor...', 'info');
-
-        const pages = Array.from(document.querySelectorAll<HTMLElement>('.worksheet-page'));
-        if (pages.length === 0) {
-            addToast('İndirilecek içerik bulunamadı.', 'warning');
-            setIsLoading(false);
-            return;
-        }
-
-        const pdf = new jsPDF({
-            orientation: printSettings.orientation,
-            unit: 'mm',
-            format: 'a4',
-        });
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-
-        const processPage = async (pageIndex: number) => {
-            if (pageIndex >= pages.length) {
-                addToast('PDF dosyası oluşturuluyor...', 'info');
-                pdf.save('MathGen_Calisma_Kagidi.pdf');
-                addToast('PDF başarıyla indirildi!', 'success');
-                setIsLoading(false);
-                return;
-            }
-
-            const page = pages[pageIndex];
-            addToast(`Sayfa ${pageIndex + 1}/${pages.length} işleniyor...`, 'info');
-
-            await new Promise(resolve => setTimeout(resolve, 50));
-            
-            try {
-                const canvas = await html2canvas(page, {
-                    scale: 1.5,
-                    useCORS: true,
-                    logging: false,
-                    width: page.offsetWidth,
-                    height: page.offsetHeight,
-                    windowWidth: page.scrollWidth,
-                    windowHeight: page.scrollHeight
-                });
-
-                if (pageIndex > 0) {
-                    pdf.addPage();
-                }
-
-                const imgData = canvas.toDataURL('image/png');
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-                await processPage(pageIndex + 1);
-
-            } catch (error) {
-                console.error(`PDF oluşturma hatası - Sayfa ${pageIndex + 1}:`, error);
-                addToast(`Sayfa ${pageIndex + 1} işlenirken bir hata oluştu.`, 'error');
-                setIsLoading(false);
-            }
-        };
-
-        processPage(0).catch(error => {
-            console.error("PDF oluşturma işlemi başarısız oldu:", error);
-            addToast('PDF oluşturulurken genel bir hata oluştu.', 'error');
-            setIsLoading(false);
-        });
-    };
     
     const ActionButtons = () => (
         <>
             <button onClick={triggerAutoRefresh} className="action-button" title="Soruları Yenile"><RefreshIcon /><span>Soruları Yenile</span></button>
             <button onClick={() => { openPrintSettings(); setActionMenuOpen(false); }} className="action-button" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /><span>Yazdırma Ayarları</span></button>
             <button onClick={() => { openFavoritesPanel(); setActionMenuOpen(false); }} className="action-button" title="Favorilerim"><HeartIcon /><span>Favorilerim</span></button>
-            <button onClick={handlePrint} className="action-button" title="Yazdır"><PrintIcon /><span>Yazdır</span></button>
-            <button onClick={handleDownloadPDF} className="action-button" title="PDF Olarak İndir"><DownloadIcon /><span>PDF İndir</span></button>
+            <button onClick={() => { onPrint(); setActionMenuOpen(false); }} className="action-button" title="Yazdır"><PrintIcon /><span>Yazdır</span></button>
+            <button onClick={() => { onDownloadPDF(); setActionMenuOpen(false); }} className="action-button" title="PDF Olarak İndir"><DownloadIcon /><span>PDF İndir</span></button>
             <button onClick={() => { openHowToUse(); setActionMenuOpen(false); }} className="action-button" title="Nasıl Kullanılır?"><HelpIcon /><span>Nasıl Kullanılır?</span></button>
             <button onClick={() => { openContactModal(); setActionMenuOpen(false); }} className="action-button" title="İletişim & Geri Bildirim"><MailIcon /><span>İletişim</span></button>
         </>
@@ -246,15 +175,8 @@ const Header: React.FC = memo(() => {
 
                 {/* Desktop Action Buttons */}
                 <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center gap-2">
-                    <Search />
                     <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
-                    <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
-                    <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
-                    <button onClick={handlePrint} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon /></button>
-                    <button onClick={handleDownloadPDF} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
                     <ThemeSwitcher />
-                    <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
-                    <button onClick={openContactModal} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon /></button>
                 </div>
             </div>
         </div>
@@ -351,14 +273,15 @@ const WorksheetToolbar: React.FC = memo(() => {
 
 const AppContent: React.FC = () => {
     const { 
-        isPrintSettingsVisible, closePrintSettings,
-        isHowToUseVisible, closeHowToUse,
-        isContactModalVisible, closeContactModal,
-        isFavoritesPanelVisible, closeFavoritesPanel,
+        isPrintSettingsVisible, closePrintSettings, openPrintSettings,
+        isHowToUseVisible, closeHowToUse, openHowToUse,
+        isContactModalVisible, closeContactModal, openContactModal,
+        isFavoritesPanelVisible, closeFavoritesPanel, openFavoritesPanel,
         isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
     } = useUI();
-    const { isLoading } = useWorksheet();
+    const { isLoading, setIsLoading } = useWorksheet();
     const { settings, setSettings } = usePrintSettings();
+    const { addToast } = useToast();
     
     const panAreaRef = useRef<HTMLDivElement>(null);
     const panState = useRef({ isPanning: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
@@ -448,11 +371,93 @@ const AppContent: React.FC = () => {
     };
      // --- End of performance optimization ---
 
+    const handlePrint = () => {
+        window.print();
+    };
+
+    const handleDownloadPDF = () => {
+        setIsLoading(true);
+        addToast('PDF oluşturma işlemi başlatılıyor...', 'info');
+
+        const pages = Array.from(document.querySelectorAll<HTMLElement>('.worksheet-page'));
+        if (pages.length === 0) {
+            addToast('İndirilecek içerik bulunamadı.', 'warning');
+            setIsLoading(false);
+            return;
+        }
+
+        const pdf = new jsPDF({
+            orientation: settings.orientation,
+            unit: 'mm',
+            format: 'a4',
+        });
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const processPage = async (pageIndex: number) => {
+            if (pageIndex >= pages.length) {
+                addToast('PDF dosyası oluşturuluyor...', 'info');
+                pdf.save('MathGen_Calisma_Kagidi.pdf');
+                addToast('PDF başarıyla indirildi!', 'success');
+                setIsLoading(false);
+                return;
+            }
+
+            const page = pages[pageIndex];
+            addToast(`Sayfa ${pageIndex + 1}/${pages.length} işleniyor...`, 'info');
+
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            try {
+                const canvas = await html2canvas(page, {
+                    scale: 1.5,
+                    useCORS: true,
+                    logging: false,
+                    width: page.offsetWidth,
+                    height: page.offsetHeight,
+                    windowWidth: page.scrollWidth,
+                    windowHeight: page.scrollHeight
+                });
+
+                if (pageIndex > 0) {
+                    pdf.addPage();
+                }
+
+                const imgData = canvas.toDataURL('image/png');
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+                await processPage(pageIndex + 1);
+
+            } catch (error) {
+                console.error(`PDF oluşturma hatası - Sayfa ${pageIndex + 1}:`, error);
+                addToast(`Sayfa ${pageIndex + 1} işlenirken bir hata oluştu.`, 'error');
+                setIsLoading(false);
+            }
+        };
+
+        processPage(0).catch(error => {
+            console.error("PDF oluşturma işlemi başarısız oldu:", error);
+            addToast('PDF oluşturulurken genel bir hata oluştu.', 'error');
+            setIsLoading(false);
+        });
+    };
+
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
             
+            <div className="hidden md:flex items-center justify-end gap-2 px-4 py-1 bg-stone-200 dark:bg-stone-800 border-b border-stone-300 dark:border-stone-700 print:hidden">
+                <Search />
+                <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
+                <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="Favorilerim"><HeartIcon /></button>
+                <button onClick={handlePrint} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="Yazdır"><PrintIcon /></button>
+                <button onClick={handleDownloadPDF} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
+                <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
+                <button onClick={openContactModal} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="İletişim & Geri Bildirim"><MailIcon /></button>
+            </div>
+
             <header className="flex-shrink-0 bg-primary text-white shadow-md z-20 print:hidden">
-                <Header />
+                <Header onPrint={handlePrint} onDownloadPDF={handleDownloadPDF}/>
             </header>
 
             <div className="flex flex-grow overflow-hidden">
