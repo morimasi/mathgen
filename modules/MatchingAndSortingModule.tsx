@@ -134,7 +134,7 @@ const MatchingAndSortingModule: React.FC = () => {
                                <span className="text-stone-500 dark:text-stone-400 font-normal">{`${(settings.letterSpacing ?? 2).toFixed(1)}rem`}</span>
                             </label>
                             <input
-                                type="range" id="letter-spacing-slider" value={settings.letterSpacing || 2} min={0.5} max={10} step={0.1}
+                                type="range" id="letter-spacing-slider" value={settings.letterSpacing || 2} min={0.5} max={50} step={0.1}
                                 onChange={e => handleSettingChange('letterSpacing', parseFloat(e.target.value))}
                                 className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-primary"
                             />
@@ -145,7 +145,7 @@ const MatchingAndSortingModule: React.FC = () => {
                                <span className="text-stone-500 dark:text-stone-400 font-normal">{`${(settings.letterHorizontalSpacing ?? 4).toFixed(1)}rem`}</span>
                             </label>
                             <input
-                                type="range" id="letter-horizontal-spacing-slider" value={settings.letterHorizontalSpacing || 4} min={0} max={15} step={0.5}
+                                type="range" id="letter-horizontal-spacing-slider" value={settings.letterHorizontalSpacing || 4} min={0} max={50} step={0.5}
                                 onChange={e => handleSettingChange('letterHorizontalSpacing', parseFloat(e.target.value))}
                                 className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-primary"
                             />
