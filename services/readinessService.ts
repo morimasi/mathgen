@@ -93,12 +93,17 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
             const letters = shuffleArray(alphabet).slice(0, itemCount);
             const shuffledLetters = shuffleArray(letters);
             const finalLetterStyle = `font-size: 4rem; font-weight: bold; font-family: sans-serif; padding: 0.5rem;`;
-            const colStyle = `gap: ${letterSpacing ?? 2}rem;`;
+            const colStyle = `display: flex; flex-direction: column; gap: ${letterSpacing ?? 2}rem;`;
             const finalLeftColLetters = letters.map(letter => `<div class="matching-item" style="${finalLetterStyle}">${letter}</div>`).join('');
             const finalRightColLetters = shuffledLetters.map(letter => `<div class="matching-item" style="${finalLetterStyle}">${letter}</div>`).join('');
             
-            const horizontalPadding = letterHorizontalSpacing ?? 4;
-            const containerWrapperStyle = `padding: 0 ${horizontalPadding}rem;`;
+            // Invert the slider value to control padding. Max slider value is 15.
+            // When slider is at max (15), we want minimum padding (0).
+            // When slider is at min (0), we want maximum padding (15).
+            const MAX_SLIDER_VALUE = 15;
+            const horizontalPadding = MAX_SLIDER_VALUE - (letterHorizontalSpacing ?? 4);
+
+            const containerWrapperStyle = `padding: 0 ${horizontalPadding}rem; max-width: 100%; box-sizing: border-box;`;
             const finalContainerStyle = `display: flex; justify-content: space-between; width: 100%;`;
 
             question = `<p>Soldaki harfleri sağdaki aynı harflerle eşleştir.</p>
