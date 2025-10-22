@@ -373,21 +373,170 @@ const generateIntroToMeasurement = (settings: any): { problem: Problem, title: s
     return { problem: { question, answer, category: 'intro-to-measurement', display: 'flow' }, title };
 }
 
+// --- NEW IMPLEMENTATION for SimpleGraphs ---
 const generateSimpleGraphs = (settings: SimpleGraphsSettings): { problem: Problem, title: string, preamble?: string } => {
-    // This is a new, complex implementation for various graph types.
-    let question = 'Not implemented';
-    let answer = '...';
-    let title = 'Basit Grafikler ve Veri';
-    let preamble = 'Aşağıdaki tablo ve grafiklere göre soruları cevaplayınız.';
+    const { activityType, theme, categoryCount, maxItemCount, scale } = settings;
     
-    // ... (Full implementation of all graph types would go here, which is very long)
-    // For brevity, I'll add a placeholder implementation. The full logic is complex.
-    question = `<div class="p-4 border rounded-lg bg-yellow-50 text-yellow-800">
-        <h4 class="font-bold">Yeni Grafik Modülü!</h4>
-        <p>Bu modül, çetele tabloları, sıklık tabloları, nesne ve sütun grafikleri oluşturmanıza olanak tanır. Lütfen ayarlar panelinden bir etkinlik türü seçin.</p>
-    </div>`;
+    // FIX: Defined a type for graph data to resolve TypeScript errors related to circular references and unknown properties.
+    interface GraphDataItem {
+        name: string;
+        icon: string;
+        value: number;
+    }
 
+    // 1. Data Generation
+    const GRAPH_THEMES: Record<string, {name: string, icon: string}[]> = {
+        fruits: [{name: 'Elma', icon: '🍎'}, {name: 'Armut', icon: '🍐'}, {name: 'Çilek', icon: '🍓'}, {name: 'Muz', icon: '🍌'}, {name: 'Karpuz', icon: '🍉'}, {name: 'Kiraz', icon: '🍒'}],
+        animals: [{name: 'Koyun', icon: '🐑'}, {name: 'İnek', icon: '🐄'}, {name: 'Tavuk', icon: '🐔'}, {name: 'At', icon: '🐎'}, {name: 'Köpek', icon: '🐕'}, {name: 'Kedi', icon: '🐈'}],
+        vehicles: [{name: 'Araba', icon: '🚗'}, {name: 'Otobüs', icon: '🚌'}, {name: 'Uçak', icon: '✈️'}, {name: 'Gemi', icon: '🚢'}, {name: 'Bisiklet', icon: '🚲'}, {name: 'Tren', icon: '🚆'}],
+        shapes: [{name: 'Daire', icon: '🟢'}, {name: 'Kare', icon: '🟧'}, {name: 'Üçgen', icon: '🔺'}, {name: 'Yıldız', icon: '⭐'}, {name: 'Kalp', icon: '❤️'}, {name: 'Dikdörtgen', icon: '🟦'}],
+        toys: [{name: 'Ayıcık', icon: '🧸'}, {name: 'Bebek', icon: '🪆'}, {name: 'Robot', icon: '🤖'}, {name: 'Uçak', icon: '✈️'}, {name: 'Top', icon: '⚽'}, {name: 'Lego', icon: '🧱'}],
+    };
 
+    const themeKey = theme === 'custom' ? Object.keys(GRAPH_THEMES)[getRandomInt(0, Object.keys(GRAPH_THEMES).length - 1)] : theme;
+    const dataPool = GRAPH_THEMES[themeKey];
+    const data: GraphDataItem[] = shuffleArray(dataPool).slice(0, categoryCount).map(item => ({
+        ...item,
+        value: getRandomInt(1, Math.floor(maxItemCount / (scale > 1 ? scale : 1))) * (scale > 1 ? scale : 1)
+    }));
+    
+    // 2. Question Generation
+    const generateQuestions = (graphData: GraphDataItem[]) => {
+        const questions: {q: string, a: string}[] = [];
+        const sorted = [...graphData].sort((a,b) => b.value - a.value);
+        const most = sorted[0];
+        const least = sorted[sorted.length-1];
+
+        // Q1: Most/Least
+        if (Math.random() < 0.5) {
+            questions.push({ q: `En çok sevilen ${themeKey === 'animals' ? 'hayvan' : 'meyve'} hangisidir?`, a: most.name });
+        } else {
+            questions.push({ q: `En az sevilen ${themeKey === 'animals' ? 'hayvan' : 'meyve'} hangisidir?`, a: least.name });
+        }
+        
+        // Q2: Total
+        questions.push({ q: `Toplam kaç öğrenciye soru sorulmuştur?`, a: String(graphData.reduce((sum, item) => sum + item.value, 0)) });
+        
+        // Q3: Difference
+        questions.push({ q: `En çok sevilen ile en az sevilen arasındaki fark kaçtır?`, a: String(most.value - least.value) });
+
+        // Q4: Sum of two
+        const [item1, item2] = shuffleArray(graphData).slice(0,2);
+        questions.push({ q: `${item1.name} ve ${item2.name} sevenlerin toplamı kaçtır?`, a: String(item1.value + item2.value) });
+
+        // Q5: Comparison
+        const [item3, item4] = shuffleArray(graphData).slice(0,2);
+        if (item3.value > item4.value) {
+            questions.push({ q: `${item3.name} sevenler, ${item4.name} sevenlerden kaç fazladır?`, a: String(item3.value - item4.value) });
+        } else {
+             questions.push({ q: `${item4.name} sevenler, ${item3.name} sevenlerden kaç fazladır?`, a: String(item4.value - item3.value) });
+        }
+        
+        return shuffleArray(questions).slice(0,5);
+    };
+
+    const valueToTally = (n: number) => {
+        const fives = '<s>||||</s>'.repeat(Math.floor(n / 5));
+        const ones = '|'.repeat(n % 5);
+        return `<span style="letter-spacing: 2px; color: #3b82f6; font-weight: bold;">${fives} ${ones}</span>`;
+    };
+
+    let question = '', answer = 'Cevaplar', title = 'Basit Grafikler', preamble = '';
+    const questions = generateQuestions(data);
+    const questionListHTML = `<ol style="margin-top: 1rem; list-style-position: inside; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem;">${questions.map(q => `<li>${q.q}</li>`).join('')}</ol>`;
+    
+    // 3. HTML Generation
+    switch(activityType) {
+        case SimpleGraphActivityType.ReadTallyChart:
+        case SimpleGraphActivityType.ReadFrequencyTable: {
+            const isTally = activityType === SimpleGraphActivityType.ReadTallyChart;
+            title = isTally ? 'Çetele Tablosu' : 'Sıklık Tablosu';
+            preamble = `Aşağıdaki ${isTally ? 'çetele' : 'sıklık'} tablosuna göre soruları cevaplayınız.`;
+            
+            const tableHeader = `<th>${data[0].name === 'Daire' ? 'Şekil' : 'Kategori'}</th><th>Sayı</th>`;
+            const tableRows = data.map(item => `<tr><td>${item.name}</td><td>${isTally ? valueToTally(item.value) : item.value}</td></tr>`).join('');
+            const table = `<table class="simple-table"><thead><tr>${tableHeader}</tr></thead><tbody>${tableRows}</tbody></table>`;
+            
+            question = `${table}${questionListHTML}`;
+            break;
+        }
+        case SimpleGraphActivityType.ReadObjectGraph:
+        case SimpleGraphActivityType.ReadColumnGraph: {
+            const isColumn = activityType === SimpleGraphActivityType.ReadColumnGraph;
+            title = isColumn ? 'Sütun Grafiği' : 'Nesne Grafiği';
+            preamble = `Aşağıdaki ${isColumn ? 'sütun' : 'nesne'} grafiğine göre soruları cevaplayınız.`;
+            
+            let graphHTML = '';
+            if (isColumn) {
+                const maxVal = Math.max(...data.map(d => d.value));
+                const yAxisSteps = Math.min(maxVal/scale, 10);
+                const stepValue = Math.ceil(maxVal / yAxisSteps / scale) * scale;
+
+                graphHTML = `<div class="column-chart-container">
+                    <div class="y-axis">${Array.from({length: yAxisSteps + 1}).map((_, i) => `<span>${(yAxisSteps - i) * stepValue}</span>`).join('')}</div>
+                    <div class="x-axis">
+                        ${data.map(item => `<div class="bar-group">
+                            <div class="bar" style="height: ${item.value / maxVal * 100}%">${item.icon}</div>
+                            <div class="label">${item.name}</div>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+            } else {
+                 const tableHeader = `<th>Kategori</th><th>Sayı</th>`;
+                 const tableRows = data.map(item => `<tr><td>${item.name}</td><td style="font-size: 1.5rem; letter-spacing: 2px;">${item.icon.repeat(item.value / scale)}</td></tr>`).join('');
+                 graphHTML = `<table class="simple-table object-graph"><thead><tr>${tableHeader}</tr></thead><tbody>${tableRows}</tbody></table>`;
+            }
+            const note = scale > 1 ? `<p style="margin-top: 0.5rem; font-style: italic; font-size: 0.9em;"><b>Not:</b> Her ${data[0].icon} ${scale} adet belirtmektedir.</p>` : '';
+            question = `${graphHTML}${note}${questionListHTML}`;
+            break;
+        }
+        case SimpleGraphActivityType.CountAndFill: {
+            title = 'Say, Doldur ve Cevapla';
+            preamble = 'Aşağıdaki nesneleri sayıp çetele ve sıklık tablolarını doldurunuz. Ardından soruları cevaplayınız.';
+            const itemPool = shuffleArray(data.flatMap(item => Array(item.value).fill(item.icon)));
+
+            const tableHeader = `<th>Şekil</th><th>Sayı</th>`;
+            const tallyRows = data.map(item => `<tr><td>${item.name}</td><td></td></tr>`).join('');
+            const freqRows = data.map(item => `<tr><td>${item.name}</td><td></td></tr>`).join('');
+            
+            question = `<div class="item-pool">${itemPool.join(' ')}</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+                            <div><b>Çetele Tablosu</b><table class="simple-table"><thead><tr>${tableHeader}</tr></thead><tbody>${tallyRows}</tbody></table></div>
+                            <div><b>Sıklık Tablosu</b><table class="simple-table"><thead><tr>${tableHeader}</tr></thead><tbody>${freqRows}</tbody></table></div>
+                        </div>
+                        ${questionListHTML}`;
+            break;
+        }
+        case SimpleGraphActivityType.ConvertGraph: {
+            title = 'Grafik Dönüştürme';
+            preamble = 'Nesne grafiğindeki bilgileri kullanarak sütun grafiğini tamamlayınız.';
+
+            const objGraphRows = data.map(item => `<tr><td>${item.name}</td><td style="font-size: 1.5rem; letter-spacing: 2px;">${item.icon.repeat(item.value / scale)}</td></tr>`).join('');
+            const objGraphHTML = `<table class="simple-table object-graph"><thead><tr><th>Kategori</th><th>Sayı</th></tr></thead><tbody>${objGraphRows}</tbody></table>`;
+            const note = scale > 1 ? `<p style="margin-top: 0.5rem; font-style: italic; font-size: 0.9em;"><b>Not:</b> Her ${data[0].icon} ${scale} adet belirtmektedir.</p>` : '';
+
+            const maxVal = Math.max(...data.map(d => d.value));
+            const yAxisSteps = 10;
+            const stepValue = Math.ceil(maxVal / yAxisSteps);
+
+             const emptyBarChartHTML = `<div class="column-chart-container empty">
+                    <div class="y-axis">${Array.from({length: yAxisSteps + 1}).map((_, i) => `<span>${(yAxisSteps - i) * stepValue}</span>`).join('')}</div>
+                    <div class="x-axis">
+                        ${data.map(item => `<div class="bar-group">
+                            <div class="bar-bg"></div>
+                            <div class="label">${item.name}</div>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+            
+            question = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: flex-start;">
+                            <div>${objGraphHTML}${note}</div>
+                            <div>${emptyBarChartHTML}</div>
+                        </div>`;
+            break;
+        }
+
+    }
     return { problem: { question, answer, category: 'simple-graphs', display: 'flow' }, title, preamble };
 };
 

@@ -59,11 +59,25 @@ const SimpleGraphsModule: React.FC = () => {
         generate(clearPrevious);
     }, [generate]);
 
+    const getHintText = () => {
+        switch (settings.activityType) {
+            case SimpleGraphActivityType.ReadObjectGraph:
+            case SimpleGraphActivityType.ReadColumnGraph:
+                return "'Grafik Ölçeği' ayarı, grafikteki her bir nesnenin veya sembolün gerçekte kaç adedi temsil ettiğini belirler. Örneğin, ölçek 3 ise ve 4 🧸 varsa, bu 12 oyuncak anlamına gelir.";
+            case SimpleGraphActivityType.CountAndFill:
+                return "Bu etkinlikte, öğrencinin önce karışık olarak verilen nesneleri sayması, ardından boş çetele ve sıklık tablolarını doldurması ve son olarak da ilgili soruları yanıtlaması beklenir.";
+            case SimpleGraphActivityType.ConvertGraph:
+                return "Bu etkinlik, bir veri temsil formatından diğerine geçiş yapma becerisini ölçer. Öğrenciden, verilen bir nesne grafiğindeki bilgileri boş bir sütun grafiğine aktarması istenir.";
+            default:
+                return "'Etkinlik Türü' seçerek çetele ve sıklık tabloları, ölçekli nesne ve sütun grafikleri gibi çeşitli alıştırmalar oluşturabilirsiniz.";
+        }
+    };
+
     return (
         <div className="space-y-2">
             <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold">Basit Grafikler ve Veri Ayarları</h2>
-                <HintButton text="'Etkinlik Türü' seçerek çetele ve sıklık tabloları, ölçekli nesne ve sütun grafikleri gibi çeşitli alıştırmalar oluşturabilirsiniz." />
+                <HintButton text={getHintText()} />
             </div>
              <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <Checkbox
@@ -104,8 +118,8 @@ const SimpleGraphsModule: React.FC = () => {
                     options={[
                         { value: SimpleGraphActivityType.ReadTallyChart, label: 'Çetele Tablosu Okuma' },
                         { value: SimpleGraphActivityType.ReadFrequencyTable, label: 'Sıklık Tablosu Okuma' },
-                        { value: SimpleGraphActivityType.ReadObjectGraph, label: 'Nesne Grafiği Okuma (Ölçekli)' },
-                        { value: SimpleGraphActivityType.ReadColumnGraph, label: 'Sütun Grafiği Okuma (Ölçekli)' },
+                        { value: SimpleGraphActivityType.ReadObjectGraph, label: 'Nesne Grafiği Okuma' },
+                        { value: SimpleGraphActivityType.ReadColumnGraph, label: 'Sütun Grafiği Okuma' },
                         { value: SimpleGraphActivityType.CountAndFill, label: 'Say ve Tablo Doldur' },
                         { value: SimpleGraphActivityType.ConvertGraph, label: 'Grafik Dönüştürme' },
                     ]}
