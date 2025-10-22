@@ -302,7 +302,7 @@ export interface PrintSettings {
     pageMargin: number;
     lineHeight: number;
     scale: number;
-    colorTheme: string;
+    textColor: string;
     orientation: 'portrait' | 'landscape';
     textAlign: 'left' | 'center' | 'right';
 }

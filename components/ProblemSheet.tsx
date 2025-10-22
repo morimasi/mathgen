@@ -17,7 +17,7 @@ const ProblemSheet: React.FC = () => {
         '--font-size': `${settings.fontSize}px`,
         '--line-height': settings.lineHeight,
         '--text-align': settings.textAlign,
-        '--color': `var(--theme-color-${settings.colorTheme})`,
+        '--color': settings.textColor,
         '--scale': settings.scale,
     } as React.CSSProperties;
 

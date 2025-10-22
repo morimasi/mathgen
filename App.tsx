@@ -243,11 +243,23 @@ const WorksheetToolbar: React.FC = memo(() => {
             </div>
              <Separator />
              {/* --- Style --- */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
                 <Select label="Hizalama" id="text-align" value={localSettings.textAlign} onChange={e => handleLocalChange('textAlign', e.target.value as 'left' | 'center' | 'right' )} options={[{value: 'left', label: 'Sol'}, {value: 'center', label: 'Orta'}, {value: 'right', label: 'Sağ'}]} />
                 <Select label="Kenarlık" id="border-style" value={localSettings.borderStyle} onChange={e => handleLocalChange('borderStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'card', label: 'Kart' }, { value: 'solid', label: 'Düz Çizgi' }, { value: 'dashed', label: 'Kesik Çizgi' }, { value: 'shadow-lift', label: 'Gölge' }, { value: 'top-bar-color', label: 'Renkli Çizgi' }]}/>
                 <Select label="Defter Stili" id="notebook-style" value={localSettings.notebookStyle} onChange={e => handleLocalChange('notebookStyle', e.target.value as any)} options={[{ value: 'none', label: 'Yok' }, { value: 'lines', label: 'Çizgili' }, { value: 'grid', label: 'Kareli' }, { value: 'dotted', label: 'Noktalı' }, { value: 'handwriting', label: 'El Yazısı' }]} />
                 <Select label="Yazı Tipi" id="font-theme" value={fontTheme} onChange={e => setFontTheme(e.target.value as any)} options={fontThemeOptions}/>
+                <div className="flex items-center gap-1">
+                    <label htmlFor="text-color" className="font-medium text-xs text-stone-700 dark:text-stone-300">Renk</label>
+                    <div className="relative w-6 h-6 rounded-md border border-stone-300 dark:border-stone-600 overflow-hidden cursor-pointer" title="Metin Rengini Değiştir">
+                        <input
+                            id="text-color"
+                            type="color"
+                            value={localSettings.textColor || '#1c1917'}
+                            onChange={(e) => handleLocalChange('textColor', e.target.value)}
+                            className="absolute -top-1 -left-1 w-8 h-8 cursor-pointer"
+                        />
+                    </div>
+                </div>
             </div>
              <Separator />
              {/* --- Spacing --- */}

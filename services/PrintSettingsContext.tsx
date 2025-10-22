@@ -22,7 +22,7 @@ const initialPrintSettings: PrintSettings = {
     pageMargin: 2,
     lineHeight: 1.5,
     scale: 1,
-    colorTheme: 'black',
+    textColor: '#1c1917',
     orientation: 'portrait',
     textAlign: 'left',
 };
