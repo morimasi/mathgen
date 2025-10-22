@@ -92,11 +92,12 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
             const alphabet = 'ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ'.split('');
             const letters = shuffleArray(alphabet).slice(0, itemCount);
             const shuffledLetters = shuffleArray(letters);
-            const finalLetterStyle = `font-size: 3rem; font-weight: bold; font-family: sans-serif; padding: 0.5rem;`;
+            const finalLetterStyle = `font-size: 4rem; font-weight: bold; font-family: sans-serif; padding: 0.5rem;`;
+            const colStyle = `gap: 2rem;`;
             const finalLeftColLetters = letters.map(letter => `<div class="matching-item" style="${finalLetterStyle}">${letter}</div>`).join('');
             const finalRightColLetters = shuffledLetters.map(letter => `<div class="matching-item" style="${finalLetterStyle}">${letter}</div>`).join('');
-            const finalContainerStyle = `display: flex; justify-content: space-between; width: 100%; max-width: 300px; margin: 1rem auto;`;
-            question = `<p>Soldaki harfleri sağdaki aynı harflerle eşleştir.</p><div style="${finalContainerStyle}"><div class="matching-col">${finalLeftColLetters}</div><div class="matching-col">${finalRightColLetters}</div></div>`;
+            const finalContainerStyle = `display: flex; justify-content: space-between; width: 100%;`;
+            question = `<p>Soldaki harfleri sağdaki aynı harflerle eşleştir.</p><div style="${finalContainerStyle}"><div class="matching-col" style="${colStyle}">${finalLeftColLetters}</div><div class="matching-col" style="${colStyle}">${finalRightColLetters}</div></div>`;
             break;
     }
     return { problem: { question, answer: "Eşleştirme", category: 'matching-and-sorting', display: 'flow' }, title };

@@ -89,6 +89,11 @@ const ProblemSheet: React.FC = () => {
             >
                 {problems.map(renderProblem)}
             </div>
+             {settings.showPageNumbers && (
+                <div className="worksheet-footer">
+                    {pageIndex + 1} / {pageCount}
+                </div>
+            )}
         </div>
     ));
 

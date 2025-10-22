@@ -41,6 +41,7 @@ import html2canvas from 'html2canvas';
 import LoadingDaisy from './components/LoadingDaisy.tsx';
 import { PrintSettings } from './types.ts';
 import Search from './components/Search.tsx';
+import Checkbox from './components/form/Checkbox.tsx';
 
 // Debounce hook for performance optimization
 function useDebounce<T>(value: T, delay: number): T {
@@ -259,6 +260,8 @@ const WorksheetToolbar: React.FC = memo(() => {
                         />
                     </div>
                 </div>
+                <Checkbox label="Prob. No." id="toolbar-problem-numbers" checked={localSettings.showProblemNumbers} onChange={e => handleLocalChange('showProblemNumbers', e.target.checked)} title="Problem Numaraları" containerClassName="pt-3"/>
+                <Checkbox label="Sayfa No." id="toolbar-page-numbers" checked={localSettings.showPageNumbers} onChange={e => handleLocalChange('showPageNumbers', e.target.checked)} title="Sayfa Numaraları" containerClassName="pt-3"/>
             </div>
              <Separator />
              {/* --- Spacing --- */}

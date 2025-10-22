@@ -178,6 +178,12 @@ const PrintSettingsPanel: React.FC<PrintSettingsPanelProps> = ({ isVisible, onCl
                                 checked={settings.showProblemNumbers}
                                 onChange={e => handleChange('showProblemNumbers', e.target.checked)}
                             />
+                            <Checkbox
+                                label="Sayfa Numaralarını Göster"
+                                id="print-show-page-numbers"
+                                checked={settings.showPageNumbers}
+                                onChange={e => handleChange('showPageNumbers', e.target.checked)}
+                            />
                         </div>
                     </div>
                 </div>

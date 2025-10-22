@@ -393,6 +393,9 @@
   .given-wanted-container { @apply mt-2 space-y-2 text-sm; }
   .solution-box { @apply w-full h-12 border border-stone-300 rounded p-1 mt-1; }
   .solution-box.tall { @apply h-24; }
+  .worksheet-footer {
+    @apply absolute bottom-4 right-6 text-xs text-stone-500;
+  }
   .answer-key { @apply bg-white p-8 hidden w-[210mm] box-border; }
   @keyframes daisy-sway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
   .daisy-sway { animation: daisy-sway 4s ease-in-out infinite; transform-origin: 75px 140px; }
