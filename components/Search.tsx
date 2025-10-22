@@ -105,7 +105,7 @@ const Search: React.FC = () => {
             </div>
 
             {showDropdown && (
-                <div className="absolute left-0 mt-2 w-64 origin-top-left bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20 py-1 max-h-80 overflow-y-auto">
+                <div className="absolute left-0 mt-2 w-64 origin-top-left bg-white dark:bg-stone-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-30 py-1 max-h-80 overflow-y-auto">
                     {filteredTabs.length > 0 ? (
                         filteredTabs.map(tab => {
                             const Icon = itemIconMap[tab.id];
