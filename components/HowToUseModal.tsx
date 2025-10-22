@@ -151,6 +151,17 @@ const moduleContent: { [key: string]: { title: string; content: React.ReactNode 
                             </ul>
                         </>
                     }
+                    {tab.id === 'problem-creation' && 
+                        <>
+                            <p>Öğrencilere hazır bir işlem (örn: 5+3=8) ve bir görsel tema verilir. Öğrenciden bu bilgileri kullanarak kendi metin problemini yazması istenir. Yaratıcılığı ve matematiksel düşünceyi birleştirir.</p>
+                            <h4 className="font-semibold mt-3">Kullanım:</h4>
+                            <ul className="list-disc list-inside mt-2 space-y-2">
+                                <li><strong>İşlem Türü & Zorluk:</strong> Oluşturulacak temel işlemi (toplama/çıkarma) ve sayıların büyüklüğünü belirleyin.</li>
+                                <li><strong>Görsel Tema:</strong> Problemin kurulacağı görsel bağlamı seçin (Hayvanlar, Taşıtlar vb.). Bu, öğrencinin hayal gücünü harekete geçirir.</li>
+                                <li><strong>AI ile Örnek:</strong> "AI ile Örnek Problem Oluştur" seçeneği, öğrencilere nasıl bir problem kurabilecekleri konusunda yapay zeka tarafından üretilmiş bir örnek sunar.</li>
+                            </ul>
+                        </>
+                    }
                     {tab.id === 'fractions' && 
                         <>
                             <p>Kesirler konusunu pekiştirmek için dört işlemden görselleştirmeye kadar çeşitli problem türleri sunar.</p>
