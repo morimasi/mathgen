@@ -88,17 +88,17 @@ const Search: React.FC = () => {
     return (
         <div ref={searchRef} className="relative">
             <div className="relative flex items-center">
-                <SearchIcon className="absolute left-3 w-4 h-4 text-stone-300/70 pointer-events-none" />
+                <SearchIcon className="absolute left-3 w-4 h-4 text-white/70 pointer-events-none" />
                 <input
                     type="text"
                     placeholder="Modül ara..."
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     onFocus={() => setIsFocused(true)}
-                    className="w-48 pl-9 pr-8 py-1.5 text-sm text-white placeholder:text-stone-300/70 bg-white/10 rounded-md border border-transparent focus:bg-white/20 focus:border-white/50 focus:outline-none transition-all"
+                    className="w-48 pl-9 pr-8 py-1.5 text-sm text-white placeholder:text-white/70 bg-white/10 rounded-md border border-transparent focus:bg-white/20 focus:border-white/50 focus:outline-none transition-all"
                 />
                 {query && (
-                    <button onClick={() => setQuery('')} className="absolute right-2 p-0.5 rounded-full text-stone-300 hover:bg-white/20 hover:text-white">
+                    <button onClick={() => setQuery('')} className="absolute right-2 p-0.5 rounded-full text-white/80 hover:bg-white/20 hover:text-white">
                         <XIcon className="w-4 h-4" />
                     </button>
                 )}

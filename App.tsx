@@ -173,10 +173,8 @@ const Header: React.FC<HeaderProps> = memo(({ onPrint, onDownloadPDF }) => {
                     </div>
                 </div>
 
-                {/* Desktop Action Buttons */}
-                <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center gap-2">
-                    <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
-                    <ThemeSwitcher />
+                {/* Desktop Action Buttons (Moved to TopBar) */}
+                <div className="hidden md:flex items-center gap-2">
                 </div>
             </div>
         </div>
@@ -271,6 +269,43 @@ const WorksheetToolbar: React.FC = memo(() => {
     );
 });
 
+interface TopBarProps {
+    onPrint: () => void;
+    onDownloadPDF: () => void;
+    triggerAutoRefresh: () => void;
+    openPrintSettings: () => void;
+    openFavoritesPanel: () => void;
+    openHowToUse: () => void;
+    openContactModal: () => void;
+}
+
+const TopBar: React.FC<TopBarProps> = memo(({
+    onPrint,
+    onDownloadPDF,
+    triggerAutoRefresh,
+    openPrintSettings,
+    openFavoritesPanel,
+    openHowToUse,
+    openContactModal
+}) => {
+    return (
+        <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center justify-end gap-2 px-4 py-1 bg-primary text-white print:hidden">
+            <Search />
+            <div className="h-5 border-l border-white/30 mx-1"></div>
+            <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
+            <ThemeSwitcher />
+            <div className="h-5 border-l border-white/30 mx-1"></div>
+            <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdırma Ayarları"><SettingsIcon /></button>
+            <button onClick={onPrint} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdır"><PrintIcon /></button>
+            <button onClick={onDownloadPDF} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
+            <div className="h-5 border-l border-white/30 mx-1"></div>
+            <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Favorilerim"><HeartIcon /></button>
+            <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
+            <button onClick={openContactModal} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="İletişim & Geri Bildirim"><MailIcon /></button>
+        </div>
+    );
+});
+
 const AppContent: React.FC = () => {
     const { 
         isPrintSettingsVisible, closePrintSettings, openPrintSettings,
@@ -279,7 +314,7 @@ const AppContent: React.FC = () => {
         isFavoritesPanelVisible, closeFavoritesPanel, openFavoritesPanel,
         isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
     } = useUI();
-    const { isLoading, setIsLoading } = useWorksheet();
+    const { isLoading, setIsLoading, triggerAutoRefresh } = useWorksheet();
     const { settings, setSettings } = usePrintSettings();
     const { addToast } = useToast();
     
@@ -446,15 +481,15 @@ const AppContent: React.FC = () => {
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
             
-            <div className="hidden md:flex items-center justify-end gap-2 px-4 py-1 bg-stone-200 dark:bg-stone-800 border-b border-stone-300 dark:border-stone-700 print:hidden">
-                <Search />
-                <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /></button>
-                <button onClick={openFavoritesPanel} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="Favorilerim"><HeartIcon /></button>
-                <button onClick={handlePrint} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="Yazdır"><PrintIcon /></button>
-                <button onClick={handleDownloadPDF} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="PDF Olarak İndir"><DownloadIcon /></button>
-                <button onClick={openHowToUse} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="Nasıl Kullanılır?"><HelpIcon /></button>
-                <button onClick={openContactModal} className="p-2 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors" title="İletişim & Geri Bildirim"><MailIcon /></button>
-            </div>
+            <TopBar 
+                onPrint={handlePrint}
+                onDownloadPDF={handleDownloadPDF}
+                triggerAutoRefresh={triggerAutoRefresh}
+                openPrintSettings={openPrintSettings}
+                openFavoritesPanel={openFavoritesPanel}
+                openHowToUse={openHowToUse}
+                openContactModal={openContactModal}
+            />
 
             <header className="flex-shrink-0 bg-primary text-white shadow-md z-20 print:hidden">
                 <Header onPrint={handlePrint} onDownloadPDF={handleDownloadPDF}/>
