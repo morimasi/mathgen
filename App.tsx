@@ -1,5 +1,9 @@
 
 
+
+
+
+
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
@@ -68,8 +72,7 @@ function useDebouncedCallback<A extends any[]>(
 ) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // FIX: The useEffect cleanup function was likely calling `clearTimeout` without an argument,
-  // which causes a runtime error. It has been corrected to be called with the timeout ID from the ref.
+  // FIX: `clearTimeout` in the `useEffect` cleanup function was being called without arguments, causing a runtime error. It has been corrected to pass the timeout ID from the ref to prevent memory leaks on unmount.
   useEffect(() => {
     // On component unmount, clear any pending timeout to prevent memory leaks.
     return () => {
@@ -185,6 +188,7 @@ const Header: React.FC<HeaderProps> = memo(({ onPrint, onDownloadPDF }) => {
 const WorksheetToolbar: React.FC = memo(() => {
     const { settings, setSettings } = usePrintSettings();
     const { fontTheme, setFontTheme } = useFontTheme();
+    const { openPrintSettings } = useUI();
     const fontThemeOptions = Object.entries(fontThemes).map(([key, value]) => ({ value: key, label: value.name }));
     
     // --- Start of debounce implementation for performance ---
@@ -221,7 +225,7 @@ const WorksheetToolbar: React.FC = memo(() => {
     const Separator: React.FC = () => <div className="border-l border-stone-300 dark:border-stone-600 h-6 mx-2 hidden lg:block"></div>;
 
     return (
-        <div id={TUTORIAL_ELEMENT_IDS.WORKSHEET_TOOLBAR} className="flex-shrink-0 p-2 flex items-center justify-start border-b border-stone-200 dark:border-stone-700 print:hidden flex-wrap gap-x-4 gap-y-2">
+        <div id={TUTORIAL_ELEMENT_IDS.WORKSHEET_TOOLBAR} className="flex-shrink-0 p-2 flex items-center border-b border-stone-200 dark:border-stone-700 print:hidden flex-wrap gap-x-4 gap-y-2">
             {/* --- Scale --- */}
             <div className="flex items-center gap-2">
                 <label htmlFor="zoom-slider" className="text-xs font-medium">Ölçek</label>
@@ -277,6 +281,11 @@ const WorksheetToolbar: React.FC = memo(() => {
                     <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
                     <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
                 </div>
+             </div>
+             <div className="ml-auto pl-2">
+                <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors" title="Gelişmiş Yazdırma Ayarları">
+                    <SettingsIcon />
+                </button>
              </div>
         </div>
     );
