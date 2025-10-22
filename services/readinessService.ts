@@ -55,6 +55,12 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
     let title = 'Eşleştirme ve Gruplama';
     let question = '';
 
+    const verticalGap = letterSpacing ?? 2;
+    const horizontalGap = letterHorizontalSpacing ?? 4;
+    
+    const matchingContainerStyle = `style="gap: ${horizontalGap}rem;"`;
+    const matchingColStyle = `style="gap: ${verticalGap}rem;"`;
+
     switch(type) {
         case MatchingType.OneToOne:
             title = 'Bire Bir Eşleştirme';
@@ -62,7 +68,7 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
             const shuffledItems = shuffleArray(items);
             const leftCol = items.map(item => `<div class="matching-item">${item}</div>`).join('');
             const rightCol = shuffledItems.map(item => `<div class="matching-item">${item}</div>`).join('');
-            question = `<p>Soldaki nesneleri sağdaki aynı nesnelerle eşleştir.</p><div class="matching-container"><div class="matching-col">${leftCol}</div><div class="matching-col">${rightCol}</div></div>`;
+            question = `<p>Soldaki nesneleri sağdaki aynı nesnelerle eşleştir.</p><div class="matching-container" ${matchingContainerStyle}><div class="matching-col" ${matchingColStyle}>${leftCol}</div><div class="matching-col" ${matchingColStyle}>${rightCol}</div></div>`;
             break;
 
         case MatchingType.Shadow:
@@ -71,17 +77,18 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
              const shuffledShadows = shuffleArray(shadowItems);
              const leftColItems = shadowItems.map(item => `<div class="matching-item">${item}</div>`).join('');
              const rightColShadows = shuffledShadows.map(item => `<div class="matching-item shadow">${item}</div>`).join('');
-             question = `<p>Soldaki nesneleri sağdaki gölgeleriyle eşleştir.</p><div class="matching-container"><div class="matching-col">${leftColItems}</div><div class="matching-col">${rightColShadows}</div></div>`;
+             question = `<p>Soldaki nesneleri sağdaki gölgeleriyle eşleştir.</p><div class="matching-container" ${matchingContainerStyle}><div class="matching-col" ${matchingColStyle}>${leftColItems}</div><div class="matching-col" ${matchingColStyle}>${rightColShadows}</div></div>`;
             break;
             
         case MatchingType.ByProperty:
             title = 'Özelliğe Göre Gruplama';
+            const groupingGapStyle = `style="gap: ${verticalGap}rem;"`;
             const category1Items = getThemeItems('animals', 3, true);
             const category2Items = getThemeItems('vehicles', 3, true);
             const allItems = shuffleArray([...category1Items, ...category2Items]);
             question = `<p>Nesneleri doğru gruplara ayır.</p>
-                        <div class="grouping-container">${allItems.map(i => `<span>${i}</span>`).join('')}</div>
-                        <div class="matching-container">
+                        <div class="grouping-container" ${groupingGapStyle}>${allItems.map(i => `<span>${i}</span>`).join('')}</div>
+                        <div class="matching-container" ${matchingContainerStyle}>
                             <div class="grouping-box"><b>Hayvanlar</b></div>
                             <div class="grouping-box"><b>Taşıtlar</b></div>
                         </div>`;
@@ -93,25 +100,13 @@ const generateMatchingAndSorting = (settings: any): { problem: Problem, title: s
             const letters = shuffleArray(alphabet).slice(0, itemCount);
             const shuffledLetters = shuffleArray(letters);
             const finalLetterStyle = `font-size: 4rem; font-weight: bold; font-family: sans-serif; padding: 0.5rem;`;
-            const colStyle = `display: flex; flex-direction: column; gap: ${letterSpacing ?? 2}rem;`;
             const finalLeftColLetters = letters.map(letter => `<div class="matching-item" style="${finalLetterStyle}">${letter}</div>`).join('');
             const finalRightColLetters = shuffledLetters.map(letter => `<div class="matching-item" style="${finalLetterStyle}">${letter}</div>`).join('');
             
-            // Invert the slider value to control padding. Max slider value is 50.
-            // When slider is at max (50), we want minimum padding (0).
-            // When slider is at min (0), we want maximum padding (50).
-            const MAX_SLIDER_VALUE = 50;
-            const horizontalPadding = MAX_SLIDER_VALUE - (letterHorizontalSpacing ?? 4);
-
-            const containerWrapperStyle = `padding: 0 ${horizontalPadding}rem; max-width: 100%; box-sizing: border-box;`;
-            const finalContainerStyle = `display: flex; justify-content: space-between; width: 100%;`;
-
             question = `<p>Soldaki harfleri sağdaki aynı harflerle eşleştir.</p>
-                        <div style="${containerWrapperStyle}">
-                            <div style="${finalContainerStyle}">
-                                <div class="matching-col" style="${colStyle}">${finalLeftColLetters}</div>
-                                <div class="matching-col" style="${colStyle}">${finalRightColLetters}</div>
-                            </div>
+                        <div class="matching-container" ${matchingContainerStyle}>
+                            <div class="matching-col" ${matchingColStyle}>${finalLeftColLetters}</div>
+                            <div class="matching-col" ${matchingColStyle}>${finalRightColLetters}</div>
                         </div>`;
             break;
     }

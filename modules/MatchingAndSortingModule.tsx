@@ -126,32 +126,32 @@ const MatchingAndSortingModule: React.FC = () => {
                     value={settings.itemCount}
                     onChange={e => handleSettingChange('itemCount', parseInt(e.target.value))}
                 />
-                 {isLetterMatching && (
-                    <div className="space-y-3 col-span-1 sm:col-span-2">
-                        <div className="space-y-1">
-                            <label htmlFor="letter-spacing-slider" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
-                               <span>Dikey Harf Aralığı</span>
-                               <span className="text-stone-500 dark:text-stone-400 font-normal">{`${(settings.letterSpacing ?? 2).toFixed(1)}rem`}</span>
-                            </label>
-                            <input
-                                type="range" id="letter-spacing-slider" value={settings.letterSpacing || 2} min={0.5} max={50} step={0.1}
-                                onChange={e => handleSettingChange('letterSpacing', parseFloat(e.target.value))}
-                                className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-primary"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label htmlFor="letter-horizontal-spacing-slider" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
-                               <span>Yatay Harf Aralığı</span>
-                               <span className="text-stone-500 dark:text-stone-400 font-normal">{`${(settings.letterHorizontalSpacing ?? 4).toFixed(1)}rem`}</span>
-                            </label>
-                            <input
-                                type="range" id="letter-horizontal-spacing-slider" value={settings.letterHorizontalSpacing || 4} min={0} max={50} step={0.5}
-                                onChange={e => handleSettingChange('letterHorizontalSpacing', parseFloat(e.target.value))}
-                                className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-primary"
-                            />
-                        </div>
+                 
+                <div className="space-y-3 col-span-1 sm:col-span-2">
+                    <div className="space-y-1">
+                        <label htmlFor="letter-spacing-slider" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
+                           <span>Dikey Öğe Aralığı</span>
+                           <span className="text-stone-500 dark:text-stone-400 font-normal">{`${(settings.letterSpacing ?? 2).toFixed(1)}rem`}</span>
+                        </label>
+                        <input
+                            type="range" id="letter-spacing-slider" value={settings.letterSpacing || 2} min={0.5} max={10} step={0.1}
+                            onChange={e => handleSettingChange('letterSpacing', parseFloat(e.target.value))}
+                            className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-primary"
+                        />
                     </div>
-                )}
+                    <div className="space-y-1">
+                        <label htmlFor="letter-horizontal-spacing-slider" className="flex justify-between items-center font-medium text-xs text-stone-700 dark:text-stone-300">
+                           <span>Yatay Öğe Aralığı</span>
+                           <span className="text-stone-500 dark:text-stone-400 font-normal">{`${(settings.letterHorizontalSpacing ?? 4).toFixed(1)}rem`}</span>
+                        </label>
+                        <input
+                            type="range" id="letter-horizontal-spacing-slider" value={settings.letterHorizontalSpacing || 4} min={1} max={20} step={0.5}
+                            onChange={e => handleSettingChange('letterHorizontalSpacing', parseFloat(e.target.value))}
+                            className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-primary"
+                        />
+                    </div>
+                </div>
+                
                 <NumberInput 
                     label="Sayfa Başına Problem"
                     id="problems-per-page"
