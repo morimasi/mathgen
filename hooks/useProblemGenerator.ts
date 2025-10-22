@@ -60,9 +60,9 @@ export const useProblemGenerator = <S,>({
                 } else if (printSettings.layoutMode === 'table') {
                     totalCount = printSettings.rows * printSettings.columns;
                 } else if (finalSettings.autoFit) {
-                    //FIX: contentRef can be null, provide fallback
-                    const problemsPerPage = contentRef.current ? calculateMaxProblems(contentRef, printSettings) : finalSettings.problemsPerPage!;
-                    totalCount = (problemsPerPage || finalSettings.problemsPerPage!) * (finalSettings.pageCount ?? 1);
+                    // FIX: Check if contentRef.current exists before using it and provide a safe fallback.
+                    const problemsPerPage = contentRef.current ? calculateMaxProblems(contentRef, printSettings) : (finalSettings.problemsPerPage || 20);
+                    totalCount = problemsPerPage * (finalSettings.pageCount ?? 1);
                 } else if (overrideSettings) {
                     totalCount = 1;
                 }

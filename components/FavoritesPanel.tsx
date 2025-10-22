@@ -35,7 +35,7 @@ const FavoritesPanel: React.FC<FavoritesPanelProps> = ({ isVisible, onClose }) =
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
 
-        // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+        // FIX: Ensure the element is an HTMLElement before calling focus to prevent runtime errors.
         if (firstElement instanceof HTMLElement) firstElement.focus();
 
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -48,13 +48,13 @@ const FavoritesPanel: React.FC<FavoritesPanelProps> = ({ isVisible, onClose }) =
 
             if (event.shiftKey) { // Shift+Tab
                 if (document.activeElement === firstElement) {
-                    // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+                    // FIX: Ensure the element is an HTMLElement before calling focus.
                     if (lastElement instanceof HTMLElement) lastElement.focus();
                     event.preventDefault();
                 }
             } else { // Tab
                 if (document.activeElement === lastElement) {
-                    // FIX: Use instanceof check to ensure element is an HTMLElement before calling focus.
+                    // FIX: Ensure the element is an HTMLElement before calling focus.
                     if (firstElement instanceof HTMLElement) firstElement.focus();
                     event.preventDefault();
                 }
@@ -80,7 +80,7 @@ const FavoritesPanel: React.FC<FavoritesPanelProps> = ({ isVisible, onClose }) =
         }
     };
     
-    // FIX: Add type guard and assertion to correctly type favoriteEntries and resolve 'unknown' type errors.
+    // FIX: Asserting the correct type for the filtered entries to ensure type safety.
     const favoriteEntries = Object.entries(allFavorites).filter(([, presets]) => Array.isArray(presets) && presets.length > 0) as [string, string[]][];
 
     return (

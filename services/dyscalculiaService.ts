@@ -168,7 +168,7 @@ const generateTimeMeasurementGeometryLocal = (settings: any): { problem: Problem
 
 const generateSpatialReasoningLocal = (settings: any): { problem: Problem; title: string; } => {
     const title = "Uzamsal Akıl Yürütme";
-    // FIX: Declare 'question' and 'answer' variables before use.
+    // FIX: Declared 'question' and 'answer' variables before use to avoid block-scoping issues.
     let question = "", answer = "";
     const patternColors = ['#ef4444', '#3b82f6', '#22c55e'];
     const pattern = shuffleArray(patternColors).slice(0,3).map(c => `<div class="pattern-block" style="background-color: ${c}"></div>`).join('');
@@ -179,7 +179,7 @@ const generateSpatialReasoningLocal = (settings: any): { problem: Problem; title
 
 const generateEstimationSkillsLocal = (settings: any): { problem: Problem; title: string; } => {
     const title = "Tahmin Becerileri";
-    // FIX: Declare 'question' and 'answer' variables before use.
+    // FIX: Declared 'question' and 'answer' variables before use to avoid block-scoping issues.
     let question = "", answer = "";
     const count = getRandomInt(15, 40);
     const jarItems = Array.from({length: count}).map(() => `<circle cx="${getRandomInt(15,85)}" cy="${getRandomInt(15,95)}" r="3" fill="#8b5cf6"/>`).join('');
