@@ -280,24 +280,95 @@ const generateIntroToMeasurement = (settings: any): { problem: Problem, title: s
     let title = 'Ölçmeye Giriş';
     let question = '', answer = '';
 
+    // Data pools for variety
+    const lengthPairs = [
+        { long: '🦒', short: '🐈', q: ['uzun', 'kısa'] },
+        { long: '🚆', short: '🚗', q: ['uzun', 'kısa'] },
+        { long: '📏', short: '✏️', q: ['uzun', 'kısa'] },
+        { long: '🐍', short: '🐛', q: ['uzun', 'kısa'] },
+    ];
+    const weightPairs = [
+        { heavy: '🐘', light: '🐜', q: ['ağır', 'hafif'] },
+        { heavy: '🍉', light: '🍓', q: ['ağır', 'hafif'] },
+        { heavy: '🧱', light: '🎈', q: ['ağır', 'hafif'] },
+        { heavy: '🐳', light: '🐠', q: ['ağır', 'hafif'] },
+    ];
+    const capacityPairs = [
+        { more: '🪣', less: '🥛', q: ['çok', 'az'] },
+        { more: '🛁', less: '🥤', q: ['çok', 'az'] },
+        { more: '🏺', less: '🍵', q: ['çok', 'az'] },
+        { more: '🥣', less: '🥄', q: ['çok', 'az'] },
+    ];
+    const nonStandardObjects = ['🔑', '🍌', '🐟', '🥕', '🥖'];
+    const nonStandardUnits = ['🟥', '●', '➖', '📎'];
+
     switch(type) {
-        case IntroMeasurementType.CompareLength:
-            question = `<p><b>Daha uzun</b> olanı işaretle.</p><div class="side-by-side-container vertical"><div style="font-size: 4rem;">✏️</div><div style="font-size: 2rem;">✏️</div></div>`;
-            answer = 'Soldaki';
+        case IntroMeasurementType.CompareLength: {
+            const pair = lengthPairs[getRandomInt(0, lengthPairs.length - 1)];
+            const askForLong = Math.random() < 0.5;
+            const longIsLeft = Math.random() < 0.5;
+            const questionText = askForLong ? pair.q[0] : pair.q[1];
+            
+            const leftItem = longIsLeft ? pair.long : pair.short;
+            const rightItem = longIsLeft ? pair.short : pair.long;
+
+            question = `<p><b>Daha ${questionText}</b> olanı işaretle.</p>
+                        <div class="side-by-side-container vertical" style="font-size: 3rem; align-items: flex-end;">
+                            <div>${leftItem}</div>
+                            <div>${rightItem}</div>
+                        </div>`;
+            answer = askForLong ? (longIsLeft ? 'Soldaki' : 'Sağdaki') : (longIsLeft ? 'Sağdaki' : 'Soldaki');
             break;
-        case IntroMeasurementType.CompareWeight:
-            question = `<p><b>Daha ağır</b> olanı işaretle.</p><div class="side-by-side-container"><span style="font-size: 3rem">🐘</span><span style="font-size: 1.5rem"> 🐁</span></div>`;
-            answer = '🐘';
+        }
+        case IntroMeasurementType.CompareWeight: {
+            const pair = weightPairs[getRandomInt(0, weightPairs.length - 1)];
+            const askForHeavy = Math.random() < 0.5;
+            const heavyIsLeft = Math.random() < 0.5;
+            const questionText = askForHeavy ? pair.q[0] : pair.q[1];
+
+            const leftItem = heavyIsLeft ? pair.heavy : pair.light;
+            const rightItem = heavyIsLeft ? pair.light : pair.heavy;
+
+            question = `<p><b>Daha ${questionText}</b> olanı işaretle.</p>
+                        <div class="side-by-side-container" style="font-size: 3rem;">
+                           <div style="transform: scale(${heavyIsLeft ? 1.5 : 1});">${leftItem}</div>
+                           <div style="transform: scale(${!heavyIsLeft ? 1.5 : 1});">${rightItem}</div>
+                        </div>`;
+            answer = askForHeavy ? (heavyIsLeft ? 'Soldaki' : 'Sağdaki') : (heavyIsLeft ? 'Sağdaki' : 'Soldaki');
             break;
-        case IntroMeasurementType.CompareCapacity:
-            question = `<p><b>Daha çok</b> su alan hangisidir?</p><div class="side-by-side-container vertical"><span style="font-size: 4rem">🪣</span><span style="font-size: 2rem">🥛</span></div>`;
-            answer = 'Soldaki';
+        }
+        case IntroMeasurementType.CompareCapacity: {
+             const pair = capacityPairs[getRandomInt(0, capacityPairs.length - 1)];
+            const askForMore = Math.random() < 0.5;
+            const moreIsLeft = Math.random() < 0.5;
+            const questionText = askForMore ? pair.q[0] : pair.q[1];
+
+            const leftItem = moreIsLeft ? pair.more : pair.less;
+            const rightItem = moreIsLeft ? pair.less : pair.more;
+
+            question = `<p><b>Daha ${questionText}</b> su alan hangisidir?</p>
+                        <div class="side-by-side-container vertical" style="font-size: 3rem; align-items: flex-end;">
+                           <div style="transform: scale(${moreIsLeft ? 1.5 : 1});">${leftItem}</div>
+                           <div style="transform: scale(${!moreIsLeft ? 1.5 : 1});">${rightItem}</div>
+                        </div>`;
+            answer = askForMore ? (moreIsLeft ? 'Soldaki' : 'Sağdaki') : (moreIsLeft ? 'Sağdaki' : 'Soldaki');
             break;
-        case IntroMeasurementType.NonStandardLength:
-            const itemCount = getRandomInt(3, 6);
-            question = `<p>Kalem kaç ataş uzunluğundadır?</p><div class="non-standard-measure"><span class="object-to-measure">✏️</span><div class="measuring-units">${'📎'.repeat(itemCount)}</div></div><div class="answer-box-large"></div>`;
+        }
+        case IntroMeasurementType.NonStandardLength: {
+            const objectToMeasure = nonStandardObjects[getRandomInt(0, nonStandardObjects.length - 1)];
+            const measuringUnit = nonStandardUnits[getRandomInt(0, nonStandardUnits.length - 1)];
+            const unitName = {'🟥': 'kare', '●': 'yuvarlak', '➖': 'çizgi', '📎': 'ataş'}[measuringUnit as '🟥' | '●' | '➖' | '📎'] || 'birim';
+            const itemCount = getRandomInt(3, 8);
+            
+            question = `<p>${objectToMeasure} kaç ${unitName} uzunluğundadır?</p>
+                        <div class="non-standard-measure">
+                            <span class="object-to-measure">${objectToMeasure}</span>
+                            <div class="measuring-units">${measuringUnit.repeat(itemCount)}</div>
+                        </div>
+                        <div class="answer-box-large"></div>`;
             answer = `${itemCount}`;
             break;
+        }
     }
     return { problem: { question, answer, category: 'intro-to-measurement', display: 'flow' }, title };
 }
