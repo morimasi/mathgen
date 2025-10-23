@@ -64,7 +64,7 @@ const generateSpecialLearningAIProblem = async (
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-flash-latest',
+            model: 'gemini-flash-lite-latest',
             contents: prompt,
             config: {
                 systemInstruction,
@@ -132,7 +132,7 @@ export const generateContextualWordProblems = async (module: string, settings: a
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-flash-latest',
+            model: 'gemini-flash-lite-latest',
             contents: prompt,
             config: {
                 systemInstruction,

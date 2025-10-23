@@ -70,8 +70,7 @@ function useDebouncedCallback<A extends any[]>(
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
-        // FIX: The `clearTimeout` function requires one argument (the timeout ID), but was being called with zero, causing a runtime error.
-        // Passing the timeout ID from the ref to `clearTimeout` to prevent memory leaks on unmount.
+        // FIX: The `clearTimeout` function requires one argument (the timeout ID), but was being called with zero arguments.
         clearTimeout(timeoutRef.current);
       }
     };
