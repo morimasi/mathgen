@@ -60,7 +60,11 @@ const generateSpecialLearningAIProblem = async (
         return { problems: [], title: 'Hata', error: `AI prompt for submodule '${subModuleId}' not found.` };
     }
 
-    const prompt = promptGenerator(settings, count);
+    let prompt = promptGenerator(settings, count);
+    
+    // Add robustness instructions
+    prompt += `\n\nIMPORTANT: Ensure the entire output is a single, valid JSON array of objects, strictly following the schema. Do not include any text before or after the JSON array. The language must be very simple and clear, suitable for a young child with learning difficulties. All content must be in Turkish.`;
+
 
     try {
         const response = await ai.models.generateContent({

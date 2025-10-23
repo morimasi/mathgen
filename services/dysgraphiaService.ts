@@ -51,6 +51,21 @@ const SYMBOLS = {
     equals: '=',
 };
 
+const getDotPattern = (num: number): {x:number, y:number}[] => {
+    switch(num) {
+        case 3: return [{x:50, y:20}, {x:90, y:90}, {x:10, y:90}]; // Triangle
+        case 4: return [{x:20, y:20}, {x:80, y:20}, {x:80, y:80}, {x:20, y:80}]; // Square
+        case 5: return [{x:50,y:15}, {x:85,y:40}, {x:70,y:85}, {x:30,y:85}, {x:15,y:40}]; // Pentagon
+        default: // Default spiral
+            return Array.from({length: num}, (_, i) => {
+                const angle = i * 2.5;
+                const r = 15 + i * 4;
+                return { x: 50 + r * Math.cos(angle), y: 70 + r * Math.sin(angle) };
+            });
+    }
+}
+
+
 // --- Local Generator Functions ---
 
 const localGenerators: { [key: string]: (settings: any) => { problem: Problem; title: string; preamble?: string } } = {
@@ -71,11 +86,45 @@ const localGenerators: { [key: string]: (settings: any) => { problem: Problem; t
         };
     },
     'math-connect-the-dots': (settings) => {
-        // This is a simplified representation. A real implementation would generate SVG points.
-        const num = getRandomInt(5, 10);
+        const { countingType } = settings;
+        const title = "Noktadan Noktaya Matematik";
+        let preamble = "";
+        const numPoints = getRandomInt(8, 15);
+        const points = getDotPattern(numPoints);
+        let labels: string[] = [];
+        let answer = "";
+        
+        switch (countingType) {
+            case 'sequential':
+                preamble = "Noktaları 1'den başlayarak sırayla birleştir.";
+                labels = Array.from({length: numPoints}, (_, i) => String(i + 1));
+                answer = "Sıralı birleştirme";
+                break;
+            case 'by-twos':
+                const startTwo = getRandomInt(1, 5) * 2;
+                preamble = `Noktaları ${startTwo}'den başlayarak ikişer sayarak birleştir.`;
+                labels = Array.from({length: numPoints}, (_, i) => String(startTwo + i * 2));
+                answer = "İkişer ritmik sayma";
+                break;
+            case 'by-fives':
+                const startFive = getRandomInt(1, 4) * 5;
+                preamble = `Noktaları ${startFive}'den başlayarak beşer sayarak birleştir.`;
+                labels = Array.from({length: numPoints}, (_, i) => String(startFive + i * 5));
+                answer = "Beşer ritmik sayma";
+                break;
+        }
+    
+        const dotsSVG = points.map((p, i) => `
+            <circle cx="${p.x}" cy="${p.y}" r="2.5" fill="black" />
+            <text x="${p.x}" y="${p.y - 5}" font-size="10" text-anchor="middle">${labels[i]}</text>
+        `).join('');
+    
+        const question = `<svg viewBox="0 0 100 120" style="width: 100%; max-width: 300px; margin: auto; border: 1px solid #e5e7eb; border-radius: 8px;">${dotsSVG}</svg>`;
+    
         return {
-            problem: { question: `1'den ${num}'e kadar olan noktaları birleştir.`, answer: "Resim", category: 'dysgraphia' },
-            title: "Noktadan Noktaya Matematik"
+            problem: { question, answer, category: 'dysgraphia' },
+            title,
+            preamble
         };
     },
     'digit-calligraphy': (settings) => {

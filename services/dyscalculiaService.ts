@@ -113,9 +113,13 @@ const generateFractionsDecimalsIntroLocal = (settings: any): { problem: Problem,
     let question = "", answer = "", title = "Kesirlere Giriş";
     
     if (type === 'visual-match') {
-        const fractions = [{n: 1, d: 2}, {n: 1, d: 3}, {n: 1, d: 4}];
-        const selected = fractions[getRandomInt(0, fractions.length - 1)];
-        question = `<p>Bu şekil hangi kesri gösteriyor?</p><div class="dyscalculia-fraction-container">${drawFractionPie(selected.n, selected.d)} <div class="options"><span>1/3</span><span>1/2</span><span>1/4</span></div></div>`;
+        const fractions = [{n: 1, d: 2}, {n: 1, d: 3}, {n: 1, d: 4}, {n: 2, d: 3}, {n: 3, d: 4}];
+        const options = shuffleArray(fractions).slice(0, 3);
+        const selected = options[getRandomInt(0, 2)];
+        
+        const optionsHTML = shuffleArray(options).map(opt => `<span>${opt.n}/${opt.d}</span>`).join('');
+
+        question = `<p>Bu şekil hangi kesri gösteriyor?</p><div class="dyscalculia-fraction-container">${drawFractionPie(selected.n, selected.d)} <div class="options">${optionsHTML}</div></div>`;
         answer = `${selected.n}/${selected.d}`;
     } else { // compare
         question = `<p>Hangisi daha büyük? İşaretle.</p><div class="dyscalculia-fraction-container">${drawFractionPie(1, 2)} ${drawFractionPie(1, 4)}</div>`;
@@ -149,7 +153,17 @@ const generateTimeMeasurementGeometryLocal = (settings: any): { problem: Problem
     if (category === 'time') {
         const title = "Saat Okuma";
         const hour = getRandomInt(1, 12);
-        const question = `<p>Bu saat kaçı gösteriyor?</p><div class="dyscalculia-clock-container">${drawAnalogClock(hour, 0)} <div class="options vertical"><span>Saat 3</span><span>Saat ${hour}</span><span>Saat 9</span></div></div>`;
+        
+        let distractors = [hour];
+        while(distractors.length < 3) {
+            const d = getRandomInt(1, 12);
+            if (!distractors.includes(d)) {
+                distractors.push(d);
+            }
+        }
+        const optionsHTML = shuffleArray(distractors).map(h => `<span>Saat ${h}</span>`).join('');
+
+        const question = `<p>Bu saat kaçı gösteriyor?</p><div class="dyscalculia-clock-container">${drawAnalogClock(hour, 0)} <div class="options vertical">${optionsHTML}</div></div>`;
         const answer = `Saat tam ${hour}`;
         return { problem: { question, answer, category: 'dyscalculia', display: 'flow' }, title };
     } else if (category === 'measurement') {
