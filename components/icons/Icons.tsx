@@ -47,7 +47,6 @@ export const PositionalConceptsIcon: React.FC<IconProps> = (props) => <IconWrapp
 export const IntroToMeasurementIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M3 3v18h18" /><path d="M7 3v2M12 3v2M17 3v2M3 7h2M3 12h2M3 17h2" /></IconWrapper>;
 export const SimpleGraphsIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M3 3v18h18" /><path d="M7 12v4M12 7v9M17 4v12" /></IconWrapper>;
 export const SpecialLearningIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M12 2a10 10 0 0 0-7.5 16.5A10 10 0 0 0 12 22a10 10 0 0 0 7.5-3.5A10 10 0 0 0 12 2zM6 10h4v4H6zM14 10h4v4h-4zM10 16h4v4h-4z" /></IconWrapper>;
-export const DyslexiaIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M6 8h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H6zm12 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4zM6 12h6M18 12h-6" /></IconWrapper>;
 export const DyscalculiaIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /><path d="M8 8l8 8M16 8l-8 8" /></IconWrapper>;
 export const DysgraphiaIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /><path d="M15 5l4 4" /></IconWrapper>;
 export const VisualAdditionSubtractionIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><circle cx="6" cy="6" r="3" /><circle cx="18" cy="18" r="3" /><line x1="8" y1="12" x2="16" y2="12" /><line x1="12" y1="8" x2="12" y2="16" /></IconWrapper>;
@@ -88,14 +87,15 @@ export const FavoriteIcon: React.FC<IconProps> = (props) => <IconWrapper {...pro
 export const XIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M18 6L6 18M6 6l12 12" /></IconWrapper>;
 export const InstagramIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="18.5" y1="5.5" x2="18.51" y2="5.5" /></IconWrapper>;
 export const LoadingIcon = RefreshIcon;
+// FIX: Exported missing icons as aliases of existing ones to fix import errors.
+export const LetterFormationIcon = DysgraphiaIcon;
+export const LetterFormRecognitionIcon = SearchIcon;
+export const CreativeWritingIcon = WordProblemsIcon;
 export const PaletteIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10" /><path d="M12 2a10 10 0 0 0-3.5 19.33A10 10 0 0 1 15.5 4.67" /><path d="M12 2a10 10 0 0 1 3.5 19.33A10 10 0 0 0 8.5 4.67" /></IconWrapper>;
 export const SunIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></IconWrapper>;
 export const MoonIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></IconWrapper>;
 
 export const NumberSenseIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M3 6h18M3 18h18M7 6l4 6-4 6" /><path d="M17 6l-4 6 4 6" /></IconWrapper>;
-export const LetterFormationIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /><path d="M14 7l-8.5 8.5" /><path d="M14 11h-4" /></IconWrapper>;
-export const LetterFormRecognitionIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /><path d="M7 13l4-6 4 6" /><path d="M7 10h8" /></IconWrapper>;
-export const CreativeWritingIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /><path d="m15 5 4 4" /><path d="M22 2l-5.5 5.5" /><path d="M2 22l5.5-5.5" /></IconWrapper>;
 export const InteractiveStoryIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></IconWrapper>;
 export const ArithmeticFluencyIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /><path d="m8 16 2-2 2 2-2 2-2-2z" /></IconWrapper>;
 export const NumberGroupingIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><circle cx="6" cy="6" r="2" /><circle cx="6" cy="12" r="2" /><circle cx="6" cy="18" r="2" /><circle cx="12" cy="6" r="2" /><circle cx="18" cy="6" r="2" /><circle cx="12" cy="12" r="2" /></IconWrapper>;

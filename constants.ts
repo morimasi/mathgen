@@ -47,7 +47,6 @@ export const TAB_GROUPS = [
     {
         title: "Özel Öğrenme",
         tabs: [
-            { id: "dyslexia", label: "Disleksi" },
             { id: "dyscalculia", label: "Diskalkuli" },
             { id: "dysgraphia", label: "Disgrafi" },
         ],

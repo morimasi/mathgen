@@ -24,7 +24,6 @@ const BasicShapesModule = React.lazy(() => import('../modules/BasicShapesModule.
 const PositionalConceptsModule = React.lazy(() => import('../modules/PositionalConceptsModule.tsx'));
 const IntroToMeasurementModule = React.lazy(() => import('../modules/IntroToMeasurementModule.tsx').then(module => ({ default: module.IntroToMeasurementModule })));
 const SimpleGraphsModule = React.lazy(() => import('../modules/SimpleGraphsModule.tsx'));
-const DyslexiaModule = React.lazy(() => import('../modules/DyslexiaModule.tsx'));
 const DyscalculiaModule = React.lazy(() => import('../modules/DyscalculiaModule.tsx'));
 const DysgraphiaModule = React.lazy(() => import('../modules/DysgraphiaModule.tsx'));
 const VisualAdditionSubtractionModule = React.lazy(() => import('../modules/VisualAdditionSubtractionModule.tsx'));
@@ -59,7 +58,6 @@ const SettingsPanel: React.FC = () => {
             case 'positional-concepts': return <PositionalConceptsModule />;
             case 'intro-to-measurement': return <IntroToMeasurementModule />;
             case 'simple-graphs': return <SimpleGraphsModule />;
-            case 'dyslexia': return <DyslexiaModule />;
             case 'dyscalculia': return <DyscalculiaModule />;
             case 'dysgraphia': return <DysgraphiaModule />;
             case 'visual-addition-subtraction': return <VisualAdditionSubtractionModule />;

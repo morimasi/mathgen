@@ -6,7 +6,7 @@ import {
     ArithmeticIcon, FractionsIcon, DecimalsIcon, PlaceValueIcon, RhythmicIcon, TimeIcon,
     GeometryIcon, MeasurementIcon, WordProblemsIcon, VisualSupportIcon, MatchingIcon,
     ComparingIcon, NumberRecognitionIcon, PatternsIcon, BasicShapesIcon, PositionalConceptsIcon,
-    IntroToMeasurementIcon, SimpleGraphsIcon, DyslexiaIcon, DyscalculiaIcon, DysgraphiaIcon,
+    IntroToMeasurementIcon, SimpleGraphsIcon, DyscalculiaIcon, DysgraphiaIcon,
     VisualAdditionSubtractionIcon, VerbalArithmeticIcon, MissingNumberIcon, SymbolicArithmeticIcon,
     ProblemCreationIcon,
 } from './icons/Icons.tsx';
@@ -31,7 +31,6 @@ const itemIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = 
     'positional-concepts': PositionalConceptsIcon,
     'intro-to-measurement': IntroToMeasurementIcon,
     'simple-graphs': SimpleGraphsIcon,
-    'dyslexia': DyslexiaIcon,
     'dyscalculia': DyscalculiaIcon,
     'dysgraphia': DysgraphiaIcon,
     'visual-addition-subtraction': VisualAdditionSubtractionIcon,

@@ -1,6 +1,6 @@
 // services/geminiService.ts
 import { GoogleGenAI, Type } from "@google/genai";
-import { Problem, DyslexiaSubModuleType, DyscalculiaSubModuleType, DysgraphiaSubModuleType } from '../types.ts';
+import { Problem, DyscalculiaSubModuleType, DysgraphiaSubModuleType, DyslexiaSubModuleType } from '../types.ts';
 
 // In a real scenario, this would be configured securely.
 // For this environment, we assume process.env.API_KEY is available.
@@ -22,16 +22,6 @@ const problemSchema = {
 
 
 // --- PROMPT DEFINITIONS ---
-const dyslexiaPrompts: Record<string, (settings: any, count: number) => string> = {
-    'reading-fluency-coach': (settings: any, count: number) => `Generate ${count} short, simple, and phonetically regular Turkish texts suitable for a grade ${settings.gradeLevel} student with dyslexia to practice reading fluency. The topic should be '${settings.topic}'. The texts should not contain complex sentences or rare words. Format as a JSON array of objects, each with "question" (the text to read) and "answer" (a simple confirmation like "Okuma metni").`,
-    'comprehension-explorer': (settings: any, count: number) => `Generate ${count} Turkish story of '${settings.textLength}' length for a grade ${settings.gradeLevel} student. After each story, create one comprehension question about the '${settings.questionType}'. The language should be clear and direct. Format as a JSON array of objects, each with "question" (the story followed by the question) and "answer" (the correct answer to the question).`,
-    'vocabulary-explorer': (settings: any, count: number) => `Generate ${count} Turkish vocabulary words appropriate for a grade ${settings.gradeLevel} student at a '${settings.difficulty}' difficulty level. For each word, provide its simple meaning and an example sentence. Format as a JSON array of objects, each with "question" (the word in bold, followed by its meaning and example sentence) and "answer" (just the word itself).`,
-    'word-hunter': (settings: any, count: number) => `Create ${count} exercises for morphological awareness focusing on '${settings.focus}'. Provide a word and ask the student to identify the specified part. The difficulty should be '${settings.difficulty}'. Format as a JSON array of objects, each with "question" (the instruction and the word) and "answer" (the correct root, prefix, or suffix). Example for suffix: Q: "'kitaplık' kelimesindeki eki bulun." A: "-lık".`,
-    'spelling-champion': (settings: any, count: number) => `Create ${count} Turkish spelling exercises of '${settings.difficulty}' difficulty focusing on '${settings.category}'. The task is to identify the correctly spelled word from a pair. Format as a JSON array of objects, each with "question" (e.g., "Hangisi doğru: 'herkez' mi, 'herkes' mi?") and "answer" (the correct word).`,
-    'auditory-writing': (settings: any, count: number) => `Generate ${count} Turkish auditory writing (dictation) prompts. The prompt type is '${settings.type}' and difficulty is '${settings.difficulty}'. The AI's role is to provide the text to be dictated. Format as a JSON array of objects, each with "question" (e.g., "Dinle ve yaz: 'kedi'") and "answer" (the word/sentence to be dictated, which is 'kedi'). The user interface will handle the audio part.`,
-    'interactive-story': (settings: any, count: number) => `Create the beginning of ${count} 'choose your own adventure' story in Turkish. The genre is '${settings.genre}' and it's for a grade ${settings.gradeLevel} student. The story should end with a choice for the reader. Format as a JSON array of objects, each with "question" (the story segment with choices) and "answer" (a logical continuation for one of the choices).`
-};
-
 const dyscalculiaPrompts: Record<string, (settings: any, count: number) => string> = {
     'problem-solving': (settings: any, count: number) => `Create ${count} very simple, single-step Turkish math word problems for a grade ${settings.gradeLevel} student with dyscalculia. Use clear, direct language and simple numbers. Avoid distracting information. The topic is '${settings.topic}'. Format as a JSON array of objects, each with "question" and "answer".`,
     'interactive-story-dc': (settings: any, count: number) => `Create the beginning of ${count} story set in a '${settings.genre}' for a grade ${settings.gradeLevel} student. The story must be in Turkish. The story must include a simple, clear mathematical choice (e.g., counting, comparing small numbers). Format as a JSON array of objects, each with "question" (the story segment with choices) and "answer" (a logical continuation for one of the choices).`
@@ -41,6 +31,17 @@ const dysgraphiaPrompts: Record<string, (settings: any, count: number) => string
     'listing-the-givens-ai': (settings: any, count: number) => `Generate ${count} grade ${settings.gradeLevel} Turkish math word problems. The student's task is NOT to solve it, but to read the problem and list the important numbers and facts ('givens'). The problem should be simple, clear, and contain 2-3 key pieces of numerical information. Format as a JSON array of objects, with "question" being the word problem, and "answer" being the list of 'givens'. Example: Q: 'Bir sepette 5 kırmızı elma ve 3 yeşil elma var. Toplam kaç elma vardır?' A: 'Verilenler: 5 kırmızı elma, 3 yeşil elma'.`,
     'step-by-step-scribe-ai': (settings: any, count: number) => `Create ${count} simple ${settings.difficulty} level ${settings.operation} Turkish math problems that require 2-3 steps to solve. Provide the solution steps as a numbered list, but leave blanks for the student to fill in the numbers and the final answer. The student's task is to copy and complete the solution steps. This helps with organizing written work. Format as a JSON array of objects, each with a "question" (the problem and the fill-in-the-blank steps) and an "answer" (the completed steps). Example for '5 + 3': Q: "Problem: 5 + 3 = ?\n1. __ ile başla.\n2. __ ekle.\n3. Sonuç __.'\nA: '1. 5 ile başla. 2. 3 ekle. 3. Sonuç 8.'`,
     'story-problem-creator-ai': (settings: any, count: number) => `Provide ${count} simple mathematical equations (e.g., '7 - 2 = 5') of '${settings.difficulty}' difficulty. The student's task is to write a short story problem based on this equation, related to the topic: '${settings.topic}'. Provide one simple example in the question to guide the student. The example and sample story must be in Turkish. Format as a JSON array of objects, where "question" is the instruction and the equation, and "answer" is a sample story problem.`,
+};
+
+// FIX: Added prompts for the Dyslexia AI modules.
+const dyslexiaPrompts: Record<string, (settings: any, count: number) => string> = {
+    'reading-fluency-coach': (settings: any, count: number) => `Create ${count} short Turkish reading passage(s) for a grade ${settings.gradeLevel} student. The topic is '${settings.topic}'. The text should be simple, with short sentences and common words, suitable for practicing reading fluency. Format as a JSON array of objects, each with "question" (the passage) and "answer" (a simple comprehension question about the passage).`,
+    'comprehension-explorer': (settings: any, count: number) => `Generate ${count} ${settings.textLength} Turkish text passage(s) for a grade ${settings.gradeLevel} student. After the passage, create one multiple-choice question focusing on '${settings.questionType}'. Format as a JSON array of objects, where "question" contains the passage and the question, and "answer" contains the correct choice.`,
+    'vocabulary-explorer': (settings: any, count: number) => `Generate ${count} ${settings.difficulty} level Turkish vocabulary words suitable for a grade ${settings.gradeLevel} student. For each word, provide its meaning and an example sentence. Format as a JSON array of objects, where "question" is the word and "answer" is 'Anlamı: [meaning]. Cümle: [example sentence]'.`,
+    'word-hunter': (settings: any, count: number) => `Create ${count} ${settings.difficulty} level exercises focusing on the morphological component '${settings.focus}'. Provide a short sentence with a target word. The student's task is to identify the component. Format as a JSON array of objects, where "question" is the sentence (e.g., 'Kediler çok sevimlidir.') and "answer" is the identified component (e.g., 'Son ek: -ler').`,
+    'spelling-champion': (settings: any, count: number) => `Generate ${count} ${settings.difficulty} level spelling exercises about '${settings.category}'. Present two options, one correct and one incorrect. The student must choose the correct one. Format as a JSON array of objects, where "question" is 'Hangisi doğru yazılmıştır: [option1] / [option2]?' and "answer" is the correct option.`,
+    'auditory-writing': (settings: any, count: number) => `Generate ${count} ${settings.difficulty} level ${settings.type === 'single_words' ? 'Turkish words' : 'short Turkish sentences'} for a dictation (auditory writing) exercise. The teacher will read these aloud. Format as a JSON array of objects, where "question" is a placeholder like 'Dinle ve yaz.' and "answer" is the word/sentence to be read.`,
+    'interactive-story': (settings: any, count: number) => `Create the beginning of ${count} interactive story in Turkish. Genre: '${settings.genre}'. Grade level: ${settings.gradeLevel}. The story must present two choices for the reader to continue. Format as a JSON array of objects, where "question" is the story part with the choices, and "answer" is a logical continuation for one of the choices.`,
 };
 
 
@@ -168,14 +169,15 @@ export const generateContextualWordProblems = async (module: string, settings: a
     }
 };
 
-export const generateDyslexiaAIProblem = (subModuleId: DyslexiaSubModuleType, settings: any, count: number) => {
-    return generateSpecialLearningAIProblem(dyslexiaPrompts, subModuleId, settings, count);
-};
-
 export const generateDyscalculiaAIProblem = (subModuleId: DyscalculiaSubModuleType, settings: any, count: number) => {
     return generateSpecialLearningAIProblem(dyscalculiaPrompts, subModuleId, settings, count);
 };
 
 export const generateDysgraphiaAIProblem = (subModuleId: DysgraphiaSubModuleType, settings: any, count: number) => {
     return generateSpecialLearningAIProblem(dysgraphiaPrompts, subModuleId, settings, count);
+};
+
+// FIX: Added the missing export for dyslexia AI problem generation.
+export const generateDyslexiaAIProblem = (subModuleId: DyslexiaSubModuleType, settings: any, count: number) => {
+    return generateSpecialLearningAIProblem(dyslexiaPrompts, subModuleId, settings, count);
 };

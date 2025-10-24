@@ -517,56 +517,6 @@ export interface ProblemCreationSettings {
     topic?: string;
 }
 
-// --- DYSLEXIA ---
-export type DyslexiaSubModuleType =
-  | 'sound-wizard'
-  | 'letter-detective'
-  | 'reading-fluency-coach'
-  | 'comprehension-explorer'
-  | 'vocabulary-explorer'
-  | 'visual-master'
-  | 'word-hunter'
-  | 'spelling-champion'
-  | 'memory-gamer'
-  | 'auditory-writing'
-  | 'interactive-story'
-  | 'attention-question'
-  | 'map-reading';
-
-export interface SoundWizardSettings { type: 'rhyme' | 'syllable' | 'blend'; difficulty: 'easy' | 'medium'; wordLength: number; }
-export interface LetterDetectiveSettings { letterGroup: 'vowels' | 'common_consonants' | 'tricky_consonants' | 'mixed'; difficulty: 'easy' | 'medium'; }
-export interface ReadingFluencyCoachSettings { gradeLevel: '1' | '2' | '3'; topic: string; }
-export interface ComprehensionExplorerSettings { gradeLevel: '1' | '2' | '3' | '4'; textLength: 'short' | 'medium' | 'long'; questionType: 'main_idea' | 'inference' | 'vocabulary' | 'mixed'; }
-export interface VocabularyExplorerSettings { gradeLevel: '1' | '2' | '3' | '4'; difficulty: 'easy' | 'medium' | 'hard'; }
-export interface VisualMasterSettings { type: 'letter' | 'word'; pair: 'b-d' | 'p-q' | 'm-n' | 'ev-ve' | 'yok-koy' | 'kar-rak' | 'mixed'; }
-export interface WordHunterSettings { focus: 'prefix' | 'suffix' | 'root'; difficulty: 'easy' | 'medium'; }
-export interface SpellingChampionSettings { category: 'common_errors' | 'homophones' | 'mixed'; difficulty: 'easy' | 'medium' | 'hard'; }
-export interface MemoryGamerSettings { type: 'digit_span' | 'word_sequence' | 'sentence_repeat'; sequenceLength: number; }
-export interface AuditoryWritingSettings { type: 'single_words' | 'short_sentences'; difficulty: 'easy' | 'medium' | 'hard'; }
-export interface InteractiveStorySettings { genre: 'adventure' | 'mystery' | 'fantasy' | 'sci-fi'; gradeLevel: '2' | '3' | '4'; }
-export interface AttentionQuestionSettings { questionType: 'numerical' | 'verbal'; difficulty: 'easy' | 'medium' | 'hard'; numberRange: '1-50' | '1-100' | '100-999'; }
-export interface MapReadingSettings { mapType: 'neighborhood' | 'zoo' | 'city'; task: 'find-place' | 'follow-directions'; }
-
-export interface DyslexiaSettings {
-    activeSubModule: DyslexiaSubModuleType;
-    problemsPerPage: number;
-    pageCount: number;
-    autoFit: boolean;
-    soundWizard: SoundWizardSettings;
-    letterDetective: LetterDetectiveSettings;
-    readingFluencyCoach: ReadingFluencyCoachSettings;
-    comprehensionExplorer: ComprehensionExplorerSettings;
-    vocabularyExplorer: VocabularyExplorerSettings;
-    visualMaster: VisualMasterSettings;
-    wordHunter: WordHunterSettings;
-    spellingChampion: SpellingChampionSettings;
-    memoryGamer: MemoryGamerSettings;
-    auditoryWriting: AuditoryWritingSettings;
-    interactiveStory: InteractiveStorySettings;
-    attentionQuestion: AttentionQuestionSettings;
-    mapReading: MapReadingSettings;
-}
-
 // --- DYSCALCULIA ---
 export type DyscalculiaSubModuleType =
   | 'number-sense'
@@ -650,4 +600,54 @@ export interface DysgraphiaSettings {
     listingTheGivensAi: ListingTheGivensSettings;
     stepByStepScribeAi: StepByStepScribeSettings;
     storyProblemCreatorAi: StoryProblemCreatorSettings;
+}
+// FIX: Added all missing Dyslexia-related types.
+// --- DYSLEXIA ---
+export type DyslexiaSubModuleType =
+  | 'sound-wizard'
+  | 'letter-detective'
+  | 'reading-fluency-coach'
+  | 'comprehension-explorer'
+  | 'vocabulary-explorer'
+  | 'visual-master'
+  | 'word-hunter'
+  | 'spelling-champion'
+  | 'memory-gamer'
+  | 'auditory-writing'
+  | 'interactive-story'
+  | 'attention-question'
+  | 'map-reading';
+
+export interface SoundWizardSettings { type: 'rhyme' | 'syllable' | 'blend'; difficulty: 'easy' | 'medium'; wordLength: number; }
+export interface LetterDetectiveSettings { letterGroup: 'vowels' | 'common_consonants' | 'tricky_consonants' | 'mixed'; difficulty: 'easy' | 'medium'; }
+export interface ReadingFluencyCoachSettings { gradeLevel: '1' | '2' | '3'; topic: string; }
+export interface ComprehensionExplorerSettings { gradeLevel: '1' | '2' | '3' | '4'; textLength: 'short' | 'medium' | 'long'; questionType: 'main_idea' | 'inference' | 'vocabulary' | 'mixed'; }
+export interface VocabularyExplorerSettings { gradeLevel: '1' | '2' | '3' | '4'; difficulty: 'easy' | 'medium' | 'hard'; }
+export interface VisualMasterSettings { type: 'letter' | 'word'; pair: 'b-d' | 'p-q' | 'm-n' | 'ev-ve' | 'yok-koy' | 'kar-rak' | 'mixed'; }
+export interface WordHunterSettings { focus: 'prefix' | 'suffix' | 'root'; difficulty: 'easy' | 'medium'; }
+export interface SpellingChampionSettings { category: 'common_errors' | 'homophones' | 'mixed'; difficulty: 'easy' | 'medium' | 'hard'; }
+export interface MemoryGamerSettings { type: 'digit_span' | 'word_sequence' | 'sentence_repeat'; sequenceLength: number; }
+export interface AuditoryWritingSettings { type: 'single_words' | 'short_sentences'; difficulty: 'easy' | 'medium' | 'hard'; }
+export interface InteractiveStorySettings { genre: 'adventure' | 'mystery' | 'fantasy' | 'sci-fi'; gradeLevel: '2' | '3' | '4'; }
+export interface AttentionQuestionSettings { questionType: 'numerical' | 'verbal'; difficulty: 'easy' | 'medium' | 'hard'; numberRange: '1-50' | '1-100' | '100-999'; }
+export interface MapReadingSettings { mapType: 'neighborhood' | 'zoo' | 'city'; task: 'find-place' | 'follow-directions'; }
+
+export interface DyslexiaSettings {
+    activeSubModule: DyslexiaSubModuleType;
+    problemsPerPage: number;
+    pageCount: number;
+    autoFit: boolean;
+    soundWizard: SoundWizardSettings;
+    letterDetective: LetterDetectiveSettings;
+    readingFluencyCoach: ReadingFluencyCoachSettings;
+    comprehensionExplorer: ComprehensionExplorerSettings;
+    vocabularyExplorer: VocabularyExplorerSettings;
+    visualMaster: VisualMasterSettings;
+    wordHunter: WordHunterSettings;
+    spellingChampion: SpellingChampionSettings;
+    memoryGamer: MemoryGamerSettings;
+    auditoryWriting: AuditoryWritingSettings;
+    interactiveStory: InteractiveStorySettings;
+    attentionQuestion: AttentionQuestionSettings;
+    mapReading: MapReadingSettings;
 }
