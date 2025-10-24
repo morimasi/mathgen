@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { UIProvider, useUI } from './services/UIContext.tsx';
 import { WorksheetProvider, useWorksheet } from './services/WorksheetContext.tsx';
@@ -276,7 +277,7 @@ const WorksheetToolbar: React.FC = memo(() => {
                 </div>
                  <div className="flex flex-col gap-0.5">
                     <label htmlFor="page-margin-slider" className="font-medium text-xs text-stone-700 dark:text-stone-300">Sayfa Kenar Boşluğu</label>
-                    <input id="page-margin-slider" type="range" min={0.5} max={4} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
+                    <input id="page-margin-slider" type="range" min={0.5} max={6} step={0.1} value={localSettings.pageMargin} onChange={(e) => handleLocalChange('pageMargin', parseFloat(e.target.value))} className="w-20 accent-primary"/>
                 </div>
              </div>
         </div>

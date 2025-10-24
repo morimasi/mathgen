@@ -11,7 +11,7 @@ const PrintSettingsContext = createContext<PrintSettingsContextType | undefined>
 const initialPrintSettings: PrintSettings = {
     layoutMode: 'flow',
     rows: 10,
-    columns: 2,
+    columns: 1,
     columnGap: 2,
     fontSize: 16,
     showHeader: false,
