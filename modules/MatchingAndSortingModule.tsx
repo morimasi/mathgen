@@ -145,7 +145,7 @@ const MatchingAndSortingModule: React.FC = () => {
                            <span className="text-stone-500 dark:text-stone-400 font-normal">{`${(settings.letterHorizontalSpacing ?? 4).toFixed(1)}rem`}</span>
                         </label>
                         <input
-                            type="range" id="letter-horizontal-spacing-slider" value={settings.letterHorizontalSpacing || 4} min={1} max={20} step={0.5}
+                            type="range" id="letter-horizontal-spacing-slider" value={settings.letterHorizontalSpacing || 4} min={1} max={40} step={0.5}
                             onChange={e => handleSettingChange('letterHorizontalSpacing', parseFloat(e.target.value))}
                             className="w-full h-2 bg-stone-200 dark:bg-stone-600 rounded-lg appearance-none cursor-pointer accent-primary"
                         />
