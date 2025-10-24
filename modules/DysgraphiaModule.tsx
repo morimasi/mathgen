@@ -72,7 +72,7 @@ const allSubModules = subModuleGroups.flatMap(g => g.modules);
 
 const defaultSettings: DysgraphiaSettings = {
     activeSubModule: 'number-trace',
-    problemsPerPage: 8, pageCount: 1, autoFit: true,
+    problemsPerPage: 8, pageCount: 1, autoFit: false,
     numberTrace: { digits: 2 },
     geometricDoodling: { shape: 'square' },
     mathConnectTheDots: { countingType: 'sequential' },

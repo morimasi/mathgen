@@ -40,7 +40,7 @@ const initialVisualSupportSettings: VisualSupportSettings = {
     maxNumber: 10,
     problemsPerPage: 12,
     pageCount: 1,
-    autoFit: true,
+    autoFit: false,
     emojiSize: 32,
     numberSize: 16,
     boxSize: 50,

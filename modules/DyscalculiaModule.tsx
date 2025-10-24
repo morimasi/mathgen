@@ -49,7 +49,7 @@ const subModules: { id: DyscalculiaSubModuleType; label: string; icon: React.FC<
 
 const defaultSettings: DyscalculiaSettings = {
     activeSubModule: 'number-sense',
-    problemsPerPage: 10, pageCount: 1, autoFit: true,
+    problemsPerPage: 10, pageCount: 1, autoFit: false,
     numberSense: { type: 'number-line', maxNumber: 20 },
     arithmeticFluency: { operation: 'addition', difficulty: 'easy' },
     numberGrouping: { maxNumber: 10 },

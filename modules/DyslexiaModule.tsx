@@ -63,7 +63,7 @@ const subModules: { id: DyslexiaSubModuleType; label: string; icon: React.FC<Rea
 
 const defaultSettings: DyslexiaSettings = {
     activeSubModule: 'sound-wizard',
-    problemsPerPage: 10, pageCount: 1, autoFit: true,
+    problemsPerPage: 10, pageCount: 1, autoFit: false,
     soundWizard: { type: 'rhyme', difficulty: 'easy', wordLength: 4 },
     letterDetective: { letterGroup: 'vowels', difficulty: 'easy' },
     readingFluencyCoach: { gradeLevel: '1', topic: 'Hayvanlar' },
