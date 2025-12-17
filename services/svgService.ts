@@ -711,35 +711,184 @@ export const drawCalendar = (monthName: string, startDay: number, daysInMonth: n
     `;
 };
 
-export const drawRuler = (length: number, highlight?: number): string => {
-    const scale = 10; // pixels per unit
-    const width = (length + 1) * scale * 2;
+export const drawRuler = (length: number, highlight?: number, unit: 'cm' | 'mm' = 'cm', startVal: number = 0): string => {
+    const scale = 30; // pixels per unit (cm)
+    const totalUnits = length;
+    const width = totalUnits * scale + 40;
     const height = 50;
     
     let marks = '';
-    for (let i = 0; i <= length; i++) {
-        const x = 10 + i * scale * 2;
-        marks += `<line x1="${x}" y1="${height}" x2="${x}" y2="${height - 15}" stroke="black" stroke-width="1.5" />`;
-        marks += `<text x="${x}" y="${height - 20}" text-anchor="middle" font-size="10" font-family="sans-serif">${i}</text>`;
+    
+    // Draw ticks
+    for (let i = 0; i <= totalUnits; i++) {
+        const x = 20 + i * scale;
+        // Main tick
+        marks += `<line x1="${x}" y1="${height}" x2="${x}" y2="${height - 15}" stroke="#374151" stroke-width="1.5" />`;
+        // Label
+        marks += `<text x="${x}" y="${height - 20}" text-anchor="middle" font-size="10" font-family="monospace" fill="#374151">${startVal + i}</text>`;
         
-        // Half marks
-        if (i < length) {
-             const hx = x + scale;
-             marks += `<line x1="${hx}" y1="${height}" x2="${hx}" y2="${height - 10}" stroke="black" stroke-width="1" />`;
+        // Millimeter ticks
+        if (i < totalUnits) {
+            if (unit === 'cm') {
+                const midX = x + scale / 2;
+                marks += `<line x1="${midX}" y1="${height}" x2="${midX}" y2="${height - 10}" stroke="#9ca3af" stroke-width="1" />`;
+            } else {
+                for (let j=1; j<10; j++) {
+                    const mmX = x + (scale * j / 10);
+                    const h = j === 5 ? 10 : 6;
+                    marks += `<line x1="${mmX}" y1="${height}" x2="${mmX}" y2="${height - h}" stroke="#9ca3af" stroke-width="0.5" />`;
+                }
+            }
         }
     }
 
     let highlightSvg = '';
     if (highlight !== undefined) {
-        const x = 10 + highlight * scale * 2;
-        highlightSvg = `<path d="M ${x} ${height-25} L ${x-4} ${height-35} H ${x+4} Z" fill="#ef4444" />`;
+        const x = 20 + (highlight - startVal) * scale;
+        highlightSvg = `<path d="M ${x} ${height-25} L ${x-5} ${height-35} H ${x+5} Z" fill="#ef4444" />`;
     }
 
     return `
-        <svg viewBox="0 0 ${width + 20} ${height}" style="max-width: 100%; height: ${height}px; display: block; margin: auto;">
-            <rect x="0" y="0" width="${width + 20}" height="${height}" fill="#fef3c7" stroke="#d97706" stroke-width="1" rx="4" />
+        <svg viewBox="0 0 ${width} ${height}" style="max-width: 100%; height: ${height}px; display: block; margin: auto;">
+            <rect x="0" y="0" width="${width}" height="${height}" fill="#fef3c7" stroke="#d97706" stroke-width="1" rx="4" />
             ${marks}
             ${highlightSvg}
+        </svg>
+    `;
+};
+
+export const drawThermometer = (value: number): string => {
+    // Value range typical -10 to 40
+    const min = -10;
+    const max = 40;
+    const range = max - min;
+    const height = 150;
+    const width = 60;
+    const bulbRadius = 15;
+    const stemWidth = 12;
+    const scaleY = (height - bulbRadius * 2 - 20) / range; // Pixels per degree
+    
+    // Position
+    const cx = width / 2;
+    const stemTop = 10;
+    const zeroY = stemTop + max * scaleY;
+    const mercuryY = zeroY - value * scaleY;
+    
+    // Ticks
+    let ticks = '';
+    for (let t = min; t <= max; t += 10) {
+        const y = zeroY - t * scaleY;
+        ticks += `<line x1="${cx + stemWidth/2}" y1="${y}" x2="${cx + stemWidth/2 + 8}" y2="${y}" stroke="black" stroke-width="1"/>`;
+        ticks += `<text x="${cx + stemWidth/2 + 12}" y="${y + 3}" font-size="9" font-family="sans-serif">${t}</text>`;
+    }
+    for (let t = min; t <= max; t += 5) {
+        if (t % 10 !== 0) {
+            const y = zeroY - t * scaleY;
+            ticks += `<line x1="${cx + stemWidth/2}" y1="${y}" x2="${cx + stemWidth/2 + 5}" y2="${y}" stroke="black" stroke-width="0.5"/>`;
+        }
+    }
+
+    return `
+        <svg viewBox="0 0 ${width} ${height + 10}" style="height: 150px; display: block; margin: auto;">
+            <!-- Glass stem -->
+            <rect x="${cx - stemWidth/2}" y="${stemTop}" width="${stemWidth}" height="${height - bulbRadius}" rx="${stemWidth/2}" fill="white" stroke="#cbd5e1" stroke-width="1"/>
+            
+            <!-- Bulb -->
+            <circle cx="${cx}" cy="${height - bulbRadius}" r="${bulbRadius}" fill="white" stroke="#cbd5e1" stroke-width="1"/>
+            
+            <!-- Mercury Stem -->
+            <rect x="${cx - stemWidth/2 + 2}" y="${mercuryY}" width="${stemWidth - 4}" height="${(height - bulbRadius) - mercuryY}" fill="#ef4444"/>
+            
+            <!-- Mercury Bulb -->
+            <circle cx="${cx}" cy="${height - bulbRadius}" r="${bulbRadius - 2}" fill="#ef4444"/>
+            
+            <!-- Ticks -->
+            ${ticks}
+        </svg>
+    `;
+};
+
+export const drawBeaker = (capacity: number, level: number, unit: string = 'mL'): string => {
+    const width = 80;
+    const height = 120;
+    const padding = 10;
+    const beakerHeight = height - padding * 2;
+    const beakerWidth = width - padding * 2;
+    
+    // Simple graduation logic
+    const step = capacity / 5;
+    let ticks = '';
+    const pxPerUnit = beakerHeight / capacity;
+    
+    for (let v = step; v <= capacity; v += step) {
+        const y = (height - padding) - (v * pxPerUnit);
+        ticks += `<line x1="${padding + beakerWidth}" y1="${y}" x2="${padding + beakerWidth - 10}" y2="${y}" stroke="black" stroke-width="1"/>`;
+        ticks += `<text x="${padding + beakerWidth - 12}" y="${y+3}" text-anchor="end" font-size="9" font-family="sans-serif">${v}</text>`;
+    }
+
+    const fluidHeight = level * pxPerUnit;
+    const fluidY = (height - padding) - fluidHeight;
+
+    return `
+        <svg viewBox="0 0 ${width} ${height}" style="height: 120px; display: block; margin: auto;">
+            <!-- Fluid -->
+            <rect x="${padding}" y="${fluidY}" width="${beakerWidth}" height="${fluidHeight}" fill="#bfdbfe" fill-opacity="0.6"/>
+            
+            <!-- Beaker Outline -->
+            <path d="M ${padding} ${padding} V ${height - padding - 5} Q ${padding} ${height - padding} ${padding + 5} ${height - padding} H ${width - padding - 5} Q ${width - padding} ${height - padding} ${width - padding} ${height - padding - 5} V ${padding}" fill="none" stroke="#475569" stroke-width="2"/>
+            
+            <!-- Spout -->
+            <path d="M ${width - padding} ${padding} L ${width} ${padding - 5}" stroke="#475569" stroke-width="2"/>
+            
+            <!-- Ticks -->
+            ${ticks}
+            <text x="${width/2}" y="${height - padding - 5}" text-anchor="middle" font-size="10" fill="#475569">${unit}</text>
+        </svg>
+    `;
+};
+
+export const drawBalanceScale = (leftWeight: number, rightWeight: number): string => {
+    // Simple logic: if left > right, tilt left down.
+    // Angle max 15 degrees.
+    const diff = rightWeight - leftWeight; // Positive means right heavy (tilts right down, angle positive)
+    const maxDiff = Math.max(leftWeight, rightWeight) || 1; // avoid div by zero
+    // Normalize tilt
+    let angle = (diff / (maxDiff * 1.5)) * 20; 
+    angle = Math.max(-20, Math.min(20, angle)); // Clamp
+
+    const width = 150;
+    const height = 100;
+    const fulcrumX = 75;
+    const fulcrumY = 80;
+    const beamLength = 120;
+    
+    return `
+        <svg viewBox="0 0 ${width} ${height}" style="height: 100px; display: block; margin: auto;">
+            <!-- Base -->
+            <path d="M ${fulcrumX} ${fulcrumY} L ${fulcrumX - 10} ${height} H ${fulcrumX + 10} Z" fill="#4b5563"/>
+            <line x1="${fulcrumX}" y1="${fulcrumY}" x2="${fulcrumX}" y2="${height}" stroke="#4b5563" stroke-width="2"/>
+
+            <!-- Rotating Group -->
+            <g transform="rotate(${angle}, ${fulcrumX}, ${fulcrumY})">
+                <!-- Beam -->
+                <line x1="${fulcrumX - beamLength/2}" y1="${fulcrumY}" x2="${fulcrumX + beamLength/2}" y2="${fulcrumY}" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/>
+                
+                <!-- Left Pan Chain -->
+                <line x1="${fulcrumX - beamLength/2}" y1="${fulcrumY}" x2="${fulcrumX - beamLength/2}" y2="${fulcrumY + 30}" stroke="#9ca3af"/>
+                <!-- Right Pan Chain -->
+                <line x1="${fulcrumX + beamLength/2}" y1="${fulcrumY}" x2="${fulcrumX + beamLength/2}" y2="${fulcrumY + 30}" stroke="#9ca3af"/>
+                
+                <!-- Pans (keep them horizontal by counter-rotating) -->
+                <g transform="translate(${fulcrumX - beamLength/2}, ${fulcrumY + 30}) rotate(${-angle})">
+                    <path d="M -15 0 A 15 10 0 0 0 15 0 Z" fill="#d1d5db" stroke="#6b7280"/>
+                    ${leftWeight > 0 ? `<rect x="-8" y="-12" width="16" height="12" fill="#ef4444" rx="2"/> <text x="0" y="-4" font-size="8" text-anchor="middle" fill="white">${leftWeight}</text>` : ''}
+                </g>
+                
+                <g transform="translate(${fulcrumX + beamLength/2}, ${fulcrumY + 30}) rotate(${-angle})">
+                    <path d="M -15 0 A 15 10 0 0 0 15 0 Z" fill="#d1d5db" stroke="#6b7280"/>
+                    ${rightWeight > 0 ? `<rect x="-8" y="-12" width="16" height="12" fill="#3b82f6" rx="2"/> <text x="0" y="-4" font-size="8" text-anchor="middle" fill="white">${rightWeight}</text>` : ''}
+                </g>
+            </g>
         </svg>
     `;
 };

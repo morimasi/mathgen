@@ -11,6 +11,8 @@ export interface Problem {
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'mixed';
 
+// ... [Existing Arithmetic, Fractions, Decimals, Time, Place Value, Rhythmic Counting, Geometry Settings - KEEP AS IS] ...
+
 // --- Arithmetic ---
 export enum ArithmeticOperation {
     Addition = 'addition',
@@ -268,24 +270,37 @@ export interface GeometrySettings {
     topic: string;
 }
 
-// --- Measurement ---
-export enum MeasurementProblemType {
-    LengthConversion = 'length',
-    WeightConversion = 'weight',
-    VolumeConversion = 'volume',
+// --- Measurement (PROFESSIONAL UPDATE) ---
+export enum MeasurementDomain {
+    Length = 'length',
+    Weight = 'weight',
+    Capacity = 'capacity', // Liquids
+    Temperature = 'temperature',
     Mixed = 'mixed'
+}
+
+export enum MeasurementProblemType {
+    ReadTool = 'read-tool',       // Read ruler, scale, thermometer
+    Conversion = 'conversion',    // Convert units
+    Comparison = 'comparison',    // Compare quantities (visual balance scale etc)
+    Estimation = 'estimation',    // Real world estimation
+    Operations = 'operations',    // Add/Sub measurements
 }
 
 export interface MeasurementSettings {
     gradeLevel: number;
+    domain: MeasurementDomain;
     type: MeasurementProblemType;
     difficulty: Difficulty;
     problemsPerPage: number;
     pageCount: number;
     useWordProblems: boolean;
     autoFit: boolean;
-    useVisuals: boolean;
     topic: string;
+    
+    // Specific tool settings
+    rulerDetail?: 'cm' | 'mm' | 'broken'; // Broken = starts from non-zero
+    scaleType?: 'balance' | 'digital' | 'analog';
 }
 
 
