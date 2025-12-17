@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { generateMeasurementProblem } from '../services/measurementService.ts';
 import { generateContextualWordProblems } from '../services/geminiService.ts';
-import { MeasurementSettings, MeasurementProblemType, MeasurementDomain, Difficulty } from '../types.ts';
+import { MeasurementSettings, MeasurementProblemType, MeasurementDomain, Difficulty, VisualStyle } from '../types.ts';
 import Button from '../components/form/Button.tsx';
 import NumberInput from '../components/form/NumberInput.tsx';
 import Select from '../components/form/Select.tsx';
@@ -29,6 +29,7 @@ const MeasurementModule: React.FC = () => {
         topic: '',
         rulerDetail: 'cm',
         scaleType: 'balance',
+        visualStyle: 'none',
     });
 
     const { generate } = useProblemGenerator({
@@ -64,7 +65,7 @@ const MeasurementModule: React.FC = () => {
     };
 
     const getHintText = () => {
-        if (settings.useWordProblems) return "AI modu, seçilen ölçü birimiyle ilgili (örn: 'manavda ağırlık', 'terzide uzunluk') hikayeleştirilmiş problemler üretir.";
+        if (settings.useWordProblems) return "AI modu, seçilen ölçü birimiyle ilgili (örn: 'manavda ağırlık', 'terzide uzunluk') hikayeleştirilmiş problemler üretir. 'Görsel Stil' ayarından 'Teknik Çizim'i seçerek cetvel veya terazi gibi araçların eklenmesini sağlayabilirsiniz.";
         if (settings.type === MeasurementProblemType.ReadTool) return "Öğrencilerin cetvel, termometre, terazi veya dereceli kap gibi gerçek ölçüm araçlarını okuma becerilerini geliştirir.";
         if (settings.type === MeasurementProblemType.Estimation) return "Gerçek dünyadaki nesnelerin (bir elma, bir kapı vb.) tahmini ölçüleri üzerine farkındalık yaratır.";
         return "Ölçüler modülü, birim dönüştürmeden araç kullanımına kadar kapsamlı bir matematiksel ölçme deneyimi sunar.";
@@ -114,7 +115,7 @@ const MeasurementModule: React.FC = () => {
                     onChange={e => handleSettingChange('useWordProblems', e.target.checked)}
                 />
                  {settings.useWordProblems && (
-                    <div className="mt-1.5 pl-6">
+                    <div className="mt-1.5 pl-6 grid grid-cols-1 gap-2">
                          <div className="relative">
                             <TextInput
                                 label="Senaryo (Örn: Mutfak, İnşaat)"
@@ -127,6 +128,17 @@ const MeasurementModule: React.FC = () => {
                                 <ShuffleIcon className="w-5 h-5" />
                             </button>
                         </div>
+                        <Select
+                            label="Görsel Stil"
+                            id="measurement-visual-style"
+                            value={settings.visualStyle}
+                            onChange={e => handleSettingChange('visualStyle', e.target.value as VisualStyle)}
+                            options={[
+                                { value: 'none', label: 'Yalnızca Metin' },
+                                { value: 'ai-illustration', label: 'AI İllüstrasyon (Resim)' },
+                                { value: 'technical-svg', label: 'Teknik Çizim (Cetvel/Terazi)' },
+                            ]}
+                        />
                     </div>
                 )}
             </div>

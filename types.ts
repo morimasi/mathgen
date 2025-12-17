@@ -287,6 +287,8 @@ export enum MeasurementProblemType {
     Operations = 'operations',    // Add/Sub measurements
 }
 
+export type VisualStyle = 'none' | 'ai-illustration' | 'technical-svg';
+
 export interface MeasurementSettings {
     gradeLevel: number;
     domain: MeasurementDomain;
@@ -297,6 +299,7 @@ export interface MeasurementSettings {
     useWordProblems: boolean;
     autoFit: boolean;
     topic: string;
+    visualStyle: VisualStyle;
     
     // Specific tool settings
     rulerDetail?: 'cm' | 'mm' | 'broken'; // Broken = starts from non-zero
@@ -318,6 +321,8 @@ export interface WordProblemSettings {
     layout: 'default' | 'with-visual-space' | 'given-wanted';
     digits: string;
     uploadedImage?: string;
+    visualStyle?: VisualStyle;
+    domain?: string;
 }
 
 // --- Visual Support ---

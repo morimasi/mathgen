@@ -2,6 +2,7 @@
 // services/geminiService.ts
 import { GoogleGenAI, Type } from "@google/genai";
 import { Problem, DyscalculiaSubModuleType, DysgraphiaSubModuleType, DyslexiaSubModuleType, WordProblemSettings } from '../types.ts';
+import { drawRuler, drawThermometer, drawBeaker } from './svgService.ts';
 
 // In a real scenario, this would be configured securely.
 // For this environment, we assume process.env.API_KEY is available.
@@ -44,6 +45,19 @@ const visualProblemSchema = {
         },
       },
       required: ['question', 'answer', 'visualPrompt'],
+    },
+};
+
+const technicalProblemSchema = {
+    type: Type.ARRAY,
+    items: {
+      type: Type.OBJECT,
+      properties: {
+        question: { type: Type.STRING, description: 'The math problem question text in Turkish. Refer to "the image" or "the figure below".' },
+        answer: { type: Type.STRING, description: 'The answer to the math problem.' },
+        technicalValue: { type: Type.NUMBER, description: 'The specific numerical value that should be displayed on the technical tool (e.g., 5 for 5cm, 20 for 20 degrees).' }
+      },
+      required: ['question', 'answer', 'technicalValue'],
     },
 };
 
@@ -119,6 +133,30 @@ const processVisualPrompts = async (problems: any[]): Promise<any[]> => {
         return p;
     });
     return Promise.all(imagePromises);
+};
+
+const processTechnicalSVGs = (problems: any[], domain: string): any[] => {
+    return problems.map(p => {
+        if (typeof p.technicalValue === 'number') {
+            let svg = '';
+            // Basic mapping based on domain
+            if (domain === 'length') {
+                // Draw a ruler showing the value
+                svg = drawRuler(Math.ceil(p.technicalValue + 2), p.technicalValue, 'cm', 0);
+                p.question = `<div style="margin-bottom:1em; display:flex; justify-content:center;">${svg}</div>` + p.question;
+            } else if (domain === 'temperature') {
+                svg = drawThermometer(p.technicalValue);
+                p.question = `<div style="margin-bottom:1em; display:flex; justify-content:center;">${svg}</div>` + p.question;
+            } else if (domain === 'capacity') {
+                svg = drawBeaker(1000, p.technicalValue * 100); // Assume val is 1-10 scale mapped to 100-1000ml or similar
+                p.question = `<div style="margin-bottom:1em; display:flex; justify-content:center;">${svg}</div>` + p.question;
+            } else {
+                // Default fallback for weight or unknown: just show the value in a box
+                p.question = `<div style="border:2px solid #ccc; padding:10px; text-align:center; font-weight:bold; margin-bottom:10px;">Değer: ${p.technicalValue}</div>` + p.question;
+            }
+        }
+        return p;
+    });
 };
 
 
@@ -246,7 +284,12 @@ export const generateContextualWordProblems = async (module: string, settings: W
         }
         prompt += `Each problem should require ${settings.operationCount} operation(s) to solve. `;
         
-        if (settings.useVisuals && !settings.uploadedImage) {
+        const isTechnicalSVG = settings.visualStyle === 'technical-svg';
+        const isAIIllustration = settings.visualStyle === 'ai-illustration' || (settings.useVisuals && !settings.uploadedImage && settings.visualStyle !== 'none');
+
+        if (isTechnicalSVG) {
+            prompt += ` Important: The problem will be accompanied by a technical diagram (like a ruler or scale). Please include a "technicalValue" field in the JSON (a number) representing the value shown in the diagram (e.g., the length in cm, or temperature in degrees). The question text should refer to "the figure" or "the image".`;
+        } else if (isAIIllustration) {
             prompt += ` For each problem, also provide a "visualPrompt" key. The "visualPrompt" must be a detailed, descriptive prompt IN ENGLISH for an image generation model, describing the scene of the problem visually in a simple, colorful, children's book illustration style, without including any numbers or direct clues to the answer. Do not include emojis in the question text when generating a visual prompt.`;
         } else {
             prompt += ` If relevant, include emojis in the problem text to make it more engaging.`;
@@ -263,6 +306,13 @@ export const generateContextualWordProblems = async (module: string, settings: W
 
     try {
         let response;
+        const isAIIllustration = settings.visualStyle === 'ai-illustration' || (settings.useVisuals && !settings.uploadedImage && settings.visualStyle !== 'none');
+        const isTechnicalSVG = settings.visualStyle === 'technical-svg';
+
+        let schema = problemSchema;
+        if (isAIIllustration) schema = visualProblemSchema;
+        if (isTechnicalSVG) schema = technicalProblemSchema;
+
         if (settings.uploadedImage) {
             const match = settings.uploadedImage.match(/^data:(.+);base64,(.+)$/);
             if (!match) {
@@ -281,7 +331,7 @@ export const generateContextualWordProblems = async (module: string, settings: W
                 config: {
                     systemInstruction,
                     responseMimeType: "application/json",
-                    responseSchema: (settings.useVisuals && !settings.uploadedImage) ? visualProblemSchema : problemSchema,
+                    responseSchema: schema,
                 },
             });
         } else {
@@ -291,7 +341,7 @@ export const generateContextualWordProblems = async (module: string, settings: W
                 config: {
                     systemInstruction,
                     responseMimeType: "application/json",
-                    responseSchema: settings.useVisuals ? visualProblemSchema : problemSchema,
+                    responseSchema: schema,
                 },
             });
         }
@@ -301,8 +351,10 @@ export const generateContextualWordProblems = async (module: string, settings: W
             throw new Error("AI response is not a valid array.");
         }
         
-        if (settings.useVisuals && !settings.uploadedImage) {
+        if (isAIIllustration) {
             parsedProblems = await processVisualPrompts(parsedProblems);
+        } else if (isTechnicalSVG && settings.domain) {
+            parsedProblems = processTechnicalSVGs(parsedProblems, settings.domain);
         }
 
         return parsedProblems.map((p: any) => ({
