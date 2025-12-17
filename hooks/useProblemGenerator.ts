@@ -1,0 +1,149 @@
+import { useCallback, useRef, useEffect } from 'react';
+import { useWorksheet } from '../services/WorksheetContext.tsx';
+import { usePrintSettings } from '../services/PrintSettingsContext.tsx';
+import { calculateMaxProblems } from '../services/layoutService.ts';
+import { useToast } from '../services/ToastContext.tsx';
+import { Problem } from '../types.ts';
+
+interface GeneratorOptions<S> {
+    moduleKey: string;
+    settings: S & { useWordProblems?: boolean, problemsPerPage?: number, pageCount?: number, autoFit?: boolean };
+    generatorFn: (settings: S) => { problem: Problem, title: string, error?: string, preamble?: string };
+    // FIX: Changed the type of the 'settings' parameter to 'any' to allow different module settings types.
+    aiGeneratorFn?: (module: string, settings: any) => Promise<Problem[]>;
+    aiGeneratorTitle?: string;
+    isLive?: boolean;
+    isPracticeSheet?: boolean;
+}
+
+export const useProblemGenerator = <S,>({
+    moduleKey,
+    settings,
+    generatorFn,
+    aiGeneratorFn,
+    aiGeneratorTitle,
+    isLive = false,
+    isPracticeSheet = false,
+}: GeneratorOptions<S>) => {
+    const { updateWorksheet, setIsLoading, lastGeneratorModule, autoRefreshTrigger } = useWorksheet();
+    const { settings: printSettings } = usePrintSettings();
+    const { addToast } = useToast();
+    const contentRef = useRef<HTMLDivElement | null>(null);
+    const isInitialMount = useRef(true);
+    const autoRefreshTriggerRef = useRef(autoRefreshTrigger);
+
+
+    useEffect(() => {
+        if (!contentRef.current) {
+            // FIX: Cast the result of getElementById to HTMLDivElement to match the ref's type.
+            contentRef.current = document.getElementById('worksheet-container-0') as HTMLDivElement;
+        }
+    }, []);
+
+    const generate = useCallback(async (clearPrevious: boolean, overrideSettings?: Partial<S>) => {
+        setIsLoading(true);
+        try {
+            const finalSettings = { ...settings, ...overrideSettings };
+
+            if (finalSettings.useWordProblems && aiGeneratorFn) {
+                const problems = await aiGeneratorFn(moduleKey, finalSettings);
+                updateWorksheet({ 
+                    newProblems: problems, 
+                    clearPrevious, 
+                    title: aiGeneratorTitle || 'Yapay Zeka Destekli Problemler',
+                    generatorModule: moduleKey,
+                    pageCount: printSettings.layoutMode === 'table' ? 1 : finalSettings.pageCount
+                });
+            } else {
+                let totalCount;
+                if (isPracticeSheet) {
+                    // For practice sheets, the number of items to generate IS the page count
+                    // because 1 practice sheet = 1 page.
+                    totalCount = finalSettings.pageCount ?? 1;
+                } else if (printSettings.layoutMode === 'table') {
+                    totalCount = printSettings.rows * printSettings.columns;
+                } else if (finalSettings.autoFit) {
+                    // FIX: Check if contentRef.current exists before using it and provide a safe fallback.
+                    const problemsPerPage = contentRef.current ? calculateMaxProblems(contentRef, printSettings) : (finalSettings.problemsPerPage || 20);
+                    totalCount = problemsPerPage * (finalSettings.pageCount ?? 1);
+                } else if (overrideSettings) {
+                    totalCount = 1;
+                }
+                else {
+                    totalCount = (finalSettings.problemsPerPage ?? 20) * (finalSettings.pageCount ?? 1);
+                }
+                
+                const newProblems: Problem[] = [];
+                let newTitle = '';
+                let newPreamble: string | undefined = undefined;
+
+                for (let i = 0; i < totalCount; i++) {
+                    const { problem, title, error, preamble } = generatorFn(finalSettings);
+                    if (error) {
+                        addToast(error, 'error');
+                        break; 
+                    }
+                    newProblems.push(problem);
+                    if (i === 0) {
+                        newTitle = title;
+                        newPreamble = preamble;
+                    }
+                }
+
+                updateWorksheet({ 
+                    newProblems, 
+                    clearPrevious, 
+                    title: newTitle, 
+                    preamble: newPreamble,
+                    generatorModule: moduleKey,
+                    // Ensure the context knows exactly how many pages were requested
+                    pageCount: isPracticeSheet 
+                        ? (finalSettings.pageCount ?? 1) 
+                        : (printSettings.layoutMode === 'table' ? 1 : (finalSettings.pageCount ?? 1))
+                });
+            }
+        } catch (error: any) {
+            console.error(`Error generating problems for ${moduleKey}:`, error);
+            addToast(`Problem oluşturulurken hata: ${error.message}`, 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [
+        settings, 
+        printSettings, 
+        moduleKey, 
+        aiGeneratorFn,
+        aiGeneratorTitle,
+        generatorFn,
+        isPracticeSheet,
+        setIsLoading, 
+        updateWorksheet, 
+        addToast,
+    ]);
+
+    // Handle live updates
+    useEffect(() => {
+        if (!isLive || isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        if (lastGeneratorModule === moduleKey) {
+            const handler = setTimeout(() => {
+                generate(true);
+            }, 300); // Debounce
+            return () => clearTimeout(handler);
+        }
+    }, [settings, printSettings, isLive, generate, lastGeneratorModule, moduleKey]);
+
+    // Handle auto refresh on print settings change
+    useEffect(() => {
+        if (autoRefreshTrigger > autoRefreshTriggerRef.current && lastGeneratorModule === moduleKey) {
+            autoRefreshTriggerRef.current = autoRefreshTrigger;
+            generate(true);
+        }
+    }, [autoRefreshTrigger, lastGeneratorModule, generate, moduleKey]);
+
+
+    return { generate };
+};

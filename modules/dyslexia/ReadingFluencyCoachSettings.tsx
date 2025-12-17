@@ -1,0 +1,44 @@
+import React from 'react';
+// FIX: Changed import from ReadingFluencyCoachSettings to the correct ReadingFluencySettings.
+import { ReadingFluencySettings } from '../../types.ts';
+import Select from '../../components/form/Select.tsx';
+import TextInput from '../../components/form/TextInput.tsx';
+import HintButton from '../../components/HintButton.tsx';
+
+interface Props {
+    settings: ReadingFluencySettings;
+    onChange: (settings: Partial<ReadingFluencySettings>) => void;
+}
+
+const ReadingFluencyCoachSettingsComponent: React.FC<Props> = ({ settings, onChange }) => {
+    return (
+        <div className="space-y-2">
+            <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold">Sesli Okuma Koçu Ayarları</h3>
+                <HintButton text="Yapay zeka, seçilen sınıf seviyesine ve konuya uygun, akıcı okuma pratiği yapmak için tasarlanmış kısa metinler oluşturur." />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+                <Select
+                    label="Sınıf Seviyesi"
+                    id="rfc-gradeLevel"
+                    value={settings.gradeLevel}
+                    onChange={e => onChange({ gradeLevel: e.target.value as ReadingFluencySettings['gradeLevel'] })}
+                    options={[
+                        { value: '1', label: '1. Sınıf' },
+                        { value: '2', label: '2. Sınıf' },
+                        { value: '3', label: '3. Sınıf' },
+                    ]}
+                />
+                <TextInput
+                    label="Metin Konusu"
+                    id="rfc-topic"
+                    value={settings.topic}
+                    onChange={e => onChange({ topic: e.target.value })}
+                    placeholder="Örn: Orman, Uzay, Deniz"
+                />
+            </div>
+        </div>
+    );
+};
+
+export default ReadingFluencyCoachSettingsComponent;

@@ -1,0 +1,46 @@
+import React from 'react';
+// FIX: Changed import from non-existent WordHunterSettings to MorphologicalAwarenessSettings.
+import { MorphologicalAwarenessSettings } from '../../types.ts';
+import Select from '../../components/form/Select.tsx';
+import HintButton from '../../components/HintButton.tsx';
+
+interface Props {
+    settings: MorphologicalAwarenessSettings;
+    onChange: (settings: Partial<MorphologicalAwarenessSettings>) => void;
+}
+
+const WordHunterSettings: React.FC<Props> = ({ settings, onChange }) => {
+    return (
+        <div className="space-y-2">
+             <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold">Kelime Avcısı Ayarları</h3>
+                <HintButton text="Bu morfolojik farkındalık egzersizi, öğrencilerin kelimelerin köklerini ve eklerini tanımalarına yardımcı olarak kelime dağarcığını ve anlama becerilerini geliştirir." />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+                <Select
+                    label="Odaklan"
+                    id="wh-focus"
+                    value={settings.focus}
+                    onChange={e => onChange({ focus: e.target.value as MorphologicalAwarenessSettings['focus'] })}
+                    options={[
+                        { value: 'prefix', label: 'Ön Ekler' },
+                        { value: 'suffix', label: 'Son Ekler (-ler, -lık, vb.)' },
+                        { value: 'root', label: 'Kelime Kökü' },
+                    ]}
+                />
+                <Select
+                    label="Zorluk"
+                    id="wh-difficulty"
+                    value={settings.difficulty}
+                    onChange={e => onChange({ difficulty: e.target.value as MorphologicalAwarenessSettings['difficulty'] })}
+                    options={[
+                        { value: 'easy', label: 'Kolay (Yaygın Ekler)' },
+                        { value: 'medium', label: 'Orta (Daha Az Yaygın Ekler)' },
+                    ]}
+                />
+            </div>
+        </div>
+    );
+};
+
+export default WordHunterSettings;
