@@ -20,6 +20,9 @@ interface UIContextType {
     isFavoritesPanelVisible: boolean;
     openFavoritesPanel: () => void;
     closeFavoritesPanel: () => void;
+    isArchivePanelVisible: boolean;
+    openArchivePanel: () => void;
+    closeArchivePanel: () => void;
     isSettingsPanelCollapsed: boolean;
     setIsSettingsPanelCollapsed: (collapsed: boolean) => void;
 }
@@ -33,6 +36,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isContactModalVisible, setContactModalVisible] = useState(false);
     const [contactModalPrefill, setContactModalPrefill] = useState('');
     const [isFavoritesPanelVisible, setFavoritesPanelVisible] = useState(false);
+    const [isArchivePanelVisible, setArchivePanelVisible] = useState(false);
     const [isSettingsPanelCollapsed, setIsSettingsPanelCollapsed] = useState(window.innerWidth < 768); // Collapse on mobile by default
     
     const openPrintSettings = useCallback(() => setPrintSettingsVisible(true), []);
@@ -51,6 +55,8 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const closeContactModal = useCallback(() => setContactModalVisible(false), []);
     const openFavoritesPanel = useCallback(() => setFavoritesPanelVisible(true), []);
     const closeFavoritesPanel = useCallback(() => setFavoritesPanelVisible(false), []);
+    const openArchivePanel = useCallback(() => setArchivePanelVisible(true), []);
+    const closeArchivePanel = useCallback(() => setArchivePanelVisible(false), []);
 
     return (
         <UIContext.Provider value={{
@@ -59,6 +65,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             isHowToUseVisible, openHowToUse, closeHowToUse,
             isContactModalVisible, openContactModal, closeContactModal, contactModalPrefill,
             isFavoritesPanelVisible, openFavoritesPanel, closeFavoritesPanel,
+            isArchivePanelVisible, openArchivePanel, closeArchivePanel,
             isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
         }}>
             {children}

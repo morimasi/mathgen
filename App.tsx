@@ -8,6 +8,7 @@ import { ColorThemeProvider } from './services/ColorThemeContext.tsx';
 import { FlyingLadybugProvider } from './services/FlyingLadybugContext.tsx';
 import { ToastProvider, useToast } from './services/ToastContext.tsx';
 import { TutorialProvider } from './services/TutorialContext.tsx';
+import { ArchiveProvider, useArchive } from './services/ArchiveContext.tsx';
 import Tabs from './components/Tabs.tsx';
 import SettingsPanel from './components/SettingsPanel.tsx';
 import ProblemSheet from './components/ProblemSheet.tsx';
@@ -16,6 +17,7 @@ import PrintSettingsPanel from './components/PrintSettingsPanel.tsx';
 import HowToUseModal from './components/HowToUseModal.tsx';
 import ContactModal from './components/ContactModal.tsx';
 import FavoritesPanel from './components/FavoritesPanel.tsx';
+import ArchivePanel from './components/ArchivePanel.tsx';
 import AnimatedLogo from './components/AnimatedLogo.tsx';
 import ThemeSwitcher from './components/ThemeSwitcher.tsx';
 import TutorialGuide from './components/TutorialGuide.tsx';
@@ -32,7 +34,9 @@ import {
     DownloadIcon,
     MenuIcon,
     MoreVerticalIcon,
-    FlagIcon
+    FlagIcon,
+    ArchiveIcon,
+    SaveIcon
 } from './components/icons/Icons.tsx';
 import Button from './components/form/Button.tsx';
 import Select from './components/form/Select.tsx';
@@ -96,8 +100,10 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = memo(({ onPrint, onDownloadPDF }) => {
-    const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel } = useUI();
-    const { clearWorksheet, triggerAutoRefresh } = useWorksheet();
+    const { activeTab, setActiveTab, openPrintSettings, openHowToUse, openContactModal, openFavoritesPanel, openArchivePanel } = useUI();
+    const { clearWorksheet, triggerAutoRefresh, problems, title, preamble, pageCount, lastGeneratorModule } = useWorksheet();
+    const { saveToArchive } = useArchive();
+    const { addToast } = useToast();
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isActionMenuOpen, setActionMenuOpen] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -124,10 +130,30 @@ const Header: React.FC<HeaderProps> = memo(({ onPrint, onDownloadPDF }) => {
             window.location.reload();
         }
     };
+
+    const handleSaveToArchive = () => {
+        if (problems.length === 0) {
+            addToast('Arşive kaydetmek için önce bir çalışma kağıdı oluşturun.', 'warning');
+            return;
+        }
+        const archiveTitle = window.prompt('Arşiv için bir isim girin:', title);
+        if (archiveTitle) {
+            saveToArchive({
+                title: archiveTitle,
+                moduleType: lastGeneratorModule || activeTab,
+                problems: problems,
+                preamble: preamble,
+                pageCount: pageCount
+            });
+            addToast('Çalışma kağıdı arşive kaydedildi.', 'success');
+        }
+    };
     
     const ActionButtons = () => (
         <>
             <button onClick={triggerAutoRefresh} className="action-button" title="Soruları Yenile"><RefreshIcon /><span>Soruları Yenile</span></button>
+            <button onClick={() => { handleSaveToArchive(); setActionMenuOpen(false); }} className="action-button" title="Arşive Kaydet"><SaveIcon /><span>Arşive Kaydet</span></button>
+            <button onClick={() => { openArchivePanel(); setActionMenuOpen(false); }} className="action-button" title="Arşivim"><ArchiveIcon /><span>Arşivim</span></button>
             <button onClick={() => { openPrintSettings(); setActionMenuOpen(false); }} className="action-button" title="Gelişmiş Yazdırma Ayarları"><SettingsIcon /><span>Yazdırma Ayarları</span></button>
             <button onClick={() => { openFavoritesPanel(); setActionMenuOpen(false); }} className="action-button" title="Favorilerim"><HeartIcon /><span>Favorilerim</span></button>
             <button onClick={() => { onPrint(); setActionMenuOpen(false); }} className="action-button" title="Yazdır"><PrintIcon /><span>Yazdır</span></button>
@@ -296,8 +322,10 @@ interface TopBarProps {
     triggerAutoRefresh: () => void;
     openPrintSettings: () => void;
     openFavoritesPanel: () => void;
+    openArchivePanel: () => void;
     openHowToUse: () => void;
     openContactModal: () => void;
+    handleSaveToArchive: () => void;
 }
 
 const TopBar: React.FC<TopBarProps> = memo(({
@@ -306,14 +334,18 @@ const TopBar: React.FC<TopBarProps> = memo(({
     triggerAutoRefresh,
     openPrintSettings,
     openFavoritesPanel,
+    openArchivePanel,
     openHowToUse,
-    openContactModal
+    openContactModal,
+    handleSaveToArchive
 }) => {
     return (
         <div id={TUTORIAL_ELEMENT_IDS.HEADER_ACTIONS} className="hidden md:flex items-center justify-end gap-2 px-4 py-1 bg-primary text-white print:hidden">
             <Search />
             <div className="h-5 border-l border-white/30 mx-1"></div>
             <button onClick={triggerAutoRefresh} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Soruları Yenile"><RefreshIcon /></button>
+            <button onClick={handleSaveToArchive} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Arşive Kaydet"><SaveIcon /></button>
+            <button onClick={openArchivePanel} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Arşivim"><ArchiveIcon /></button>
             <ThemeSwitcher />
             <div className="h-5 border-l border-white/30 mx-1"></div>
             <button onClick={openPrintSettings} className="p-2 rounded-md hover:bg-white/20 transition-colors" title="Yazdırma Ayarları"><SettingsIcon /></button>
@@ -333,10 +365,13 @@ const AppContent: React.FC = () => {
         isHowToUseVisible, closeHowToUse, openHowToUse,
         isContactModalVisible, closeContactModal, openContactModal,
         isFavoritesPanelVisible, closeFavoritesPanel, openFavoritesPanel,
-        isSettingsPanelCollapsed, setIsSettingsPanelCollapsed
+        isArchivePanelVisible, closeArchivePanel, openArchivePanel,
+        isSettingsPanelCollapsed, setIsSettingsPanelCollapsed,
+        activeTab
     } = useUI();
-    const { isLoading, setIsLoading, triggerAutoRefresh } = useWorksheet();
+    const { isLoading, setIsLoading, triggerAutoRefresh, problems, title, preamble, pageCount, lastGeneratorModule } = useWorksheet();
     const { settings, setSettings } = usePrintSettings();
+    const { saveToArchive } = useArchive();
     const { addToast } = useToast();
     
     const panAreaRef = useRef<HTMLDivElement>(null);
@@ -499,6 +534,24 @@ const AppContent: React.FC = () => {
         });
     };
 
+    const handleSaveToArchive = () => {
+        if (problems.length === 0) {
+            addToast('Arşive kaydetmek için önce bir çalışma kağıdı oluşturun.', 'warning');
+            return;
+        }
+        const archiveTitle = window.prompt('Arşiv için bir isim girin:', title);
+        if (archiveTitle) {
+            saveToArchive({
+                title: archiveTitle,
+                moduleType: lastGeneratorModule || activeTab,
+                problems: problems,
+                preamble: preamble,
+                pageCount: pageCount
+            });
+            addToast('Çalışma kağıdı arşive kaydedildi.', 'success');
+        }
+    };
+
     return (
         <div className="flex flex-col h-screen bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
             
@@ -508,8 +561,10 @@ const AppContent: React.FC = () => {
                 triggerAutoRefresh={triggerAutoRefresh}
                 openPrintSettings={openPrintSettings}
                 openFavoritesPanel={openFavoritesPanel}
+                openArchivePanel={openArchivePanel}
                 openHowToUse={openHowToUse}
                 openContactModal={openContactModal}
+                handleSaveToArchive={handleSaveToArchive}
             />
 
             <header className="flex-shrink-0 bg-primary text-white shadow-md z-20 print:hidden">
@@ -568,6 +623,7 @@ const AppContent: React.FC = () => {
             <HowToUseModal isVisible={isHowToUseVisible} onClose={closeHowToUse} />
             <ContactModal isVisible={isContactModalVisible} onClose={closeContactModal} />
             <FavoritesPanel isVisible={isFavoritesPanelVisible} onClose={closeFavoritesPanel} />
+            <ArchivePanel />
         </div>
     );
 };
@@ -581,12 +637,14 @@ const App: React.FC = () => {
         <FlyingLadybugProvider>
         <ToastProvider>
         <WorksheetProvider>
+        <ArchiveProvider>
         <TutorialProvider>
             <AppContent />
             <ToastContainer />
             <TutorialGuide />
             <FirstTimeUserBanner />
         </TutorialProvider>
+        </ArchiveProvider>
         </WorksheetProvider>
         </ToastProvider>
         </FlyingLadybugProvider>

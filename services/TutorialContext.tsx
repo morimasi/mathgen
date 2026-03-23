@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 import { useUI } from './UIContext.tsx';
 
@@ -5,7 +6,8 @@ export interface TutorialStep {
     targetId: string;
     title: string;
     content: string;
-    action?: (ui: ReturnType<typeof useUI>) => void;
+    // Action can now be async to allow for UI transitions (e.g. waiting for a tab to switch)
+    action?: (ui: ReturnType<typeof useUI>) => Promise<void> | void;
     placement?: 'top' | 'bottom' | 'left' | 'right' | 'center';
 }
 
@@ -26,12 +28,20 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
     const [steps, setSteps] = useState<TutorialStep[]>([]);
     const ui = useUI();
 
-    const startTutorial = useCallback((tutorialSteps: TutorialStep[]) => {
+    const executeStepAction = async (step: TutorialStep) => {
+        if (step.action) {
+            await step.action(ui);
+            // Add a small delay after action to allow UI to settle (rendering panels etc)
+            await new Promise(resolve => setTimeout(resolve, 300)); 
+        }
+    };
+
+    const startTutorial = useCallback(async (tutorialSteps: TutorialStep[]) => {
         setSteps(tutorialSteps);
         setCurrentStepIndex(0);
         setIsTutorialActive(true);
-        if (tutorialSteps[0]?.action) {
-            tutorialSteps[0].action(ui);
+        if (tutorialSteps.length > 0) {
+            await executeStepAction(tutorialSteps[0]);
         }
     }, [ui]);
 
@@ -42,19 +52,17 @@ export const TutorialProvider: React.FC<{ children: ReactNode }> = ({ children }
         localStorage.setItem('hasSeenTutorial', 'true');
     }, []);
 
-    const goToStep = useCallback((index: number) => {
+    const goToStep = useCallback(async (index: number) => {
         if (index < 0 || index >= steps.length) {
             endTutorial();
             return;
         }
+        
+        // Execute the action for the upcoming step
         const step = steps[index];
-        if (step.action) {
-            step.action(ui);
-        }
-        // A small delay to allow UI to update (e.g., panel opening)
-        setTimeout(() => {
-            setCurrentStepIndex(index);
-        }, 150);
+        await executeStepAction(step);
+        
+        setCurrentStepIndex(index);
     }, [steps, endTutorial, ui]);
 
     return (

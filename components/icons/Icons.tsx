@@ -31,6 +31,8 @@ export const MeasurementIcon: React.FC<IconProps> = (props) => <IconWrapper {...
 export const WordProblemsIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM12 8v.01M12 11h.01" /></IconWrapper>;
 export const VisualSupportIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></IconWrapper>;
 
+export const ArchiveIcon: React.FC<IconProps> = (props) => <IconWrapper {...props}><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></IconWrapper>;
+
 export const ChevronDownIcon: React.FC<IconProps> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
